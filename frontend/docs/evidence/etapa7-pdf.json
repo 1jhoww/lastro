@@ -1,0 +1,14 @@
+{
+  "commercial": {
+    "pages": 1,
+    "bytes": 30376,
+    "has_money": true,
+    "has_commercial_total": true
+  },
+  "packing": {
+    "pages": 1,
+    "bytes": 29879,
+    "has_money": false,
+    "has_commercial_total": false
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "environment": "API real + emuladores demo locais",
+  "cases": [
+    {
+      "name": "resolução atômica de dano com aceite zero não cria dinheiro",
+      "ok": true
+    },
+    {
+      "name": "dano rejeitado encerra avaliação sem crédito, reembolso ou estoque vendável",
+      "ok": true
+    },
+    {
+      "name": "inícios concorrentes com mesma chave produzem mesma execução",
+      "ok": true
+    },
+    {
+      "name": "mesma chave com destino diferente é recusada sem trocar decisão",
+      "ok": true
+    },
+    {
+      "name": "publicação retomável restaura fonte original e destina somente caixa",
+      "ok": true
+    },
+    {
+      "name": "versão antiga de cancelamento atômico é recusada sem efeitos",
+      "ok": true
+    }
+  ],
+  "passed": 6,
+  "failed": 0
+}

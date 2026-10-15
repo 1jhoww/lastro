@@ -1,0 +1,5 @@
+# Financeiro preserva as origens D e compensa em diário próprio
+
+Recebíveis, snapshots e operações históricas D permanecem como origem imutável na migração; a Fase E materializa financialTitles e financialOrderStates somente no primeiro lançamento, validando identidade/hash da origem. Escolhemos projeções separadas e diário compensador em vez de converter e reescrever recebíveis antigos, para preservar replay e histórico sob a regra aprovada pelo usuário. Guard D, títulos, fontes, diário, auditoria e idempotência são atualizados no mesmo commit; legado com dinheiro sem origem comprovada bloqueia para revisão formal, sem inferir crédito ou pagamento.
+
+Cancelamento/restauração/devolução mantêm origem dos centavos, e crédito não nasce de excedente. Devoluções expedidas usam agregado próprio com recebimentos parciais imutáveis, bloqueio por pedido desde a intenção e resolução financeira separada; não revendável fica fora do estoque vendável e depende de aceite financeiro administrativo. Essa escolha preserva os agregados C/D e evita acrescentar depósito/quarentena ou efeito bancário sem autorização.

@@ -1,0 +1,78 @@
+{
+  "dateUtc": "2026-10-14T01:44:59.5659184Z",
+  "backendRuntime": "Node 22.23.3 existente",
+  "evidence": ["finance-c-e2e.json", "finance-c-e2e-additional.json", "finance-c-web-storage.json"],
+  "limitations": [
+    "Bundles locais não são APK/AAB ou iOS assinado.",
+    "Não houve dispositivo físico nem emulador Android/iOS.",
+    "Restart nativo usa adapter real com KV de disco de teste; Keychain/Keystore físico não foi testado.",
+    "Harness IndexedDB não é automação completa da UI.",
+    "Não executou 20.000 fontes, deploy, commit/push, produção ou recurso pago."
+  ],
+  "dependencies": "Sem alteração de dependências/lockfile; package.json mudou somente coleta Jest para ignorar .local.",
+  "phase": "C",
+  "storage": {
+    "web": "IndexedDB, transação readwrite por uid/tenant",
+    "beforePost": "persistência confirmada obrigatória",
+    "native": "SecureStore instalado, fragmentos e ponteiro de geração verificados",
+    "recovery": "GET oficial sem POST automático",
+    "unknownAdvance": "chave/payload preservados no checkpoint antes de resume explícito com novo fence"
+  },
+  "checks": {
+    "exports": "web/android/ios passed",
+    "prettier": "passed",
+    "expoDoctor": "21/21",
+    "typescriptStrict": "passed",
+    "npmCi": "passed",
+    "lint": "passed, zero erros/avisos"
+  },
+  "bundles": [
+    {
+      "bytes": 2723148,
+      "file": "_expo/static/js/web/entry-b578134fe555b49213c332226a760199.js",
+      "platform": "web",
+      "sha256": "cc72cfa6ef99a3fe123734d7f356bba1a7adf62d993fd8d6f0b4ceeeb9773dc1"
+    },
+    {
+      "bytes": 5025663,
+      "file": "_expo/static/js/android/entry-1123fa7d93f081a7e078efe42584fe65.hbc",
+      "platform": "android",
+      "sha256": "bb1a28749a767f5bf7255b60dacc55deba69b218a646f9d9453fb2865cb30aff"
+    },
+    {
+      "bytes": 4726871,
+      "file": "_expo/static/js/ios/entry-ae0fcdc895e9fc8a183a3b51b63e774e.hbc",
+      "platform": "ios",
+      "sha256": "445e99d4f4ebbdcf636b73c06d1be15fc9fcac399766ad96af5080aa00cecccd"
+    }
+  ],
+  "tests": {
+    "pending": 0,
+    "passed": 433,
+    "suites": 31,
+    "total": 433,
+    "new": 79,
+    "failed": 0
+  },
+  "backendChanges": "Nenhuma alteração de código",
+  "webStorage": {
+    "failed": 0,
+    "passed": 5,
+    "environment": "Edge headless, IndexedDB real, perfil isolado, reload e novo processo de browser"
+  },
+  "baseline": {
+    "suites": 26,
+    "total": 354,
+    "passed": 354
+  },
+  "httpE2E": {
+    "environment": "Auth/Firestore/Storage Emulator demo local",
+    "additionalPassed": 6,
+    "realReceiptSamples": [10, 101],
+    "totalPassed": 30,
+    "mainPassed": 24,
+    "failed": 0
+  },
+  "runtime": "Node 24.19.0",
+  "contract": "OpenAPI 0.8.1 / 114 operações"
+}

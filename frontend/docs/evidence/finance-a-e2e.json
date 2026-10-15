@@ -1,0 +1,72 @@
+{
+  "phase": "A",
+  "executedAt": "2026-10-13T23:13:32.847Z",
+  "environment": "demo-lastro-phase-a / loopback",
+  "mode": "HTTP do frontend + backend real, sem navegador ou aparelho físico",
+  "results": [
+    {
+      "name": "parcelas oficiais nascem na confirmação (2 × 1000 centavos)",
+      "ok": true
+    },
+    {
+      "name": "baixa parcial usa corpo produzido pelo formulário",
+      "ok": true
+    },
+    {
+      "name": "resposta perdida simulada após commit: mesma chave recupera operação sem duplicar",
+      "ok": true
+    },
+    {
+      "name": "mesma chave com corpo diferente é recusada",
+      "ok": true
+    },
+    {
+      "name": "versões antigas recusam nova intenção",
+      "ok": true
+    },
+    {
+      "name": "pagamento detalhado conserva forma efetiva e alocação",
+      "ok": true
+    },
+    {
+      "name": "baixa total do remanescente quita parcela sem alterar segunda",
+      "ok": true
+    },
+    {
+      "name": "listagem suporta situação, cliente, pedido e período",
+      "ok": true
+    },
+    {
+      "name": "página vazia filtrada conserva cursor para próximo título",
+      "ok": true
+    },
+    {
+      "name": "histórico de recebimentos pagina sem inventar total",
+      "ok": true
+    },
+    {
+      "name": "histórico financeiro usa sequência e paginação oficiais",
+      "ok": true
+    },
+    {
+      "name": "vendedor não consulta nem registra financeiro",
+      "ok": true
+    },
+    {
+      "name": "Super Admin Hepta sem vínculo não consulta tenant comercial",
+      "ok": true
+    },
+    {
+      "name": "outra empresa não acessa título nem pagamento",
+      "ok": true
+    },
+    {
+      "name": "recebimentos concorrentes com mesmas versões: apenas um aplica",
+      "ok": true
+    },
+    {
+      "name": "reconciliação paginada só conclui com complete=true",
+      "ok": true
+    }
+  ]
+}

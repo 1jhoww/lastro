@@ -1,0 +1,111 @@
+{
+  "phase": "C",
+  "api": "OpenAPI 0.8.1",
+  "environment": "Auth/Firestore/Storage Emulator demo local",
+  "cases": [
+    {
+      "name": "cancelamento atômico origina somente crédito do caixa recebido",
+      "ok": true
+    },
+    {
+      "name": "resposta atômica perdida/replay não duplica crédito ou liberação de reserva",
+      "ok": true
+    },
+    {
+      "name": "destino refund cria obrigação pendente, sem pagamento realizado",
+      "ok": true
+    },
+    {
+      "name": "novo processo recupera intenção após commit perdido sem POST automático",
+      "ok": true
+    },
+    {
+      "name": "202 aceita execução e conserva visão financeira publicada anterior",
+      "ok": true
+    },
+    {
+      "name": "outro início e escritores financeiros são bloqueados pelo lock oficial",
+      "ok": true
+    },
+    {
+      "name": "início retorna HTTP 202 real; abort prévio mantém dinheiro e pedido originais",
+      "ok": true
+    },
+    {
+      "name": "segunda sessão não avança nem assume lease ativo",
+      "ok": true
+    },
+    {
+      "name": "lease expirado mantém lock; segundo administrador retoma e cerca executor anterior",
+      "ok": true
+    },
+    {
+      "name": "passo com resposta perdida reusa chave e snapshot sem aplicar duas vezes",
+      "ok": true
+    },
+    {
+      "name": "continuação explícita publica uma única vez e rejeita abort após aplicação",
+      "ok": true
+    },
+    {
+      "name": "journal paginado só encerra com complete; contagens cumulativas",
+      "ok": true
+    },
+    {
+      "name": "provas paginadas acumulam verificação oficial separada do journal",
+      "ok": true
+    },
+    {
+      "name": "cursor assinado de provas não pode mudar ator ou limite",
+      "ok": true
+    },
+    {
+      "name": "vendedor não consulta execução, lista ou provas nem avança",
+      "ok": true
+    },
+    {
+      "name": "Super Admin não tem comércio implícito; tenant externo não encontra execução",
+      "ok": true
+    },
+    {
+      "name": "lista administrativa paginada encontra pendentes e terminais oficiais",
+      "ok": true
+    },
+    {
+      "name": "expedido não aceita cancelamento financeiro",
+      "ok": true
+    },
+    {
+      "name": "preview de devolução usa somente recebido oficial e limita dano em centavos",
+      "ok": true
+    },
+    {
+      "name": "dano sem decisão ou acima do limite é recusado",
+      "ok": true
+    },
+    {
+      "name": "resolução retomável da devolução publica parcial e mantém pendência física",
+      "ok": true
+    },
+    {
+      "name": "obrigação da devolução não representa transferência bancária",
+      "ok": true
+    },
+    {
+      "name": "histórico por ID identifica sequência e resolução publicada apenas uma vez",
+      "ok": true
+    },
+    {
+      "name": "101 recebimentos reais exigem retomável sem efeito atômico parcial",
+      "ok": true
+    }
+  ],
+  "passed": 24,
+  "failed": 0,
+  "representativeRealReceipts": [10, 101],
+  "processRestart": "Três processos Node distintos; adapter de fragmentos do frontend com KV de disco de teste; leitura GET sem POST e replay original.",
+  "limitations": [
+    "Não é teste de Keychain/Keystore físico.",
+    "Não executa 20.000 fontes, produção, deploy ou banco."
+  ]
+}

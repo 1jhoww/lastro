@@ -1,0 +1,42 @@
+{
+  "executedAt": "2026-10-15T04:01:18.401Z",
+  "browser": "Edge headless local",
+  "results": [
+    {
+      "name": "catálogo anônimo desktop carrega produto e imagem pela API pública",
+      "ok": true
+    },
+    {
+      "name": "revisão real e preparação de WhatsApp sem envio ou navegação externa",
+      "ok": true
+    },
+    {
+      "name": "catálogo responsivo 390px preserva seleção e revisão",
+      "ok": true
+    },
+    {
+      "name": "login local e relatório administrativo com valor comercial",
+      "ok": true
+    },
+    {
+      "name": "PDF autenticado abre Blob local e download preserva nome/bytes",
+      "ok": true
+    },
+    {
+      "name": "CSV real baixa página UTF-8/BOM pelo navegador",
+      "ok": true
+    },
+    {
+      "name": "configuração mostra endereço público copiável e versão corrente",
+      "ok": true
+    },
+    {
+      "name": "logout revoga URL temporária sem recarregar o documento web",
+      "ok": true
+    },
+    {
+      "name": "sem erros JavaScript durante E2E",
+      "ok": true
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+node_modules
+dist
+.expo
+.local
+contract/openapi.json
+src/api/schema.d.ts

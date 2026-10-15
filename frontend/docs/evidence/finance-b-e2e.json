@@ -1,0 +1,141 @@
+{
+  "phase": "B",
+  "executedAt": "2026-10-13T23:53:32.456Z",
+  "environment": "demo-lastro-phase-a / loopback",
+  "mode": "HTTP do cliente do frontend + backend real e emuladores; sem navegador ou dispositivo",
+  "fixtures": "Créditos/obrigações originados por cancelamento atômico pequeno via API. Nenhuma execução F02. Comprovantes financeiros sintéticos, sem transferência bancária.",
+  "results": [
+    {
+      "name": "presets e forma recebem versões e status oficiais",
+      "ok": true
+    },
+    {
+      "name": "criação de forma é idempotente com resposta original",
+      "ok": true
+    },
+    {
+      "name": "condição personalizada aceita doze parcelas e pesos",
+      "ok": true
+    },
+    {
+      "name": "prazos fora de ordem e pesos inválidos são recusados",
+      "ok": true
+    },
+    {
+      "name": "preview comercial usa condição e método ativos sem liquidar",
+      "ok": true
+    },
+    {
+      "name": "desconto administrativo aprova somente rascunho e registra snapshot",
+      "ok": true
+    },
+    {
+      "name": "desativação de cadastro preserva snapshots confirmados",
+      "ok": true
+    },
+    {
+      "name": "versão antiga de cadastro recebe conflito",
+      "ok": true
+    },
+    {
+      "name": "opções ativas deixam de listar condições e formas desativadas",
+      "ok": true
+    },
+    {
+      "name": "reativação e GET individual conservam versão oficial",
+      "ok": true
+    },
+    {
+      "name": "desconto em confirmado é recusado sem alterar snapshot",
+      "ok": true
+    },
+    {
+      "name": "fontes legítimas mostram origem e paginação sem total fictício",
+      "ok": true
+    },
+    {
+      "name": "aplicação parcial usa payload do formulário e reduz saldo da fonte",
+      "ok": true
+    },
+    {
+      "name": "resposta perdida após commit recupera aplicação original sem duplicar",
+      "ok": true
+    },
+    {
+      "name": "crédito insuficiente é recusado pelo servidor",
+      "ok": true
+    },
+    {
+      "name": "estorno parcial de crédito restaura fonte original",
+      "ok": true
+    },
+    {
+      "name": "histórico de aplicações preserva original, estornado e referência da fonte",
+      "ok": true
+    },
+    {
+      "name": "estorno de dinheiro usa saldo reversível e atualiza recebível",
+      "ok": true
+    },
+    {
+      "name": "replay de estorno não repete restituição de saldo",
+      "ok": true
+    },
+    {
+      "name": "estorno superior ao remanescente é recusado",
+      "ok": true
+    },
+    {
+      "name": "obrigação pendente não significa dinheiro devolvido",
+      "ok": true
+    },
+    {
+      "name": "confirmação manual registra comprovante e quita parcialmente obrigação",
+      "ok": true
+    },
+    {
+      "name": "replay de confirmação não registra segundo reembolso",
+      "ok": true
+    },
+    {
+      "name": "reembolso superior à obrigação é recusado",
+      "ok": true
+    },
+    {
+      "name": "listagem de obrigações respeita cliente e pedido",
+      "ok": true
+    },
+    {
+      "name": "confirmação integral encerra obrigação manual com saldo zero",
+      "ok": true
+    },
+    {
+      "name": "versões antigas em nova aplicação são recusadas",
+      "ok": true
+    },
+    {
+      "name": "vendedor não aplica, estorna, confirma reembolso nem configura cadastros",
+      "ok": true
+    },
+    {
+      "name": "Super Admin sem vínculo não consulta créditos comerciais",
+      "ok": true
+    },
+    {
+      "name": "outro tenant não acessa pagamento, aplicação ou obrigação",
+      "ok": true
+    },
+    {
+      "name": "concorrência entre aplicações usa guarda e aplica apenas uma",
+      "ok": true
+    },
+    {
+      "name": "estorno em pedido cancelado não reabre dívida",
+      "ok": true
+    },
+    {
+      "name": "journal registra operações B e mantém reconciliação consistente",
+      "ok": true
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "executedAt": "2026-10-15T03:41:46.889Z",
+  "environment": "local API + Auth/Firestore/Storage emulators",
+  "results": [
+    {
+      "name": "configuração inicial ausente; PUT autorizado e replay da mesma intenção",
+      "ok": true
+    },
+    {
+      "name": "versão antiga conflita; vendedor e plataforma não configuram catálogo",
+      "ok": true
+    },
+    {
+      "name": "perfil público anônimo e CORS sem identidade privada",
+      "ok": true
+    },
+    {
+      "name": "produtos públicos selecionados, busca/categoria e detalhe sem estoque ou SKU",
+      "ok": true
+    },
+    {
+      "name": "imagem WebP pública somente via API",
+      "ok": true
+    },
+    {
+      "name": "preview usa centavos inteiros e arredondamento oficial",
+      "ok": true
+    },
+    {
+      "name": "WhatsApp conserva linhas e revisão, sem criar pedido ou reserva",
+      "ok": true
+    },
+    {
+      "name": "preços ocultos são null; revisão anterior recebe QUOTE_CHANGED",
+      "ok": true
+    },
+    {
+      "name": "quantidade inválida e produto privado recusados na prévia",
+      "ok": true
+    },
+    {
+      "name": "CSV clientes preserva BOM, fórmula neutralizada, filtros e paginação real",
+      "ok": true
+    },
+    {
+      "name": "CSV produtos limita seleção pública e não inventa estoque",
+      "ok": true
+    },
+    {
+      "name": "CSV pedidos respeita estado/cliente e montante comercial",
+      "ok": true
+    },
+    {
+      "name": "CSV recebíveis usa vencimento e saldo oficial, distinto de recebido",
+      "ok": true
+    },
+    {
+      "name": "vendedor e plataforma não exportam; empresa alheia não recebe dados",
+      "ok": true
+    },
+    {
+      "name": "PDF comercial e romaneio são bytes reais com nome seguro e no-store",
+      "ok": true
+    },
+    {
+      "name": "vendedor baixa PDF próprio da carteira; outra empresa e plataforma não acessam",
+      "ok": true
+    },
+    {
+      "name": "transferência de carteira revoga documento do vendedor anterior",
+      "ok": true
+    }
+  ],
+  "artifacts": {
+    "customers.csv": "0d9d4598bc703f1d3a3d912f41b65609f5ba486a78c0c7fd23f91f75c63def8a",
+    "commercial.pdf": "5317ee108a51fbca436860dc8135a871201fe3a40a6473f15b8f2c732b873acf",
+    "packing.pdf": "ecd5fc45dcac38d45fcd1fc167ab5015485dba1cdc731ab7173a644d8840eea1"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "environment": "Edge headless local com IndexedDB real",
+  "cases": [
+    {
+      "name": "Reload recupera chave e corpo no IndexedDB real",
+      "ok": true
+    },
+    {
+      "name": "Novo processo Edge recupera intenção sem memória JavaScript anterior",
+      "ok": true
+    },
+    {
+      "name": "Outra conta ou empresa não lê partição anterior",
+      "ok": true
+    },
+    {
+      "name": "Conexões concorrentes não perdem atualização nem chave",
+      "ok": true
+    },
+    {
+      "name": "Transação inválida aborta e preserva snapshot anterior",
+      "ok": true
+    }
+  ],
+  "passed": 5,
+  "limitations": [
+    "Harness do adapter real, não E2E completo da UI.",
+    "Não valida Keychain/Keystore em dispositivo físico.",
+    "Profile de teste isolado em .local/finance."
+  ]
+}

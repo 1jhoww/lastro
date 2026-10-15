@@ -1,0 +1,85 @@
+{
+  "stage": 7,
+  "executedAt": "2026-10-15T04:04:26.667Z",
+  "contract": "OpenAPI 0.8.1 / 114 operations",
+  "runtime": {
+    "frontend": "v24.19.0",
+    "backend": "22.23.3",
+    "expo": "57.0.29"
+  },
+  "checks": {
+    "npmCi": "passed, 1166 packages; final lockfile",
+    "typescriptStrict": "passed",
+    "lint": "passed, zero errors/warnings",
+    "prettier": "passed",
+    "expoDoctor": "21/21",
+    "exports": "web, Android Hermes, iOS Hermes passed"
+  },
+  "tests": {
+    "baseline": 433,
+    "passed": 524,
+    "new": 91,
+    "suites": 37,
+    "failed": 0
+  },
+  "e2e": {
+    "http": {
+      "passed": 17,
+      "total": 17
+    },
+    "web": {
+      "passed": 9,
+      "total": 9,
+      "target": "final exported web bundle served on loopback, Edge headless, desktop and 390px viewport"
+    }
+  },
+  "bundles": [
+    {
+      "platform": "web",
+      "file": "export/_expo/static/js/web/entry-3c5065f76724d90c4b5b5d0b9abc19a6.js",
+      "bytes": 2765836,
+      "sha256": "95dbe2a6e9fbb5c51547910cff126985df602a7789b6ce3c244aab932e85bbf6"
+    },
+    {
+      "platform": "android",
+      "file": "export/_expo/static/js/android/entry-da28347e9150fac84f12f8705e045cb3.hbc",
+      "bytes": 5161155,
+      "sha256": "ff57180ed25b6dd6e04e779fe883b4f7ba5462452f0f4b4887c72da2e7fd0a4f"
+    },
+    {
+      "platform": "ios",
+      "file": "export/_expo/static/js/ios/entry-1fd348166c934dca1ad0e28da5206b5a.hbc",
+      "bytes": 4861159,
+      "sha256": "fa71195538865518777f51cbe90ff20685cd26ab24763a526ce9cd2bdd34625c"
+    }
+  ],
+  "hashes": {
+    "lockfile": "c69510e761fb276e2380a23ed3c68bfe6bff32d9da675fdcb8e8ff4ff1e078a5",
+    "openapi": "5087826934ac2a49a05a59ddf3a2ea6ee9d0ad76eb059a848addaf611a44355d"
+  },
+  "dependencyAudit": {
+    "info": 0,
+    "low": 0,
+    "moderate": 17,
+    "high": 54,
+    "critical": 0,
+    "total": 71
+  },
+  "cleanup": {
+    "localServices": "API, web server and emulator process trees stopped; ports 3000/8097/8080/9099/9199 verified without listeners",
+    "seedCredentialRemoved": true,
+    "browserFixtureRemoved": true
+  },
+  "nativeBuilds": {
+    "android": "not executed: Android SDK/adb/Gradle unavailable",
+    "ios": "not executed: Windows host, Xcode unavailable",
+    "signedArtifacts": false,
+    "physicalDevices": false,
+    "nativeEmulators": false
+  },
+  "limits": [
+    "CSV is one page, no global snapshot or invented aggregation",
+    "Native filesystem/sharing tests use controlled adapters; no physical device claim",
+    "No backend edits, deploy, production, commit/push, paid resources or automated WhatsApp sending"
+  ]
+}

@@ -1,0 +1,12 @@
+node_modules
+dist
+coverage
+.cache
+.local
+.firebase
+package-lock.json
+docs/api/generated-types.ts
+docs/api/openapi.json
+*-debug.log
+reports
+.env

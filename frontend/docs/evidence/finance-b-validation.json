@@ -1,0 +1,77 @@
+{
+  "phase": "B",
+  "recordedAt": "2026-10-14T00:04:18.0293295Z",
+  "runtime": "Node 24.19.0 / Windows",
+  "contract": {
+    "version": "0.8.1",
+    "operations": 114
+  },
+  "dependenciesChanged": false,
+  "tests": {
+    "failed": 0,
+    "command": "jest --runInBand --json --outputFile=.local/finance/frontend-b-tests.json",
+    "skipped": 0,
+    "success": true,
+    "failedSuites": 0,
+    "phaseB": 61,
+    "previous": 293,
+    "passed": 354,
+    "passedSuites": 26
+  },
+  "typecheck": {
+    "command": "tsc --noEmit",
+    "exitCode": 0
+  },
+  "lint": {
+    "command": "expo lint",
+    "warnings": 0,
+    "exitCode": 0
+  },
+  "formatting": {
+    "command": "prettier --check .",
+    "exitCode": 0
+  },
+  "doctor": {
+    "command": "expo-doctor",
+    "passed": 21,
+    "total": 21,
+    "exitCode": 0
+  },
+  "export": {
+    "nativeSignedBuild": false,
+    "command": "expo export --platform all --output-dir .local/finance/export-b",
+    "artifacts": [
+      {
+        "bytes": 4911096,
+        "path": ".local/finance/export-b/_expo/static/js/android/entry-e5efd0f071598f597b05573896299a8e.hbc",
+        "sha256": "34505365d3f01b3a20cd1b68461c075f106232fd26f5a10aca046b3c072c138d"
+      },
+      {
+        "bytes": 4613015,
+        "path": ".local/finance/export-b/_expo/static/js/ios/entry-32907cbc41ffb5df1564d1f195b9fa6f.hbc",
+        "sha256": "d14b665edd3f0acb5a067a20fb2d5e9575b3582d633a0f0aa1648150a62c46d5"
+      },
+      {
+        "bytes": 2665602,
+        "path": ".local/finance/export-b/_expo/static/js/web/entry-ec557846e2cb7dc90770dfb68a526622.js",
+        "sha256": "d016ecf0da863820aab4fc14166f83f8d3a0d0fd8036e844cf5c252bba5ffc7d"
+      }
+    ],
+    "physicalDeviceTest": false,
+    "exitCode": 0
+  },
+  "e2e": {
+    "fixtures": "Origem financeira legítima via API atômica pequena; comprovantes sintéticos; nenhuma transferência bancária",
+    "evidence": "finance-b-e2e.json",
+    "failed": 0,
+    "environment": "demo-lastro-phase-a / loopback / Auth-Firestore-Storage Emulator",
+    "passed": 33,
+    "browserAutomation": false
+  },
+  "phaseCStarted": false,
+  "executorFrontendImplemented": false,
+  "f02PostSent": false,
+  "backendSourceChanged": false,
+  "deployed": false,
+  "commitCreated": false
+}

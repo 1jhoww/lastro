@@ -1,0 +1,79 @@
+{
+  "phase": "A",
+  "recordedAt": "2026-10-13T23:15:19.1024993Z",
+  "contract": {
+    "operations": 114,
+    "version": "0.8.1"
+  },
+  "runtime": "Node 24.19.0 / Windows",
+  "installation": {
+    "lockfileChanged": false,
+    "command": "npm ci --no-audit --no-fund",
+    "exitCode": 0,
+    "warning": "Peer herdado de test-renderer/react-reconciler requer React 19.3; projeto usa React 19.2.3"
+  },
+  "tests": {
+    "command": "node node_modules/jest/bin/jest.js --runInBand --json --outputFile=.local/finance/frontend-tests.json",
+    "failedSuites": 0,
+    "passedSuites": 23,
+    "previous": 252,
+    "failed": 0,
+    "skipped": 0,
+    "success": true,
+    "finance": 41,
+    "passed": 293
+  },
+  "typecheck": {
+    "exitCode": 0,
+    "command": "tsc --noEmit"
+  },
+  "lint": {
+    "exitCode": 0,
+    "command": "expo lint"
+  },
+  "formatting": {
+    "exitCode": 0,
+    "command": "prettier --check ."
+  },
+  "doctor": {
+    "total": 21,
+    "command": "expo-doctor",
+    "passed": 21,
+    "exitCode": 0
+  },
+  "export": {
+    "nativeSignedBuild": false,
+    "artifacts": [
+      {
+        "sha256": "de1658530749659f83f7758fe36ed61a02bccacde1724b106f6d486fd910e0e9",
+        "bytes": 4822194,
+        "path": ".local/finance/export/_expo/static/js/android/entry-d9a070020188a5f6f28ec675981ce484.hbc"
+      },
+      {
+        "sha256": "11eed2bf9033b1297bc9d6d26013caa211e2a69451ebf31198229dcb5e370ce9",
+        "bytes": 4524995,
+        "path": ".local/finance/export/_expo/static/js/ios/entry-2aa1884b4abc7d951edf5721ce58d486.hbc"
+      },
+      {
+        "sha256": "b558540433759debadcf06a7fe15d3ae9d7d9cfe88d99f08d0fb4121b08dcaf6",
+        "bytes": 2607137,
+        "path": ".local/finance/export/_expo/static/js/web/entry-4d5044f00269137accbf35961090218c.js"
+      }
+    ],
+    "command": "expo export --platform all --output-dir .local/finance/export",
+    "exitCode": 0,
+    "physicalDeviceTest": false
+  },
+  "e2e": {
+    "environment": "Auth/Firestore/Storage Emulator / demo-lastro-phase-a / loopback",
+    "failed": 0,
+    "passed": 16,
+    "evidence": "finance-a-e2e.json",
+    "browserAutomation": false
+  },
+  "phaseB": "pending",
+  "phaseC": "pending",
+  "executorFrontendImplemented": false,
+  "backendSourceChanged": false,
+  "deployed": false
+}
