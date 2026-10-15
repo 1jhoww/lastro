@@ -45,3 +45,7 @@ yarn-error.*
 .local/
 firebase-debug.log
 firestore-debug.log
+
+.vercel
+.env*
+!.env.example

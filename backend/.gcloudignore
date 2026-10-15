@@ -1,0 +1,14 @@
+.gcloudignore
+.git
+node_modules/
+dist/
+coverage/
+.cache/
+.local/
+.firebase/
+reports/
+tests/
+docs/
+*.log
+.env
+.env.*
