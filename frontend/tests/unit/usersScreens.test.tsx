@@ -18,6 +18,14 @@ const member = (id: string, o: Record<string, unknown> = {}) => ({
   ...o,
 });
 
+const profissional = {
+  code: 'profissional',
+  name: 'Profissional',
+  userLimit: 2,
+  features: ['users.invite', 'catalog.public', 'commercial.sellers'],
+};
+const essencial = { code: 'essencial', name: 'Essencial', userLimit: 1, features: [] };
+
 function world(
   role: 'administrator' | 'seller' = 'administrator',
   items: unknown[] = [
@@ -25,6 +33,9 @@ function world(
     member('s1', { name: 'Bruno Vendas', email: 'bruno@lastro.test' }),
     member('s2', { email: 'carla@lastro.test', status: 'disabled' }),
   ],
+  // Vagas calculadas pelo servidor (ativos, convites reservados e livres).
+  capacity: object = { userLimit: 4, activeUsers: 2, reservedInvitations: 1, available: 1 },
+  plan?: object,
 ) {
   const gateway = new FakeGateway({
     initialUser: { uid: 'u1', email: 'ana@lastro.test', emailVerified: true },
@@ -35,12 +46,13 @@ function world(
         uid: 'u1',
         email: 'ana@lastro.test',
         platformAdmin: false,
-        memberships: [membership('t1', role)],
+        memberships: [{ ...membership('t1', role), ...(plan ? { plan } : {}) }],
       }),
     )
     .on('GET', '/api/v1/users', () =>
       ok({
         items,
+        capacity,
         nextCursor: null,
         pendingInvitations: [
           {
@@ -180,6 +192,68 @@ describe('usuários', () => {
     expect(screen.queryByRole('radio', { name: 'Vendedor' })).toBeNull();
     expect(screen.getByLabelText('Acesso ativo').props.disabled).toBe(true);
     expect(screen.getByRole('button', { name: 'Salvar usuário' })).toBeDisabled();
+  });
+
+  it('Essencial mostra a vaga ocupada e não oferece convite nem perfil Vendedor', async () => {
+    const { gateway, server } = world(
+      'administrator',
+      [
+        member('u1', { role: 'administrator', name: 'Ana Dona' }),
+        member('a2', { role: 'administrator', name: 'Davi Admin', status: 'disabled' }),
+      ],
+      { userLimit: 1, activeUsers: 1, reservedInvitations: 0, available: 0 },
+      essencial,
+    );
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/configuracoes/usuarios',
+      overrides,
+    });
+    expect(await screen.findByText('Plano Essencial')).toBeTruthy();
+    expect(screen.getByText('Sem vagas livres')).toBeTruthy();
+    expect(screen.getByText('Convites adicionais não fazem parte do seu plano')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Convidar usuário' })).toBeNull();
+    // Reativar exigiria vaga: a tela explica antes de o servidor recusar.
+    await fireEvent.press(screen.getByRole('button', { name: 'Editar Davi Admin' }));
+    expect(await screen.findByText('Sem vaga para reativar')).toBeTruthy();
+    expect(screen.getByLabelText('Acesso ativo').props.disabled).toBe(true);
+    expect(screen.queryByRole('radio', { name: 'Vendedor' })).toBeNull();
+    expect(screen.getByText('O perfil Vendedor faz parte do plano Profissional.')).toBeTruthy();
+  });
+
+  it('Profissional sem vagas livres orienta a liberar uma vaga', async () => {
+    const { gateway, server } = world(
+      'administrator',
+      undefined,
+      { userLimit: 2, activeUsers: 1, reservedInvitations: 1, available: 0 },
+      profissional,
+    );
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/configuracoes/usuarios',
+      overrides,
+    });
+    expect(await screen.findByText('Todas as vagas do plano estão ocupadas')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Convidar usuário' })).toBeNull();
+  });
+
+  it('suporte Lastro aparece identificado e não conta como administrador da empresa', async () => {
+    const { gateway, server } = world('administrator', [
+      member('u1', { role: 'seller', name: 'Ana (vendedora)' }),
+      member('a3', { role: 'administrator', name: 'Eva Admin' }),
+      member('sup', { role: 'administrator', name: 'Suporte', seatExempt: true }),
+    ]);
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/configuracoes/usuarios',
+      overrides,
+    });
+    expect(await screen.findByText('Suporte Lastro')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Editar Eva Admin' }));
+    expect(await screen.findByText('Único administrador ativo')).toBeTruthy();
   });
 
   it('vendedor não acessa a gestão de usuários nem consulta a API', async () => {

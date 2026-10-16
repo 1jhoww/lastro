@@ -5,8 +5,7 @@ import Companies from '@/app/plataforma/empresas/index';
 import Company from '@/app/plataforma/empresas/[id]';
 import Charges from '@/app/plataforma/cobrancas';
 import Invitations from '@/app/plataforma/convites';
-import Users from '@/app/(app)/configuracoes/usuarios';
-import { createFakeApi, membership, ok } from '../support/fakeApi';
+import { createFakeApi, ok } from '../support/fakeApi';
 import { FakeGateway } from '../support/fakeGateway';
 import { renderApp } from '../support/renderApp';
 
@@ -17,7 +16,6 @@ const overrides = {
   'plataforma/empresas/[id]': Company,
   'plataforma/cobrancas': Charges,
   'plataforma/convites': Invitations,
-  '(app)/configuracoes/usuarios': Users,
 };
 const now = '2026-10-01T12:00:00.000Z';
 
@@ -383,98 +381,5 @@ describe('Super Admin: cobranças e convites', () => {
     const call = server.calls.find((c) => c.method === 'POST')!;
     expect(call.body).toEqual({ ownerEmail: 'dono@nova.test', expectedVersion: 1 });
     expect(call.headers['idempotency-key']).toMatch(/^[0-9a-f-]{36}$/);
-  });
-});
-
-describe('Empresa: usuários e limites do plano', () => {
-  function tenantWorld(plan: object, capacity: object) {
-    const gateway = new FakeGateway({
-      initialUser: { uid: 'u1', email: 'ana@lastro.test', emailVerified: true },
-    });
-    const server = createFakeApi()
-      .on('GET', '/api/v1/me', () =>
-        ok({
-          uid: 'u1',
-          email: 'ana@lastro.test',
-          platformAdmin: false,
-          memberships: [{ ...membership('t1'), plan }],
-        }),
-      )
-      .on('GET', '/api/v1/users', () =>
-        ok({
-          items: [
-            {
-              id: 'u1',
-              role: 'administrator',
-              status: 'active',
-              seatExempt: false,
-              version: 1,
-              createdAt: now,
-              updatedAt: now,
-            },
-          ],
-          nextCursor: null,
-          pendingInvitations: [],
-          capacity,
-        }),
-      );
-    return { gateway, server };
-  }
-
-  it('Essencial mostra a vaga ocupada e não oferece convite', async () => {
-    const { gateway, server } = tenantWorld(
-      { code: 'essencial', name: 'Essencial', userLimit: 1, features: [] },
-      { userLimit: 1, activeUsers: 1, reservedInvitations: 0, available: 0 },
-    );
-    await renderApp({
-      gateway,
-      fetch: server.fetch,
-      initialUrl: '/configuracoes/usuarios',
-      overrides,
-    });
-    expect(await screen.findByText('Plano Essencial')).toBeTruthy();
-    expect(screen.getByText('Convites adicionais não fazem parte do seu plano')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Gerar convite' })).toBeNull();
-  });
-
-  it('Profissional com vaga livre oferece convite com perfil vendedor', async () => {
-    const { gateway, server } = tenantWorld(
-      {
-        code: 'profissional',
-        name: 'Profissional',
-        userLimit: 2,
-        features: ['users.invite', 'catalog.public', 'commercial.sellers'],
-      },
-      { userLimit: 2, activeUsers: 1, reservedInvitations: 0, available: 1 },
-    );
-    await renderApp({
-      gateway,
-      fetch: server.fetch,
-      initialUrl: '/configuracoes/usuarios',
-      overrides,
-    });
-    expect(await screen.findByText('1 livre(s)')).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Gerar convite' })).toBeTruthy();
-    expect(screen.getByRole('radio', { name: 'Vendedor' })).toBeTruthy();
-  });
-
-  it('Profissional sem vagas livres orienta a liberar uma vaga', async () => {
-    const { gateway, server } = tenantWorld(
-      {
-        code: 'profissional',
-        name: 'Profissional',
-        userLimit: 2,
-        features: ['users.invite', 'catalog.public', 'commercial.sellers'],
-      },
-      { userLimit: 2, activeUsers: 1, reservedInvitations: 1, available: 0 },
-    );
-    await renderApp({
-      gateway,
-      fetch: server.fetch,
-      initialUrl: '/configuracoes/usuarios',
-      overrides,
-    });
-    expect(await screen.findByText('Todas as vagas do plano estão ocupadas')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Gerar convite' })).toBeNull();
   });
 });

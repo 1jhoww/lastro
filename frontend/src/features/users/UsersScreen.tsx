@@ -7,8 +7,9 @@ import { z } from 'zod';
 import { unwrap } from '@/api/client';
 import { toApiError } from '@/api/errors';
 import { queryKeys } from '@/api/queryKeys';
-import type { Member, PendingInvitation, Role } from '@/api/types';
+import type { Member, MembershipPlan, PendingInvitation, Role, UsersPage } from '@/api/types';
 import { IssuedInviteCard } from '@/features/invitations/IssuedInviteCard';
+import { featureLabel } from '@/features/platform/copy';
 import { Screen } from '@/layout/Screen';
 import { formatDate } from '@/lib/dates';
 import { roleLabel, useSession, useTenantApi } from '@/session/SessionContext';
@@ -45,15 +46,21 @@ const roleOptions: { value: Role; label: string }[] = [
   { value: 'administrator', label: 'Administrador' },
 ];
 
+/** Perfis oferecidos: sem o recurso de vendedores no plano, só administrador. */
+const rolesFor = (sellers: boolean) =>
+  sellers ? roleOptions : roleOptions.filter((o) => o.value === 'administrator');
+
 /**
  * Equipe da empresa: pessoas com acesso e convites pendentes. Novas pessoas entram só por
  * convite; aqui se muda perfil e situação. O servidor é a autoridade: recusa tirar o último
- * administrador ativo, passar do limite do plano ou mexer em outra empresa. A tela só esconde
- * o que não se aplica (a própria conta, por exemplo).
+ * administrador ativo, passar do limite do plano ou mexer em outra empresa. Vagas e recursos
+ * do plano vêm do backend (`capacity` da listagem e `plan.features` do /me); a tela só esconde
+ * o que o plano não oferece e o que não se aplica (a própria conta, por exemplo).
  */
 export function UsersScreen() {
   const { api, tenantId, header } = useTenantApi();
-  const { user } = useSession();
+  const { user, membership } = useSession();
+  const plan = membership?.plan ?? null;
   const compact = useLayoutSize() === 'compact';
   const [inviting, setInviting] = useState(false);
   const [editing, setEditing] = useState<Member | null>(null);
@@ -71,17 +78,22 @@ export function UsersScreen() {
   const members = users.data?.pages.flatMap((p) => p.items) ?? [];
   // Convites pendentes vêm completos na primeira página.
   const pending = users.data?.pages[0]?.pendingInvitations ?? [];
+  // Vagas calculadas pelo servidor; o suporte Lastro (seatExempt) não ocupa vaga.
+  const capacity = users.data?.pages[0]?.capacity ?? null;
+  const canInvite = plan?.features.includes('users.invite') ?? false;
+  const sellers = plan?.features.includes('commercial.sellers') ?? false;
+  const hasSeat = (capacity?.available ?? 0) > 0;
+  // Último administrador da própria empresa: o acesso de suporte não conta (como no servidor).
   const activeAdmins = members.filter(
-    (m) => m.role === 'administrator' && m.status === 'active',
+    (m) => m.role === 'administrator' && m.status === 'active' && !m.seatExempt,
   ).length;
-  const active = members.filter((m) => m.status === 'active').length;
 
   const columns: Column<Member>[] = [
     {
       key: 'name',
       label: 'Nome',
       flex: 3,
-      render: (m) => <MemberName member={m} you={m.id === user?.uid} />,
+      render: (m) => <MemberName member={m} you={m.id === user?.uid} nameOnly />,
     },
     {
       key: 'email',
@@ -111,20 +123,32 @@ export function UsersScreen() {
     <Screen
       title="Usuários"
       description={
-        users.isPending
-          ? 'Pessoas com acesso à empresa.'
-          : `${active} ${active === 1 ? 'ativo' : 'ativos'} · ${pending.length} ${pending.length === 1 ? 'convite pendente' : 'convites pendentes'}. Cada um ocupa uma vaga do plano.`
+        capacity
+          ? `${capacity.activeUsers} ${capacity.activeUsers === 1 ? 'ativo' : 'ativos'} · ${capacity.reservedInvitations} ${capacity.reservedInvitations === 1 ? 'convite pendente' : 'convites pendentes'}. Cada um ocupa uma vaga do plano.`
+          : 'Pessoas com acesso à empresa.'
       }
       actions={
-        <Button
-          label="Convidar usuário"
-          icon={UserPlus}
-          variant="strong"
-          fullWidth={compact}
-          onPress={() => setInviting(true)}
-        />
+        canInvite && hasSeat ? (
+          <Button
+            label="Convidar usuário"
+            icon={UserPlus}
+            variant="strong"
+            fullWidth={compact}
+            onPress={() => setInviting(true)}
+          />
+        ) : undefined
       }
     >
+      {plan && capacity ? <SeatsPanel plan={plan} capacity={capacity} /> : null}
+      {!plan || !capacity ? null : !canInvite ? (
+        <Alert title="Convites adicionais não fazem parte do seu plano">
+          {`O plano ${plan.name ?? 'contratado'} permite ${plan.userLimit === 1 ? '1 usuário' : `${plan.userLimit} usuários`}. Para convidar mais pessoas, fale com o Lastro sobre o plano Profissional.`}
+        </Alert>
+      ) : !hasSeat ? (
+        <Alert tone="warning" title="Todas as vagas do plano estão ocupadas">
+          Revogue um convite pendente ou desative um usuário para liberar uma vaga.
+        </Alert>
+      ) : null}
       {users.isError ? (
         <Alert
           tone="danger"
@@ -203,15 +227,21 @@ export function UsersScreen() {
         )}
       </Panel>
 
-      <InviteDialog visible={inviting} onClose={() => setInviting(false)} />
+      <InviteDialog visible={inviting} sellers={sellers} onClose={() => setInviting(false)} />
       {editing ? (
         <EditMemberDialog
           // Remonta a cada pessoa, com os valores atuais dela.
           key={`${editing.id}:${editing.version}`}
           member={editing}
           onlyAdmin={
-            editing.role === 'administrator' && editing.status === 'active' && activeAdmins <= 1
+            editing.role === 'administrator' &&
+            editing.status === 'active' &&
+            !editing.seatExempt &&
+            activeAdmins <= 1
           }
+          sellers={sellers}
+          // Reativar ocupa uma vaga, exceto o acesso de suporte; o servidor confirma.
+          canReactivate={editing.seatExempt || hasSeat}
           onClose={() => setEditing(null)}
         />
       ) : null}
@@ -219,18 +249,59 @@ export function UsersScreen() {
   );
 }
 
-function MemberName({ member: m, you }: { member: Member; you: boolean }) {
+/** Plano contratado e vagas: usuários ativos e convites pendentes. */
+function SeatsPanel({ plan, capacity }: { plan: MembershipPlan; capacity: UsersPage['capacity'] }) {
+  const used = capacity.activeUsers + capacity.reservedInvitations;
+  return (
+    <Panel
+      title={`Plano ${plan.name ?? 'contratado'}`}
+      description={`${used} de ${capacity.userLimit} ${capacity.userLimit === 1 ? 'vaga em uso' : 'vagas em uso'}`}
+      action={
+        <Badge
+          label={
+            capacity.available
+              ? `${capacity.available} ${capacity.available === 1 ? 'vaga livre' : 'vagas livres'}`
+              : 'Sem vagas livres'
+          }
+          tone={capacity.available ? 'success' : 'warning'}
+        />
+      }
+    >
+      <Text variant="small" color={color.textSecondary}>
+        {plan.features.length
+          ? `Recursos do plano: ${plan.features.map((f) => featureLabel[f]).join(', ')}.`
+          : 'Inclui clientes, produtos, pedidos, financeiro, relatórios e documentos. Convites adicionais, vitrine e vendedores fazem parte do Profissional.'}
+      </Text>
+    </Panel>
+  );
+}
+
+/**
+ * Nome da pessoa. Na tabela (`nameOnly`), sem nome cadastrado a coluna não repete o e-mail,
+ * que já tem coluna própria; nas linhas empilhadas, o e-mail identifica a pessoa.
+ */
+function MemberName({
+  member: m,
+  you,
+  nameOnly,
+}: {
+  member: Member;
+  you: boolean;
+  nameOnly?: boolean;
+}) {
+  const missing = nameOnly && !m.name;
   return (
     <View style={styles.nameRow}>
       <Text
-        variant="bodyStrong"
+        variant={missing ? 'body' : 'bodyStrong'}
         numberOfLines={1}
         style={styles.flexShrink}
-        color={m.status === 'active' ? color.text : color.textSecondary}
+        color={m.status === 'active' && !missing ? color.text : color.textSecondary}
       >
-        {memberLabel(m)}
+        {missing ? 'Nome não informado' : memberLabel(m)}
       </Text>
       {you ? <Badge label="Você" /> : null}
+      {m.seatExempt ? <Badge label="Suporte Lastro" tone="accent" /> : null}
     </View>
   );
 }
@@ -248,12 +319,20 @@ function StatusBadge({ member }: { member: Member }) {
 function EditMemberDialog({
   member,
   onlyAdmin,
+  sellers,
+  canReactivate,
   onClose,
 }: {
   member: Member;
   onlyAdmin: boolean;
+  /** Plano inclui vendedores; quem já é vendedor mantém o perfil. */
+  sellers: boolean;
+  /** Há vaga para voltar a ativar (ou é acesso de suporte, que não ocupa vaga). */
+  canReactivate: boolean;
   onClose: () => void;
 }) {
+  const options = sellers || member.role === 'seller' ? roleOptions : rolesFor(false);
+  const blockReactivation = member.status === 'disabled' && !canReactivate;
   const toast = useToast();
   const update = useUpdateMember();
   const [role, setRole] = useState<Role>(member.role);
@@ -314,26 +393,39 @@ function EditMemberDialog({
             mudar o perfil ou desativar este acesso.
           </Alert>
         ) : null}
+        {blockReactivation ? (
+          <Alert tone="warning" title="Sem vaga para reativar">
+            Todas as vagas do plano estão ocupadas. Revogue um convite ou desative outra pessoa
+            antes de reativar este acesso.
+          </Alert>
+        ) : null}
         <View style={styles.field}>
           <Text variant="smallStrong">Perfil</Text>
-          {onlyAdmin ? (
+          {onlyAdmin || options.length === 1 ? (
             <Text variant="body">{roleLabel[role]}</Text>
           ) : (
-            <Segmented<Role> label="Perfil" value={role} onChange={setRole} options={roleOptions} />
+            <Segmented<Role> label="Perfil" value={role} onChange={setRole} options={options} />
           )}
           <Text variant="small" color={color.textSecondary}>
             {roleDescription[role]}
           </Text>
+          {!sellers && member.role !== 'seller' ? (
+            <Text variant="small" color={color.textSecondary}>
+              O perfil Vendedor faz parte do plano Profissional.
+            </Text>
+          ) : null}
         </View>
         <Switch
           label="Acesso ativo"
           description={
             status === 'active'
-              ? 'Entra no app e ocupa uma vaga do plano.'
+              ? member.seatExempt
+                ? 'Acesso de suporte do Lastro: não ocupa vaga do plano.'
+                : 'Entra no app e ocupa uma vaga do plano.'
               : 'Não entra mais no app. Clientes e pedidos dele continuam salvos.'
           }
           value={status === 'active'}
-          disabled={onlyAdmin}
+          disabled={onlyAdmin || blockReactivation}
           onChange={(on) => setStatus(on ? 'active' : 'disabled')}
         />
       </Dialog>
@@ -359,6 +451,7 @@ function memberError(code: string): string | undefined {
     return 'Este usuário foi alterado por outra pessoa. A lista foi recarregada; abra de novo para editar.';
   if (code === 'FORBIDDEN')
     return 'Não é possível reativar: a conta desta pessoa está indisponível.';
+  if (code === 'FEATURE_NOT_IN_PLAN') return 'O perfil Vendedor não faz parte do plano contratado.';
   return undefined;
 }
 
@@ -370,13 +463,23 @@ const inviteSchema = z.object({
 });
 type InviteValues = z.infer<typeof inviteSchema>;
 
-function InviteDialog({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+function InviteDialog({
+  visible,
+  sellers,
+  onClose,
+}: {
+  visible: boolean;
+  /** Plano inclui vendedores; sem o recurso, só se convida administrador. */
+  sellers: boolean;
+  onClose: () => void;
+}) {
   const { api, tenantId, header } = useTenantApi();
   const queryClient = useQueryClient();
   const [issued, setIssued] = useState<{ email: string; token: string } | null>(null);
+  const defaultRole: Role = sellers ? 'seller' : 'administrator';
   const { control, handleSubmit, reset, formState } = useForm<InviteValues>({
     resolver: zodResolver(inviteSchema),
-    defaultValues: { email: '', role: 'seller' },
+    defaultValues: { email: '', role: defaultRole },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
@@ -390,7 +493,7 @@ function InviteDialog({ visible, onClose }: { visible: boolean; onClose: () => v
       ),
     onSuccess: (result) => {
       setIssued({ email: result.invitation.email, token: result.token });
-      reset({ email: '', role: 'seller' });
+      reset({ email: '', role: defaultRole });
       queryClient.invalidateQueries({ queryKey: queryKeys.users(tenantId) });
     },
   });
@@ -402,7 +505,7 @@ function InviteDialog({ visible, onClose }: { visible: boolean; onClose: () => v
     if (invite.isPending) return;
     setIssued(null);
     invite.reset();
-    reset({ email: '', role: 'seller' });
+    reset({ email: '', role: defaultRole });
     onClose();
   };
 
@@ -468,15 +571,24 @@ function InviteDialog({ visible, onClose }: { visible: boolean; onClose: () => v
             render={({ field }) => (
               <View style={styles.field}>
                 <Text variant="smallStrong">Perfil</Text>
-                <Segmented<Role>
-                  label="Perfil"
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={roleOptions}
-                />
+                {sellers ? (
+                  <Segmented<Role>
+                    label="Perfil"
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={rolesFor(sellers)}
+                  />
+                ) : (
+                  <Text variant="body">{roleLabel[field.value]}</Text>
+                )}
                 <Text variant="small" color={color.textSecondary}>
                   {roleDescription[field.value]}
                 </Text>
+                {sellers ? null : (
+                  <Text variant="small" color={color.textSecondary}>
+                    O perfil Vendedor faz parte do plano Profissional.
+                  </Text>
+                )}
               </View>
             )}
           />
@@ -492,6 +604,8 @@ function inviteError(e: unknown): string {
     return 'Já existe convite pendente ou acesso ativo para este e-mail.';
   if (err.code === 'USER_LIMIT_REACHED')
     return 'O plano não tem vaga para mais um usuário. Revogue um convite ou desative alguém.';
+  if (err.code === 'FEATURE_NOT_IN_PLAN')
+    return 'Este convite não faz parte do plano contratado (convites adicionais ou perfil Vendedor).';
   return err.userMessage;
 }
 
@@ -525,6 +639,7 @@ function PendingRow({ invitation, last }: { invitation: PendingInvitation; last:
           </Text>
         ) : null}
       </View>
+      {invitation.seatExempt ? <Badge label="Suporte Lastro" tone="accent" /> : null}
       <IconButton
         icon={X}
         label={`Revogar convite de ${invitation.email}`}
