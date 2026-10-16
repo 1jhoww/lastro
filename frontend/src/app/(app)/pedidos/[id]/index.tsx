@@ -21,7 +21,7 @@ import { formatCents } from '@/lib/money';
 import { formatQuantity, fromApiQuantity } from '@/lib/quantity';
 import { useSession } from '@/session/SessionContext';
 import { color, space } from '@/theme';
-import { Alert, Badge, Button, DataTable, Panel, Text, type Column } from '@/ui';
+import { Alert, Badge, Button, DataTable, Disclosure, Panel, Text, type Column } from '@/ui';
 import { canReadFinance } from '@/features/finance/FinanceAccess';
 import { OrderDocuments } from '@/features/files/OrderDocuments';
 
@@ -94,20 +94,25 @@ function OrderView({ order: o, onRefresh }: { order: Order; onRefresh: () => voi
       <View style={styles.status}>
         <Badge label={statusLabel[o.status]} tone={statusTone[o.status]} />
         <Text variant="small" color={color.textSecondary} selectable>
-          {o.commercialId}
+          {formatCents(o.totalCents)}
         </Text>
       </View>
       {o.status === 'confirmed' ? (
         <Alert tone="info" title="Estoque reservado">
-          Os itens estão reservados para este pedido. Na expedição, a reserva vira saída física.
+          Os itens estão reservados para este pedido. Ao registrar saída, os produtos saem do
+          estoque físico.
         </Alert>
       ) : null}
 
       <OrderActions order={o} onRefresh={onRefresh} />
-      <OrderDocuments id={o.id} />
+      {o.status === 'dispatched' && session.permissions.includes('returns:manage') ? (
+        <Link href={`/pedidos/${o.id}/devolucoes` as Href} asChild>
+          <Button label="Registrar devolução" variant="outline" />
+        </Link>
+      ) : null}
       {canReadFinance(session) ? (
         <Link href={`/financeiro/pedidos/${o.id}` as Href} asChild>
-          <Button label="Administrar financeiro e desconto" variant="outline" />
+          <Button label="Abrir financeiro do pedido" variant="outline" />
         </Link>
       ) : null}
 
@@ -116,7 +121,7 @@ function OrderView({ order: o, onRefresh }: { order: Order; onRefresh: () => voi
           <>
             <Panel
               title={`Itens (${o.lines.length})`}
-              description="Preços e totais registrados no pedido pelo servidor."
+              description="Quantidades e valores do pedido."
               flush
             >
               <DataTable
@@ -200,11 +205,19 @@ function OrderView({ order: o, onRefresh }: { order: Order; onRefresh: () => voi
                     value={`${formatDateTime(o.canceledAt)} · ${who(o.canceledBy)}`}
                   />
                 ) : null}
-                <Fact label="Versão do pedido" value={String(o.version)} />
+                <Disclosure label="Identificação do pedido">
+                  <Fact label="Número completo" value={o.commercialId} />
+                  <Fact label="Versão" value={String(o.version)} />
+                </Disclosure>
               </View>
             </Panel>
             <OrderFinancePanel order={o} />
-            <OrderHistoryPanel orderId={o.id} />
+            <Disclosure label="Histórico do pedido">
+              <OrderHistoryPanel orderId={o.id} />
+            </Disclosure>
+            <Disclosure label="Documentos" summary="Pedido em PDF e romaneio sem preços">
+              <OrderDocuments id={o.id} />
+            </Disclosure>
           </>
         }
       />

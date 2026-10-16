@@ -224,9 +224,7 @@ describe('pedidos: criação', () => {
   }
 
   async function buildCart() {
-    await fireEvent.press(await screen.findByRole('button', { name: 'Escolher cliente' }));
     await fireEvent.press(await screen.findByRole('button', { name: 'Escolher Mercado Central' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Continuar para produtos' }));
     await fireEvent.press(await screen.findByRole('button', { name: 'Adicionar Água 500 ml' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Adicionar Queijo' }));
     const water = screen.getByLabelText('Quantidade de Água 500 ml');
@@ -478,7 +476,7 @@ describe('pedidos: confirmação e reserva', () => {
       app.queryClient.getQueryState(['tenant', 't1', 'inventory', 'item', 'p1'])?.isInvalidated,
     ).toBe(true);
     expect(screen.queryByRole('button', { name: 'Confirmar pedido' })).toBeNull();
-    expect(screen.getByRole('button', { name: 'Expedir pedido' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Registrar saída' })).toBeTruthy();
   });
 
   it('estoque insuficiente: nada reservado e divergência por item', async () => {
@@ -626,13 +624,11 @@ describe('pedidos: expedição e cancelamento', () => {
         ),
       );
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/o1', overrides });
-    await screen.findByRole('button', { name: 'Expedir pedido' });
+    await screen.findByRole('button', { name: 'Registrar saída' });
     expect(screen.queryByRole('button', { name: 'Cancelar pedido' })).toBeNull();
-    await fireEvent.press(screen.getByRole('button', { name: 'Expedir pedido' }));
-    expect(
-      await screen.findByText(/O estoque reservado deste pedido vira saída física/),
-    ).toBeTruthy();
-    await fireEvent.press(screen.getAllByRole('button', { name: 'Expedir pedido' }).at(-1)!);
+    await fireEvent.press(screen.getByRole('button', { name: 'Registrar saída' }));
+    expect(await screen.findByText(/Os produtos sairão do estoque físico/)).toBeTruthy();
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Registrar saída' }).at(-1)!);
     expect(await screen.findByText('Expedido')).toBeTruthy();
     const post = calls(server, 'POST', '/api/v1/orders/o1/dispatch')[0]!;
     expect(post.body).toEqual({ expectedVersion: 4 });
@@ -762,10 +758,11 @@ describe('pedidos: expedição e cancelamento', () => {
         ),
       );
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/o1', overrides });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Histórico do pedido' }));
     expect(await screen.findByText('Pedido confirmado (estoque reservado)')).toBeTruthy();
     expect(screen.getByText(/Usuário V9ABCD/)).toBeTruthy();
     expect(screen.getByText('Motivo: Cliente desistiu')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Expedir pedido' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Registrar saída' })).toBeNull();
   });
 });
 

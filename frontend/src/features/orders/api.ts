@@ -181,7 +181,8 @@ function useStoreOrder() {
     queryClient.setQueryData(queryKeys.order(tenantId, order.id), order);
     queryClient.invalidateQueries({
       queryKey: queryKeys.orders(tenantId),
-      predicate: (q) => !(q.queryKey[3] === 'detail' && q.queryKey[4] === order.id),
+      predicate: (q) =>
+        q.queryKey[3] === 'list' || (q.queryKey[4] === order.id && q.queryKey[3] !== 'detail'),
     });
   };
 }

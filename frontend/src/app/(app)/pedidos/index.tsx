@@ -14,7 +14,17 @@ import { formatCents } from '@/lib/money';
 import { canCreateOrder } from '@/navigation/destinations';
 import { useSession } from '@/session/SessionContext';
 import { color, space, useLayoutSize } from '@/theme';
-import { Badge, Button, DataTable, EmptyState, Segmented, Text, type Column } from '@/ui';
+import {
+  Badge,
+  Button,
+  DataTable,
+  EmptyState,
+  ChoiceChips,
+  SearchField,
+  Segmented,
+  Text,
+  type Column,
+} from '@/ui';
 import { ClipboardList, Plus, SearchX, X } from '@/ui/icons';
 
 // Filtros que GET /orders aceita: situação, cliente e ordem por data. Não há busca textual.
@@ -45,6 +55,7 @@ function Orders() {
   const [direction, setDirection] = useState<'desc' | 'asc'>('desc');
   const [customer, setCustomer] = useState<{ id: string; name: string } | null>(null);
   const [picking, setPicking] = useState(false);
+  const [numberSearch, setNumberSearch] = useState('');
   const size = useLayoutSize();
   const compact = size === 'compact';
   const admin = permissions.includes('orders:all:manage');
@@ -88,7 +99,12 @@ function Orders() {
       key: 'status',
       label: 'Situação',
       width: 120,
-      render: (o) => <Badge label={statusLabel[o.status]} tone={statusTone[o.status]} />,
+      render: (o) => (
+        <View style={{ gap: 4 }}>
+          <Badge label={statusLabel[o.status]} tone={statusTone[o.status]} />
+          {o.status === 'confirmed' ? <Text variant="caption">Aguardando saída</Text> : null}
+        </View>
+      ),
     },
     ...(admin
       ? [
@@ -113,7 +129,10 @@ function Orders() {
     },
   ];
 
-  const filtered = status !== 'all' || customer !== null;
+  const visibleItems = items.filter((o) =>
+    o.commercialId.toLocaleLowerCase().includes(numberSearch.trim().toLocaleLowerCase()),
+  );
+  const filtered = status !== 'all' || customer !== null || !!numberSearch.trim();
 
   return (
     <Screen
@@ -130,7 +149,7 @@ function Orders() {
         ) : null
       }
     >
-      <Segmented
+      <ChoiceChips
         label="Situação do pedido"
         options={statusOptions}
         value={status}
@@ -164,15 +183,25 @@ function Orders() {
         />
       </View>
 
+      <SearchField
+        label="Número nos pedidos carregados"
+        value={numberSearch}
+        onChangeText={setNumberSearch}
+        placeholder="Número comercial do pedido"
+      />
+      <Text variant="caption" color={color.textSecondary}>
+        Busca por número nos {items.length} pedidos carregados. Carregue mais para ampliar; o filtro
+        por cliente consulta todos os pedidos.
+      </Text>
       <ListPanel
         query={query}
-        count={items.length}
+        count={visibleItems.length}
         empty={
           filtered ? (
             <EmptyState
               icon={SearchX}
               title="Nenhum pedido nesses filtros"
-              description="Mude a situação ou o cliente."
+              description="Mude a situação, o cliente ou o número buscado."
             />
           ) : (
             <EmptyState
@@ -192,7 +221,7 @@ function Orders() {
       >
         <DataTable
           label="Pedidos"
-          rows={items}
+          rows={visibleItems}
           keyOf={(o) => o.id}
           hrefOf={(o) => `/pedidos/${o.id}` as Href}
           columns={columns}
@@ -208,6 +237,16 @@ function Orders() {
                 <View style={styles.badge}>
                   <Badge label={statusLabel[o.status]} tone={statusTone[o.status]} />
                 </View>
+                <Text variant="caption" color={color.textSecondary}>
+                  {o.status === 'confirmed'
+                    ? 'Aguardando saída'
+                    : o.status === 'draft'
+                      ? 'Revisar e confirmar'
+                      : o.status === 'dispatched'
+                        ? 'Consultar saída e devoluções'
+                        : 'Consultar histórico'}
+                </Text>
+                {admin ? <Text variant="caption">{who(o.sellerUid)}</Text> : null}
               </View>
               <Text variant="figure">{formatCents(o.totalCents)}</Text>
             </View>

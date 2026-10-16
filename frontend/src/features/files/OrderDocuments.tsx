@@ -17,13 +17,15 @@ export function OrderDocuments({ id }: { id: string }) {
 function Documents({ id }: { id: string }) {
   const { api, tenantId } = useTenantApi();
   return (
-    <Panel title="Documentos" description="Emitidos pelo servidor. Sem valor fiscal.">
+    <Panel title="Documentos" description="Documentos oficiais do pedido, sem valor fiscal.">
       <View style={{ gap: space[3] }}>
         <FileActions
+          compact
           label="Obter pedido comercial (PDF)"
           load={(signal) => orderDocument(api, tenantId, id, 'commercial', signal)}
         />
         <FileActions
+          compact
           label="Obter romaneio sem preços (PDF)"
           load={(signal) => orderDocument(api, tenantId, id, 'packing', signal)}
         />

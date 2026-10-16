@@ -13,30 +13,37 @@ import { focusRing, showFocusRing, type InteractionState } from '@/ui/interactio
  * Cliente do pedido: só ativos e, para o vendedor, só os da carteira (o servidor filtra).
  * Cliente desativado não aparece e o servidor recusa com CUSTOMER_INACTIVE se mudar depois.
  */
+type CustomerSelectionProps = {
+  onPick: (customer: Customer) => void;
+  includeInactive?: boolean;
+};
 export function CustomerPicker({
   visible,
   onClose,
-  onPick,
-  includeInactive = false,
-}: {
+  ...props
+}: CustomerSelectionProps & {
   visible: boolean;
   onClose: () => void;
-  onPick: (customer: Customer) => void;
-  /** Consultas (ex.: financeiro) também precisam de clientes desativados. */
-  includeInactive?: boolean;
 }) {
+  if (!visible) return null;
+  return (
+    <Dialog
+      visible
+      title="Escolher cliente"
+      onClose={onClose}
+      actions={<Button label="Fechar" variant="ghost" onPress={onClose} />}
+    >
+      <CustomerSelection {...props} />
+    </Dialog>
+  );
+}
+export function CustomerSelection({ onPick, includeInactive = false }: CustomerSelectionProps) {
   const [search, setSearch] = useState('');
   const q = useDebouncedValue(search).trim();
   const { query, items } = useCustomerList({ q, status: includeInactive ? 'all' : 'active' });
 
   return (
-    <Dialog
-      visible={visible}
-      title="Escolher cliente"
-      description={`${includeInactive ? 'Clientes ativos e desativados' : 'Clientes ativos'}. A busca considera o início do nome.`}
-      onClose={onClose}
-      actions={<Button label="Fechar" variant="ghost" onPress={onClose} />}
-    >
+    <View style={{ gap: space[3] }}>
       <SearchField
         label="Buscar cliente"
         hideLabel
@@ -93,7 +100,7 @@ export function CustomerPicker({
           ) : null}
         </View>
       )}
-    </Dialog>
+    </View>
   );
 }
 

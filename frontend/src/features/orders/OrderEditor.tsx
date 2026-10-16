@@ -15,6 +15,7 @@ import {
   Alert,
   Button,
   EmptyState,
+  Disclosure,
   Panel,
   Segmented,
   Select,
@@ -25,11 +26,13 @@ import {
 import { Package, UserRound } from '@/ui/icons';
 import { useConditionOptions, useCreateOrder, useMethodOptions, useUpdateOrder } from './api';
 import { CartList } from './CartList';
-import { CustomerPicker } from './CustomerPicker';
+import { CustomerPicker, CustomerSelection } from './CustomerPicker';
 import { PaymentFields } from './PaymentFields';
+import { paymentPreview } from './paymentPreview';
 import { ProductSearch } from './ProductSearch';
 import {
   cartFromOrder,
+  formatCalendarDate,
   cartTotalPreview,
   paymentBody,
   paymentChoiceOf,
@@ -98,8 +101,8 @@ export function OrderEditor({
   const [picking, setPicking] = useState(false);
   const [paymentError, setPaymentError] = useState<string>();
 
-  const conditions = useConditionOptions();
-  const methods = useMethodOptions();
+  const conditions = useConditionOptions(step === 'revisao');
+  const methods = useMethodOptions(step === 'revisao');
   const members = useMembers(admin);
   const create = useCreateOrder();
   const update = useUpdateOrder(order?.id ?? '');
@@ -158,7 +161,7 @@ export function OrderEditor({
       ...(admin && sellerUid && sellerUid !== (order?.sellerUid ?? user?.uid) ? { sellerUid } : {}),
     };
     const onSuccess = (saved: Order) => {
-      toast.show(order ? 'Rascunho salvo' : 'Rascunho criado');
+      toast.show(order ? 'Rascunho salvo!' : 'Pedido criado!');
       router.replace(`/pedidos/${saved.id}` as Href);
     };
     if (order)
@@ -196,14 +199,11 @@ export function OrderEditor({
           <Text variant="bodyStrong">{customer.name}</Text>
         </View>
       ) : (
-        <EmptyState
-          size="compact"
-          icon={UserRound}
-          title="Escolha o cliente"
-          description={admin ? 'Clientes ativos da empresa.' : 'Clientes ativos da sua carteira.'}
-          action={
-            <Button label="Escolher cliente" variant="strong" onPress={() => setPicking(true)} />
-          }
+        <CustomerSelection
+          onPick={(c) => {
+            setCustomer({ id: c.id, name: c.name });
+            setStep('produtos');
+          }}
         />
       )}
       {admin && members.data ? (
@@ -230,7 +230,7 @@ export function OrderEditor({
   const cartPanel = (
     <Panel
       title={`Carrinho (${lines.length} ${lines.length === 1 ? 'item' : 'itens'})`}
-      description="Prévia com preços de tabela. O servidor registra os valores oficiais ao salvar."
+      description="Confira quantidades e valores antes de salvar."
     >
       {lines.length === 0 ? (
         <EmptyState
@@ -279,6 +279,7 @@ export function OrderEditor({
 
       {step === 'produtos' ? (
         <>
+          {customerPanel}
           <View style={[styles.columns, wide && styles.columnsWide]}>
             <View style={[styles.col, wide && { flex: 2 }]}>
               <Panel title="Produtos">
@@ -302,36 +303,73 @@ export function OrderEditor({
       {step === 'revisao' ? (
         <>
           {customerPanel}
-          {cartPanel}
-          <Panel title="Pagamento">
-            {conditions.isError ? (
-              <Alert tone="danger" title="Condições indisponíveis">
-                {toApiError(conditions.error).userMessage}
-              </Alert>
-            ) : null}
-            <PaymentFields
-              choice={payment}
-              onChange={setPayment}
-              conditions={conditions.data ?? []}
-              methods={methods.data ?? []}
-              methodId={methodId}
-              onMethod={setMethodId}
-              error={paymentError}
-              disabled={saving}
-            />
-          </Panel>
-          <Panel title="Observações">
-            <TextField
-              label="Observações do pedido"
-              hideLabel
-              optional
-              multiline
-              maxLength={1000}
-              value={notes}
-              onChangeText={setNotes}
-              style={styles.notes}
-            />
-          </Panel>
+          <View style={[styles.columns, wide && styles.columnsWide]}>
+            <View style={[styles.col, { flex: 1, minWidth: 0 }]}>
+              <Disclosure
+                label={`Revisar ${lines.length} itens`}
+                summary={formatCents(total)}
+                defaultOpen
+              >
+                {cartPanel}
+              </Disclosure>
+            </View>
+            <View style={[styles.col, { flex: 1, minWidth: 0 }]}>
+              <Panel title="Pagamento">
+                {conditions.isError ? (
+                  <Alert tone="danger" title="Condições indisponíveis">
+                    {toApiError(conditions.error).userMessage}
+                  </Alert>
+                ) : null}
+                {methods.isError ? (
+                  <Alert
+                    tone="danger"
+                    title="Formas indisponíveis"
+                    action={<Button label="Recarregar formas" onPress={() => methods.refetch()} />}
+                  >
+                    {toApiError(methods.error).userMessage}
+                  </Alert>
+                ) : null}
+                <PaymentFields
+                  choice={payment}
+                  onChange={setPayment}
+                  conditions={conditions.data ?? []}
+                  methods={methods.data ?? []}
+                  methodId={methodId}
+                  onMethod={setMethodId}
+                  error={paymentError}
+                  disabled={saving}
+                />
+                {paymentPreview(total, payment, conditions.data ?? [], today).map((p, i) => (
+                  <View
+                    key={i}
+                    style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space[2] }}
+                  >
+                    <Text variant="small">
+                      {i + 1}ª · {formatCalendarDate(p.date)}
+                    </Text>
+                    <Text variant="smallStrong">{formatCents(p.amountCents)}</Text>
+                  </View>
+                ))}
+                {payment.mode !== 'later' ? (
+                  <Text variant="caption" color={color.textSecondary}>
+                    Prévia de vencimentos e valores. Confira as parcelas registradas após salvar.
+                  </Text>
+                ) : null}
+              </Panel>
+              <Panel title="Observações">
+                <TextField
+                  label="Observações do pedido"
+                  hideLabel
+                  optional
+                  multiline
+                  maxLength={1000}
+                  value={notes}
+                  onChangeText={setNotes}
+                  style={styles.notes}
+                />
+              </Panel>
+            </View>
+          </View>
 
           {createUnknown ? (
             <Alert
@@ -376,7 +414,7 @@ export function OrderEditor({
               label={order ? 'Salvar rascunho' : 'Criar rascunho'}
               variant="strong"
               loading={saving}
-              disabled={!customer || lines.length === 0}
+              disabled={!customer || lines.length === 0 || createUnknown}
               onPress={save}
             />
           </FormActions>

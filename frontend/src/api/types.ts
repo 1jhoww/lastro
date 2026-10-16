@@ -1,5 +1,10 @@
 import type { paths } from './schema';
 
+export type ReturnCreateInput = BodyOf<'/api/v1/orders/{id}/returns', 'post'>;
+export type ReturnReceiveInput = BodyOf<'/api/v1/returns/{id}/receipts', 'post'>;
+export type ReturnCancelInput = BodyOf<'/api/v1/returns/{id}/cancel-pending', 'post'>;
+export type ReturnUpdateInput = BodyOf<'/api/v1/returns/{id}', 'patch'>;
+
 export type CatalogSettings = DataOf<'/api/v1/catalog-settings', 'put'>;
 export type CatalogInput = BodyOf<'/api/v1/catalog-settings', 'put'>;
 export type PublicCatalog = DataOf<'/api/v1/public/catalogs/{slug}', 'get'>;

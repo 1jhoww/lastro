@@ -35,9 +35,9 @@ const verb: Record<OrderCommandKind, { done: string; unknown: string; rejected: 
     rejected: 'Pedido não confirmado',
   },
   dispatch: {
-    done: 'Pedido expedido',
-    unknown: 'Não sabemos se o pedido foi expedido',
-    rejected: 'Pedido não expedido',
+    done: 'Saída registrada!',
+    unknown: 'Não sabemos se a saída foi registrada',
+    rejected: 'Saída não registrada',
   },
   cancel: {
     done: 'Pedido cancelado',
@@ -229,7 +229,7 @@ export function OrderActions({ order, onRefresh }: { order: Order; onRefresh: ()
           ) : null}
           {actions.includes('dispatch') ? (
             <Button
-              label="Expedir pedido"
+              label="Registrar saída"
               icon={Truck}
               variant="strong"
               disabled={locked}
@@ -265,9 +265,9 @@ export function OrderActions({ order, onRefresh }: { order: Order; onRefresh: ()
 
       <ConfirmDialog
         visible={open === 'dispatch'}
-        title="Expedir pedido?"
-        description="O estoque reservado deste pedido vira saída física. O Lastro não emite nota fiscal nem integra transportadora."
-        confirmLabel="Expedir pedido"
+        title="Registrar saída?"
+        description="Os produtos sairão do estoque físico e a reserva será liberada. Isso não confirma entrega ao cliente."
+        confirmLabel="Registrar saída"
         tone="strong"
         loading={busy}
         onCancel={() => setOpen(null)}

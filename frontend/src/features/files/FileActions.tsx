@@ -13,9 +13,11 @@ export function FileActions({
   load,
   label,
   onLoaded,
+  compact = false,
 }: {
   load: (signal: AbortSignal) => Promise<Download>;
   label: string;
+  compact?: boolean;
   onLoaded?: (file: Download) => void;
 }) {
   const [busy, setBusy] = useState(false);
@@ -71,6 +73,7 @@ export function FileActions({
     <View style={{ gap: space[3] }}>
       <Button
         label={label}
+        size={compact ? 'sm' : 'md'}
         loading={busy}
         disabled={cooldown.seconds > 0}
         variant="outline"

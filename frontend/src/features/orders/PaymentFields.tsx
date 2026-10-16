@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { ConditionOption, MethodOption } from '@/api/types';
 import { FieldRow } from '@/features/catalog/FormParts';
 import { color, space } from '@/theme';
-import { Segmented, Select, Text, TextField } from '@/ui';
-import { formatCalendarDate, manualDueDates, parseCalendarDate, type PaymentChoice } from './rules';
+import { Segmented, Select, Text, DateField } from '@/ui';
+import { formatCalendarDate, manualDueDates, type PaymentChoice } from './rules';
 
 const intervals = [7, 10, 14, 15, 21, 28, 30, 45, 60];
 
@@ -33,9 +32,6 @@ export function PaymentFields({
   disabled?: boolean;
 }) {
   const selectValue = choice.mode === 'condition' ? choice.conditionId : choice.mode;
-  const [dateText, setDateText] = useState(
-    choice.mode === 'manual' ? formatCalendarDate(choice.first) : '',
-  );
   const options = [
     ...conditions.map((c) => ({
       value: c.id,
@@ -61,7 +57,6 @@ export function PaymentFields({
           if (v === 'later') onChange({ mode: 'later' });
           else if (v === 'manual') {
             const first = choice.mode === 'manual' ? choice.first : '';
-            setDateText(first ? formatCalendarDate(first) : '');
             onChange({ mode: 'manual', type: 'cash', first, count: 2, interval: 30 });
           } else onChange({ mode: 'condition', conditionId: v });
         }}
@@ -78,16 +73,11 @@ export function PaymentFields({
             ]}
           />
           <FieldRow>
-            <TextField
+            <DateField
               label={choice.type === 'cash' ? 'Vencimento' : 'Primeiro vencimento'}
-              placeholder="DD/MM/AAAA"
-              inputMode="numeric"
-              value={dateText}
-              editable={!disabled}
-              onChangeText={(t) => {
-                setDateText(t);
-                onChange({ ...choice, first: parseCalendarDate(t) ?? '' });
-              }}
+              value={choice.first}
+              disabled={disabled}
+              onChange={(first) => onChange({ ...choice, first })}
             />
             {choice.type === 'installments' ? (
               <Select
@@ -131,6 +121,9 @@ export function PaymentFields({
           onChange={(v) => onMethod(v === 'none' ? null : v)}
         />
       ) : null}
+      <Text variant="caption" color={color.textSecondary}>
+        Condição define quando pagar. Forma indica como pretende pagar; não registra recebimento.
+      </Text>
       {error ? (
         <Text variant="small" color={color.danger} accessibilityRole="alert">
           {error}

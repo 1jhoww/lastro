@@ -6,14 +6,9 @@ import { formatCents } from '@/lib/money';
 import { useSession } from '@/session/SessionContext';
 import { color, space } from '@/theme';
 import { Alert, Badge, Button, Panel, Skeleton, Text } from '@/ui';
-import { useOrderFinance } from './api';
+import { useFinancialState, usePendingExecutions } from '@/features/finance/api';
 import { canReadFinance } from '@/features/finance/FinanceAccess';
-import {
-  executionDone,
-  executionPublished,
-  executionStatusLabel,
-  formatCalendarDate,
-} from './rules';
+import { executionDone, executionStatusLabel, formatCalendarDate } from './rules';
 
 const titleLabel = {
   open: 'Em aberto',
@@ -32,8 +27,12 @@ const titleLabel = {
 export function OrderFinancePanel({ order }: { order: Order }) {
   const session = useSession();
   const allowed = canReadFinance(session) && order.confirmedAt !== null;
-  const finance = useOrderFinance(order.id, allowed);
   if (!allowed) return null;
+  return <FinanceSummary order={order} />;
+}
+function FinanceSummary({ order }: { order: Order }) {
+  const finance = useFinancialState(order.id);
+  const executions = usePendingExecutions(order.id);
 
   return (
     <Panel
@@ -51,10 +50,10 @@ export function OrderFinancePanel({ order }: { order: Order }) {
         </Alert>
       ) : (
         <View style={styles.body}>
-          <Link href={`/financeiro?pedido=${order.id}` as Href} asChild>
-            <Button label="Abrir contas a receber" variant="outline" />
+          <Link href={`/financeiro/pedidos/${order.id}` as Href} asChild>
+            <Button label="Abrir parcelas e recebimentos" variant="outline" />
           </Link>
-          {finance.data.executions
+          {executions.items
             .filter((e) => !executionDone(e))
             .map((e) => (
               <Alert key={e.id} tone="warning" title="Operação financeira em andamento">
@@ -64,24 +63,19 @@ export function OrderFinancePanel({ order }: { order: Order }) {
                 </Link>
               </Alert>
             ))}
-          {finance.data.executions.filter(executionPublished).map((e) => (
-            <Text key={e.id} variant="small" color={color.textSecondary}>
-              {`${e.kind === 'cancellation' ? 'Cancelamento financeiro' : 'Resolução de devolução'} concluído${e.publishedAt ? ' e publicado' : ''}.`}
-            </Text>
-          ))}
           <View style={styles.row}>
             <Text variant="small" color={color.textSecondary}>
-              Recebido em dinheiro
+              Recebimentos registrados
             </Text>
-            <Text variant="small">{formatCents(finance.data.state.cashReceivedCents)}</Text>
+            <Text variant="small">{formatCents(finance.data.cashReceivedCents)}</Text>
           </View>
           <View style={styles.row}>
             <Text variant="small" color={color.textSecondary}>
               Créditos aplicados
             </Text>
-            <Text variant="small">{formatCents(finance.data.state.creditSettledCents)}</Text>
+            <Text variant="small">{formatCents(finance.data.creditSettledCents)}</Text>
           </View>
-          {finance.data.state.titles.map((t) => (
+          {finance.data.titles.map((t) => (
             <View key={t.id} style={styles.title}>
               <View style={styles.flex}>
                 <Text variant="smallStrong">{`${t.installmentNumber}ª parcela · ${formatCalendarDate(t.dueDate)}`}</Text>

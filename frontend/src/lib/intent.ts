@@ -26,6 +26,7 @@ export type OrderCommandKind = 'confirm' | 'dispatch' | 'cancel';
 export type IntentKind =
   | MovementKind
   | OrderCommandKind
+  | 'return-command'
   | 'receipt'
   | 'finance-command'
   | 'finance-setting'
@@ -123,6 +124,7 @@ export function createIntentLedger(storage?: IntentStore) {
         fingerprint = fingerprintOf(body);
       let key = '';
       const economic = [
+        'return-command',
         'receipt',
         'finance-command',
         'finance-resolution',
@@ -356,6 +358,7 @@ export function useOtherOrderIntent(
           ([scope, intent]) =>
             scope.endsWith(`:${orderId}`) &&
             [
+              'return-command',
               'receipt',
               'finance-command',
               'finance-resolution',
