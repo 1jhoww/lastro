@@ -2,23 +2,25 @@
 
 Inclui fundação, comércio, estoque, pedidos, projeções financeiras e retornos v1 das Fases A–E. As seções D preservam a descrição histórica; seção E registra os contratos vigentes.
 
-Schemas executáveis em `src/shared/schemas/models.ts`; entrada HTTP em `shared/schemas/http.ts`. Documentos usam `schemaVersion: 1`, IDs opacos e timestamps ISO 8601 UTC. Valores monetários são inteiros entre 0 e 100.000.000 centavos; limite de usuários entre 2 e 100 nesta fundação. Email de convite deve estar normalizado em minúsculas; token apresentado não substitui email verificado no Firebase.
+Schemas executáveis em `src/shared/schemas/models.ts`; entrada HTTP em `shared/schemas/http.ts`. Documentos usam `schemaVersion: 1`, IDs opacos e timestamps ISO 8601 UTC. Valores monetários são inteiros entre 0 e 100.000.000 centavos; limite de usuários entre 1 e 100 (Essencial usa 1). Campos novos de assinatura, vínculo (`seatExempt`) e convite (`seatExempt`) têm padrão na leitura, então documentos anteriores continuam válidos sem reescrita. Email de convite deve estar normalizado em minúsculas; token apresentado não substitui email verificado no Firebase.
 
-| Caminho                                     | Dados e relacionamentos                                                                                                                      |
-| ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `identities/{uid}`                          | UID Firebase, estado global `active/disabled`, timestamps. Sem senha, tenant ou perfil global empresarial.                                   |
-| `platformAdmins/{uid}`                      | UID, estado, criação e schema; atribuição fora de endpoints públicos.                                                                        |
-| `tenants/{id}`                              | Nome, fuso, `provisioning/active`, subscriptionId, versão, contadores internos e timestamps.                                                 |
-| `tenants/{id}/memberships/{uid}`            | UID, tenantId, `administrator/seller`, `active/disabled`, versão e timestamps. Unicidade pelo UID dentro da empresa.                         |
-| `tenants/{id}/invitations/{id}`             | Email, perfil, SHA-256 do token, `pending/accepted/revoked`, prazo, criador e aceitante. Expiração é derivada do prazo, sem job obrigatório. |
-| `tenants/{id}/invitationEmails/{emailHash}` | Ponte para último convite emitido ao email; hash no caminho evita documento com email cru. Histórico e autoridade permanecem no convite.     |
-| `plans/{id}`                                | Versão corrente, nome, valores, userLimit, `active/archived` e timestamps.                                                                   |
-| `plans/{id}/versions/{version}`             | Snapshots imutáveis; nunca sobrescritos por PATCH.                                                                                           |
-| `subscriptions/{id}`                        | Tenant, plano/versão, valores contratados, limite, estado, início, notas opcionais e versão. ID inicial coincide com tenant.                 |
-| `tenants/{id}/auditLogs/{id}`               | Ações empresariais, ator, recurso, requestId, instante e mudanças permitidas.                                                                |
-| `auditLogs/{id}`                            | Ações de plataforma, sem permitir consulta comercial geral.                                                                                  |
-| `idempotencyRecords/{hash}`                 | Ator, operação, hash canônico do comando e IDs do resultado; nenhum token de convite cru.                                                    |
-| `rateLimits/{hash}`                         | Contador por ator/operação ou IP/janela, com expiração Timestamp para futura limpeza.                                                        |
+| Caminho                                     | Dados e relacionamentos                                                                                                                                                 |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `identities/{uid}`                          | UID Firebase, estado global `active/disabled`, timestamps. Sem senha, tenant ou perfil global empresarial.                                                              |
+| `platformAdmins/{uid}`                      | UID, estado, criação e schema; atribuição fora de endpoints públicos.                                                                                                   |
+| `tenants/{id}`                              | Nome, fuso, `provisioning/active`, subscriptionId, versão, contadores internos e timestamps.                                                                            |
+| `tenants/{id}/memberships/{uid}`            | UID, tenantId, `administrator/seller`, `active/disabled`, versão e timestamps. Unicidade pelo UID dentro da empresa.                                                    |
+| `tenants/{id}/invitations/{id}`             | Email, perfil, SHA-256 do token, `pending/accepted/revoked`, prazo, criador e aceitante. Expiração é derivada do prazo, sem job obrigatório.                            |
+| `tenants/{id}/invitationEmails/{emailHash}` | Ponte para último convite emitido ao email; hash no caminho evita documento com email cru. Histórico e autoridade permanecem no convite.                                |
+| `plans/{id}`                                | Planos personalizados anteriores ao catálogo oficial; somente leitura. Planos oficiais ficam no código (ADR 0009).                                                      |
+| `plans/{id}/versions/{version}`             | Snapshots imutáveis dos planos personalizados.                                                                                                                          |
+| `subscriptions/{id}`                        | Tenant, plano/versão, `planCode` (nulo = legado), valor, limite, estado, início, dia de vencimento, início da cobrança, contato, notas, versão. ID coincide com tenant. |
+| `billingCharges/{subscriptionId}_{AAAA-MM}` | Cobrança da competência: valor congelado, vencimento, `pending/paid/canceled`, pagamento, notas, origem, plano, versão (ADR 0010).                                      |
+| `auditLogs/{id}`                            | Ações da plataforma; contratos, cobranças e convites revogados pelo Super Admin levam `tenantId` para o histórico.                                                      |
+| `tenants/{id}/auditLogs/{id}`               | Ações empresariais, ator, recurso, requestId, instante e mudanças permitidas.                                                                                           |
+| `auditLogs/{id}`                            | Ações de plataforma, sem permitir consulta comercial geral.                                                                                                             |
+| `idempotencyRecords/{hash}`                 | Ator, operação, hash canônico do comando e IDs do resultado; nenhum token de convite cru.                                                                               |
+| `rateLimits/{hash}`                         | Contador por ator/operação ou IP/janela, com expiração Timestamp para futura limpeza.                                                                                   |
 
 Exemplo sintético: empresa `tenant_abc`, vínculo `uid_demo` administrador ativo, plano v1 (15000/20000 centavos, duas vagas) e assinatura active. Convite pendente para `other@example.invalid` reserva a segunda vaga, ainda sem vínculo. Aceitação transforma a reserva em vínculo ativo sem aumentar a capacidade ocupada total.
 
@@ -34,7 +36,9 @@ Vínculos são únicos pelo caminho tenant/UID. Convites vivos para um email nã
 
 Idempotência de criação usa ator/operação/chave, valida hash canônico e mantém IDs. Enquanto o registro existir, outra carga com a chave gera conflito. `expiresAt` indica retenção planejada de pelo menos 30 dias, mas não há remoção automática habilitada nesta fase. Replay de criação de empresa recompõe o resultado enquanto o convite inicial estiver pendente/válido; após consumo retorna conflito sem criar outra empresa. Não habilitar TTL desses registros sem revisar a política de replay. Convites são HMAC por tenant/ID; só o hash é persistido e a chave fica fora do código.
 
-Adicionar schemas novos deve seguir expandir/leitura compatível/migrar em lotes/verificar/contrair, com checkpoint e auditoria. Migrations de produção não são fornecidas nem executadas nesta fase. Antes de migrar contadores, reconciliar vínculos ativos e administradores em ambiente isolado, sem remover a proteção transacional. Prazos legais de retenção, anonimização e exclusão de backups exigem política aprovada.
+Adicionar schemas novos deve seguir expandir/leitura compatível/migrar em lotes/verificar/contrair, com checkpoint e auditoria. A migração para os planos oficiais (`npm run migrate:plans`, dry-run por padrão) segue essa ordem e está descrita em [operação da plataforma](../operations-platform-billing.md); nenhuma migração de produção roda sem autorização.
+
+Índices da plataforma ficam declarados por `scripts/platform-indexes.mjs`: histórico de auditoria por recurso, cobranças por situação/empresa/vencimento e pagamentos do mês. Antes de migrar contadores, reconciliar vínculos ativos e administradores em ambiente isolado, sem remover a proteção transacional. Prazos legais de retenção, anonimização e exclusão de backups exigem política aprovada.
 
 ## Fase B — schemas comerciais v1
 

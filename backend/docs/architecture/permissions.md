@@ -5,9 +5,11 @@
 | Consultar empresa atual                            | Sim                                         | Sim                                      | Não                     |
 | Alterar empresa                                    | Sim                                         | Não                                      | Não                     |
 | Listar/convidar/revogar/alterar vínculos           | Sim                                         | Não                                      | Não                     |
-| Criar empresas e recuperar primeiro convite        | Não                                         | Não                                      | Sim                     |
-| Criar/versionar planos                             | Não                                         | Não                                      | Sim                     |
-| Gerenciar assinaturas/limites/condições            | Não                                         | Não                                      | Sim                     |
+| Criar empresas (com plano) e recuperar convite     | Não                                         | Não                                      | Sim                     |
+| Consultar catálogo oficial de planos               | Não                                         | Não                                      | Sim                     |
+| Trocar plano, ajustar valor/vencimento, suspender  | Não                                         | Não                                      | Sim                     |
+| Cobranças: gerar, registrar pagamento, corrigir    | Não                                         | Não                                      | Sim                     |
+| Painel: indicadores, empresas, convites            | Não                                         | Não                                      | Sim                     |
 | Consultar produtos/preços                          | Todos, inclusive inativos                   | Somente ativos                           | Não                     |
 | Gerenciar clientes                                 | Todos                                       | Carteira própria, sem responsável/status | Não                     |
 | Transferir/desativar/reativar clientes             | Sim                                         | Não                                      | Não                     |
@@ -24,6 +26,20 @@
 | Gerar documentos                                   | Própria empresa                             | Próprios e carteira atual                | Não                     |
 
 Clientes/produtos/imagens B, estoque C, pedidos D, financeiro E, catálogo F e documentos G têm implementação real. Administrator não ganha permissão da plataforma. Vendedor ganhou orders:own:dispatch, sem inventory:manage ou orders:all:manage.
+
+## Limites e recursos por plano
+
+As permissões efetivas são as do perfil filtradas pelos recursos do plano contratado ([ADR 0009](../adr/0009-planos-oficiais-e-recursos.md)). O backend recusa a operação com `FEATURE_NOT_IN_PLAN` (403), e o `/me` já devolve a lista filtrada.
+
+| Regra                                            | Essencial               | Profissional          | Contrato legado       |
+| ------------------------------------------------ | ----------------------- | --------------------- | --------------------- |
+| Usuários ativos + convites pendentes             | 1                       | 2                     | Limite do contrato    |
+| Convidar usuários (`users.invite`)               | Não                     | Sim, dentro do limite | Sim, dentro do limite |
+| Vitrine e `catalog:manage` (`catalog.public`)    | Não; vitrine fora do ar | Sim                   | Sim                   |
+| Perfil vendedor/carteiras (`commercial.sellers`) | Não                     | Sim                   | Sim                   |
+| Demais módulos                                   | Sim                     | Sim                   | Sim                   |
+
+Convites e vínculos do Super Admin (acesso de suporte) não ocupam vaga, independem de `users.invite` e deixam de valer se o papel de plataforma for retirado. A empresa pode desativar esse acesso como faria com qualquer vínculo.
 
 ## Fase G vigente
 
