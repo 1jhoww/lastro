@@ -55,6 +55,7 @@ export function PaymentFields({
 
   const condition = (
     <Select
+      key="condition"
       label="Condição de pagamento"
       value={selectValue}
       options={options}
@@ -70,6 +71,7 @@ export function PaymentFields({
   );
   const method = (
     <Select
+      key="method"
       label="Forma pretendida"
       optional
       value={methodId ?? 'none'}

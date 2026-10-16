@@ -12,7 +12,7 @@ export function clearOrphanFiles() {
   initialized = true;
 }
 /** Nativo abre pela folha do sistema; não há aba a reservar. */
-export function reserveViewer(): Viewer | null {
+export function reserveViewer(_waiting?: string): Viewer | null {
   return null;
 }
 export function stageFile(download: Download): FilePresentation {

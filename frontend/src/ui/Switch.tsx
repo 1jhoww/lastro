@@ -8,10 +8,19 @@ type Props = {
   onChange: (value: boolean) => void;
   description?: string;
   disabled?: boolean;
+  /** Nome para leitores de tela quando o rótulo visível é genérico (ex.: em listas). */
+  accessibilityLabel?: string;
 };
 
 /** Ligar/desligar com efeito imediato (ex.: produto ativo). Usa o controle nativo de cada plataforma. */
-export function Switch({ label, value, onChange, description, disabled }: Props) {
+export function Switch({
+  label,
+  value,
+  onChange,
+  description,
+  disabled,
+  accessibilityLabel,
+}: Props) {
   return (
     <View style={styles.row}>
       <View style={styles.copy}>
@@ -23,7 +32,7 @@ export function Switch({ label, value, onChange, description, disabled }: Props)
         ) : null}
       </View>
       <RNSwitch
-        accessibilityLabel={label}
+        accessibilityLabel={accessibilityLabel ?? label}
         value={value}
         onValueChange={onChange}
         disabled={disabled}

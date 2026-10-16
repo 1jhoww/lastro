@@ -29,19 +29,21 @@ const money = (value: number) =>
   );
 export function quoteMessage(summary: z.infer<typeof quoteSummary>) {
   const rows = [
-    `Solicitação de orçamento - ${messageText(summary.catalog.tradeName)}`,
-    'Não é pedido confirmado. Valores e disponibilidade sujeitos à confirmação.',
+    `Olá! Gostaria de solicitar um orçamento à ${messageText(summary.catalog.tradeName)}:`,
     '',
     ...summary.lines.map(
-      (line, i) =>
-        `${i + 1}. ${messageText(line.name)}\n   ${line.quantity} ${line.unit}` +
+      (line) =>
+        `• ${line.quantity} ${line.unit} × ${messageText(line.name)}` +
         (line.unitPriceCents !== null && line.subtotalCents !== null
-          ? ` | Unitário: ${money(line.unitPriceCents)} | Estimado: ${money(line.subtotalCents)}`
+          ? ` (${money(line.unitPriceCents)}/${line.unit}) — ${money(line.subtotalCents)}`
           : ''),
     ),
     ...(summary.totalEstimatedCents !== null
       ? ['', `Total estimado: ${money(summary.totalEstimatedCents)}`]
       : []),
+    '',
+    'Não é pedido confirmado. Valores e disponibilidade sujeitos à confirmação.',
+    'Aguardo o retorno. Obrigado!',
   ];
   return rows.join('\n');
 }

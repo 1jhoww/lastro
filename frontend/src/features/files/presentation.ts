@@ -41,14 +41,14 @@ export function stageFile(download: Download): FilePresentation {
  * Abre a aba ainda dentro do toque e só depois recebe o PDF. Sem `opener`: a aba não alcança o
  * Lastro. Retorna null quando o navegador bloqueia; nesse caso a abertura direta é tentada.
  */
-export function reserveViewer(): Viewer | null {
+export function reserveViewer(waiting = 'Gerando PDF…'): Viewer | null {
   const tab = window.open('', '_blank');
   if (!tab) return null;
   try {
     tab.opener = null;
-    tab.document.title = 'Gerando PDF…';
+    tab.document.title = waiting;
     tab.document.body.style.font = '15px system-ui, sans-serif';
-    tab.document.body.textContent = 'Gerando PDF…';
+    tab.document.body.textContent = waiting;
   } catch {
     /* Página em branco sem acesso ao documento: segue só com a navegação. */
   }

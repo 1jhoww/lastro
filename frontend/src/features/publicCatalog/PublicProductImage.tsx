@@ -1,12 +1,29 @@
-import { Image } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
 import { useSession } from '@/session/SessionContext';
 import { blobToDataUri } from '@/lib/blob';
-import { Text } from '@/ui';
-export function PublicProductImage({ slug, id, name }: { slug: string; id: string; name: string }) {
+import { color, radius } from '@/theme';
+import { Package } from '@/ui/icons';
+
+/**
+ * Imagem do produto em moldura de proporção fixa (4:3). Sem imagem, carregando ou com falha:
+ * mesmo marcador discreto, para a grade não "pular".
+ */
+export function PublicProductImage({
+  slug,
+  id,
+  name,
+  hasImage,
+}: {
+  slug: string;
+  id: string;
+  name: string;
+  hasImage: boolean;
+}) {
   const { publicApi } = useSession();
   const image = useQuery({
     queryKey: ['public-catalog', slug, 'image', id],
+    enabled: hasImage,
     staleTime: 0,
     gcTime: 0,
     retry: false,
@@ -28,13 +45,26 @@ export function PublicProductImage({ slug, id, name }: { slug: string; id: strin
       return blobToDataUri(result.data);
     },
   });
-  if (image.isError) return <Text variant="small">Imagem indisponível.</Text>;
-  if (!image.data) return <Text variant="small">Carregando imagem…</Text>;
   return (
-    <Image
-      accessibilityLabel={name}
-      source={{ uri: image.data }}
-      style={{ width: '100%', height: 170, resizeMode: 'contain' }}
-    />
+    <View style={styles.frame}>
+      {image.data ? (
+        <Image accessibilityLabel={name} source={{ uri: image.data }} style={styles.image} />
+      ) : (
+        <Package size={28} color={color.borderStrong} strokeWidth={1.5} />
+      )}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  frame: {
+    width: '100%',
+    aspectRatio: 4 / 3,
+    borderRadius: radius.md,
+    backgroundColor: color.surfaceSunken,
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  image: { width: '100%', height: '100%', resizeMode: 'contain' },
+});
