@@ -2,6 +2,7 @@ import { Pressable, Text } from 'react-native';
 import { router, type Href } from 'expo-router';
 import { act, fireEvent, screen, waitFor } from 'expo-router/testing-library';
 import Finance from '@/app/(app)/financeiro/index';
+import Receivables from '@/app/(app)/financeiro/receber';
 import Title from '@/app/(app)/financeiro/[id]';
 import { useSession } from '@/session/SessionContext';
 import { intentLedger } from '@/lib/intent';
@@ -21,7 +22,11 @@ jest.mock('@/theme/useLayoutSize', () => ({
   ...jest.requireActual('@/theme/useLayoutSize'),
   useLayoutSize: () => mockSize,
 }));
-const overrides = { '(app)/financeiro/index': Finance, '(app)/financeiro/[id]': Title };
+const overrides = {
+  '(app)/financeiro/index': Finance,
+  '(app)/financeiro/receber': Receivables,
+  '(app)/financeiro/[id]': Title,
+};
 beforeEach(() => {
   mockSize = 'compact';
   intentLedger.reset();
@@ -47,24 +52,26 @@ function world(role: 'administrator' | 'seller' = 'administrator', permissions?:
     .on('GET', '/api/v1/payments', () => ok(page([])))
     .on('GET', '/api/v1/orders/o1/financial-history', () => ok(page([])))
     .on('GET', '/api/v1/financial-executions', () => ok(page([])))
+    .on('GET', '/api/v1/refund-obligations', () => ok(page([])))
     .on('GET', '/api/v1/orders/payment-options/methods', () => ok(page([method])));
   return { gateway, server };
 }
-async function fillReceipt(amount = '500') {
-  await screen.findByText('Registrar recebimento');
+async function openReceipt() {
   await waitFor(() =>
-    expect(screen.getByRole('button', { name: 'Revisar recebimento' })).toBeEnabled(),
+    expect(screen.getByRole('button', { name: 'Registrar pagamento' })).toBeEnabled(),
   );
-  await fireEvent.changeText(screen.getByLabelText('Valor recebido'), amount);
-  await fireEvent.press(screen.getByRole('button', { name: 'Forma efetiva: Escolha' }));
-  await fireEvent.press(await screen.findByRole('radio', { name: 'Pix conferido' }));
-  await fireEvent.changeText(screen.getByLabelText('Recebido em'), '2026-10-13');
-  await fireEvent.changeText(
-    screen.getByLabelText('Motivo do recebimento'),
-    'Recebimento conferido',
-  );
-  await fireEvent.press(screen.getByRole('button', { name: 'Revisar recebimento' }));
-  await screen.findByText('Confirmar recebimento?');
+  await fireEvent.press(screen.getByRole('button', { name: 'Registrar pagamento' }));
+  await screen.findByRole('radio', { name: 'Pix conferido' });
+}
+async function fillReceipt(amount: string | null = '500') {
+  await openReceipt();
+  if (amount !== null) await fireEvent.changeText(screen.getByLabelText('Valor recebido'), amount);
+  await fireEvent.press(screen.getByRole('radio', { name: 'Pix conferido' }));
+  await fireEvent.changeText(screen.getByLabelText('Data do pagamento'), '13/10/2026');
+  await fireEvent.press(screen.getByRole('button', { name: 'Mais detalhes' }));
+  await fireEvent.changeText(screen.getByLabelText('Observação'), 'Recebimento conferido');
+  await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
+  await screen.findByRole('button', { name: 'Confirmar pagamento' });
 }
 const postCalls = (s: ReturnType<typeof createFakeApi>) =>
   s.calls.filter((c) => c.method === 'POST');
@@ -82,26 +89,37 @@ describe('financeiro: telas e isolamento', () => {
     expect(await screen.findByText('Você não tem acesso a esta área')).toBeTruthy();
     expect(server.calls.filter((c) => c.path.includes('receivables'))).toHaveLength(0);
   });
-  it('lista compacta mostra saldo, parcela e situação oficial', async () => {
+  it('lista compacta mostra cliente, saldo e situação de cobrança', async () => {
     const { gateway, server } = world();
-    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro', overrides });
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/financeiro/receber',
+      overrides,
+    });
     expect(await screen.findByText('Mercado Central')).toBeTruthy();
     expect(screen.getByText('R$ 20,00')).toBeTruthy();
-    expect(screen.getByText('Em aberto')).toBeTruthy();
     expect(await screen.findByText('Vencido')).toBeTruthy();
+    expect(screen.getByText(/01\/10\/2026/)).toBeTruthy();
     expect(server.calls.find((c) => c.path === '/api/v1/receivables')?.headers['x-tenant-id']).toBe(
       't1',
     );
   });
-  it('desktop mostra colunas financeiras', async () => {
+  it('desktop mostra colunas de valor, recebido e saldo', async () => {
     mockSize = 'expanded';
     const { gateway, server } = world();
-    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro', overrides });
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/financeiro/receber',
+      overrides,
+    });
     await screen.findByText('Mercado Central');
-    expect(screen.getByText('Original')).toBeTruthy();
+    expect(screen.getByText('Valor')).toBeTruthy();
+    expect(screen.getByText('Recebido')).toBeTruthy();
     expect(screen.getByText('Saldo')).toBeTruthy();
   });
-  it('página vazia com cursor conserva continuação e filtros suportados', async () => {
+  it('link antigo com pedido abre a lista filtrada; página vazia continua pelo cursor', async () => {
     const { gateway, server } = world();
     server.on('GET', '/api/v1/receivables', (c) =>
       c.query.cursor ? ok(page([receivable()])) : ok(page([], 'next')),
@@ -112,41 +130,74 @@ describe('financeiro: telas e isolamento', () => {
       initialUrl: '/financeiro?pedido=o1',
       overrides,
     });
-    await screen.findByText('Nenhum título nestes filtros');
-    await fireEvent.press(screen.getByRole('button', { name: 'Carregar mais' }));
     await screen.findByText('Mercado Central');
     expect(server.calls.filter((c) => c.path === '/api/v1/receivables')[1]?.query).toMatchObject({
       cursor: 'next',
       orderId: 'o1',
       limit: '25',
     });
-    await fireEvent.changeText(screen.getByLabelText('Vencimento de'), '2026-10-01');
-    await fireEvent.changeText(screen.getByLabelText('Vencimento até'), '2026-10-13');
-    await fireEvent.press(screen.getByRole('button', { name: 'Aplicar período e pedido' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Período' }));
+    await fireEvent.changeText(screen.getByLabelText('Vencimento de'), '01/10/2026');
+    await fireEvent.changeText(screen.getByLabelText('Vencimento até'), '13/10/2026');
     await waitFor(() =>
       expect(
         server.calls.some((c) => c.query.from === '2026-10-01' && c.query.to === '2026-10-13'),
       ).toBe(true),
     );
   });
+  it('vencidos usa limite do servidor até ontem e esconde quitados', async () => {
+    const { gateway, server } = world();
+    server.on('GET', '/api/v1/receivables', () =>
+      ok(
+        page([
+          receivable(),
+          receivable({
+            id: 'r2',
+            customerName: 'Cliente quitado',
+            outstandingCents: 0,
+            cashCents: 2000,
+            status: 'paid',
+          }),
+        ]),
+      ),
+    );
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/financeiro/receber?situacao=overdue',
+      overrides,
+    });
+    await screen.findByText('Mercado Central');
+    expect(screen.queryByText('Cliente quitado')).toBeNull();
+    await waitFor(() =>
+      expect(server.calls.some((c) => c.path === '/api/v1/receivables' && c.query.to)).toBe(true),
+    );
+  });
   it('erro de lista mostra ação de recarga', async () => {
     const { gateway, server } = world();
     server.on('GET', '/api/v1/receivables', () => fail(403, 'FORBIDDEN'));
-    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro', overrides });
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/financeiro/receber',
+      overrides,
+    });
     expect(await screen.findByText('Não foi possível carregar a lista')).toBeTruthy();
     server.on('GET', '/api/v1/receivables', () => ok(page([receivable()])));
     await fireEvent.press(screen.getByRole('button', { name: 'Tentar de novo' }));
     expect(await screen.findByText('Mercado Central')).toBeTruthy();
   });
-  it('detalhe mostra saldos e históricos vazios', async () => {
+  it('detalhe mostra saldo, vencimento e históricos vazios', async () => {
     const { gateway, server } = world();
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
-    await screen.findByText('Mercado Central · 1ª parcela');
-    expect(await screen.findByText('Nenhum recebimento')).toBeTruthy();
+    await screen.findByText('Mercado Central');
+    expect(await screen.findByText('Nenhum pagamento registrado neste pedido.')).toBeTruthy();
+    expect(screen.getByText(/Vencimento 01\/10\/2026/)).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Histórico completo do pedido' }));
     expect(await screen.findByText('Nenhum evento financeiro')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Abrir pedido' })).toBeTruthy();
   });
-  it('baixa parcial só envia após revisão e recarrega saldo oficial', async () => {
+  it('pagamento parcial só envia após confirmação e recarrega saldo oficial', async () => {
     const { gateway, server } = world();
     server.on('POST', '/api/v1/orders/o1/receipts', () => {
       const updated = receivable({
@@ -163,31 +214,62 @@ describe('financeiro: telas e isolamento', () => {
     });
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
     await fillReceipt();
+    expect(screen.getByText('Restam R$ 15,00 em aberto')).toBeTruthy();
     expect(postCalls(server)).toHaveLength(0);
-    await fireEvent.press(screen.getByRole('button', { name: 'Registrar baixa' }));
-    await screen.findByText('Recebimento confirmado');
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar pagamento' }));
+    await screen.findByText('Pagamento registrado!');
     expect(postCalls(server)[0]?.body).toEqual(receiptBody);
-    expect(await screen.findByText('Parcialmente recebido')).toBeTruthy();
+    expect((await screen.findAllByText('Parcial')).length).toBeGreaterThan(0);
     expect(screen.getAllByText('R$ 15,00').length).toBeGreaterThan(0);
   });
-  it('botão de saldo total envia valor da projeção atual', async () => {
+  it('valor sugerido é o saldo atual e quita a parcela', async () => {
     const { gateway, server } = world();
     server.on('POST', '/api/v1/orders/o1/receipts', () =>
       ok({ ...financialResult, amountCents: 2000 }),
     );
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
-    await fillReceipt('2000');
-    await fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
-    await fireEvent.changeText(screen.getByLabelText('Valor recebido'), '1');
-    await fireEvent.press(screen.getByRole('button', { name: 'Receber saldo total' }));
+    await openReceipt();
     expect(screen.getByLabelText('Valor recebido').props.value).toBe('R$ 20,00');
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar recebimento' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Registrar baixa' }));
-    await screen.findByText('Recebimento confirmado');
+    await fireEvent.press(screen.getByRole('button', { name: 'Cancelar' }));
+    await fillReceipt(null);
+    expect(screen.getByText('Parcela quitada')).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar pagamento' }));
+    await screen.findByText('Pagamento registrado!');
     expect(postCalls(server)[0]?.body).toMatchObject({
       amountCents: 2000,
       allocations: [{ amountCents: 2000 }],
     });
+  });
+  it('valor acima do saldo não pode seguir para confirmação', async () => {
+    const { gateway, server } = world();
+    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
+    await openReceipt();
+    await fireEvent.changeText(screen.getByLabelText('Valor recebido'), '2500');
+    expect(await screen.findByText('Máximo R$ 20,00 (saldo da parcela)')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Continuar' })).toBeDisabled();
+    expect(postCalls(server)).toHaveLength(0);
+  });
+  it('data futura não é aceita', async () => {
+    const { gateway, server } = world();
+    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
+    await openReceipt();
+    await fireEvent.changeText(screen.getByLabelText('Data do pagamento'), '31/12/2099');
+    expect(await screen.findByText(/Use data até/)).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Continuar' }));
+    expect(await screen.findByText('A data do pagamento não pode ser futura.')).toBeTruthy();
+    expect(postCalls(server)).toHaveLength(0);
+  });
+  it('sem formas ativas mostra estado vazio com acesso ao cadastro', async () => {
+    const { gateway, server } = world();
+    server.on('GET', '/api/v1/orders/payment-options/methods', () => ok(page([])));
+    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Registrar pagamento' })).toBeEnabled(),
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Registrar pagamento' }));
+    expect(await screen.findByText('Nenhuma forma de pagamento ativa')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Cadastrar forma de pagamento' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Continuar' })).toBeDisabled();
   });
   it('resposta perdida mantém intenção ao fechar tela; repete mesma chave e corpo', async () => {
     const { gateway, server } = world();
@@ -198,39 +280,39 @@ describe('financeiro: telas e isolamento', () => {
     });
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
     await fillReceipt();
-    await fireEvent.press(screen.getByRole('button', { name: 'Registrar baixa' }));
-    await screen.findByText('Resultado desconhecido');
+    await fireEvent.press(screen.getByRole('button', { name: 'Confirmar pagamento' }));
+    await screen.findByText('Ainda não sabemos se o pagamento foi registrado');
     expect(postCalls(server)).toHaveLength(1);
-    await act(() => router.replace('/financeiro'));
+    await act(() => router.replace('/financeiro/receber'));
     await screen.findByText('Mercado Central');
     await act(() => router.push('/financeiro/r1' as Href));
-    await screen.findByText('Resultado desconhecido');
-    expect(screen.getByRole('button', { name: 'Revisar recebimento' })).toBeDisabled();
-    await fireEvent.press(screen.getByRole('button', { name: 'Repetir mesma baixa' }));
-    await screen.findByText('Recebimento confirmado');
+    await screen.findByText('Ainda não sabemos se o pagamento foi registrado');
+    expect(screen.getByRole('button', { name: 'Registrar pagamento' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Conferir pagamento' }));
+    await screen.findByText('Pagamento registrado!');
     expect(postCalls(server)[0]?.headers['idempotency-key']).toBe(
       postCalls(server)[1]?.headers['idempotency-key'],
     );
     expect(postCalls(server)[0]?.body).toEqual(postCalls(server)[1]?.body);
   });
-  it('sem payments:manage não monta formulário nem busca formas', async () => {
+  it('sem payments:manage não mostra a ação nem busca formas', async () => {
     const { gateway, server } = world('administrator', ['receivables:read']);
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
-    await screen.findByText('Nenhum evento financeiro');
-    expect(screen.queryByText('Registrar recebimento')).toBeNull();
+    await screen.findByText('Nenhum pagamento registrado neste pedido.');
+    expect(screen.queryByRole('button', { name: 'Registrar pagamento' })).toBeNull();
     expect(server.calls.some((c) => c.path.endsWith('payment-options/methods'))).toBe(false);
   });
-  it('devolução ativa bloqueia baixa', async () => {
+  it('devolução ativa bloqueia pagamento', async () => {
     const { gateway, server } = world();
     server.on('GET', '/api/v1/orders/o1/financial-state', () =>
       ok(financialState(undefined, { activeReturnCount: 1 })),
     );
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
-    await screen.findByText('Recebimento bloqueado');
-    expect(screen.getByRole('button', { name: 'Revisar recebimento' })).toBeDisabled();
+    await screen.findByText('Pagamento indisponível no momento');
+    expect(screen.getByRole('button', { name: 'Registrar pagamento' })).toBeDisabled();
     expect(postCalls(server)).toHaveLength(0);
   });
-  it('202 pendente nunca mostra publicação concluída', async () => {
+  it('202 pendente nunca mostra conclusão e bloqueia pagamento', async () => {
     const { gateway, server } = world();
     server.on('GET', '/api/v1/financial-executions', () =>
       ok(
@@ -247,8 +329,9 @@ describe('financeiro: telas e isolamento', () => {
     );
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/r1', overrides });
     await screen.findByText('Operação financeira pendente');
-    expect(screen.queryByText('Recebimento confirmado')).toBeNull();
-    expect(screen.getByRole('button', { name: 'Revisar recebimento' })).toBeDisabled();
+    expect(screen.queryByText('Pagamento registrado!')).toBeNull();
+    expect(screen.queryByText('Concluída')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Registrar pagamento' })).toBeDisabled();
   });
   it('troca de empresa remonta formulário e não mostra saldo anterior', async () => {
     const { gateway, server } = world();
@@ -298,15 +381,13 @@ describe('financeiro: telas e isolamento', () => {
     });
     await fireEvent.press(await screen.findByText('Escolher A'));
     await act(() => router.push('/financeiro/r1' as Href));
-    await screen.findByText('Registrar recebimento');
-    await fireEvent.changeText(
-      screen.getByLabelText('Motivo do recebimento'),
-      'Corpo da empresa A',
-    );
+    await openReceipt();
+    await fireEvent.press(screen.getByRole('button', { name: 'Mais detalhes' }));
+    await fireEvent.changeText(screen.getByLabelText('Observação'), 'Corpo da empresa A');
     await fireEvent.press(screen.getByText('Trocar para B'));
-    await screen.findByText('Empresa B cliente · 1ª parcela');
-    expect(screen.queryByText('Mercado Central · 1ª parcela')).toBeNull();
-    expect(screen.getByLabelText('Motivo do recebimento').props.value).toBe('');
+    await screen.findByText('Empresa B cliente');
+    expect(screen.queryByText('Mercado Central')).toBeNull();
+    expect(screen.queryByDisplayValue('Corpo da empresa A')).toBeNull();
     expect(queryClient.getQueryCache().findAll({ queryKey: ['tenant', 't1'] })).toHaveLength(0);
   });
 });

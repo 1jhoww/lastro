@@ -8,6 +8,8 @@ import { useCursorList } from '@/features/catalog/useCursorList';
 import { intentLedger, outcomeOf, PendingIntentError, withDeadline } from '@/lib/intent';
 import { tenantHeader, useSession, useTenantApi } from '@/session/SessionContext';
 import { canReadFinance } from './FinanceAccess';
+import { applyConfirmedReceipt, refreshAfterFinanceCommand } from './cacheUpdates';
+import { OVERVIEW_MAX_PAGES, OVERVIEW_PAGE_SIZE } from './overview';
 import { receiptResultSchema } from './rules';
 
 export type ReceivableFilters = {
@@ -35,6 +37,53 @@ export function useReceivables(filters: ReceivableFilters, limit = 25) {
       ),
     allowed,
   );
+}
+
+async function scanPages<T>(
+  fetchPage: (cursor?: string) => Promise<{ items: T[]; nextCursor: string | null }>,
+) {
+  const items: T[] = [];
+  let cursor: string | undefined;
+  for (let i = 0; i < OVERVIEW_MAX_PAGES; i++) {
+    const page = await fetchPage(cursor);
+    items.push(...page.items);
+    if (!page.nextCursor) return { items, complete: true };
+    cursor = page.nextCursor;
+  }
+  return { items, complete: false };
+}
+
+/** Leitura integral (limitada) para o painel; indicadores incompletos não são exibidos. */
+export function useFinanceOverview() {
+  const { api, tenantId, header } = useTenantApi();
+  const allowed = canReadFinance(useSession());
+  return useQuery({
+    queryKey: [...queryKeys.finance(tenantId), 'overview'],
+    enabled: allowed,
+    retry: false,
+    queryFn: async ({ signal }) => {
+      const limit = String(OVERVIEW_PAGE_SIZE);
+      const [titles, payments] = await Promise.all([
+        scanPages((cursor) =>
+          unwrap(
+            api.GET('/api/v1/receivables', {
+              params: { header, query: { limit, ...(cursor ? { cursor } : {}) } },
+              signal,
+            }),
+          ),
+        ),
+        scanPages((cursor) =>
+          unwrap(
+            api.GET('/api/v1/payments', {
+              params: { header, query: { limit, ...(cursor ? { cursor } : {}) } },
+              signal,
+            }),
+          ),
+        ),
+      ]);
+      return { titles, payments, fetchedAt: new Date().toISOString() };
+    },
+  });
 }
 
 export function useReceivable(id: string) {
@@ -220,9 +269,15 @@ export function useReceipt(orderId: string, scope: string) {
           throw new ApiError(403, 'TENANT_ACCESS_DENIED', 'Sessão mudou antes do recebimento');
       });
     },
-    onSettled: () => {
-      cache.invalidateQueries({ queryKey: queryKeys.finance(tenantId) });
-      cache.invalidateQueries({ queryKey: queryKeys.orders(tenantId) });
+    // Saldo novo aparece junto com a confirmação; nada é aplicado antes da resposta da API.
+    onSuccess: (result, body) => applyConfirmedReceipt(cache, tenantId, body, result),
+    // Sem `return`: a confirmação não espera as consultas de atualização terminarem.
+    onSettled: (_result, _error, body) => {
+      void refreshAfterFinanceCommand(cache, tenantId, [
+        orderId,
+        body.customerId,
+        ...body.allocations.map((a) => a.receivableId),
+      ]);
     },
   });
 }

@@ -2,6 +2,10 @@
 
 ## Checkpoint
 
+**Fase 1 (reformulação de UX do Financeiro):** painel, navegação, contas a receber, registro de
+pagamento, condições e formas, créditos, estornos, reembolsos e operações avançadas foram
+reformulados sem mudar contratos nem garantias. Consulte [finance-phase1.md](finance-phase1.md).
+
 **Continuidade posterior:** a Etapa 7 integra relatórios disponíveis, PDFs, quatro CSVs e catálogo
 público. Consulte [etapa-7-relatorio-final.md](etapa-7-relatorio-final.md) para o checkpoint atual,
 evidências, matriz do MVP e pendências de homologação. Os resultados e instruções abaixo permanecem

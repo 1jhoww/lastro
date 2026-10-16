@@ -54,7 +54,7 @@ export function DiscountPanel({ order }: { order: Order }) {
       setBasisVersion(saved.version);
       setReview(null);
       setNotice(
-        'Desconto confirmado pelo servidor. Qualquer edição posterior do rascunho exige nova aprovação.',
+        'Desconto aprovado! Se o rascunho for editado depois, será preciso aprovar de novo.',
       );
     } catch (error) {
       if (outcomeOf(error).status === 'unknown' || pending) intentLedger.markUnknown(scope);
@@ -68,7 +68,7 @@ export function DiscountPanel({ order }: { order: Order }) {
   return (
     <FormSection
       title="Desconto administrativo"
-      description="Somente rascunho. O servidor aprova, distribui desconto, calcula parcelas e registra snapshot."
+      description="Somente em rascunho. O Lastro distribui o desconto entre os itens e recalcula as parcelas."
     >
       {notice ? (
         <Alert tone="info" title="Estado do desconto">
@@ -81,7 +81,7 @@ export function DiscountPanel({ order }: { order: Order }) {
           title="Desconto com resultado desconhecido"
           action={
             <Button
-              label="Conferir desconto oficial"
+              label="Conferir desconto"
               loading={checking}
               onPress={async () => {
                 setChecking(true);
@@ -106,14 +106,14 @@ export function DiscountPanel({ order }: { order: Order }) {
                   if (confirmed) {
                     await intentLedger.finish(scope);
                     setBasisVersion(official.version);
-                    setNotice('Estado oficial confirma desconto solicitado. Não houve novo PATCH.');
+                    setNotice('Tudo certo: o desconto já estava aprovado. Nada foi repetido.');
                   } else if (
                     official.status === 'draft' &&
                     official.version === body.expectedVersion
                   ) {
                     setReview(body);
                     setNotice(
-                      'Estado oficial ainda tem versão original. A repetição explícita usa essa mesma versão, sem renovar aprovação.',
+                      'O desconto ainda não aparece no pedido. Você pode repetir a mesma aprovação com segurança.',
                     );
                   } else
                     setNotice(
@@ -128,8 +128,8 @@ export function DiscountPanel({ order }: { order: Order }) {
             />
           }
         >
-          Chave local e payload estão preservados para conferência. PATCH não tem replay por chave;
-          repetição exige consulta oficial e versão original.
+          A conexão caiu antes da confirmação. Confira o desconto antes de aprovar de novo; a
+          aprovação original foi guardada.
         </Alert>
       ) : null}
       {update.isError ? (
@@ -212,14 +212,14 @@ export function DiscountPanel({ order }: { order: Order }) {
             value: order.discount?.value ?? 0,
             reason: order.discount?.reason ?? '',
           });
-          setNotice('Campos e versão recarregados do pedido atual. Revise antes de aprovar.');
+          setNotice('Valores atualizados com o pedido atual. Revise antes de aprovar.');
         }}
       />
-      <Text>{`Versão revisada: ${basisVersion} · subtotal oficial ${formatCents(order.subtotalCents)}`}</Text>
+      <Text>{`Subtotal do pedido ${formatCents(order.subtotalCents)}`}</Text>
       <ConfirmDialog
         visible={review !== null}
         title="Confirmar desconto administrativo?"
-        description="Esta aprovação altera apenas rascunho. O servidor decide limite, parcelas e snapshots; novas edições invalidam aprovação."
+        description="Vale só para este rascunho. Se ele for editado depois, a aprovação precisa ser feita de novo."
         confirmLabel="Aprovar desconto"
         tone="strong"
         loading={update.isPending}
@@ -227,7 +227,7 @@ export function DiscountPanel({ order }: { order: Order }) {
         onConfirm={() => {
           if (review && order.status === 'draft') send(review);
           else {
-            setNotice('Pedido deixou de ser rascunho. Confira estado oficial.');
+            setNotice('Este pedido não é mais rascunho. Confira a situação atual.');
             setReview(null);
           }
         }}

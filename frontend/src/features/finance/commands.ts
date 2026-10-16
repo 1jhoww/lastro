@@ -31,10 +31,10 @@ export type SettingCommand =
 export type FinanceCommand = EconomicCommand | SettingCommand;
 export type FinanceCommandResult = FinancialResult | PaymentCondition | PaymentMethod;
 export const commandLabels: Record<FinanceCommand['kind'], string> = {
-  'apply-credit': 'Aplicar crédito',
-  'reverse-payment': 'Estornar recebimento',
-  'reverse-credit': 'Estornar aplicação de crédito',
-  'confirm-refund': 'Registrar reembolso realizado',
+  'apply-credit': 'Usar crédito do cliente',
+  'reverse-payment': 'Estornar pagamento',
+  'reverse-credit': 'Estornar uso de crédito',
+  'confirm-refund': 'Registrar reembolso já feito',
   'create-condition': 'Criar condição',
   'update-condition': 'Atualizar condição',
   'create-method': 'Criar forma',

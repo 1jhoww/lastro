@@ -7,6 +7,7 @@ import { useCursorList } from '@/features/catalog/useCursorList';
 import { RECENT_AUTH_SECONDS } from '@/features/platform/ReauthGate';
 import { intentLedger } from '@/lib/intent';
 import { useSession, useTenantApi } from '@/session/SessionContext';
+import { refreshAfterFinanceCommand } from './cacheUpdates';
 import { canManageFinance, canReadFinance } from './FinanceAccess';
 import {
   commandPermission,
@@ -205,10 +206,24 @@ export function useFinanceCommand(scope: string) {
           );
       });
     },
-    onSettled: () => {
-      cache.invalidateQueries({ queryKey: queryKeys.finance(tenantId) });
-      cache.invalidateQueries({ queryKey: queryKeys.orders(tenantId) });
-      cache.invalidateQueries({ queryKey: ['tenant', tenantId, 'payment-options'] });
+    onSettled: (_result, _error, command) => {
+      if ('orderId' in command) {
+        const body = command.body as {
+          customerId?: string;
+          allocations?: { receivableId: string }[];
+        };
+        void refreshAfterFinanceCommand(cache, tenantId, [
+          command.orderId,
+          command.id,
+          body.customerId,
+          ...(body.allocations ?? []).map((a) => a.receivableId),
+        ]);
+        return;
+      }
+      // Cadastros: listas de condições/formas e opções usadas por pedidos e recebimentos.
+      cache.invalidateQueries({ queryKey: [...queryKeys.finance(tenantId), 'conditions'] });
+      cache.invalidateQueries({ queryKey: [...queryKeys.finance(tenantId), 'methods'] });
+      void cache.invalidateQueries({ queryKey: ['tenant', tenantId, 'payment-options'] });
     },
   });
 }

@@ -81,36 +81,52 @@ const fallback: Record<ErrorKind, string> = {
 /** Códigos do contrato atual (backend Fases A–D) com orientação específica. */
 const messages: Record<string, string> = {
   INTENT_STORAGE_UNAVAILABLE:
-    'Armazenamento local indisponível ou checkpoint incompleto. Nenhuma nova operação financeira será enviada. Recupere estado oficial e tente novamente.',
+    'Não conseguimos guardar esta operação no aparelho com segurança, então ela não foi enviada. Recarregue a página e tente de novo.',
   RETURN_REQUIRED:
-    'Pedido expedido exige devolução física própria. Cancelamento financeiro direto não é permitido.',
+    'Este pedido já foi expedido. Para desfazer, registre uma devolução em vez de cancelar.',
   RETURN_VALUE_LIMIT:
-    'Aceite financeiro excede limite oficial do recebido. Atualize preview e revise decisão de dano.',
-  DAMAGED_ACCEPTANCE_REQUIRED: 'Decida explicitamente aceite ou rejeição de cada dano recebido.',
+    'O valor aceito passa do limite desta devolução. Atualize a tela e revise o valor da avaria.',
+  DAMAGED_ACCEPTANCE_REQUIRED: 'Decida o que fazer com cada item recebido com avaria.',
   FINANCIAL_RESUMABLE_REQUIRED:
-    'Histórico exige execução retomável. Atualize estado e revise início explícito; não repita cancelamento atômico.',
-  EXECUTION_CONFLICT: 'Revisão mudou. Consulte estado oficial antes de revisar outro passo.',
+    'Este pedido tem muitos registros e precisa ser processado em etapas. Escolha “Em etapas, com acompanhamento” e confirme de novo.',
+  EXECUTION_CONFLICT: 'A operação avançou em outro lugar. Atualize a situação antes de continuar.',
   EXECUTION_LEASE_CONFLICT:
-    'Lease ou fence não autoriza este avanço. Consulte estado e revise retomada com senha recente.',
+    'Outra pessoa ou aba está continuando esta operação. Atualize a situação ou retome informando o motivo.',
   EXECUTION_REVIEW_REQUIRED:
-    'Execução exige revisão administrativa. Preserve plano e consulte referência oficial.',
+    'Esta operação precisa de revisão administrativa. Informe a referência ao suporte.',
   EXECUTION_ABORT_NOT_ALLOWED:
-    'Abort não permitido após aplicação. Continue recuperação da mesma execução.',
-  CREDIT_LIMIT: 'Saldo de crédito insuficiente. Recarregue a fonte antes de revisar o valor.',
+    'A operação já começou a aplicar valores e não pode mais ser interrompida. Continue até concluir.',
+  EXCESS_PAYMENT:
+    'O valor é maior que o saldo atual da parcela. Atualize a tela e informe até o saldo restante.',
+  INVALID_PAYMENT_DATE: 'A data do pagamento não pode ser futura. Use hoje ou uma data anterior.',
+  INVALID_ALLOCATION: 'A parcela mudou desde que a tela foi aberta. Atualize e tente de novo.',
+  CREDIT_ORIGIN_INVALID: 'Este crédito não pode ser usado neste pedido. Confira cliente e origem.',
+  REQUEST_OUTCOME_UNKNOWN:
+    'Não conseguimos confirmar se deu certo. Nada foi repetido: confira antes de tentar de novo.',
+  FINANCIAL_INTEGRITY:
+    'Encontramos uma inconsistência nos registros financeiros deste pedido. Fale com o suporte.',
+  // 409 por regra (ADR 0008): recarregar não libera; o fallback de conflito orientaria errado.
+  LEGACY_FINANCIAL_REVIEW_REQUIRED:
+    'Este pedido tem registros financeiros antigos sem origem comprovada. Novos lançamentos ficam bloqueados até a revisão administrativa.',
+  FINANCIAL_SOURCE_GENERATION_STALE:
+    'Os registros financeiros do pedido mudaram durante a preparação da execução. Consulte o estado oficial antes de avançar de novo.',
+  RETURN_NOT_RESOLVABLE:
+    'Não há quantidade pendente para resolver ou falta decidir sobre itens danificados. Atualize a devolução e revise as decisões.',
+  CREDIT_LIMIT: 'O cliente não tem crédito suficiente para esse valor. Atualize a tela e revise.',
   REVERSAL_LIMIT:
-    'O valor excede a alocação ainda reversível. Parte pode ter sido estornada ou destinada anteriormente.',
-  REFUND_LIMIT: 'O valor excede a obrigação pendente. Recarregue o reembolso antes de revisar.',
+    'O valor é maior do que ainda pode ser estornado. Parte dele já pode ter sido estornada antes.',
+  REFUND_LIMIT: 'O valor é maior que o reembolso pendente. Atualize a tela e revise.',
   REAUTHENTICATION_REQUIRED: 'Confirme sua senha novamente para autorizar esta operação sensível.',
   PAYMENT_METHOD_CHANGED:
-    'A forma foi alterada ou desativada. Recarregue as opções e escolha uma forma ativa.',
+    'Essa forma de pagamento foi alterada ou desativada. Escolha outra forma disponível.',
   DUPLICATE_PAYMENT_SETTING:
-    'Já existe condição ou forma com este nome. Consulte os cadastros antes de criar outra.',
+    'Já existe uma condição ou forma com esse nome. Use outro nome ou edite a existente.',
   RETURN_FINANCIAL_BLOCK:
-    'Há devolução ativa neste pedido. Consulte a pendência antes de aplicar crédito ou estornar.',
+    'Há uma devolução em andamento neste pedido. Conclua-a antes de usar crédito ou estornar.',
   FINANCIAL_OPERATION_IN_PROGRESS:
-    'Há execução financeira pendente neste pedido. Aguarde publicação confirmada pelo servidor.',
+    'Há uma operação em andamento neste pedido. Conclua-a antes de registrar outra.',
   FINANCIAL_LOT_LOCKED:
-    'A fonte de crédito está bloqueada por outra execução. Não use valor preparado como disponível.',
+    'Este crédito está reservado por outra operação em andamento. Tente de novo quando ela terminar.',
   TENANT_ACCESS_DENIED: 'Você não tem acesso ativo a esta empresa.',
   USER_LIMIT_REACHED:
     'Todas as vagas do plano estão ocupadas. Revogue um convite ou desative um usuário.',

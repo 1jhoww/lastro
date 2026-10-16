@@ -100,13 +100,14 @@ export const executionResponseSchema = z
 export const dispositionOptions = [
   {
     value: 'customer_credit' as const,
-    label: 'Crédito do cliente',
-    description: 'Somente caixa liquidado gera nova fonte legítima.',
+    label: 'Virar crédito do cliente',
+    description: 'O valor pago fica disponível para o cliente usar em compras futuras.',
   },
   {
     value: 'refund' as const,
-    label: 'Obrigação de reembolso',
-    description: 'Pagamento externo continua separado e manual.',
+    label: 'Reembolsar o cliente',
+    description:
+      'Fica registrado um reembolso a fazer. O dinheiro é devolvido por fora do sistema.',
   },
 ];
 export const resolutionFormSchema = z.object({

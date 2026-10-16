@@ -71,8 +71,9 @@ async function choose(label: string, radio: string) {
 it('lista informa status, fase e denominador não certificado sem iniciar POST', async () => {
   const { server, gateway } = world();
   await renderApp({ gateway, fetch: server.fetch, initialUrl: '/financeiro/execucoes', overrides });
-  await screen.findByText(/Entradas técnicas: planejadas 0 · aplicadas 0 · total não certificado/);
-  expect(screen.queryByText('Publicação financeira comprovada pelo servidor')).toBeNull();
+  await screen.findByText(/^Cancelamento de pedido · PED-/);
+  expect(screen.getByText('Aguardando continuidade')).toBeTruthy();
+  expect(screen.queryByText('Concluída')).toBeNull();
   expect(posts(server)).toHaveLength(0);
 });
 it('continuação exige revisão explícita e versões oficiais; consulta GET depois do passo', async () => {
@@ -91,11 +92,13 @@ it('continuação exige revisão explícita e versões oficiais; consulta GET de
   });
   await fireEvent.press(await screen.findByRole('button', { name: 'Continuar execução' }));
   expect(posts(server)).toHaveLength(0);
-  await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar decisão' }));
-  await screen.findByText(/Fase payments · revisão 4 · fence 1/);
+  await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar' }));
+  await fireEvent.press(await screen.findByRole('button', { name: 'Detalhes técnicos' }));
+  await screen.findByText(/Revisão 4 · fence 1/);
+  expect(screen.getByText(/fase payments/)).toBeTruthy();
   expect(posts(server)).toHaveLength(1);
   expect(posts(server)[0]?.body).toEqual({ expectedRevision: 1, fencingToken: 1 });
-  expect(screen.queryByText('Publicação financeira confirmada')).toBeNull();
+  expect(screen.queryByText('Operação concluída')).toBeNull();
 });
 it('reinício restaura passo e chave; abrir tela não avança nem repete POST', async () => {
   const { server, gateway } = world();
@@ -117,10 +120,10 @@ it('reinício restaura passo e chave; abrir tela não avança nem repete POST', 
     initialUrl: '/financeiro/execucoes/exec1',
     overrides,
   });
-  await screen.findByText('Passo com resposta desconhecida preservado');
+  await screen.findByText('Última etapa sem confirmação');
   expect(posts(server)).toHaveLength(0);
   await fireEvent.press(screen.getByRole('button', { name: 'Revisar passo original' }));
-  await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar decisão' }));
+  await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar' }));
   await waitFor(() => expect(posts(server)).toHaveLength(1));
   expect(posts(server)[0]?.headers['idempotency-key']).toBe(key);
 });
@@ -142,7 +145,7 @@ it('GET publicado encerra checkpoint local sem repetir início ou movimento', as
     initialUrl: '/financeiro/execucoes/exec1',
     overrides,
   });
-  await screen.findByText('Publicação financeira confirmada');
+  await screen.findByText('Operação concluída');
   await waitFor(() => expect(intentLedger.get(scope)).toBeUndefined());
   expect(posts(server)).toHaveLength(0);
   expect(screen.queryByRole('button', { name: 'Continuar execução' })).toBeNull();
@@ -169,7 +172,8 @@ it.each(['PAUSED', 'NEEDS_REVIEW'] as const)(
       initialUrl: '/financeiro/execucoes/exec1',
       overrides,
     });
-    await screen.findByText(/PROOF_MISSING · referência safe-ref/);
+    await screen.findByText(/Referência safe-ref · PROOF_MISSING/);
+    expect(screen.getByText('Necessita atenção')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Continuar execução' })).toBeDisabled();
     expect(posts(server)).toHaveLength(0);
     await fireEvent.changeText(
@@ -177,7 +181,7 @@ it.each(['PAUSED', 'NEEDS_REVIEW'] as const)(
       'Conferência administrativa de origem',
     );
     await fireEvent.press(screen.getByRole('button', { name: 'Revisar retomada' }));
-    await screen.findByText('Retomar execução com novo fence');
+    await screen.findByText('Retomar operação');
     expect(posts(server)).toHaveLength(0);
   },
 );
@@ -195,6 +199,7 @@ it('lease expirado bloqueia avanço; senha antiga pede reauth para retomar', asy
   });
   await screen.findByRole('button', { name: 'Continuar execução' });
   expect(screen.getByRole('button', { name: 'Continuar execução' })).toBeDisabled();
+  await fireEvent.press(screen.getByRole('button', { name: 'Retomar ou interromper' }));
   await fireEvent.changeText(
     screen.getByLabelText('Justificativa da retomada ou abort'),
     'Assumir lease expirado',
@@ -211,7 +216,9 @@ it('sem payments:manage consulta detalhes sem controles de execução', async ()
     initialUrl: '/financeiro/execucoes/exec1',
     overrides,
   });
+  await fireEvent.press(await screen.findByRole('button', { name: 'Detalhes técnicos' }));
   await screen.findByText('Progresso técnico');
+  expect(screen.getByText(/total: não certificado/)).toBeTruthy();
   expect(screen.queryByRole('button', { name: 'Continuar execução' })).toBeNull();
   expect(posts(server)).toHaveLength(0);
 });
@@ -265,21 +272,17 @@ it('devolução usa preview oficial, exige decisão de dano e envia centavos int
     initialUrl: '/financeiro/devolucoes/ret1',
     overrides,
   });
-  await waitFor(() =>
-    expect(screen.getByRole('button', { name: 'Revisar resolução financeira' })).toBeEnabled(),
-  );
-  await fireEvent.press(screen.getByRole('button', { name: 'Revisar resolução financeira' }));
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Revisar' })).toBeEnabled());
+  expect(screen.getByText('Resolução financeira pendente')).toBeTruthy();
+  await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
   await screen.findByText('Decida cada dano recebido antes de revisar.');
   expect(posts(server)).toHaveLength(0);
-  await choose('Decisão do dano line1', 'Aceitar valor parcial');
-  await fireEvent.changeText(screen.getByLabelText('Valor aceito line1'), '250');
-  await fireEvent.changeText(
-    screen.getByLabelText('Justificativa da resolução'),
-    'Aceite parcial conferido',
-  );
-  await fireEvent.press(screen.getByRole('button', { name: 'Revisar resolução financeira' }));
-  await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar decisão' }));
-  await screen.findByText('Resolução atômica confirmada');
+  await choose('Avaria do item 1', 'Abater parte do valor');
+  await fireEvent.changeText(screen.getByLabelText('Valor a abater do item 1'), '250');
+  await fireEvent.changeText(screen.getByLabelText('Motivo'), 'Aceite parcial conferido');
+  await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
+  await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar' }));
+  await screen.findByText('Acerto confirmado');
   expect(posts(server)[0]?.body).toMatchObject({
     expectedVersion: 3,
     expectedGuardVersion: 7,
@@ -317,15 +320,15 @@ it('journal incompleto mantém divergência mesmo se última página vier consis
     initialUrl: '/financeiro/execucoes/exec1',
     overrides,
   });
-  await screen.findByText('Publicação financeira confirmada');
-  await fireEvent.press(screen.getAllByRole('button', { name: 'Consultar reconciliação' })[0]!);
-  await screen.findByText('Divergência acumulada');
-  expect(screen.queryByText('Consulta completa e consistente neste escopo')).toBeNull();
-  await fireEvent.press(
-    screen.getByRole('button', { name: 'Consultar próxima página de reconciliação' }),
-  );
-  await screen.findByText('Verificados cumulativamente: 3');
-  expect(screen.getByText('Divergência acumulada')).toBeTruthy();
+  await screen.findByText('Operação concluída');
+  await fireEvent.press(screen.getByRole('button', { name: 'Verificação técnica' }));
+  await fireEvent.press(screen.getAllByRole('button', { name: 'Verificar integridade' })[0]!);
+  await screen.findByText('Divergência encontrada');
+  expect(screen.queryByText('Nenhuma divergência encontrada')).toBeNull();
+  await fireEvent.press(screen.getByRole('button', { name: 'Continuar verificação' }));
+  await screen.findByText('Conferidos até agora: 3');
+  expect(screen.getByText('Divergência encontrada')).toBeTruthy();
+  expect(screen.queryByText('Nenhuma divergência encontrada')).toBeNull();
 });
 it('cancelamento pede revisão e não inicia automaticamente retomável após recusa', async () => {
   const { server, gateway } = world();
@@ -339,19 +342,18 @@ it('cancelamento pede revisão e não inicia automaticamente retomável após re
     initialUrl: '/financeiro/pedidos/o1',
     overrides,
   });
-  await waitFor(() =>
-    expect(screen.getByRole('button', { name: 'Revisar resolução financeira' })).toBeEnabled(),
-  );
+  await fireEvent.press(await screen.findByRole('button', { name: 'Operações excepcionais' }));
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Revisar' })).toBeEnabled());
   await fireEvent.changeText(
-    screen.getByLabelText('Justificativa da resolução'),
+    screen.getByLabelText('Motivo'),
     'Cancelar pedido por decisão administrativa',
   );
-  await fireEvent.press(screen.getByRole('button', { name: 'Revisar resolução financeira' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
   expect(posts(server)).toHaveLength(0);
-  await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar decisão' }));
-  await screen.findByText(/FINANCIAL_RESUMABLE_REQUIRED/);
+  await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar' }));
+  await screen.findByText(/processado em etapas/);
   expect(posts(server)).toHaveLength(1);
-  await fireEvent.press(screen.getByRole('button', { name: 'Revisar caminho retomável' }));
+  await fireEvent.press(screen.getByRole('button', { name: 'Usar processamento em etapas' }));
   expect(posts(server)).toHaveLength(1);
 });
 it('troca de empresa esconde intenção anterior e preserva chave em disco', async () => {
@@ -406,9 +408,13 @@ it('troca de empresa esconde intenção anterior e preserva chave em disco', asy
     overrides: { ...overrides, empresas: SelectA, '(app)/financeiro/execucoes/index': Switch },
   });
   await fireEvent.press(await screen.findByText('Escolher A'));
-  await screen.findByText('Intenções locais preservadas');
+  expect((await screen.findAllByText('Operações aguardando conferência')).length).toBeGreaterThan(
+    0,
+  );
   await fireEvent.press(screen.getByText('Trocar para B'));
-  await waitFor(() => expect(screen.queryByText('Intenções locais preservadas')).toBeNull());
+  await waitFor(() =>
+    expect(screen.queryAllByText('Operações aguardando conferência')).toHaveLength(0),
+  );
   expect(intentLedger.get(scope)?.key).toBe(key);
   expect(posts(server)).toHaveLength(0);
 });

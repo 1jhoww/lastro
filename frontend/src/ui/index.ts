@@ -19,3 +19,6 @@ export { ConfirmDialog } from './ConfirmDialog';
 export { Select, type SelectOption } from './Select';
 export { ToastProvider, useToast } from './Toast';
 export { DataTable, type Column } from './DataTable';
+export { DateField } from './DateField';
+export { Disclosure } from './Disclosure';
+export { ChoiceChips, type Choice } from './ChoiceChips';

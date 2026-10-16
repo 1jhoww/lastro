@@ -17,20 +17,23 @@ export function CustomerPicker({
   visible,
   onClose,
   onPick,
+  includeInactive = false,
 }: {
   visible: boolean;
   onClose: () => void;
   onPick: (customer: Customer) => void;
+  /** Consultas (ex.: financeiro) também precisam de clientes desativados. */
+  includeInactive?: boolean;
 }) {
   const [search, setSearch] = useState('');
   const q = useDebouncedValue(search).trim();
-  const { query, items } = useCustomerList({ q, status: 'active' });
+  const { query, items } = useCustomerList({ q, status: includeInactive ? 'all' : 'active' });
 
   return (
     <Dialog
       visible={visible}
       title="Escolher cliente"
-      description="Clientes ativos. A busca considera o início do nome."
+      description={`${includeInactive ? 'Clientes ativos e desativados' : 'Clientes ativos'}. A busca considera o início do nome.`}
       onClose={onClose}
       actions={<Button label="Fechar" variant="ghost" onPress={onClose} />}
     >

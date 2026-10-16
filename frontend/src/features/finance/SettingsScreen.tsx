@@ -1,131 +1,350 @@
-import { useState } from 'react';
-import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState, type ReactNode } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
+import { StyleSheet, View } from 'react-native';
 import type { PaymentCondition, PaymentMethod } from '@/api/types';
 import { toApiError } from '@/api/errors';
-import { ListPanel } from '@/features/catalog/ListStates';
-import { FieldRow, FormSection } from '@/features/catalog/FormParts';
+import { todayIn } from '@/features/orders/rules';
+import { useTenant } from '@/features/session/useTenant';
 import { Screen } from '@/layout/Screen';
 import { intentScope, usePendingIntent } from '@/lib/intent';
+import { formatCents } from '@/lib/money';
 import { useSession } from '@/session/SessionContext';
-import { Alert, Badge, Button, EmptyState, Select, Text, TextField } from '@/ui';
-import { CircleDollarSign } from '@/ui/icons';
-import { useFinanceCommand, usePaymentConditions, usePaymentMethods } from './administrationApi';
+import { color, space, useLayoutSize } from '@/theme';
 import {
-  conditionFormSchema,
-  methodFormSchema,
-  type ConditionValues,
-  type MethodValues,
-} from './administrationRules';
-import { CommandConfirmation } from './CommandConfirmation';
+  Alert,
+  Badge,
+  Button,
+  ChoiceChips,
+  Dialog,
+  Disclosure,
+  EmptyState,
+  Skeleton,
+  Switch,
+  Text,
+  TextField,
+} from '@/ui';
+import { CalendarClock, Pencil, Plus, Wallet } from '@/ui/icons';
+import { Touchable } from '@/ui/Touchable';
+import { focusRing, showFocusRing, type InteractionState } from '@/ui/interaction';
+import { useFinanceCommand, usePaymentConditions, usePaymentMethods } from './administrationApi';
 import type { SettingCommand } from './commands';
+import { Guidance, FilterTabs } from './FinanceParts';
 import { FinanceNav } from './FinanceNav';
+import {
+  describeOffsets,
+  describeWeights,
+  formatDate,
+  formatPercent,
+  methodIcon,
+  methodKindLabel,
+  methodKinds,
+  nameKey,
+  previewAmounts,
+  previewDueDates,
+} from './presentation';
+
+type Tab = 'condicoes' | 'formas';
+type StatusFilter = 'active' | 'inactive' | 'all';
+const statusOptions: { value: StatusFilter; label: string }[] = [
+  { value: 'active', label: 'Disponíveis' },
+  { value: 'inactive', label: 'Inativas' },
+  { value: 'all', label: 'Todas' },
+];
+const MAX_PAGES = 10;
+
+/** Lista integral (até 10 páginas de 25) para filtrar e conferir nomes repetidos na tela. */
+function useAllPages<T>(list: {
+  query: {
+    hasNextPage: boolean;
+    isFetching: boolean;
+    fetchNextPage: () => unknown;
+    data?: { pages: unknown[] };
+  };
+  items: T[];
+}) {
+  const { query } = list;
+  const pages = query.data?.pages.length ?? 0;
+  useEffect(() => {
+    if (query.hasNextPage && !query.isFetching && pages < MAX_PAGES) query.fetchNextPage();
+  }, [query, pages]);
+  return list.items;
+}
 
 export function SettingsScreen() {
-  const [status, setStatus] = useState<'all' | 'active' | 'inactive'>('all');
-  const conditions = usePaymentConditions(status);
-  const methods = usePaymentMethods(status);
-  const [condition, setCondition] = useState<PaymentCondition | 'new' | null>(null);
-  const [method, setMethod] = useState<PaymentMethod | 'new' | null>(null);
+  const params = useLocalSearchParams<{ aba?: string }>();
+  const tab: Tab = params.aba === 'formas' ? 'formas' : 'condicoes';
   return (
     <Screen
       title="Condições e formas de pagamento"
-      description="Cadastros por empresa. Desativar impede novas seleções e mantém snapshots históricos de pedidos e recebimentos."
+      description="Condição é quando o cliente paga (à vista, 30 dias…). Forma é como ele paga (Pix, dinheiro…)."
     >
       <FinanceNav />
-      <Select
-        label="Situação dos cadastros"
-        value={status}
-        onChange={setStatus}
+      <FilterTabs<Tab>
+        label="Cadastro"
+        value={tab}
+        onChange={(aba) => router.setParams({ aba })}
         options={[
-          { value: 'all', label: 'Todos' },
-          { value: 'active', label: 'Ativos' },
-          { value: 'inactive', label: 'Inativos' },
+          { value: 'condicoes', label: 'Condições de pagamento' },
+          { value: 'formas', label: 'Formas de pagamento' },
         ]}
       />
-      <Button label="Nova condição" variant="strong" onPress={() => setCondition('new')} />
-      {condition ? (
-        <ConditionEditor
-          key={condition === 'new' ? 'new' : `${condition.id}:${condition.version}`}
-          record={condition === 'new' ? undefined : condition}
-          onClose={() => setCondition(null)}
-        />
-      ) : null}
-      <Text variant="h3">Condições cadastradas</Text>
-      <ListPanel
-        query={conditions.query}
-        count={conditions.items.length}
-        empty={
-          <EmptyState
-            icon={CircleDollarSign}
-            title="Nenhuma condição nestes filtros"
-            description="Cadastre preset ou de uma a doze parcelas com prazos e pesos."
-          />
-        }
-      >
-        {conditions.items.map((c) => (
-          <FormSection key={c.id} title={c.name} description={c.description}>
-            <Badge label={c.status === 'active' ? 'Ativa' : 'Inativa'} />
-            <Text>
-              {c.schedule
-                .map((p, i) => `${i + 1}ª: ${p.offsetDays} dias, peso ${p.weight}`)
-                .join(' · ')}
-            </Text>
-            <Text variant="caption">{`Versão ${c.version}`}</Text>
-            <Button
-              label={`Editar condição ${c.name}`}
-              variant="outline"
-              onPress={() => setCondition(c)}
-            />
-          </FormSection>
-        ))}
-      </ListPanel>
-      <Button label="Nova forma" variant="strong" onPress={() => setMethod('new')} />
-      {method ? (
-        <MethodEditor
-          key={method === 'new' ? 'new' : `${method.id}:${method.version}`}
-          record={method === 'new' ? undefined : method}
-          onClose={() => setMethod(null)}
-        />
-      ) : null}
-      <Text variant="h3">Formas cadastradas</Text>
-      <ListPanel
-        query={methods.query}
-        count={methods.items.length}
-        empty={
-          <EmptyState
-            icon={CircleDollarSign}
-            title="Nenhuma forma nestes filtros"
-            description="Forma prevista no pedido é independente da forma efetiva do recebimento."
-          />
-        }
-      >
-        {methods.items.map((m) => (
-          <FormSection key={m.id} title={m.name}>
-            <Badge label={m.status === 'active' ? 'Ativa' : 'Inativa'} />
-            <Text>{methodKinds.find((k) => k.value === m.kind)?.label}</Text>
-            <Text variant="caption">{`Versão ${m.version}`}</Text>
-            <Button
-              label={`Editar forma ${m.name}`}
-              variant="outline"
-              onPress={() => setMethod(m)}
-            />
-          </FormSection>
-        ))}
-      </ListPanel>
+      {tab === 'condicoes' ? <Conditions /> : <Methods />}
     </Screen>
   );
 }
-const methodKinds: { value: PaymentMethod['kind']; label: string }[] = [
-  { value: 'cash', label: 'Dinheiro' },
-  { value: 'pix', label: 'Pix' },
-  { value: 'transfer', label: 'Transferência' },
-  { value: 'card', label: 'Cartão' },
-  { value: 'boleto', label: 'Boleto' },
-  { value: 'other', label: 'Outra' },
-];
 
-function useSettingCommand(kind: 'condition' | 'method', id: string, onSuccess: () => void) {
+function ListHeader({
+  guidance,
+  filter,
+  onFilter,
+  action,
+}: {
+  guidance: string;
+  filter: StatusFilter;
+  onFilter: (f: StatusFilter) => void;
+  action: ReactNode;
+}) {
+  const compact = useLayoutSize() === 'compact';
+  return (
+    <View style={styles.headerBlock}>
+      <Guidance>{guidance}</Guidance>
+      <View style={[styles.toolbar, compact && styles.toolbarCompact]}>
+        <FilterTabs label="Situação" options={statusOptions} value={filter} onChange={onFilter} />
+        {action}
+      </View>
+    </View>
+  );
+}
+
+function SettingRow({
+  title,
+  details,
+  active,
+  onPress,
+  last,
+}: {
+  title: string;
+  details: string[];
+  active: boolean;
+  onPress: () => void;
+  last: boolean;
+}) {
+  return (
+    <Touchable
+      accessibilityRole="button"
+      accessibilityLabel={`Editar ${title}`}
+      onPress={onPress}
+      pressStyle={(s: InteractionState) => [
+        styles.row,
+        !last && styles.divider,
+        (s.hovered || s.pressed) && styles.hover,
+        showFocusRing(s) && focusRing(),
+      ]}
+    >
+      <View style={styles.flex}>
+        <Text variant="bodyStrong">{title}</Text>
+        {details.map((d) => (
+          <Text key={d} variant="small" color={color.textSecondary}>
+            {d}
+          </Text>
+        ))}
+      </View>
+      <Badge label={active ? 'Disponível' : 'Inativa'} tone={active ? 'success' : 'neutral'} />
+      <Pencil size={16} color={color.textSecondary} />
+    </Touchable>
+  );
+}
+
+function ListBody<T>({
+  query,
+  rows,
+  empty,
+  render,
+}: {
+  query: { isPending: boolean; isError: boolean; error: unknown; refetch: () => unknown };
+  rows: T[];
+  empty: ReactNode;
+  render: (row: T, last: boolean) => ReactNode;
+}) {
+  return (
+    <View style={styles.panel}>
+      {query.isPending ? (
+        <View style={styles.pad}>
+          <Skeleton height={18} />
+          <Skeleton height={18} width="60%" />
+        </View>
+      ) : query.isError ? (
+        <View style={styles.pad}>
+          <Alert
+            tone="danger"
+            title="Não foi possível carregar"
+            action={<Button label="Tentar de novo" size="sm" onPress={() => query.refetch()} />}
+          >
+            {toApiError(query.error).userMessage}
+          </Alert>
+        </View>
+      ) : rows.length === 0 ? (
+        empty
+      ) : (
+        rows.map((r, i) => render(r, i === rows.length - 1))
+      )}
+    </View>
+  );
+}
+
+function Conditions() {
+  const [filter, setFilter] = useState<StatusFilter>('active');
+  const list = usePaymentConditions('all');
+  const all = useAllPages(list);
+  const rows = all.filter((c) => filter === 'all' || c.status === filter);
+  const [editing, setEditing] = useState<PaymentCondition | 'new' | null>(null);
+  const [saved, setSaved] = useState<string | null>(null);
+  return (
+    <>
+      <ListHeader
+        guidance="Condições aparecem para escolha ao criar um pedido. Os vencimentos contam a partir da confirmação do pedido."
+        filter={filter}
+        onFilter={setFilter}
+        action={
+          <Button
+            label="Nova condição"
+            icon={Plus}
+            size="sm"
+            onPress={() => {
+              setSaved(null);
+              setEditing('new');
+            }}
+          />
+        }
+      />
+      {saved ? (
+        <Alert tone="success" title="Condição salva">
+          {saved}
+        </Alert>
+      ) : null}
+      <ListBody
+        query={list.query}
+        rows={rows}
+        empty={
+          <EmptyState
+            size="compact"
+            icon={CalendarClock}
+            title={
+              filter === 'inactive' ? 'Nenhuma condição inativa' : 'Nenhuma condição cadastrada'
+            }
+            description="Crie as condições que a empresa oferece, como à vista, 30 dias ou 30/60/90."
+          />
+        }
+        render={(c, last) => (
+          <SettingRow
+            key={c.id}
+            title={c.name}
+            active={c.status === 'active'}
+            last={last}
+            onPress={() => {
+              setSaved(null);
+              setEditing(c);
+            }}
+            details={[
+              `${c.schedule.length === 1 ? '1 parcela' : `${c.schedule.length} parcelas`} · ${describeOffsets(c.schedule.map((p) => p.offsetDays))}`,
+              ...(c.schedule.length > 1 ? [describeWeights(c.schedule.map((p) => p.weight))] : []),
+            ]}
+          />
+        )}
+      />
+      {editing ? (
+        <ConditionEditor
+          key={editing === 'new' ? 'new' : `${editing.id}:${editing.version}`}
+          record={editing === 'new' ? undefined : editing}
+          names={all
+            .filter((c) => editing === 'new' || c.id !== editing.id)
+            .map((c) => nameKey(c.name))}
+          onClose={() => setEditing(null)}
+          onSaved={(message) => {
+            setEditing(null);
+            setSaved(message);
+          }}
+        />
+      ) : null}
+    </>
+  );
+}
+
+function Methods() {
+  const [filter, setFilter] = useState<StatusFilter>('active');
+  const list = usePaymentMethods('all');
+  const all = useAllPages(list);
+  const rows = all.filter((m) => filter === 'all' || m.status === filter);
+  const [editing, setEditing] = useState<PaymentMethod | 'new' | null>(null);
+  const [saved, setSaved] = useState<string | null>(null);
+  return (
+    <>
+      <ListHeader
+        guidance="Formas disponíveis aparecem na hora de registrar um pagamento. Desativar não altera pagamentos já registrados."
+        filter={filter}
+        onFilter={setFilter}
+        action={
+          <Button
+            label="Nova forma"
+            icon={Plus}
+            size="sm"
+            onPress={() => {
+              setSaved(null);
+              setEditing('new');
+            }}
+          />
+        }
+      />
+      {saved ? (
+        <Alert tone="success" title="Forma salva">
+          {saved}
+        </Alert>
+      ) : null}
+      <ListBody
+        query={list.query}
+        rows={rows}
+        empty={
+          <EmptyState
+            size="compact"
+            icon={Wallet}
+            title={filter === 'inactive' ? 'Nenhuma forma inativa' : 'Nenhuma forma cadastrada'}
+            description="Cadastre como seus clientes pagam: Pix, dinheiro, transferência, boleto…"
+          />
+        }
+        render={(m, last) => (
+          <SettingRow
+            key={m.id}
+            title={m.name}
+            active={m.status === 'active'}
+            last={last}
+            onPress={() => {
+              setSaved(null);
+              setEditing(m);
+            }}
+            details={[methodKindLabel(m.kind)]}
+          />
+        )}
+      />
+      {editing ? (
+        <MethodEditor
+          key={editing === 'new' ? 'new' : `${editing.id}:${editing.version}`}
+          record={editing === 'new' ? undefined : editing}
+          names={all
+            .filter((m) => editing === 'new' || m.id !== editing.id)
+            .map((m) => nameKey(m.name))}
+          onClose={() => setEditing(null)}
+          onSaved={(message) => {
+            setEditing(null);
+            setSaved(message);
+          }}
+        />
+      ) : null}
+    </>
+  );
+}
+
+/** Envio direto (sem segunda confirmação), preservando chave e corpo em resultado incerto. */
+function useSettingCommand(kind: 'condition' | 'method', id: string) {
   const session = useSession();
   const scope = intentScope(
     session.user!.uid,
@@ -135,346 +354,508 @@ function useSettingCommand(kind: 'condition' | 'method', id: string, onSuccess: 
   );
   const pending = usePendingIntent(scope);
   const mutation = useFinanceCommand(scope);
-  const [review, setReview] = useState<SettingCommand | null>(null);
-  const send = () =>
-    review &&
-    mutation.mutate(review, {
-      onSuccess: () => {
-        setReview(null);
-        onSuccess();
-      },
-      onError: () => setReview(null),
-    });
-  const notices = (
+  return { pending, mutation };
+}
+
+function SettingNotices({
+  pending,
+  mutation,
+  onRecover,
+}: {
+  pending: ReturnType<typeof useSettingCommand>['pending'];
+  mutation: ReturnType<typeof useSettingCommand>['mutation'];
+  onRecover: () => void;
+}) {
+  return (
     <>
       {pending ? (
         <Alert
           tone="warning"
-          title="Cadastro com resultado desconhecido"
+          title="Ainda não sabemos se o cadastro foi salvo"
           action={
             <Button
-              label="Recuperar mesmo cadastro"
+              label="Conferir cadastro"
+              size="sm"
+              variant="outline"
               loading={mutation.isPending}
-              onPress={() => {
-                mutation.reset();
-                setReview(pending.body as SettingCommand);
-              }}
+              onPress={onRecover}
             />
           }
         >
-          Não crie outro cadastro. Chave, tipo e payload estão preservados para recuperar resultado
-          original.
+          A conexão caiu antes da confirmação. Não crie outro: toque abaixo para conferir. Se já
+          tiver sido salvo, nada será duplicado.
         </Alert>
       ) : null}
-      {mutation.isError ? (
-        <Alert
-          tone="danger"
-          title="Cadastro não confirmado"
-        >{`${toApiError(mutation.error).code}: ${toApiError(mutation.error).userMessage}. Recarregue a lista antes de revisar versão conflitante.`}</Alert>
-      ) : null}
-      {mutation.isSuccess && mutation.data && 'id' in mutation.data ? (
-        <Alert
-          tone="success"
-          title="Cadastro confirmado"
-        >{`${mutation.data.name} · versão ${mutation.data.version}`}</Alert>
-      ) : null}
-      {review ? (
-        <CommandConfirmation
-          command={review}
-          busy={mutation.isPending}
-          error={mutation.error}
-          onSend={send}
-          onCancel={() => setReview(null)}
-        />
+      {mutation.isError && !pending ? (
+        <Alert tone="danger" title="Não foi possível salvar">
+          {toApiError(mutation.error).code === 'CONFLICT'
+            ? 'Este cadastro foi alterado em outro lugar. Feche, abra de novo e refaça a alteração.'
+            : toApiError(mutation.error).userMessage}
+        </Alert>
       ) : null}
     </>
   );
-  return {
-    notices,
-    locked: Boolean(pending) || mutation.isPending,
-    review: (command: SettingCommand) => {
-      mutation.reset();
-      setReview(command);
-    },
-  };
 }
-function ConditionEditor({ record, onClose }: { record?: PaymentCondition; onClose: () => void }) {
-  const { control, handleSubmit, reset, formState } = useForm<ConditionValues>({
-    resolver: zodResolver(conditionFormSchema),
-    defaultValues: {
-      name: record?.name ?? '',
-      description: record?.description ?? '',
-      mode: record ? 'custom' : 'cash',
-      schedule: record?.schedule ?? [{ offsetDays: 0, weight: 1 }],
-      status: record?.status ?? 'active',
-    },
-  });
-  const fields = useFieldArray({ control, name: 'schedule' });
-  const mode = useWatch({ control, name: 'mode' });
-  const scheduleValues = useWatch({ control, name: 'schedule' });
-  const action = useSettingCommand('condition', record?.id ?? 'new', () => {
-    if (record) onClose();
-    else reset();
-  });
+
+type Row = { offsetDays: number; weight: number };
+const presets: { value: string; label: string; offsets: number[] }[] = [
+  { value: 'cash', label: 'À vista', offsets: [0] },
+  { value: 'net30', label: '30 dias', offsets: [30] },
+  { value: '30_60', label: '30 e 60', offsets: [30, 60] },
+  { value: '30_60_90', label: '30, 60 e 90', offsets: [30, 60, 90] },
+];
+const presetOf = (rows: Row[]) =>
+  presets.find(
+    (p) =>
+      p.offsets.length === rows.length &&
+      rows.every((r, i) => r.weight === 1 && r.offsetDays === p.offsets[i]),
+  )?.value ?? 'custom';
+
+function ConditionEditor({
+  record,
+  names,
+  onClose,
+  onSaved,
+}: {
+  record?: PaymentCondition;
+  names: string[];
+  onClose: () => void;
+  onSaved: (message: string) => void;
+}) {
+  const tenant = useTenant();
+  const today = todayIn(tenant.data?.timezone);
+  const { pending, mutation } = useSettingCommand('condition', record?.id ?? 'new');
+  const [name, setName] = useState(record?.name ?? '');
+  const [description, setDescription] = useState(record?.description ?? '');
+  const [rows, setRows] = useState<Row[]>(
+    record?.schedule.map((p) => ({ offsetDays: p.offsetDays, weight: p.weight })) ?? [],
+  );
+  const [mode, setMode] = useState(record ? presetOf(rows) : '');
+  const [equal, setEqual] = useState(rows.every((r) => r.weight === (rows[0]?.weight ?? 1)));
+  const [active, setActive] = useState(record ? record.status === 'active' : true);
+  const [touched, setTouched] = useState(false);
+  const locked = Boolean(pending) || mutation.isPending;
+  const effective = equal ? rows.map((r) => ({ ...r, weight: 1 })) : rows;
+  const nameError = !name.trim()
+    ? 'Dê um nome à condição'
+    : name.trim().length < 2
+      ? 'Use pelo menos 2 letras'
+      : names.includes(nameKey(name))
+        ? 'Já existe uma condição com este nome'
+        : undefined;
+  const rowErrors = effective.map((r, i) =>
+    !Number.isSafeInteger(r.offsetDays) || r.offsetDays < 0
+      ? 'Informe os dias (0 ou mais)'
+      : i > 0 && r.offsetDays < effective[i - 1]!.offsetDays
+        ? 'Use prazo igual ou maior que o da parcela anterior'
+        : !Number.isSafeInteger(r.weight) || r.weight < 1
+          ? 'Parte deve ser 1 ou mais'
+          : undefined,
+  );
+  const scheduleError = !mode
+    ? 'Escolha os prazos'
+    : rows.length === 0
+      ? 'Adicione pelo menos uma parcela'
+      : rowErrors.find(Boolean);
+  const valid = !nameError && !scheduleError;
+  const weights = effective.map((r) => r.weight);
+  const totalWeight = weights.reduce((a, w) => a + w, 0);
+  const sample = 100_000;
+  const amounts = !scheduleError ? previewAmounts(sample, weights) : [];
+  const dates = !scheduleError
+    ? previewDueDates(
+        today,
+        effective.map((r) => r.offsetDays),
+      )
+    : [];
+  const pick = (value: string) => {
+    setMode(value);
+    const preset = presets.find((p) => p.value === value);
+    if (preset) {
+      setRows(preset.offsets.map((offsetDays) => ({ offsetDays, weight: 1 })));
+      setEqual(true);
+    } else if (rows.length === 0) setRows([{ offsetDays: 30, weight: 1 }]);
+  };
+  const command = (): SettingCommand => {
+    const schedule = effective.map((r) => ({ offsetDays: r.offsetDays, weight: r.weight }));
+    if (record)
+      return {
+        kind: 'update-condition',
+        id: record.id,
+        body: {
+          expectedVersion: record.version,
+          name: name.trim(),
+          description: description.trim(),
+          schedule,
+          status: active ? 'active' : 'inactive',
+        },
+      };
+    return {
+      kind: 'create-condition',
+      body: {
+        name: name.trim(),
+        description: description.trim(),
+        ...(mode !== 'custom' && presetOf(effective) === mode
+          ? { preset: mode as 'cash' | 'net30' | '30_60' | '30_60_90' }
+          : { schedule }),
+      },
+    };
+  };
+  const send = (c: SettingCommand) =>
+    mutation.mutate(c, {
+      onSuccess: (result) => {
+        const label = 'name' in result ? result.name : name.trim();
+        onSaved(
+          record
+            ? `“${label}” atualizada.${active ? '' : ' Ela não aparece mais em novos pedidos.'}`
+            : `“${label}” criada e já disponível para novos pedidos.`,
+        );
+      },
+    });
+  const update = (i: number, patch: Partial<Row>) =>
+    setRows((current) => current.map((r, j) => (j === i ? { ...r, ...patch } : r)));
   return (
-    <FormSection
-      title={record ? 'Editar condição' : 'Criar condição'}
-      description="Prazos em dias corridos após confirmação. Pesos inteiros positivos. O servidor calcula calendário e distribuição dos centavos."
-    >
-      {action.notices}
-      <Controller
-        control={control}
-        name="name"
-        render={({ field, fieldState }) => (
-          <TextField
-            label="Nome da condição"
-            value={field.value}
-            onChangeText={field.onChange}
-            maxLength={100}
-            editable={!action.locked}
-            error={fieldState.error?.message}
-          />
-        )}
-      />
-      <Controller
-        control={control}
-        name="description"
-        render={({ field, fieldState }) => (
-          <TextField
-            label="Descrição da condição"
-            value={field.value}
-            onChangeText={field.onChange}
-            maxLength={500}
-            editable={!action.locked}
-            error={fieldState.error?.message}
-          />
-        )}
-      />
-      {!record ? (
-        <Controller
-          control={control}
-          name="mode"
-          render={({ field }) => (
-            <Select
-              label="Modelo de prazos"
-              value={field.value}
-              onChange={(next) => {
-                field.onChange(next);
-                if (next !== 'custom') fields.replace([{ offsetDays: 0, weight: 1 }]);
-              }}
-              disabled={action.locked}
-              options={[
-                { value: 'cash', label: 'À vista' },
-                { value: 'net30', label: '30 dias' },
-                { value: '30_60', label: '30 e 60 dias' },
-                { value: '30_60_90', label: '30, 60 e 90 dias' },
-                { value: 'custom', label: 'Personalizado' },
-              ]}
-            />
-          )}
-        />
-      ) : null}
-      {mode === 'custom' ? (
+    <Dialog
+      visible
+      title={record ? 'Editar condição' : 'Nova condição de pagamento'}
+      description="Defina em quantas vezes e em quantos dias o cliente paga."
+      onClose={() => !mutation.isPending && onClose()}
+      actions={
         <>
-          {fields.fields.map((f, i) => (
-            <FormSection key={f.id} title={`${i + 1}ª parcela`}>
-              <FieldRow>
-                <Controller
-                  control={control}
-                  name={`schedule.${i}.offsetDays`}
-                  render={({ field, fieldState }) => (
-                    <TextField
-                      label={`Prazo da parcela ${i + 1}`}
-                      value={Number.isNaN(field.value) ? '' : String(field.value)}
-                      onChangeText={(v) => field.onChange(v === '' ? NaN : Number(v))}
-                      inputMode="numeric"
-                      editable={!action.locked}
-                      error={fieldState.error?.message}
-                    />
-                  )}
+          <Button
+            label="Cancelar"
+            variant="ghost"
+            disabled={mutation.isPending}
+            onPress={onClose}
+          />
+          <Button
+            label={record ? 'Salvar alterações' : 'Criar condição'}
+            loading={mutation.isPending}
+            disabled={locked}
+            onPress={() => {
+              setTouched(true);
+              if (valid) send(command());
+            }}
+          />
+        </>
+      }
+    >
+      <SettingNotices
+        pending={pending}
+        mutation={mutation}
+        onRecover={() => send(pending!.body as SettingCommand)}
+      />
+      <TextField
+        label="Nome"
+        placeholder="Ex.: 30/60 dias"
+        value={name}
+        onChangeText={setName}
+        maxLength={100}
+        editable={!locked}
+        error={touched ? nameError : undefined}
+      />
+      <ChoiceChips
+        label="Prazos"
+        value={mode || null}
+        onChange={pick}
+        disabled={locked}
+        error={touched && !mode ? 'Escolha os prazos' : undefined}
+        options={[...presets, { value: 'custom', label: 'Personalizada', offsets: [] }].map(
+          (p) => ({
+            value: p.value,
+            label: p.label,
+          }),
+        )}
+      />
+      {mode === 'custom' ? (
+        <View style={styles.rows}>
+          {effective.map((r, i) => (
+            <View key={i} style={styles.installment}>
+              <View style={styles.installmentHead}>
+                <Text variant="smallStrong">{`${i + 1}ª parcela`}</Text>
+                <Button
+                  label={`Remover ${i + 1}ª parcela`}
+                  size="sm"
+                  variant="ghost"
+                  disabled={locked || rows.length === 1}
+                  onPress={() => setRows((current) => current.filter((_, j) => j !== i))}
                 />
-                <Controller
-                  control={control}
-                  name={`schedule.${i}.weight`}
-                  render={({ field, fieldState }) => (
+              </View>
+              <View style={styles.installmentFields}>
+                <View style={styles.flex}>
+                  <TextField
+                    label={`Dias da ${i + 1}ª parcela`}
+                    inputMode="numeric"
+                    value={Number.isNaN(r.offsetDays) ? '' : String(r.offsetDays)}
+                    onChangeText={(v) =>
+                      update(i, { offsetDays: v.trim() === '' ? NaN : Number(v.replace(/D/g, '')) })
+                    }
+                    editable={!locked}
+                    hint="dias após a confirmação"
+                    error={touched ? rowErrors[i] : undefined}
+                  />
+                </View>
+                {!equal ? (
+                  <View style={styles.flex}>
                     <TextField
-                      label={`Peso da parcela ${i + 1}`}
-                      value={Number.isNaN(field.value) ? '' : String(field.value)}
-                      onChangeText={(v) => field.onChange(v === '' ? NaN : Number(v))}
+                      label={`Parte da ${i + 1}ª parcela`}
                       inputMode="numeric"
-                      editable={!action.locked}
-                      error={fieldState.error?.message}
+                      value={Number.isNaN(r.weight) ? '' : String(r.weight)}
+                      onChangeText={(v) =>
+                        update(i, { weight: v.trim() === '' ? NaN : Number(v.replace(/D/g, '')) })
+                      }
+                      editable={!locked}
+                      hint={
+                        totalWeight > 0 && r.weight > 0
+                          ? `${formatPercent((r.weight / totalWeight) * 100)} do valor`
+                          : 'parte do valor'
+                      }
                     />
-                  )}
-                />
-              </FieldRow>
-              <Button
-                label={`Remover parcela ${i + 1}`}
-                variant="ghost"
-                disabled={action.locked || fields.fields.length === 1}
-                onPress={() => fields.remove(i)}
-              />
-            </FormSection>
+                  </View>
+                ) : null}
+              </View>
+            </View>
           ))}
           <Button
             label="Adicionar parcela"
+            icon={Plus}
+            size="sm"
             variant="outline"
-            disabled={action.locked || fields.fields.length >= 12}
+            disabled={locked || rows.length >= 12}
             onPress={() =>
-              fields.append({ offsetDays: scheduleValues.at(-1)?.offsetDays ?? 0, weight: 1 })
+              setRows((current) => [
+                ...current,
+                { offsetDays: (current.at(-1)?.offsetDays ?? 0) + 30, weight: 1 },
+              ])
             }
           />
-          {formState.errors.schedule?.root?.message || formState.errors.schedule?.message ? (
-            <Text>
-              {formState.errors.schedule.root?.message ?? formState.errors.schedule.message}
-            </Text>
+          {rows.length > 1 ? (
+            <Switch
+              label="Dividir o valor em partes iguais"
+              description={
+                equal
+                  ? 'Cada parcela recebe o mesmo valor.'
+                  : 'Informe a parte de cada parcela. Ex.: 1 e 2 = um terço e dois terços.'
+              }
+              value={equal}
+              onChange={(v) => {
+                setEqual(v);
+                if (!v) setRows((current) => current.map((r) => ({ ...r, weight: r.weight || 1 })));
+              }}
+              disabled={locked}
+            />
           ) : null}
-        </>
+          <Text variant="caption" color={color.textSecondary}>
+            Até 12 parcelas. Os dias contam a partir da confirmação do pedido (0 = no mesmo dia).
+          </Text>
+        </View>
+      ) : null}
+      {mode && amounts.length ? (
+        <View style={styles.preview}>
+          <Text variant="smallStrong">
+            {`Exemplo: pedido de ${formatCents(sample)} confirmado hoje (${formatDate(today)})`}
+          </Text>
+          {amounts.map((cents, i) => (
+            <View key={i} style={styles.previewRow}>
+              <Text variant="small">{`${i + 1}ª parcela · vence ${formatDate(dates[i]!)}`}</Text>
+              <Text variant="small">{formatCents(cents)}</Text>
+            </View>
+          ))}
+          <Text variant="caption" color={color.textSecondary}>
+            Prévia ilustrativa. O valor exato de cada parcela é calculado ao confirmar o pedido, em
+            dias corridos, sem ajuste para fins de semana ou feriados.
+          </Text>
+        </View>
+      ) : touched && scheduleError && mode ? (
+        <Text variant="small" color={color.danger}>
+          {scheduleError}
+        </Text>
       ) : null}
       {record ? (
-        <Controller
-          control={control}
-          name="status"
-          render={({ field }) => (
-            <Select
-              label="Situação da condição"
-              value={field.value}
-              disabled={action.locked}
-              onChange={field.onChange}
-              options={[
-                { value: 'active', label: 'Ativa' },
-                { value: 'inactive', label: 'Inativa' },
-              ]}
-            />
-          )}
+        <Switch
+          label="Disponível para novos pedidos"
+          description="Desativar não altera pedidos já confirmados."
+          value={active}
+          onChange={setActive}
+          disabled={locked}
         />
       ) : null}
-      <Button
-        label="Revisar condição"
-        variant="strong"
-        disabled={action.locked}
-        onPress={handleSubmit((v) =>
-          action.review(
-            record
-              ? {
-                  kind: 'update-condition',
-                  id: record.id,
-                  body: {
-                    expectedVersion: record.version,
-                    name: v.name,
-                    description: v.description,
-                    schedule: v.schedule,
-                    status: v.status,
-                  },
-                }
-              : {
-                  kind: 'create-condition',
-                  body: {
-                    name: v.name,
-                    description: v.description,
-                    ...(v.mode === 'custom' ? { schedule: v.schedule } : { preset: v.mode }),
-                  },
-                },
-          ),
-        )}
-      />
-      <Button
-        label="Fechar editor de condição"
-        variant="ghost"
-        disabled={action.locked}
-        onPress={onClose}
-      />
-    </FormSection>
+      <Disclosure label="Mais detalhes" summary="descrição interna">
+        <TextField
+          label="Descrição"
+          optional
+          value={description}
+          onChangeText={setDescription}
+          maxLength={500}
+          editable={!locked}
+        />
+      </Disclosure>
+    </Dialog>
   );
 }
-function MethodEditor({ record, onClose }: { record?: PaymentMethod; onClose: () => void }) {
-  const { control, handleSubmit, reset } = useForm<MethodValues>({
-    resolver: zodResolver(methodFormSchema),
-    defaultValues: {
-      name: record?.name ?? '',
-      kind: record?.kind ?? 'pix',
-      status: record?.status ?? 'active',
-    },
-  });
-  const action = useSettingCommand('method', record?.id ?? 'new', () => {
-    if (record) onClose();
-    else reset();
-  });
+
+function MethodEditor({
+  record,
+  names,
+  onClose,
+  onSaved,
+}: {
+  record?: PaymentMethod;
+  names: string[];
+  onClose: () => void;
+  onSaved: (message: string) => void;
+}) {
+  const { pending, mutation } = useSettingCommand('method', record?.id ?? 'new');
+  const [kind, setKind] = useState<PaymentMethod['kind'] | null>(record?.kind ?? null);
+  const [name, setName] = useState(record?.name ?? '');
+  const [active, setActive] = useState(record ? record.status === 'active' : true);
+  const [touched, setTouched] = useState(false);
+  const locked = Boolean(pending) || mutation.isPending;
+  const nameError = !name.trim()
+    ? 'Dê um nome à forma'
+    : name.trim().length < 2
+      ? 'Use pelo menos 2 letras'
+      : names.includes(nameKey(name))
+        ? 'Já existe uma forma com este nome'
+        : undefined;
+  const send = (c: SettingCommand) =>
+    mutation.mutate(c, {
+      onSuccess: (result) => {
+        const label = 'name' in result ? result.name : name.trim();
+        onSaved(
+          record
+            ? `“${label}” atualizada.${active ? '' : ' Ela não aparece mais ao registrar pagamentos.'}`
+            : `“${label}” criada e já disponível para registrar pagamentos.`,
+        );
+      },
+    });
   return (
-    <FormSection title={record ? 'Editar forma' : 'Criar forma'}>
-      {action.notices}
-      <Controller
-        control={control}
-        name="name"
-        render={({ field, fieldState }) => (
-          <TextField
-            label="Nome da forma"
-            value={field.value}
-            onChangeText={field.onChange}
-            maxLength={100}
-            editable={!action.locked}
-            error={fieldState.error?.message}
+    <Dialog
+      visible
+      title={record ? 'Editar forma de pagamento' : 'Nova forma de pagamento'}
+      description="Como o cliente paga. Aparece na hora de registrar um pagamento."
+      onClose={() => !mutation.isPending && onClose()}
+      actions={
+        <>
+          <Button
+            label="Cancelar"
+            variant="ghost"
+            disabled={mutation.isPending}
+            onPress={onClose}
           />
-        )}
+          <Button
+            label={record ? 'Salvar alterações' : 'Criar forma'}
+            loading={mutation.isPending}
+            disabled={locked}
+            onPress={() => {
+              setTouched(true);
+              if (!kind || nameError) return;
+              send(
+                record
+                  ? {
+                      kind: 'update-method',
+                      id: record.id,
+                      body: {
+                        expectedVersion: record.version,
+                        name: name.trim(),
+                        kind,
+                        status: active ? 'active' : 'inactive',
+                      },
+                    }
+                  : { kind: 'create-method', body: { name: name.trim(), kind } },
+              );
+            }}
+          />
+        </>
+      }
+    >
+      <SettingNotices
+        pending={pending}
+        mutation={mutation}
+        onRecover={() => send(pending!.body as SettingCommand)}
       />
-      <Controller
-        control={control}
-        name="kind"
-        render={({ field }) => (
-          <Select
-            label="Tipo da forma"
-            value={field.value}
-            options={methodKinds}
-            onChange={field.onChange}
-            disabled={action.locked}
-          />
-        )}
+      <ChoiceChips
+        label="Tipo"
+        value={kind}
+        disabled={locked}
+        error={touched && !kind ? 'Escolha o tipo' : undefined}
+        onChange={(next) => {
+          // Nome acompanha o tipo enquanto a pessoa não escreveu outro.
+          if (!name.trim() || name === methodKindLabel(kind ?? 'other'))
+            setName(methodKindLabel(next));
+          setKind(next);
+        }}
+        options={methodKinds.map((k) => ({
+          value: k.value,
+          label: k.label,
+          icon: methodIcon(k.value),
+        }))}
+      />
+      <TextField
+        label="Nome"
+        hint="Ex.: Pix, Pix Banco do Brasil, Dinheiro."
+        value={name}
+        onChangeText={setName}
+        maxLength={100}
+        editable={!locked}
+        error={touched ? nameError : undefined}
       />
       {record ? (
-        <Controller
-          control={control}
-          name="status"
-          render={({ field }) => (
-            <Select
-              label="Situação da forma"
-              value={field.value}
-              options={[
-                { value: 'active', label: 'Ativa' },
-                { value: 'inactive', label: 'Inativa' },
-              ]}
-              onChange={field.onChange}
-              disabled={action.locked}
-            />
-          )}
+        <Switch
+          label="Disponível para registrar pagamentos"
+          description="Desativar não altera pagamentos já registrados."
+          value={active}
+          onChange={setActive}
+          disabled={locked}
         />
       ) : null}
-      <Button
-        label="Revisar forma"
-        variant="strong"
-        disabled={action.locked}
-        onPress={handleSubmit((v) =>
-          action.review(
-            record
-              ? {
-                  kind: 'update-method',
-                  id: record.id,
-                  body: {
-                    expectedVersion: record.version,
-                    name: v.name,
-                    kind: v.kind,
-                    status: v.status,
-                  },
-                }
-              : { kind: 'create-method', body: { name: v.name, kind: v.kind } },
-          ),
-        )}
-      />
-      <Button
-        label="Fechar editor de forma"
-        variant="ghost"
-        disabled={action.locked}
-        onPress={onClose}
-      />
-    </FormSection>
+    </Dialog>
   );
 }
+
+const styles = StyleSheet.create({
+  headerBlock: { gap: space[3] },
+  toolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: space[3],
+  },
+  toolbarCompact: { alignItems: 'stretch' },
+  panel: {
+    backgroundColor: color.surface,
+    borderWidth: 1,
+    borderColor: color.border,
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  pad: { padding: space[5], gap: space[3] },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[3],
+    paddingVertical: space[3],
+    paddingHorizontal: space[5],
+    minHeight: 56,
+  },
+  divider: { borderBottomWidth: 1, borderBottomColor: color.border },
+  hover: { backgroundColor: 'rgba(17,17,17,0.03)' },
+  flex: { flex: 1, minWidth: 0, gap: 2 },
+  rows: { gap: space[3] },
+  installment: {
+    gap: space[1],
+    paddingBottom: space[3],
+    borderBottomWidth: 1,
+    borderBottomColor: color.border,
+  },
+  installmentHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  installmentFields: { flexDirection: 'row', gap: space[3], alignItems: 'flex-start' },
+  preview: {
+    gap: space[1] + 2,
+    padding: space[3],
+    borderRadius: 10,
+    backgroundColor: color.surfaceSunken,
+  },
+  previewRow: { flexDirection: 'row', justifyContent: 'space-between', gap: space[2] },
+});

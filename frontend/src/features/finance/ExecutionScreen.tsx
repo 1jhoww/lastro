@@ -8,7 +8,13 @@ import { Screen } from '@/layout/Screen';
 import { intentLedger, intentScope, usePendingIntent } from '@/lib/intent';
 import { formatCents } from '@/lib/money';
 import { useSession } from '@/session/SessionContext';
-import { Alert, Button, Skeleton, Text, TextField } from '@/ui';
+import { StyleSheet, View } from 'react-native';
+import { formatDateTime } from '@/lib/dates';
+import { color, space } from '@/theme';
+import { Alert, Badge, Button, Disclosure, Panel, Skeleton, Text, TextField } from '@/ui';
+import { RefreshCw } from '@/ui/icons';
+import { Guidance } from './FinanceParts';
+import { executionKindLabel, executionStage, orderCode } from './presentation';
 import { canManageFinance } from './FinanceAccess';
 import { FinanceNav } from './FinanceNav';
 import { useExecution, useResolution } from './resolutionApi';
@@ -21,8 +27,8 @@ export function ExecutionScreen({ id }: { id: string }) {
   const query = useExecution(id);
   return (
     <Screen
-      title="Acompanhamento financeiro"
-      description="Estado oficial, bloqueios e continuação manual."
+      title="Operação em andamento"
+      description="Acompanhe e continue uma operação processada em etapas."
     >
       <FinanceNav />
       {query.isPending ? (
@@ -30,8 +36,8 @@ export function ExecutionScreen({ id }: { id: string }) {
       ) : query.isError ? (
         <Alert
           tone="danger"
-          title="Execução indisponível"
-          action={<Button label="Consultar estado oficial" onPress={() => query.refetch()} />}
+          title="Operação indisponível"
+          action={<Button label="Tentar de novo" size="sm" onPress={() => query.refetch()} />}
         >
           {toApiError(query.error).userMessage}
         </Alert>
@@ -98,78 +104,105 @@ function Execution({
       body: { expectedRevision: e.revision, reason: reason.trim() },
     });
   }
+  const stage = executionStage(e);
+  const explanation = executionPublished(e)
+    ? `Pronto! Operação concluída em ${formatDateTime(e.publishedAt!)}, no valor de ${formatCents(e.result!.amountCents)}.`
+    : e.status === 'ABORTED'
+      ? 'Encerrada sem efeito financeiro. Os saldos continuam como estavam antes.'
+      : e.status === 'PAUSED' || e.status === 'NEEDS_REVIEW'
+        ? 'A operação foi pausada ou precisa de revisão. Para seguir, retome informando o motivo.'
+        : 'Esta operação avança uma etapa por vez, sempre por ação de um administrador. Enquanto não terminar, os saldos anteriores continuam valendo e o pedido fica bloqueado.';
   return (
     <>
-      <Text variant="h3">{executionStatusLabel[e.status]}</Text>
-      <Text
-        selectable
-      >{`Execução ${e.id} · pedido ${e.orderId}${e.returnId ? ` · devolução ${e.returnId}` : ''}`}</Text>
-      <Text>{`Fase ${e.phase} · revisão ${e.revision} · fence ${e.fencingToken}`}</Text>
-      <Text>{`Criada ${e.createdAt} · atualizada ${e.updatedAt}`}</Text>
-      <Text>{`Lease até ${e.leaseUntil ?? 'sem lease'} · intervalo indicado ${e.retryAfterSeconds}s`}</Text>
-      <Text>{`Pedido ${e.blockedResources.order ? 'bloqueado' : 'sem lock desta execução'} · lotes relacionados planejados ${e.blockedResources.sharedLots}`}</Text>
-      <Alert
-        tone={executionPublished(e) ? 'success' : e.status === 'ABORTED' ? 'warning' : 'info'}
-        title={
-          executionPublished(e)
-            ? 'Publicação financeira confirmada'
-            : e.status === 'ABORTED'
-              ? 'Abortada; sem sucesso financeiro'
-              : 'Resolução em processamento'
-        }
-      >
-        <Text>
-          {executionPublished(e)
-            ? `Publicado ${e.publishedAt} · resultado ${e.result!.operationId} · valor ${formatCents(e.result!.amountCents)}`
-            : 'Contadores não são dinheiro nem porcentagem. Lease expirado mantém bloqueios. Continue explicitamente.'}
-        </Text>
-        {recovered && terminal ? (
-          <Text>Checkpoint local encerrado após confirmação oficial.</Text>
-        ) : null}
-      </Alert>
+      <Panel>
+        <View style={styles.head}>
+          <View style={styles.flex}>
+            <Text variant="h2">{`${executionKindLabel(e.kind)} · ${orderCode(e.orderId)}`}</Text>
+            <Text variant="small" color={color.textSecondary}>
+              {`Iniciada em ${formatDateTime(e.createdAt)} · atualizada em ${formatDateTime(e.updatedAt)}`}
+            </Text>
+          </View>
+          <Badge label={stage.label} tone={stage.tone} />
+        </View>
+        <Alert
+          tone={executionPublished(e) ? 'success' : e.status === 'ABORTED' ? 'warning' : 'info'}
+          title={
+            executionPublished(e)
+              ? 'Operação concluída'
+              : e.status === 'ABORTED'
+                ? 'Interrompida sem efeito'
+                : 'Operação ainda não concluída'
+          }
+        >
+          <Text variant="small">{explanation}</Text>
+          {recovered && terminal ? (
+            <Text variant="small">
+              Registro local de acompanhamento encerrado após confirmação.
+            </Text>
+          ) : null}
+        </Alert>
+        <View style={styles.links}>
+          <Button
+            label="Atualizar situação"
+            icon={RefreshCw}
+            size="sm"
+            variant="ghost"
+            onPress={refresh}
+            loading={refreshing}
+          />
+          <Link href={`/financeiro/pedidos/${e.orderId}` as Href} asChild>
+            <Button label="Financeiro do pedido" size="sm" variant="outline" />
+          </Link>
+          {e.returnId ? (
+            <Link href={`/financeiro/devolucoes/${e.returnId}` as Href} asChild>
+              <Button label="Ver devolução" size="sm" variant="outline" />
+            </Link>
+          ) : null}
+        </View>
+      </Panel>
       {e.review ? (
-        <Alert tone="danger" title="Revisão administrativa necessária">
-          <Text
-            selectable
-          >{`${e.review.code} · referência ${e.review.reference} · detectada ${e.review.detectedAt}`}</Text>
-          <Text>Preserve plano. Não repare saldo nem prova pelo aplicativo.</Text>
+        <Alert tone="danger" title="Necessita revisão administrativa">
+          <Text variant="small">
+            Encontramos algo que precisa de análise. Não tente corrigir saldos por aqui; informe a
+            referência ao suporte.
+          </Text>
+          <Text variant="small" selectable>
+            {`Referência ${e.review.reference} · ${e.review.code} · ${formatDateTime(e.review.detectedAt)}`}
+          </Text>
         </Alert>
       ) : null}
-      <FormSection title="Progresso técnico">
-        {Object.entries(e.progress).map(([key, value]) => (
-          <Text key={key}>{`${key}: ${value ?? 'não certificado'}`}</Text>
-        ))}
-      </FormSection>
-      <Button
-        label="Consultar estado oficial"
-        onPress={refresh}
-        loading={refreshing}
-        variant="outline"
-      />
       {localError ? (
         <Alert tone="danger" title="Ação bloqueada">
           {localError}
         </Alert>
       ) : null}
       {mutation.isError ? (
-        <Alert tone="danger" title="Passo não confirmado">
-          <Text>
-            {`${toApiError(mutation.error).code}: ${toApiError(mutation.error).userMessage}`}{' '}
-            Consulte GET antes de repetir. Conflito de lease exige retomada autorizada.
+        <Alert tone="danger" title="Não foi possível continuar">
+          <Text variant="small">
+            {`${toApiError(mutation.error).userMessage} Atualize a situação e tente de novo.`}
           </Text>
         </Alert>
       ) : null}
       {pending && !terminal ? (
-        <Alert tone="warning" title="Passo com resposta desconhecida preservado">
+        <Alert tone="warning" title="Última etapa sem confirmação">
+          <Text variant="small">
+            A conexão caiu antes de confirmarmos a última etapa. Revise e repita a mesma etapa; ela
+            não é aplicada duas vezes.
+          </Text>
           <Button
             label="Revisar passo original"
+            size="sm"
+            variant="outline"
             disabled={refreshing || mutation.isPending}
             onPress={() => setReview(pending.body as ResolutionCommand)}
           />
         </Alert>
       ) : null}
       {canManageFinance(session, 'payments:manage') && !terminal ? (
-        <FormSection title="Continuação administrativa">
+        <FormSection title="Continuar">
+          <Guidance>
+            Cada toque processa uma etapa limitada. Repita até a operação aparecer como concluída.
+          </Guidance>
           <Button
             label="Continuar execução"
             disabled={disabled || !canAdvance(e)}
@@ -182,38 +215,46 @@ function Execution({
               })
             }
           />
-          <TextField
-            label="Justificativa da retomada ou abort"
-            value={reason}
-            onChangeText={setReason}
-            maxLength={500}
-            editable={!resumeDisabled}
-            multiline
-          />
-          <Button
-            label="Revisar retomada"
-            disabled={resumeDisabled}
-            variant="outline"
-            onPress={() => control('resume')}
-          />
-          {pending?.body.kind === 'advance' ? (
-            <Text>
-              Retomada explícita preserva passo incerto no checkpoint e pede novo fence ao servidor.
-              Não aborta resolução.
-            </Text>
-          ) : null}
-          {canOfferAbort(e) ? (
-            <Button
-              label="Revisar abort antes de aplicar"
-              disabled={disabled}
-              variant="outline"
-              onPress={() => control('abort')}
+          <Disclosure
+            label="Retomar ou interromper"
+            summary="exige motivo e senha"
+            defaultOpen={Boolean(pending) || e.status === 'PAUSED' || e.status === 'NEEDS_REVIEW'}
+          >
+            <TextField
+              label="Justificativa da retomada ou abort"
+              value={reason}
+              onChangeText={setReason}
+              maxLength={500}
+              editable={!resumeDisabled}
+              multiline
             />
-          ) : (
-            <Text>
-              Abort não oferecido após início possível de aplicação. Servidor mantém decisão final.
-            </Text>
-          )}
+            <Button
+              label="Revisar retomada"
+              disabled={resumeDisabled}
+              variant="outline"
+              size="sm"
+              onPress={() => control('resume')}
+            />
+            {pending?.body.kind === 'advance' ? (
+              <Guidance>
+                Retomar guarda a etapa sem confirmação e libera a continuidade com uma nova
+                autorização. Não interrompe a operação.
+              </Guidance>
+            ) : null}
+            {canOfferAbort(e) ? (
+              <Button
+                label="Revisar abort antes de aplicar"
+                disabled={disabled}
+                variant="outline"
+                size="sm"
+                onPress={() => control('abort')}
+              />
+            ) : (
+              <Guidance>
+                Interromper não está disponível depois que a operação começou a aplicar valores.
+              </Guidance>
+            )}
+          </Disclosure>
         </FormSection>
       ) : null}
       {review ? (
@@ -233,18 +274,46 @@ function Execution({
           }
         />
       ) : null}
-      <Link href={`/financeiro/pedidos/${e.orderId}` as Href} asChild>
-        <Button label="Conferir pedido e saldos publicados" variant="outline" />
-      </Link>
-      {e.returnId ? (
-        <Link href={`/financeiro/devolucoes/${e.returnId}` as Href} asChild>
-          <Button label="Conferir pendências da devolução" variant="outline" />
-        </Link>
-      ) : null}
-      <ReconciliationPanel orderId={e.orderId} />
-      {executionPublished(e) ? (
-        <ReconciliationPanel orderId={e.orderId} executionId={e.id} />
-      ) : null}
+      <Disclosure label="Detalhes técnicos" summary="estado interno, etapas e bloqueios">
+        <Text variant="small" selectable>
+          {`Situação técnica: ${executionStatusLabel[e.status]} (${e.status}) · fase ${e.phase}`}
+        </Text>
+        <Text variant="small" selectable>
+          {`Operação ${e.id} · pedido ${e.orderId}${e.returnId ? ` · devolução ${e.returnId}` : ''}`}
+        </Text>
+        <Text variant="small">
+          {`Revisão ${e.revision} · fence ${e.fencingToken} · lease até ${e.leaseUntil ? formatDateTime(e.leaseUntil) : 'sem lease'} · intervalo indicado ${e.retryAfterSeconds}s`}
+        </Text>
+        <Text variant="small">
+          {`Pedido ${e.blockedResources.order ? 'bloqueado' : 'sem bloqueio desta operação'} · lotes relacionados planejados ${e.blockedResources.sharedLots}`}
+        </Text>
+        <FormSection title="Progresso técnico">
+          <Text variant="caption" color={color.textSecondary}>
+            Contadores de etapas internas. Não são valores em dinheiro nem porcentagens.
+          </Text>
+          {Object.entries(e.progress).map(([key, value]) => (
+            <Text key={key} variant="small">{`${key}: ${value ?? 'não certificado'}`}</Text>
+          ))}
+        </FormSection>
+      </Disclosure>
+      <Disclosure label="Verificação técnica" summary="integridade dos registros">
+        <ReconciliationPanel orderId={e.orderId} />
+        {executionPublished(e) ? (
+          <ReconciliationPanel orderId={e.orderId} executionId={e.id} />
+        ) : null}
+      </Disclosure>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  head: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: space[3],
+    paddingTop: space[2],
+    paddingBottom: space[3],
+  },
+  flex: { flex: 1, minWidth: 0, gap: 2 },
+  links: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2], marginTop: space[3] },
+});

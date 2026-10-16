@@ -81,17 +81,19 @@ export function ResolutionForm(props: {
         };
       setReview(command);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Decisão inválida');
+      setError(friendlyResolutionError(e));
     }
   }
   const data = mutation.data;
   return (
     <FormSection
-      title={preview ? 'Resolver recebido físico existente' : 'Cancelamento financeiro'}
-      description="Backend abate dívida, restaura fontes e destina caixa elegível. Estoque e saldos são oficiais."
+      title={preview ? 'Acertar o que foi devolvido' : 'Cancelar pedido no financeiro'}
+      description="O Lastro calcula os valores: abate o que está em aberto e destina o que já foi pago."
     >
       {preview && !preview.lines.length ? (
-        <Text>Nenhum recebido elegível no preview atual. Consulte estado oficial e histórico.</Text>
+        <Text variant="small">
+          Nada recebido fisicamente aguarda acerto agora. Confira o histórico abaixo.
+        </Text>
       ) : null}
       {data ? (
         'financialCompleted' in data ? (
@@ -99,32 +101,37 @@ export function ResolutionForm(props: {
             tone={executionPublished(data) ? 'success' : 'info'}
             title={
               executionPublished(data)
-                ? 'Publicação financeira confirmada'
-                : 'Execução aceita; ainda pendente'
+                ? 'Operação concluída'
+                : 'Operação iniciada, ainda não concluída'
             }
           >
             <Link href={`/financeiro/execucoes/${data.id}` as Href} asChild>
-              <Button label="Acompanhar execução" variant="outline" />
+              <Button label="Acompanhar operação" size="sm" variant="outline" />
             </Link>
           </Alert>
         ) : (
-          <Alert tone="success" title="Resolução atômica confirmada">
-            <Text>{`Valor oficial ${formatCents(data.amountCents)}`}</Text>
+          <Alert tone="success" title="Acerto confirmado">
+            <Text variant="small">{`Pronto! ${formatCents(data.amountCents)} acertados. Saldos, créditos e reembolsos já foram atualizados.`}</Text>
           </Alert>
         )
       ) : null}
       {pending ? (
         <Alert
           tone="warning"
-          title={pending.executionId ? 'Execução registrada' : 'Resultado desconhecido preservado'}
+          title={
+            pending.executionId
+              ? 'Operação iniciada'
+              : 'Ainda não sabemos se a operação foi registrada'
+          }
         >
           {pending.executionId ? (
             <Link href={`/financeiro/execucoes/${pending.executionId}` as Href} asChild>
-              <Button label="Consultar execução existente" />
+              <Button label="Acompanhar operação" size="sm" />
             </Link>
           ) : (
             <Button
-              label="Revisar intenção original"
+              label="Revisar e repetir com segurança"
+              size="sm"
               disabled={mutation.isPending}
               onPress={() => setReview(pending.body as ResolutionCommand)}
             />
@@ -132,16 +139,17 @@ export function ResolutionForm(props: {
         </Alert>
       ) : null}
       {other ? (
-        <Alert tone="warning" title="Outra intenção financeira pendente">
-          Resolva a intenção original antes de nova operação.
+        <Alert tone="warning" title="Outra operação deste pedido aguarda confirmação">
+          Confira a operação pendente antes de iniciar outra.
         </Alert>
       ) : null}
       {mutation.isError ? (
-        <Alert tone="danger" title="Resolução não confirmada">
-          <Text>{`${toApiError(mutation.error).code}: ${toApiError(mutation.error).userMessage}`}</Text>
+        <Alert tone="danger" title="Não foi possível concluir a operação">
+          <Text variant="small">{toApiError(mutation.error).userMessage}</Text>
           {toApiError(mutation.error).code === 'FINANCIAL_RESUMABLE_REQUIRED' ? (
             <Button
-              label="Revisar caminho retomável"
+              label="Usar processamento em etapas"
+              size="sm"
               onPress={() => {
                 setMode('start');
                 mutation.reset();
@@ -156,24 +164,25 @@ export function ResolutionForm(props: {
         </Alert>
       ) : null}
       <Select
-        label="Destino do caixa elegível"
+        label="O que fazer com o valor já pago"
         value={disposition}
         options={dispositionOptions}
         onChange={setDisposition}
         disabled={frozen}
       />
       <Select
-        label="Modo de resolução"
+        label="Como processar"
         value={mode}
         options={[
-          { value: 'atomic', label: 'Atômico para histórico pequeno' },
-          { value: 'start', label: 'Retomável com acompanhamento manual' },
+          { value: 'atomic', label: 'De uma vez (pedidos com poucos pagamentos)' },
+          { value: 'start', label: 'Em etapas, com acompanhamento' },
         ]}
         onChange={setMode}
         disabled={frozen}
       />
       <TextField
-        label="Justificativa da resolução"
+        label="Motivo"
+        hint="Obrigatório. Fica registrado no histórico."
         value={reason}
         onChangeText={setReason}
         maxLength={500}
@@ -181,20 +190,20 @@ export function ResolutionForm(props: {
         multiline
       />
       {preview ? (
-        preview.lines.map((l) => (
-          <FormSection key={l.lineId} title={`Linha ${l.lineId}`}>
-            <Text>{`Recebido elegível: vendável ${l.sellableQuantity} · danificado ${l.damagedQuantity}`}</Text>
-            <Text>{`Abatimento vendável oficial ${formatCents(l.sellableCents)} · limite do dano ${formatCents(l.damagedLimitCents)}`}</Text>
+        preview.lines.map((l, index) => (
+          <FormSection key={l.lineId} title={`Item ${index + 1}`}>
+            <Text variant="small">{`Recebido: ${l.sellableQuantity} em bom estado · ${l.damagedQuantity} com avaria`}</Text>
+            <Text variant="small">{`Valor a abater (bom estado) ${formatCents(l.sellableCents)} · limite para avaria ${formatCents(l.damagedLimitCents)}`}</Text>
             {Number(l.damagedQuantity) > 0 ? (
               <>
                 <Select
-                  label={`Decisão do dano ${l.lineId}`}
+                  label={`Avaria do item ${index + 1}`}
                   value={damage[l.lineId]?.choice ?? null}
                   options={[
-                    { value: 'full', label: 'Aceitar limite integral' },
-                    { value: 'partial', label: 'Aceitar valor parcial' },
-                    { value: 'zero', label: 'Aceitar quantidade com valor zero' },
-                    { value: 'reject', label: 'Rejeitar abatimento do dano' },
+                    { value: 'full', label: 'Abater o valor integral da avaria' },
+                    { value: 'partial', label: 'Abater parte do valor' },
+                    { value: 'zero', label: 'Aceitar a devolução sem abater valor' },
+                    { value: 'reject', label: 'Recusar abatimento da avaria' },
                   ]}
                   onChange={(choice) =>
                     setDamage((d) => ({
@@ -206,7 +215,7 @@ export function ResolutionForm(props: {
                 />
                 {damage[l.lineId]?.choice === 'partial' ? (
                   <CurrencyInput
-                    label={`Valor aceito ${l.lineId}`}
+                    label={`Valor a abater do item ${index + 1}`}
                     value={damage[l.lineId]!.cents}
                     maxCents={l.damagedLimitCents}
                     onChange={(cents) =>
@@ -221,15 +230,16 @@ export function ResolutionForm(props: {
         ))
       ) : (
         <>
-          <Text>{`Caixa liquidado ${formatCents(state.cashSettledCents)} · crédito liquidado ${formatCents(state.creditSettledCents)}`}</Text>
+          <Text variant="small">{`Já pago em dinheiro ${formatCents(state.cashSettledCents)} · pago com crédito ${formatCents(state.creditSettledCents)}`}</Text>
           {state.titles.map((t) => (
             <Text
               key={t.id}
-            >{`Parcela ${t.installmentNumber}: dívida ${formatCents(t.outstandingCents)} · cancelado ${formatCents(t.canceledCents)}`}</Text>
+              variant="small"
+            >{`${t.installmentNumber}ª parcela: em aberto ${formatCents(t.outstandingCents)} · cancelado ${formatCents(t.canceledCents)}`}</Text>
           ))}
         </>
       )}
-      <Button label="Revisar resolução financeira" onPress={build} disabled={frozen} />
+      <Button label="Revisar" variant="outline" onPress={build} disabled={frozen} />
       {review ? (
         <ResolutionConfirmation
           command={review}
@@ -239,18 +249,31 @@ export function ResolutionForm(props: {
           onCancel={() => setReview(null)}
           onSend={() => mutation.mutate(review, { onSuccess: () => setReview(null) })}
         >
-          <Text>{`Cliente ${order.customerName ?? order.customerId ?? 'identificado no pedido'} · total oficial do pedido ${formatCents(order.totalCents)}`}</Text>
+          <Text>{`Cliente ${order.customerName ?? 'do pedido'} · total do pedido ${formatCents(order.totalCents)}`}</Text>
           {!preview ? (
             <Text>
-              Cancelamento não expedido libera reservas do pedido. Servidor confirma estoque e
-              destinação.
+              Como o pedido ainda não foi expedido, o estoque reservado volta a ficar disponível.
             </Text>
           ) : null}
           {!preview ? (
-            <Text>{`Caixa liquidado oficial ${formatCents(state.cashSettledCents)} · crédito aplicado oficial ${formatCents(state.creditSettledCents)}`}</Text>
+            <Text>{`Já pago em dinheiro ${formatCents(state.cashSettledCents)} · pago com crédito ${formatCents(state.creditSettledCents)}`}</Text>
           ) : null}
         </ResolutionConfirmation>
       ) : null}
     </FormSection>
   );
+}
+
+const resolutionErrors: Record<string, string> = {
+  'Nenhum recebido físico elegível ou preview oficial inválido.':
+    'Não há itens recebidos aguardando acerto. Atualize a tela.',
+  'Decida explicitamente cada linha danificada elegível.':
+    'Decida o que fazer com cada item recebido com avaria.',
+  'Aceite de dano fora do limite oficial.': 'O valor da avaria passa do limite permitido.',
+};
+/** Mensagens de validação em linguagem do dia a dia (o texto interno continua nas regras). */
+function friendlyResolutionError(e: unknown) {
+  if (!(e instanceof Error)) return 'Revise as informações e tente de novo.';
+  if (e.message.trim().startsWith('[')) return 'Escreva o motivo com pelo menos 3 caracteres.';
+  return resolutionErrors[e.message] ?? e.message;
 }

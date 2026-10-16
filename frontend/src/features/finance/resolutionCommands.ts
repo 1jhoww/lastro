@@ -41,13 +41,13 @@ export const resolutionPermission = (c: ResolutionCommand) =>
 export const resolutionSensitive = (c: ResolutionCommand) => c.kind !== 'advance';
 export const isExecutionCommand = (c: ResolutionCommand) => !c.kind.endsWith('atomic');
 export const resolutionLabels: Record<ResolutionCommand['kind'], string> = {
-  'cancel-atomic': 'Cancelar financeiramente',
-  'cancel-start': 'Iniciar cancelamento retomável',
-  'return-atomic': 'Resolver recebido financeiro',
-  'return-start': 'Iniciar resolução retomável',
-  advance: 'Continuar execução',
-  resume: 'Retomar execução com novo fence',
-  abort: 'Abortar execução antes da aplicação',
+  'cancel-atomic': 'Cancelar pedido no financeiro',
+  'cancel-start': 'Iniciar cancelamento em etapas',
+  'return-atomic': 'Acertar devolução',
+  'return-start': 'Iniciar acerto em etapas',
+  advance: 'Continuar operação',
+  resume: 'Retomar operação',
+  abort: 'Interromper operação antes de aplicar valores',
 };
 export async function getExecution(
   api: ApiClient,

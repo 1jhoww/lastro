@@ -123,16 +123,20 @@ function Recovery({ children, background }: { children: ReactNode; background: b
     return (
       <>
         {state.error ? (
-          <Alert tone="warning" title="Recuperação financeira requer atenção">
-            Abra Financeiro para conferir checkpoint. Novos comandos financeiros exigem persistência
-            confirmada.
+          <Alert tone="warning" title="Financeiro precisa de conferência">
+            Não conseguimos conferir operações pendentes neste aparelho. Abra o Financeiro para
+            verificar antes de registrar novas operações.
           </Alert>
         ) : state.backendPending ? (
-          <Alert tone="warning" title="Há resoluções financeiras pendentes">
-            <Link href={'/financeiro/execucoes' as Href} asChild>
-              <Button label="Acompanhar pendências oficiais" variant="outline" />
-            </Link>
-          </Alert>
+          <Alert
+            tone="warning"
+            title="Há operações financeiras em andamento"
+            action={
+              <Link href={'/financeiro/execucoes' as Href} asChild>
+                <Button label="Ver operações em andamento" size="sm" variant="outline" />
+              </Link>
+            }
+          />
         ) : null}
         {children}
       </>
@@ -141,10 +145,11 @@ function Recovery({ children, background }: { children: ReactNode; background: b
     return (
       <Alert
         tone="danger"
-        title="Recuperação financeira bloqueada"
+        title="Não conseguimos conferir operações pendentes"
         action={
           <Button
-            label="Tentar recuperar"
+            label="Tentar de novo"
+            size="sm"
             onPress={() => {
               setState({ ready: false, error: null });
               setRetry((v) => v + 1);
@@ -152,7 +157,7 @@ function Recovery({ children, background }: { children: ReactNode; background: b
           />
         }
       >
-        <Text>{`${toApiError(state.error).userMessage} Nenhuma nova operação será enviada. Intenções foram preservadas.`}</Text>
+        <Text variant="small">{`${toApiError(state.error).userMessage} Por segurança, nenhuma nova operação será enviada até a conferência. Nada foi perdido.`}</Text>
       </Alert>
     );
   if (!state.ready) return <Skeleton />;
@@ -162,13 +167,19 @@ function Recovery({ children, background }: { children: ReactNode; background: b
   return (
     <RecoveryContext value={true}>
       {pending.length ? (
-        <Alert tone="warning" title="Intenções financeiras recuperadas">
-          <Text>
-            Consulte estado oficial. Repetição exige revisão e conserva chave e corpo originais.
+        <Alert
+          tone="warning"
+          title="Operações aguardando conferência"
+          action={
+            <Link href={'/financeiro/execucoes' as Href} asChild>
+              <Button label="Conferir operações" size="sm" variant="outline" />
+            </Link>
+          }
+        >
+          <Text variant="small">
+            Algumas operações ficaram sem confirmação. Confira cada uma antes de repetir; nada será
+            duplicado.
           </Text>
-          <Link href={'/financeiro/execucoes' as Href} asChild>
-            <Button label="Abrir acompanhamento financeiro" variant="outline" />
-          </Link>
         </Alert>
       ) : null}
       {children}

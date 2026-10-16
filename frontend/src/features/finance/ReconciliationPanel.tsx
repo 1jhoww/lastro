@@ -66,45 +66,48 @@ export function ReconciliationPanel({
   }
   return (
     <FormSection
-      title={executionId ? 'Reconciliação de provas' : 'Reconciliação do journal'}
-      description="Verificação oficial do servidor por páginas. Journal e provas são escopos distintos."
+      title={executionId ? 'Provas da operação em etapas' : 'Registros financeiros do pedido'}
+      description={
+        executionId
+          ? 'Confere os registros gerados pela operação em etapas. É diferente da conferência do pedido.'
+          : 'Confere a sequência de registros financeiros do pedido. Não altera nada.'
+      }
     >
       {page ? (
         <>
-          <Text>{`Verificados cumulativamente: ${page.checkedEntries ?? page.checkedEvents}${page.expectedEntries === undefined ? '' : ` de ${page.expectedEntries}`}`}</Text>
+          <Text variant="small">{`Conferidos até agora: ${page.checkedEntries ?? page.checkedEvents}${page.expectedEntries === undefined ? '' : ` de ${page.expectedEntries}`}`}</Text>
           <Alert
             tone={!page.consistent ? 'danger' : page.complete ? 'success' : 'info'}
             title={
               !page.consistent
-                ? 'Divergência acumulada'
+                ? 'Divergência encontrada'
                 : page.complete
-                  ? 'Consulta completa e consistente neste escopo'
-                  : 'Consulta incompleta'
+                  ? 'Nenhuma divergência encontrada'
+                  : 'Conferência incompleta'
             }
           >
-            {page.complete
-              ? 'Resultado oficial do servidor. Não é verificação criptográfica independente pelo aplicativo.'
-              : 'Páginas restantes precisam ser consultadas antes de concluir verificação.'}
+            {!page.consistent
+              ? 'Encontramos uma divergência nos registros. Não corrija por aqui: informe o suporte.'
+              : page.complete
+                ? 'Todos os registros conferidos. Está tudo certo.'
+                : 'Ainda há registros a conferir. Continue antes de considerar a verificação concluída.'}
           </Alert>
         </>
       ) : null}
       {error ? (
-        <Alert tone="danger" title="Reconciliação interrompida">
-          <Text>{toApiError(error).userMessage} Reinicie consulta após conflito de cursor.</Text>
+        <Alert tone="danger" title="Verificação interrompida">
+          <Text variant="small">{`${toApiError(error).userMessage} Comece a verificação de novo.`}</Text>
         </Alert>
       ) : null}
       <Button
-        label={page ? 'Reiniciar reconciliação' : 'Consultar reconciliação'}
+        label={page ? 'Verificar de novo' : 'Verificar integridade'}
+        size="sm"
         loading={busy}
         onPress={() => load(true)}
         variant="outline"
       />
       {page?.nextCursor && !error ? (
-        <Button
-          label="Consultar próxima página de reconciliação"
-          disabled={busy}
-          onPress={() => load()}
-        />
+        <Button label="Continuar verificação" size="sm" disabled={busy} onPress={() => load()} />
       ) : null}
     </FormSection>
   );

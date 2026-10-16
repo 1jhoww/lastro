@@ -1,74 +1,136 @@
+import { useState } from 'react';
 import { Link, useLocalSearchParams, type Href } from 'expo-router';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { toApiError } from '@/api/errors';
-import type { CreditApplication, Order, Payment, RefundObligation } from '@/api/types';
-import { ListPanel } from '@/features/catalog/ListStates';
+import type { CreditApplication, CreditLot, Order, Payment, RefundObligation } from '@/api/types';
 import { useOrder } from '@/features/orders/api';
+import { todayIn } from '@/features/orders/rules';
+import { useTenant } from '@/features/session/useTenant';
 import { Screen } from '@/layout/Screen';
+import { formatDateTime } from '@/lib/dates';
 import { formatCents } from '@/lib/money';
-import { Alert, Button, DataTable, EmptyState, Skeleton, Text, type Column } from '@/ui';
-import { CircleDollarSign } from '@/ui/icons';
+import { useSession } from '@/session/SessionContext';
+import { color, space, useLayoutSize } from '@/theme';
+import {
+  Alert,
+  Badge,
+  Button,
+  DataTable,
+  Disclosure,
+  Panel,
+  Skeleton,
+  Text,
+  type Column,
+} from '@/ui';
+import { HandCoins, RefreshCw, Undo2, Wallet } from '@/ui/icons';
 import {
   useCreditApplications,
   useCustomerCredits,
   useRefundObligations,
 } from './administrationApi';
 import { useFinancialState, usePayments, usePendingExecutions } from './api';
-import { FinanceNav } from './FinanceNav';
-import { EconomicForm } from './EconomicForm';
+import { applicationLabels, creditOriginLabel } from './CreditsScreen';
 import { DiscountPanel } from './DiscountPanel';
-import { applicationLabels } from './CreditsScreen';
+import { EconomicForm, economicTitles } from './EconomicForm';
+import { ExecutionSummary } from './ExecutionsScreen';
+import { canManageFinance } from './FinanceAccess';
+import { DueBadge, Field, Guidance, RowLink } from './FinanceParts';
+import { FinanceNav } from './FinanceNav';
+import { formatDate, installmentLabel, orderCode } from './presentation';
+import { ReconciliationPanel } from './ReconciliationPanel';
 import { refundLabels } from './RefundsScreen';
 import { ResolutionForm } from './ResolutionForm';
-import { ReconciliationPanel } from './ReconciliationPanel';
-import { ExecutionSummary } from './ExecutionsScreen';
+import type { EconomicCommand } from './commands';
+import { useRefetchStaleOnFocus } from './cacheUpdates';
 
 export function OrderAdministrationScreen({ id }: { id: string }) {
   const order = useOrder(id);
-  const params = useLocalSearchParams<{ reembolso?: string }>();
+  const params = useLocalSearchParams<{ reembolso?: string; acao?: string }>();
   return (
     <Screen
-      title="Administração financeira do pedido"
-      description="Créditos, estornos e registro manual de reembolso. Valores e estados vêm do backend."
+      title="Financeiro do pedido"
+      description={
+        order.data
+          ? `${order.data.customerName ?? 'Sem cliente'} · ${orderCode(id)}`
+          : orderCode(id)
+      }
+      actions={
+        <Link href={`/pedidos/${id}` as Href} asChild>
+          <Button label="Abrir pedido" size="sm" variant="outline" />
+        </Link>
+      }
     >
       <FinanceNav />
-      <Link href={`/pedidos/${id}` as Href} asChild>
-        <Button label="Abrir pedido comercial" variant="outline" />
-      </Link>
       {order.isPending ? (
-        <Skeleton />
+        <Skeleton height={120} />
       ) : order.isError ? (
         <Alert
           tone="danger"
           title="Pedido indisponível"
-          action={<Button label="Recarregar pedido" onPress={() => order.refetch()} />}
+          action={<Button label="Tentar de novo" size="sm" onPress={() => order.refetch()} />}
         >
           {toApiError(order.error).userMessage}
         </Alert>
+      ) : order.data.confirmedAt ? (
+        <>
+          <OrderWorkspace
+            order={order.data}
+            defaultRefundId={params.reembolso ?? ''}
+            initialAction={
+              params.reembolso
+                ? 'confirm-refund'
+                : params.acao === 'credito'
+                  ? 'apply-credit'
+                  : params.acao === 'estorno'
+                    ? 'reverse-payment'
+                    : null
+            }
+          />
+          <Disclosure label="Desconto do pedido" summary="registrado antes da confirmação">
+            <DiscountPanel key={id} order={order.data} />
+          </Disclosure>
+        </>
       ) : (
         <>
-          <Text variant="bodyStrong">{order.data.customerName ?? 'Sem cliente'}</Text>
+          <Guidance>
+            Pagamentos, créditos e reembolsos existem a partir da confirmação do pedido. No
+            rascunho, só o desconto administrativo pode ser aprovado.
+          </Guidance>
           <DiscountPanel key={id} order={order.data} />
-          {order.data.confirmedAt ? (
-            <OrderWorkspace order={order.data} defaultRefundId={params.reembolso ?? ''} />
-          ) : (
-            <Text>
-              Créditos, recebimentos e reembolsos exigem pedido confirmado. Desconto administrativo
-              é exclusivo do rascunho.
-            </Text>
-          )}
         </>
       )}
     </Screen>
   );
 }
-function OrderWorkspace({ order, defaultRefundId }: { order: Order; defaultRefundId: string }) {
+
+function OrderWorkspace({
+  order,
+  defaultRefundId,
+  initialAction,
+}: {
+  order: Order;
+  defaultRefundId: string;
+  initialAction: EconomicCommand['kind'] | null;
+}) {
+  const session = useSession();
+  const tenant = useTenant();
+  const today = tenant.data ? todayIn(tenant.data.timezone) : null;
+  const wide = useLayoutSize() === 'expanded';
   const state = useFinancialState(order.id);
   const payments = usePayments(order.id);
   const lots = useCustomerCredits(order.customerId ?? '');
   const applications = useCreditApplications({ orderId: order.id });
   const refunds = useRefundObligations({ orderId: order.id });
   const executions = usePendingExecutions(order.id);
+  useRefetchStaleOnFocus(
+    state,
+    payments.query,
+    lots.query,
+    applications.query,
+    refunds.query,
+    executions.query,
+  );
+  const [action, setAction] = useState<EconomicCommand['kind'] | null>(initialAction);
   const blocked =
     executions.query.isPending ||
     executions.query.isError ||
@@ -76,230 +138,426 @@ function OrderWorkspace({ order, defaultRefundId }: { order: Order; defaultRefun
     Boolean(executions.query.hasNextPage) ||
     executions.items.length > 0 ||
     state.isFetching;
+  const refresh = () => {
+    state.refetch();
+    payments.query.refetch();
+    lots.query.refetch();
+    applications.query.refetch();
+    refunds.query.refetch();
+    executions.query.refetch();
+  };
+  const outstanding = state.data?.titles.reduce((a, t) => a + t.outstandingCents, 0) ?? 0;
+  const actions: {
+    kind: EconomicCommand['kind'];
+    icon: typeof Wallet;
+    available: boolean;
+    hint: string;
+  }[] = [
+    {
+      kind: 'apply-credit',
+      icon: Wallet,
+      available: outstanding > 0 && lots.items.some((l) => l.availableCents > 0),
+      hint: 'Cliente sem crédito disponível ou pedido sem saldo em aberto',
+    },
+    {
+      kind: 'reverse-payment',
+      icon: Undo2,
+      available: payments.items.some((p) => p.allocations.some((a) => a.remainingCents > 0)),
+      hint: 'Nenhum pagamento que possa ser estornado',
+    },
+    {
+      kind: 'reverse-credit',
+      icon: Undo2,
+      available: applications.items.some((a) => a.allocations.some((r) => r.remainingCents > 0)),
+      hint: 'Nenhum uso de crédito que possa ser estornado',
+    },
+    {
+      kind: 'confirm-refund',
+      icon: HandCoins,
+      available: refunds.items.some((r) => r.outstandingCents > 0) || Boolean(defaultRefundId),
+      hint: 'Nenhum reembolso pendente',
+    },
+  ];
+  const permitted = (k: EconomicCommand['kind']) =>
+    canManageFinance(
+      session,
+      k === 'apply-credit'
+        ? 'payments:manage'
+        : k === 'confirm-refund'
+          ? 'refunds:manage'
+          : 'payments:reverse',
+    );
   const paymentColumns: Column<Payment>[] = [
-    { key: 'id', label: 'Recebimento', flex: 2, render: (p) => <Text selectable>{p.id}</Text> },
     {
-      key: 'amount',
-      label: 'Original',
-      width: 120,
-      render: (p) => <Text>{formatCents(p.amountCents)}</Text>,
+      key: 'date',
+      label: 'Data',
+      width: 110,
+      render: (p) => <Text>{formatDate(p.receivedOn)}</Text>,
     },
+    { key: 'method', label: 'Forma', flex: 2, render: (p) => <Text>{p.method.name}</Text> },
     {
-      key: 'method',
-      label: 'Forma histórica',
+      key: 'reference',
+      label: 'Referência',
       flex: 2,
-      render: (p) => <Text>{p.method.name}</Text>,
-    },
-    {
-      key: 'allocated',
-      label: 'Alocações reversíveis',
-      flex: 3,
       render: (p) => (
-        <View>
-          {p.allocations.map((a) => (
-            <Text
-              key={a.receivableId}
-              selectable
-            >{`${a.receivableId} · ${formatCents(a.remainingCents)}`}</Text>
-          ))}
-        </View>
+        <Text variant="small" color={color.textSecondary} numberOfLines={1}>
+          {p.reference || '—'}
+        </Text>
       ),
     },
-  ];
-  const applicationColumns: Column<CreditApplication>[] = [
-    { key: 'id', label: 'Aplicação', flex: 2, render: (a) => <Text selectable>{a.id}</Text> },
     {
       key: 'status',
       label: 'Situação',
-      width: 100,
-      render: (a) => <Text>{applicationLabels[a.status]}</Text>,
-    },
-    {
-      key: 'lot',
-      label: 'Fonte original',
       flex: 2,
-      render: (a) => <Text selectable>{a.creditLotId}</Text>,
+      render: (p) =>
+        p.reversedCents ? (
+          <Badge label={`Estornado ${formatCents(p.reversedCents)}`} tone="danger" />
+        ) : p.transferredCents ? (
+          <Badge label="Virou crédito/reembolso" tone="neutral" />
+        ) : (
+          <Badge label="Registrado" tone="success" />
+        ),
     },
     {
       key: 'amount',
-      label: 'Aplicado / estornado / restaurado',
-      flex: 2,
-      render: (a) => (
-        <Text>{`${formatCents(a.amountCents)} / ${formatCents(a.reversedCents)} / ${formatCents(a.restoredByCancellationCents)}`}</Text>
-      ),
-    },
-  ];
-  const refundColumns: Column<RefundObligation>[] = [
-    { key: 'id', label: 'Obrigação', flex: 2, render: (r) => <Text selectable>{r.id}</Text> },
-    {
-      key: 'status',
-      label: 'Situação',
-      flex: 2,
-      render: (r) => <Text>{refundLabels[r.status]}</Text>,
-    },
-    {
-      key: 'remaining',
-      label: 'Pendente',
+      label: 'Valor',
       width: 120,
-      render: (r) => <Text>{formatCents(r.outstandingCents)}</Text>,
-    },
-    {
-      key: 'refunded',
-      label: 'Confirmado manualmente',
-      width: 175,
-      render: (r) => <Text>{formatCents(r.refundedCents)}</Text>,
+      align: 'right',
+      render: (p) => <Text variant="figure">{formatCents(p.amountCents)}</Text>,
     },
   ];
-  const empty = (title: string) => (
-    <EmptyState
-      icon={CircleDollarSign}
-      title={title}
-      description="Nenhum registro nesta página. Continuação usa cursor do servidor."
-    />
-  );
   return (
     <>
-      <Button
-        label="Atualizar operações e saldos"
-        variant="outline"
-        loading={state.isFetching}
-        onPress={() => {
-          state.refetch();
-          payments.query.refetch();
-          lots.query.refetch();
-          applications.query.refetch();
-          refunds.query.refetch();
-          executions.query.refetch();
-        }}
-      />
+      <View style={styles.toolbar}>
+        <Button
+          label="Atualizar"
+          icon={RefreshCw}
+          size="sm"
+          variant="ghost"
+          loading={state.isFetching}
+          onPress={refresh}
+        />
+      </View>
       {executions.query.isError ? (
-        <Alert tone="warning" title="Pendências indisponíveis">
+        <Alert tone="warning" title="Não foi possível conferir operações em andamento">
           {toApiError(executions.query.error).userMessage}
         </Alert>
       ) : null}
-      {executions.items.map((e) => (
-        <ExecutionSummary key={e.id} execution={e} />
-      ))}
+      {executions.items.length ? (
+        <Alert tone="warning" title="Operação em andamento neste pedido">
+          <Text variant="small">
+            Enquanto ela não for concluída, pagamentos, créditos e estornos deste pedido ficam
+            bloqueados.
+          </Text>
+          {executions.items.map((e) => (
+            <ExecutionSummary key={e.id} execution={e} />
+          ))}
+        </Alert>
+      ) : null}
       {executions.query.hasNextPage ? (
         <Button
           label="Consultar mais pendências"
+          size="sm"
+          variant="outline"
           onPress={() => executions.query.fetchNextPage()}
         />
       ) : null}
-      {state.isPending ? (
-        <Skeleton />
-      ) : state.isError ? (
-        <Alert tone="danger" title="Saldos indisponíveis">
-          {toApiError(state.error).userMessage}
-        </Alert>
-      ) : (
-        <>
-          <ResolutionForm order={order} state={state.data} blocked={blocked} />
-          <EconomicForm
-            state={state.data}
-            lots={lots.items}
-            payments={payments.items}
-            applications={applications.items}
-            refunds={refunds.items}
-            blocked={blocked}
-            settlementAllowed={order.status === 'confirmed' || order.status === 'dispatched'}
-            defaultRefundId={defaultRefundId}
-          />
-        </>
-      )}
-      <Text variant="h3">Fontes do cliente</Text>
-      <ListPanel
-        query={lots.query}
-        count={lots.items.length}
-        empty={empty('Nenhuma fonte de crédito')}
-      >
-        {lots.items.map((l) => (
-          <Text
-            key={l.id}
-            selectable
-          >{`Fonte ${l.id} · disponível ${formatCents(l.availableCents)} · aplicado ${formatCents(l.appliedCents)} · origem ${l.originOrderId}`}</Text>
-        ))}
-      </ListPanel>
-      <Text variant="h3">Recebimentos e parcelas reversíveis</Text>
-      <ListPanel
-        query={payments.query}
-        count={payments.items.length}
-        empty={empty('Nenhum recebimento do pedido')}
-      >
-        <DataTable
-          label="Recebimentos elegíveis"
-          rows={payments.items}
-          keyOf={(p) => p.id}
-          columns={paymentColumns}
-          renderCompact={(p) => (
-            <View>
-              <Text variant="bodyStrong">{`${p.method.name} · ${formatCents(p.amountCents)}`}</Text>
-              <Text>{`Estornado ${formatCents(p.reversedCents)} · destinado ${formatCents(p.transferredCents)}`}</Text>
-              {p.allocations.map((a) => (
-                <Text
-                  key={a.receivableId}
-                  selectable
-                >{`Parcela ${a.receivableId}: reversível ${formatCents(a.remainingCents)}`}</Text>
+      <View style={[styles.grid, wide && styles.gridWide]}>
+        <View style={[styles.col, wide && styles.main]}>
+          {state.isPending ? (
+            <Skeleton height={140} />
+          ) : state.isError ? (
+            <Alert
+              tone="danger"
+              title="Saldos indisponíveis"
+              action={<Button label="Tentar de novo" size="sm" onPress={() => state.refetch()} />}
+            >
+              {toApiError(state.error).userMessage}
+            </Alert>
+          ) : (
+            <Panel title="Parcelas" flush>
+              {state.data.titles.map((t, i) => (
+                <RowLink key={t.id} href={`/financeiro/${t.id}` as Href}>
+                  <View
+                    style={[styles.installment, i < state.data.titles.length - 1 && styles.divider]}
+                  >
+                    <View style={styles.flex}>
+                      <Text variant="bodyStrong">{installmentLabel(t.installmentNumber)}</Text>
+                      <Text variant="small" color={color.textSecondary}>
+                        {`Vencimento ${formatDate(t.dueDate)} · valor ${formatCents(t.originalCents)}`}
+                      </Text>
+                    </View>
+                    <View style={styles.right}>
+                      <Text variant="figure">{formatCents(t.outstandingCents)}</Text>
+                      <DueBadge title={t} today={today} />
+                    </View>
+                  </View>
+                </RowLink>
               ))}
-              <Text variant="caption" selectable>
-                {p.id}
-              </Text>
-            </View>
+              <View style={styles.totals}>
+                <Field
+                  label="Recebido em dinheiro"
+                  value={formatCents(state.data.cashSettledCents)}
+                />
+                {state.data.creditSettledCents ? (
+                  <Field
+                    label="Pago com crédito"
+                    value={formatCents(state.data.creditSettledCents)}
+                  />
+                ) : null}
+                {state.data.canceledCents ? (
+                  <Field label="Cancelado" value={formatCents(state.data.canceledCents)} />
+                ) : null}
+                {state.data.transferredCashCents ? (
+                  <Field
+                    label="Dinheiro que virou crédito ou reembolso"
+                    value={formatCents(state.data.transferredCashCents)}
+                  />
+                ) : null}
+                <Field label="Em aberto" value={formatCents(outstanding)} strong />
+              </View>
+            </Panel>
           )}
-        />
-      </ListPanel>
-      <Text variant="h3">Aplicações de crédito do pedido</Text>
-      <ListPanel
-        query={applications.query}
-        count={applications.items.length}
-        empty={empty('Nenhuma aplicação do pedido')}
-      >
-        <DataTable
-          label="Aplicações do pedido"
-          rows={applications.items}
-          keyOf={(a) => a.id}
-          columns={applicationColumns}
-          renderCompact={(a) => (
-            <View>
-              <Text variant="bodyStrong">{`${applicationLabels[a.status]} · ${formatCents(a.amountCents)}`}</Text>
-              <Text>{`Estornado ${formatCents(a.reversedCents)} · restaurado ${formatCents(a.restoredByCancellationCents)}`}</Text>
-              <Text
-                variant="caption"
-                selectable
-              >{`Aplicação ${a.id} · fonte ${a.creditLotId}`}</Text>
+          {state.data && action ? (
+            <EconomicForm
+              key={action}
+              kind={action}
+              state={state.data}
+              lots={lots.items}
+              payments={payments.items}
+              applications={applications.items}
+              refunds={refunds.items}
+              blocked={blocked}
+              settlementAllowed={order.status === 'confirmed' || order.status === 'dispatched'}
+              defaultRefundId={action === 'confirm-refund' ? defaultRefundId : ''}
+              onDone={() => setAction(null)}
+            />
+          ) : null}
+          <Panel title="Pagamentos" flush>
+            {payments.query.isPending ? (
+              <View style={styles.pad}>
+                <Skeleton height={18} />
+              </View>
+            ) : payments.items.length === 0 ? (
+              <View style={styles.pad}>
+                <Text variant="small" color={color.textSecondary}>
+                  Nenhum pagamento registrado.
+                </Text>
+              </View>
+            ) : (
+              <DataTable
+                label="Pagamentos do pedido"
+                rows={payments.items}
+                keyOf={(p) => p.id}
+                columns={paymentColumns}
+                renderCompact={(p) => (
+                  <View style={styles.compactRow}>
+                    <View style={styles.flex}>
+                      <Text variant="bodyStrong">{p.method.name}</Text>
+                      <Text variant="small" color={color.textSecondary}>
+                        {`${formatDate(p.receivedOn)}${p.reference ? ` · ${p.reference}` : ''}`}
+                      </Text>
+                      {p.reversedCents ? (
+                        <Badge label={`Estornado ${formatCents(p.reversedCents)}`} tone="danger" />
+                      ) : null}
+                    </View>
+                    <Text variant="figure">{formatCents(p.amountCents)}</Text>
+                  </View>
+                )}
+              />
+            )}
+            <MoreButton query={payments.query} />
+          </Panel>
+          <Lists lots={lots} applications={applications} refunds={refunds} />
+        </View>
+        <View style={[styles.col, wide && styles.side]}>
+          <Panel
+            title="Outras ações"
+            description="Situações específicas. Cada uma pede confirmação."
+          >
+            <View style={styles.actions}>
+              {actions
+                .filter((a) => permitted(a.kind))
+                .map((a) => (
+                  <View key={a.kind} style={styles.actionItem}>
+                    <Button
+                      label={economicTitles[a.kind]}
+                      icon={a.icon}
+                      size="sm"
+                      variant={action === a.kind ? 'strong' : 'outline'}
+                      disabled={!a.available}
+                      onPress={() => setAction(a.kind)}
+                    />
+                    {!a.available ? (
+                      <Text variant="caption" color={color.textSecondary}>
+                        {a.hint}
+                      </Text>
+                    ) : null}
+                  </View>
+                ))}
             </View>
-          )}
-        />
-      </ListPanel>
-      <Text variant="h3">Obrigações do pedido</Text>
-      <ListPanel
-        query={refunds.query}
-        count={refunds.items.length}
-        empty={empty('Nenhuma obrigação do pedido')}
-      >
-        <DataTable
-          label="Obrigações do pedido"
-          rows={refunds.items}
-          keyOf={(r) => r.id}
-          columns={refundColumns}
-          renderCompact={(r) => (
-            <View>
-              <Text variant="bodyStrong">{`${refundLabels[r.status]} · pendente ${formatCents(r.outstandingCents)}`}</Text>
-              <Text>{`Confirmado manualmente ${formatCents(r.refundedCents)}`}</Text>
-              <Text variant="caption" selectable>
-                {r.id}
-              </Text>
-            </View>
-          )}
-        />
-      </ListPanel>
-      <Link href={`/financeiro?pedido=${order.id}` as Href} asChild>
-        <Button label="Abrir títulos e histórico financeiro" variant="outline" />
-      </Link>
-      <Link href={'/financeiro/devolucoes' as Href} asChild>
-        <Button label="Consultar resoluções de devoluções" variant="outline" />
-      </Link>
-      <ReconciliationPanel orderId={order.id} />
+          </Panel>
+          {state.data ? (
+            <Disclosure label="Operações excepcionais" summary="cancelamento financeiro do pedido">
+              <Guidance>
+                Cancela o pedido no financeiro: abate o que está em aberto e transforma o que já foi
+                pago em crédito do cliente ou em reembolso a fazer. Use apenas quando o pedido não
+                será entregue.
+              </Guidance>
+              <ResolutionForm order={order} state={state.data} blocked={blocked} />
+            </Disclosure>
+          ) : null}
+          <Disclosure label="Verificação técnica" summary="integridade dos registros financeiros">
+            <Guidance>
+              Confere se os registros financeiros deste pedido estão íntegros. Não altera nada.
+            </Guidance>
+            <ReconciliationPanel orderId={order.id} />
+          </Disclosure>
+          <Link href={'/financeiro/devolucoes' as Href} asChild>
+            <Button label="Devoluções de mercadoria" size="sm" variant="ghost" />
+          </Link>
+        </View>
+      </View>
     </>
   );
 }
+
+type ListLike<T> = {
+  items: T[];
+  query: {
+    isPending: boolean;
+    hasNextPage: boolean;
+    isFetchingNextPage: boolean;
+    fetchNextPage: () => unknown;
+  };
+};
+
+function MoreButton({ query }: { query: ListLike<unknown>['query'] }) {
+  return query.hasNextPage ? (
+    <View style={styles.pad}>
+      <Button
+        label="Carregar mais"
+        size="sm"
+        variant="outline"
+        loading={query.isFetchingNextPage}
+        onPress={() => query.fetchNextPage()}
+      />
+    </View>
+  ) : null;
+}
+
+function Lists({
+  lots,
+  applications,
+  refunds,
+}: {
+  lots: ListLike<CreditLot>;
+  applications: ListLike<CreditApplication>;
+  refunds: ListLike<RefundObligation>;
+}) {
+  return (
+    <>
+      {refunds.items.length ? (
+        <Panel title="Reembolsos deste pedido" flush>
+          {refunds.items.map((r, i) => (
+            <View
+              key={r.id}
+              style={[styles.installment, i < refunds.items.length - 1 && styles.divider]}
+            >
+              <View style={styles.flex}>
+                <Text variant="bodyStrong">{refundLabels[r.status]}</Text>
+                <Text variant="small" color={color.textSecondary}>
+                  {`${creditOriginLabel[r.origin]} · devolvido ${formatCents(r.refundedCents)} de ${formatCents(r.originalCents)}`}
+                </Text>
+              </View>
+              <View style={styles.right}>
+                <Text variant="figure">{formatCents(r.outstandingCents)}</Text>
+                <Text variant="caption" color={color.textSecondary}>
+                  a devolver
+                </Text>
+              </View>
+            </View>
+          ))}
+          <MoreButton query={refunds.query} />
+        </Panel>
+      ) : null}
+      {applications.items.length ? (
+        <Panel title="Créditos usados neste pedido" flush>
+          {applications.items.map((a, i) => (
+            <View
+              key={a.id}
+              style={[styles.installment, i < applications.items.length - 1 && styles.divider]}
+            >
+              <View style={styles.flex}>
+                <Text variant="bodyStrong">{applicationLabels[a.status]}</Text>
+                <Text variant="small" color={color.textSecondary}>
+                  {`Usado em ${formatDateTime(a.createdAt)}${a.reversedCents ? ` · estornado ${formatCents(a.reversedCents)}` : ''}`}
+                </Text>
+              </View>
+              <Text variant="figure">{formatCents(a.amountCents)}</Text>
+            </View>
+          ))}
+          <MoreButton query={applications.query} />
+        </Panel>
+      ) : null}
+      {lots.items.length ? (
+        <Panel
+          title="Créditos do cliente"
+          description="Valores disponíveis para usar neste ou em outros pedidos."
+          flush
+        >
+          {lots.items.map((l, i) => (
+            <View
+              key={l.id}
+              style={[styles.installment, i < lots.items.length - 1 && styles.divider]}
+            >
+              <View style={styles.flex}>
+                <Text variant="bodyStrong">{creditOriginLabel[l.origin]}</Text>
+                <Text variant="small" color={color.textSecondary}>
+                  {`${orderCode(l.originOrderId)} · gerado em ${formatDateTime(l.createdAt)}`}
+                </Text>
+              </View>
+              <View style={styles.right}>
+                <Text variant="figure">{formatCents(l.availableCents)}</Text>
+                <Text variant="caption" color={color.textSecondary}>
+                  {`de ${formatCents(l.issuedCents)}`}
+                </Text>
+              </View>
+            </View>
+          ))}
+          <MoreButton query={lots.query} />
+        </Panel>
+      ) : null}
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  toolbar: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: -space[4] },
+  grid: { gap: space[5] },
+  gridWide: { flexDirection: 'row', alignItems: 'flex-start' },
+  col: { gap: space[5] },
+  main: { flex: 3, minWidth: 0 },
+  side: { flex: 2, minWidth: 0 },
+  flex: { flex: 1, minWidth: 0, gap: 2 },
+  installment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[3],
+    paddingVertical: space[3],
+    paddingHorizontal: space[5],
+  },
+  right: { alignItems: 'flex-end', gap: space[1] },
+  divider: { borderBottomWidth: 1, borderBottomColor: color.border },
+  totals: {
+    paddingHorizontal: space[5],
+    paddingVertical: space[3],
+    borderTopWidth: 1,
+    borderTopColor: color.border,
+    backgroundColor: color.canvas,
+  },
+  pad: { padding: space[5] },
+  compactRow: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
+  actions: { gap: space[3] },
+  actionItem: { gap: space[1], alignItems: 'flex-start' },
+});

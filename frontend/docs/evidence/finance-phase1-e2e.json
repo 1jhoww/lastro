@@ -1,0 +1,46 @@
+{
+  "executedAt": "2026-10-16T00:28:58.474Z",
+  "api": "local emulators (demo project)",
+  "results": [
+    {
+      "name": "condição cadastrada aparece nas opções do editor de pedidos (admin e vendedor)",
+      "ok": true
+    },
+    {
+      "name": "prévia da tela coincide com parcelas e vencimentos oficiais",
+      "ok": true
+    },
+    {
+      "name": "valor acima do saldo é recusado na montagem e pelo servidor",
+      "ok": true
+    },
+    {
+      "name": "data futura é recusada pelo servidor",
+      "ok": true
+    },
+    {
+      "name": "recebimento parcial com observação padrão é aceito e é idempotente",
+      "ok": true
+    },
+    {
+      "name": "quitação integral zera saldo e marca título como quitado",
+      "ok": true
+    },
+    {
+      "name": "painel: leitura integral soma o mesmo que os títulos oficiais",
+      "ok": true
+    },
+    {
+      "name": "condição desativada some das opções de pedido sem afetar pedido confirmado",
+      "ok": true
+    },
+    {
+      "name": "nome repetido de forma é recusado (validação de duplicidade)",
+      "ok": true
+    },
+    {
+      "name": "vendedor não lê títulos nem recebimentos",
+      "ok": true
+    }
+  ]
+}

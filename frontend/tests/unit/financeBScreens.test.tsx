@@ -79,36 +79,31 @@ function world(role: 'administrator' | 'seller' = 'administrator', permissions?:
 }
 const posts = (s: ReturnType<typeof createFakeApi>) =>
   s.calls.filter((c) => c.method === 'POST' || c.method === 'PATCH');
-async function choose(label: string, radio: string) {
+async function choose(label: string, radio: string | RegExp) {
   await waitFor(() =>
     expect(screen.getByRole('button', { name: new RegExp(`^${label}:`) })).toBeEnabled(),
   );
   await fireEvent.press(screen.getByRole('button', { name: new RegExp(`^${label}:`) }));
   await fireEvent.press(await screen.findByRole('radio', { name: radio }));
 }
-async function economic(kind = 'Aplicar crédito', source = /l1 · disponível/) {
-  await screen.findByText('Operações financeiras');
-  if (kind !== 'Aplicar crédito') await choose('Tipo de operação', kind);
-  await waitFor(() =>
-    expect(screen.getByRole('button', { name: /^Origem da operação:/ })).toBeEnabled(),
-  );
-  await fireEvent.press(screen.getByRole('button', { name: /^Origem da operação:/ }));
-  await fireEvent.press(await screen.findByRole('radio', { name: source }));
-  if (kind !== 'Registrar reembolso realizado') {
-    await waitFor(() =>
-      expect(screen.getByRole('button', { name: /^Parcela da operação:/ })).toBeEnabled(),
-    );
-    await fireEvent.press(screen.getByRole('button', { name: /^Parcela da operação:/ }));
-    await fireEvent.press(await screen.findByRole('radio', { name: /^1ª parcela/ }));
-  }
-  await waitFor(() =>
-    expect(screen.getByRole('button', { name: 'Revisar operação financeira' })).toBeEnabled(),
-  );
-  await fireEvent.changeText(screen.getByLabelText('Valor da operação'), '200');
-  await fireEvent.changeText(
-    screen.getByLabelText('Justificativa financeira'),
-    'Conferência administrativa',
-  );
+const sourceLabels: Record<string, string> = {
+  'Usar crédito do cliente': 'Crédito a usar',
+  'Estornar pagamento': 'Pagamento a estornar',
+  'Estornar uso de crédito': 'Uso de crédito a estornar',
+  'Registrar reembolso já feito': 'Reembolso pendente',
+};
+/** Abre a ação secundária do pedido; origem e parcela únicas já vêm escolhidas e são conferidas. */
+async function economic(kind = 'Usar crédito do cliente', source = /R\$ 7,50 disponível/) {
+  await waitFor(() => expect(screen.getByRole('button', { name: kind })).toBeEnabled());
+  await fireEvent.press(screen.getByRole('button', { name: kind }));
+  await choose(sourceLabels[kind]!, source);
+  if (kind !== 'Registrar reembolso já feito') await choose('Parcela', /^1ª parcela/);
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Revisar' })).toBeEnabled());
+  await fireEvent.changeText(screen.getByLabelText('Valor'), '200');
+  await fireEvent.changeText(screen.getByLabelText('Motivo'), 'Conferência administrativa');
+}
+async function toggle(label: string, value: boolean) {
+  await fireEvent(screen.getByLabelText(label), 'valueChange', value);
 }
 describe('financeiro B: fluxos de tela', () => {
   it('troca de personalizado inválido para preset não valida campos ocultos', async () => {
@@ -131,13 +126,12 @@ describe('financeiro B: fluxos de tela', () => {
     });
     await screen.findByText('Prazo 30 e 60');
     await fireEvent.press(screen.getByRole('button', { name: 'Nova condição' }));
-    await fireEvent.changeText(screen.getByLabelText('Nome da condição'), 'Condição revisada');
-    await choose('Modelo de prazos', 'Personalizado');
-    await fireEvent.changeText(screen.getByLabelText('Peso da parcela 1'), '0');
-    await choose('Modelo de prazos', '30 dias');
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar condição' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Cadastro confirmado');
+    await fireEvent.changeText(screen.getByLabelText('Nome'), 'Condição revisada');
+    await fireEvent.press(screen.getByRole('radio', { name: 'Personalizada' }));
+    await fireEvent.changeText(screen.getByLabelText('Dias da 1ª parcela'), '');
+    await fireEvent.press(screen.getByRole('radio', { name: '30 dias' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Criar condição' }));
+    await screen.findByText('Condição salva');
     expect(posts(server)[0]?.body).toMatchObject({ preset: 'net30' });
     expect(posts(server)[0]?.body).not.toHaveProperty('schedule');
   });
@@ -152,8 +146,10 @@ describe('financeiro B: fluxos de tela', () => {
       initialUrl: '/financeiro/pedidos/o1',
       overrides,
     });
-    await screen.findByText('Execução financeira pendente');
-    expect(screen.getByRole('button', { name: 'Revisar operação financeira' })).toBeDisabled();
+    await screen.findByText('Operação financeira pendente');
+    await fireEvent.press(screen.getByRole('button', { name: 'Usar crédito do cliente' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Revisar' })).toBeDisabled());
+    expect(screen.getByText('Operação indisponível agora')).toBeTruthy();
     expect(posts(server)).toHaveLength(0);
   });
   it('403 recente no servidor pede senha e repete mesma intenção sem loop', async () => {
@@ -170,14 +166,14 @@ describe('financeiro B: fluxos de tela', () => {
       initialUrl: '/financeiro/pedidos/o1',
       overrides,
     });
-    await economic('Estornar recebimento', /p1 · Pix/);
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar operação financeira' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
+    await economic('Estornar pagamento', /Pix conferido · R\$ 5,00 em 01\/10\/2026/);
+    await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar estorno' }));
     await screen.findByText('Confirme sua senha');
     await fireEvent.changeText(screen.getByLabelText('Senha'), 'senha-teste');
     await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Operação confirmada');
+    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar estorno' }));
+    await screen.findByText('Operação concluída');
     expect(posts(server)).toHaveLength(2);
     expect(posts(server)[0]?.headers['idempotency-key']).toBe(
       posts(server)[1]?.headers['idempotency-key'],
@@ -226,8 +222,8 @@ describe('financeiro B: fluxos de tela', () => {
     await fireEvent.press(screen.getByRole('button', { name: 'Revisar desconto' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Aprovar desconto' }));
     await screen.findByText('Desconto com resultado desconhecido');
-    await fireEvent.press(screen.getByRole('button', { name: 'Conferir desconto oficial' }));
-    await screen.findByText('Estado oficial confirma desconto solicitado. Não houve novo PATCH.');
+    await fireEvent.press(screen.getByRole('button', { name: 'Conferir desconto' }));
+    await screen.findByText('Tudo certo: o desconto já estava aprovado. Nada foi repetido.');
     expect(posts(server)).toHaveLength(1);
   });
   it.each([
@@ -273,11 +269,13 @@ describe('financeiro B: fluxos de tela', () => {
       initialUrl: '/financeiro/creditos?cliente=c1',
       overrides,
     });
-    await screen.findByText('Nenhuma fonte de crédito');
-    await fireEvent.press(screen.getByRole('button', { name: 'Carregar mais' }));
+    await screen.findByText('Este cliente não tem crédito');
+    expect(screen.getByText('—')).toBeTruthy();
+    await fireEvent.press(screen.getAllByRole('button', { name: 'Carregar mais' })[0]!);
     await screen.findByText('Cancelamento de pedido');
-    expect(screen.getByText(/Disponível R\$ 7,50/)).toBeTruthy();
-    expect(screen.getByText(/Estornado R\$ 1,00 · restaurado R\$ 1,00/)).toBeTruthy();
+    expect(screen.getAllByText('R$ 7,50').length).toBeGreaterThan(0);
+    expect(screen.getByText(/usado R\$ 2,50 de R\$ 10,00/)).toBeTruthy();
+    expect(screen.getByText(/^Usado · 01\/10\/2026/)).toBeTruthy();
   });
   it('aplicação só envia após revisão, com versões oficiais', async () => {
     const { gateway, server } = world();
@@ -291,10 +289,11 @@ describe('financeiro B: fluxos de tela', () => {
       overrides,
     });
     await economic();
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar operação financeira' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
     expect(posts(server)).toHaveLength(0);
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Operação confirmada');
+    expect(await screen.findByText('Crédito restante do cliente')).toBeTruthy();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Usar crédito' }));
+    await screen.findByText('Operação concluída');
     expect(posts(server)[0]?.body).toMatchObject({
       expectedOrderVersion: 4,
       expectedGuardVersion: 7,
@@ -314,14 +313,17 @@ describe('financeiro B: fluxos de tela', () => {
       initialUrl: '/financeiro/pedidos/o1',
       overrides,
     });
-    await economic('Estornar recebimento', /p1 · Pix/);
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar operação financeira' }));
+    await economic('Estornar pagamento', /Pix conferido · R\$ 5,00 em 01\/10\/2026/);
+    await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
     await screen.findByText('Confirme sua senha');
     expect(posts(server)).toHaveLength(0);
     await fireEvent.changeText(screen.getByLabelText('Senha'), 'senha-teste');
     await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Operação confirmada');
+    expect(
+      await screen.findByText('O pagamento fica marcado como estornado no histórico'),
+    ).toBeTruthy();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar estorno' }));
+    await screen.findByText('Operação concluída');
     expect(posts(server)[0]?.body).toMatchObject({
       expectedVersion: 8,
       allocations: [{ expectedVersion: 3, amountCents: 200 }],
@@ -338,10 +340,10 @@ describe('financeiro B: fluxos de tela', () => {
       initialUrl: '/financeiro/pedidos/o1',
       overrides,
     });
-    await economic('Estornar aplicação de crédito', /a1 · original/);
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar operação financeira' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Operação confirmada');
+    await economic('Estornar uso de crédito', /Crédito de R\$ 5,00/);
+    await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar estorno' }));
+    await screen.findByText('Operação concluída');
     expect(posts(server)[0]?.body).toMatchObject({ expectedVersion: 9, expectedLotVersion: 6 });
   });
   it('reembolso sem confirmação externa não envia; comprovante é consultado após sucesso', async () => {
@@ -369,22 +371,24 @@ describe('financeiro B: fluxos de tela', () => {
       initialUrl: '/financeiro/pedidos/o1',
       overrides,
     });
-    await economic('Registrar reembolso realizado', /f1 · pendente/);
-    await choose('Forma do reembolso realizado', 'Pix conferido');
-    await fireEvent.changeText(screen.getByLabelText('Dinheiro devolvido em'), '2026-10-13');
-    await fireEvent.changeText(screen.getByLabelText('Referência do comprovante'), 'comprovante');
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar operação financeira' }));
+    await economic('Registrar reembolso já feito', /R\$ 5,00 a devolver/);
+    await fireEvent.press(await screen.findByRole('radio', { name: 'Pix conferido' }));
+    await fireEvent.changeText(screen.getByLabelText('Data da devolução'), '13/10/2026');
+    await fireEvent.changeText(screen.getByLabelText('Comprovante'), 'comprovante');
+    await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
     await screen.findByText('Revise a operação');
     expect(posts(server)).toHaveLength(0);
     await fireEvent.press(
       screen.getByRole('checkbox', {
-        name: 'Confirmo que o dinheiro já foi devolvido fora do Lastro',
+        name: 'Confirmo que o dinheiro já foi devolvido ao cliente fora do Lastro',
       }),
     );
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar operação financeira' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Comprovante administrativo');
-    expect(screen.getByText(/Registro não executou transferência bancária/)).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
+    expect(await screen.findByText('Restam R$ 3,00 a devolver')).toBeTruthy();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Registrar reembolso' }));
+    await screen.findByText('Reembolso registrado');
+    expect(screen.getByText(/o Lastro não transfere dinheiro/)).toBeTruthy();
+    expect(posts(server)[0]?.body).toMatchObject({ refundedOn: '2026-10-13', amountCents: 200 });
   });
   it('resposta perdida bloqueia nova operação e recupera mesma intenção', async () => {
     const { gateway, server } = world();
@@ -400,13 +404,13 @@ describe('financeiro B: fluxos de tela', () => {
       overrides,
     });
     await economic();
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar operação financeira' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Operação com resultado desconhecido');
-    expect(screen.getByRole('button', { name: 'Revisar operação financeira' })).toBeDisabled();
-    await fireEvent.press(screen.getByRole('button', { name: 'Recuperar mesma operação' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Operação confirmada');
+    await fireEvent.press(screen.getByRole('button', { name: 'Revisar' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Usar crédito' }));
+    await screen.findByText('Ainda não sabemos se a operação foi registrada');
+    expect(screen.getByRole('button', { name: 'Revisar' })).toBeDisabled();
+    await fireEvent.press(screen.getByRole('button', { name: 'Conferir operação' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Usar crédito' }));
+    await screen.findByText('Operação concluída');
     expect(posts(server)[0]?.headers['idempotency-key']).toBe(
       posts(server)[1]?.headers['idempotency-key'],
     );
@@ -426,18 +430,17 @@ describe('financeiro B: fluxos de tela', () => {
     });
     await screen.findByText('Prazo 30 e 60');
     await fireEvent.press(screen.getByRole('button', { name: 'Nova condição' }));
-    await fireEvent.changeText(screen.getByLabelText('Nome da condição'), 'Condição E2E');
-    await choose('Modelo de prazos', '30 e 60 dias');
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar condição' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Cadastro confirmado');
+    await fireEvent.changeText(screen.getByLabelText('Nome'), 'Condição E2E');
+    await fireEvent.press(screen.getByRole('radio', { name: '30 e 60' }));
+    expect(screen.getByText(/2ª parcela · vence/)).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Criar condição' }));
+    await screen.findByText('Condição salva');
     expect(posts(server)[0]?.body).toMatchObject({ name: 'Condição E2E', preset: '30_60' });
-    await fireEvent.press(screen.getByRole('button', { name: 'Fechar editor de condição' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Editar condição Prazo 30 e 60' }));
-    await fireEvent.changeText(screen.getByLabelText('Prazo da parcela 1'), '15');
-    await choose('Situação da condição', 'Inativa');
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar condição' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Editar Prazo 30 e 60' }));
+    await fireEvent.press(screen.getByRole('radio', { name: 'Personalizada' }));
+    await fireEvent.changeText(screen.getByLabelText('Dias da 1ª parcela'), '15');
+    await toggle('Disponível para novos pedidos', false);
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
     await waitFor(() =>
       expect(posts(server)[1]?.body).toMatchObject({
         expectedVersion: 1,
@@ -462,26 +465,29 @@ describe('financeiro B: fluxos de tela', () => {
     await renderApp({
       gateway,
       fetch: server.fetch,
-      initialUrl: '/financeiro/configuracoes',
+      initialUrl: '/financeiro/configuracoes?aba=formas',
       overrides,
     });
     await screen.findByText('Pix conferido');
     await fireEvent.press(screen.getByRole('button', { name: 'Nova forma' }));
-    await fireEvent.changeText(screen.getByLabelText('Nome da forma'), 'Pix conferido');
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar forma' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Cadastro com resultado desconhecido');
-    await fireEvent.press(screen.getByRole('button', { name: 'Recuperar mesmo cadastro' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Cadastro confirmado');
+    await fireEvent.press(screen.getByRole('radio', { name: 'Pix' }));
+    expect(screen.getByLabelText('Nome').props.value).toBe('Pix');
+    await fireEvent.changeText(screen.getByLabelText('Nome'), 'Pix conferido');
+    await fireEvent.press(screen.getByRole('button', { name: 'Criar forma' }));
+    expect(await screen.findByText('Já existe uma forma com este nome')).toBeTruthy();
+    expect(posts(server)).toHaveLength(0);
+    await fireEvent.changeText(screen.getByLabelText('Nome'), 'Pix banco');
+    await fireEvent.press(screen.getByRole('button', { name: 'Criar forma' }));
+    await screen.findByText('Ainda não sabemos se o cadastro foi salvo');
+    await fireEvent.press(screen.getByRole('button', { name: 'Conferir cadastro' }));
+    await screen.findByText('Forma salva');
     expect(posts(server)[0]?.headers['idempotency-key']).toBe(
       posts(server)[1]?.headers['idempotency-key'],
     );
-    await fireEvent.press(screen.getByRole('button', { name: 'Fechar editor de forma' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Editar forma Pix conferido' }));
-    await choose('Situação da forma', 'Inativa');
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar forma' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
+    expect(posts(server)[0]?.body).toEqual({ name: 'Pix banco', kind: 'pix' });
+    await fireEvent.press(screen.getByRole('button', { name: 'Editar Pix conferido' }));
+    await toggle('Disponível para registrar pagamentos', false);
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
     await waitFor(() =>
       expect(posts(server)[2]?.body).toMatchObject({ expectedVersion: 5, status: 'inactive' }),
     );
@@ -492,14 +498,14 @@ describe('financeiro B: fluxos de tela', () => {
     await renderApp({
       gateway,
       fetch: server.fetch,
-      initialUrl: '/financeiro/configuracoes',
+      initialUrl: '/financeiro/configuracoes?aba=formas',
       overrides,
     });
     await screen.findByText('Pix conferido');
-    await fireEvent.press(screen.getByRole('button', { name: 'Editar forma Pix conferido' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar forma' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Confirmar operação' }));
-    await screen.findByText('Cadastro não confirmado');
+    await fireEvent.press(screen.getByRole('button', { name: 'Editar Pix conferido' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await screen.findByText('Não foi possível salvar');
+    expect(screen.getByText(/alterado em outro lugar/)).toBeTruthy();
     expect(posts(server)).toHaveLength(1);
   });
   it('sem payments:manage bloqueia aplicação mesmo com leitura', async () => {
@@ -510,8 +516,10 @@ describe('financeiro B: fluxos de tela', () => {
       initialUrl: '/financeiro/pedidos/o1',
       overrides,
     });
-    await screen.findByText('Operação não autorizada');
-    expect(screen.getByRole('button', { name: 'Revisar operação financeira' })).toBeDisabled();
+    await screen.findByText('Parcelas');
+    expect(screen.queryByRole('button', { name: 'Usar crédito do cliente' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Estornar pagamento' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Registrar reembolso já feito' })).toBeNull();
     expect(posts(server)).toHaveLength(0);
   });
   it('troca de empresa remonta editor e mantém intenção anterior isolada', async () => {
@@ -551,17 +559,17 @@ describe('financeiro B: fluxos de tela', () => {
     const { queryClient } = await renderApp({
       gateway,
       fetch: server.fetch,
-      initialUrl: '/financeiro/configuracoes',
+      initialUrl: '/financeiro/configuracoes?aba=formas',
       overrides: { ...overrides, empresas: Choice, '(app)/financeiro/configuracoes': Switching },
     });
     await fireEvent.press(await screen.findByText('Escolher A'));
-    await act(() => router.push('/financeiro/configuracoes' as Href));
+    await act(() => router.push('/financeiro/configuracoes?aba=formas' as Href));
     await screen.findByText('Forma A');
     await fireEvent.press(screen.getByRole('button', { name: 'Nova forma' }));
-    await fireEvent.changeText(screen.getByLabelText('Nome da forma'), 'Corpo empresa A');
+    await fireEvent.changeText(screen.getByLabelText('Nome'), 'Corpo empresa A');
     await fireEvent.press(screen.getByText('Trocar B'));
     await screen.findByText('Forma B');
-    expect(screen.queryByLabelText('Nome da forma')).toBeNull();
+    expect(screen.queryByLabelText('Nome')).toBeNull();
     expect(screen.queryByText('Forma A')).toBeNull();
     expect(queryClient.getQueryCache().findAll({ queryKey: ['tenant', 't1'] })).toHaveLength(0);
   });

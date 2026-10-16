@@ -22,6 +22,13 @@ describe('classificação de erros da API', () => {
     expect(new ApiError(409, 'ALGO_NOVO', 'x').userMessage).toMatch(/mudaram/);
   });
 
+  it('não manda recarregar quando o legado financeiro exige revisão', () => {
+    const error = new ApiError(409, 'LEGACY_FINANCIAL_REVIEW_REQUIRED', 'x');
+    expect(error.kind).toBe('conflict');
+    expect(error.userMessage).toMatch(/revisão administrativa/);
+    expect(error.userMessage).not.toMatch(/Recarregue/);
+  });
+
   it('converte falha de rede em ApiError', () => {
     expect(toApiError(new TypeError('Failed to fetch')).kind).toBe('network');
   });

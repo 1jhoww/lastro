@@ -1,12 +1,31 @@
 import { useEffect } from 'react';
+import { View } from 'react-native';
 import { toApiError } from '@/api/errors';
 import { ReauthGate, useReauth } from '@/features/platform/ReauthGate';
-import { ConfirmDialog, Text } from '@/ui';
 import { formatCents } from '@/lib/money';
+import { ConfirmDialog, Text } from '@/ui';
 import { commandLabels, sensitiveCommand, type FinanceCommand } from './commands';
+import { Field } from './FinanceParts';
+
+const descriptions: Partial<Record<FinanceCommand['kind'], string>> = {
+  'apply-credit': 'O crédito do cliente será usado para abater a parcela escolhida.',
+  'reverse-payment':
+    'O pagamento não será apagado: fica no histórico como estornado e o valor volta a ficar em aberto.',
+  'reverse-credit': 'O uso do crédito será desfeito e o valor volta ao crédito do cliente.',
+  'confirm-refund':
+    'Registra que o dinheiro já foi devolvido ao cliente fora do Lastro. Esta ação não transfere dinheiro.',
+};
+const confirmLabels: Partial<Record<FinanceCommand['kind'], string>> = {
+  'apply-credit': 'Usar crédito',
+  'reverse-payment': 'Confirmar estorno',
+  'reverse-credit': 'Confirmar estorno',
+  'confirm-refund': 'Registrar reembolso',
+};
 
 export function CommandConfirmation(props: {
   command: FinanceCommand;
+  /** Resumo legível (valor, origem, consequência). Sem ele, mostra o essencial do comando. */
+  details?: { label: string; value: string }[];
   busy: boolean;
   error: unknown;
   onSend: () => void;
@@ -14,7 +33,7 @@ export function CommandConfirmation(props: {
   onReauth?: () => void;
 }) {
   return sensitiveCommand(props.command) ? (
-    <ReauthGate description="Estornos e reembolsos exigem confirmação recente da senha.">
+    <ReauthGate description="Estornos e reembolsos pedem que você confirme sua senha.">
       <Confirmation {...props} />
     </ReauthGate>
   ) : (
@@ -23,6 +42,7 @@ export function CommandConfirmation(props: {
 }
 function Confirmation({
   command,
+  details,
   busy,
   error,
   onSend,
@@ -36,50 +56,30 @@ function Confirmation({
       onReauth?.();
     }
   }, [error, requireReauth, onReauth]);
-  const description =
-    command.kind === 'confirm-refund'
-      ? 'Registra comprovante de dinheiro já devolvido fora do Lastro. Esta ação não transfere dinheiro ao cliente.'
-      : 'Confira valores, origem e justificativa. O registro será auditado e não pode ser apagado. Servidor valida versões e autorização.';
   return (
     <ConfirmDialog
       visible
-      title={commandLabels[command.kind]}
-      description={description}
-      confirmLabel="Confirmar operação"
+      title={`${commandLabels[command.kind]}?`}
+      description={descriptions[command.kind] ?? 'Confira os dados antes de confirmar.'}
+      confirmLabel={confirmLabels[command.kind] ?? 'Confirmar'}
       tone={sensitiveCommand(command) ? 'danger' : 'strong'}
       loading={busy}
       onConfirm={onSend}
       onCancel={onCancel}
     >
-      {'orderId' in command ? (
+      {details?.length ? (
+        <View>
+          {details.map((d) => (
+            <Field key={d.label} label={d.label} value={d.value} />
+          ))}
+        </View>
+      ) : 'orderId' in command ? (
         <>
-          <Text selectable>{`Pedido ${command.orderId} · origem ${command.id}`}</Text>
-          <Text>{formatCents(command.body.amountCents)}</Text>
+          <Text variant="figure">{formatCents(command.body.amountCents)}</Text>
           <Text>{command.body.reason}</Text>
-          {command.kind === 'confirm-refund' ? (
-            <Text>{`${command.body.refundedOn} · forma ${command.body.methodId} · referência ${command.body.reference}`}</Text>
-          ) : (
-            <Text selectable>{`Parcela ${command.body.allocations[0]?.receivableId}`}</Text>
-          )}
         </>
       ) : (
-        <>
-          <Text>{'name' in command.body ? command.body.name : commandLabels[command.kind]}</Text>
-          {'status' in command.body ? (
-            <Text>{`Situação: ${command.body.status === 'inactive' ? 'Inativo' : 'Ativo'}`}</Text>
-          ) : null}
-          {'kind' in command.body ? <Text>{`Forma: ${command.body.kind}`}</Text> : null}
-          {'preset' in command.body && command.body.preset ? (
-            <Text>{`Prazos: ${command.body.preset}`}</Text>
-          ) : null}
-          {'schedule' in command.body && command.body.schedule ? (
-            <Text>
-              {command.body.schedule
-                .map((p, i) => `${i + 1}ª: ${p.offsetDays} dias · peso ${p.weight ?? 1}`)
-                .join('; ')}
-            </Text>
-          ) : null}
-        </>
+        <Text>{'name' in command.body ? command.body.name : commandLabels[command.kind]}</Text>
       )}
     </ConfirmDialog>
   );
