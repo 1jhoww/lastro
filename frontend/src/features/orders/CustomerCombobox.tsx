@@ -3,6 +3,7 @@ import { Platform, StyleSheet, View, type TextInput } from 'react-native';
 import { toApiError } from '@/api/errors';
 import type { Customer } from '@/api/types';
 import { useCustomerList } from '@/features/customers/api';
+import { customerSubtitle } from '@/features/customers/presentation';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
 import { color, elevation, layout, radius, space, useLayoutSize } from '@/theme';
 import { Button, SearchField, Skeleton, Text } from '@/ui';
@@ -11,13 +12,9 @@ import { focusRing, showFocusRing, type InteractionState } from '@/ui/interactio
 
 export type PickedCustomer = { id: string; name: string; detail?: string };
 
-/** Documento e cidade como identificação secundária, quando cadastrados. */
+/** Fantasia, documento formatado e cidade/UF como identificação secundária, quando cadastrados. */
 export function customerDetail(c: Customer): string | undefined {
-  const city = c.address?.city
-    ? `${c.address.city}${c.address.state ? `/${c.address.state}` : ''}`
-    : null;
-  const parts = [c.document, city].filter(Boolean);
-  return parts.length ? parts.join(' · ') : undefined;
+  return customerSubtitle(c) || undefined;
 }
 
 /** Atraso para o toque em um resultado chegar antes de o campo perder o foco e fechar a lista. */

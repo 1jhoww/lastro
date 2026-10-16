@@ -46,6 +46,29 @@ describe('Fundação com Auth e Firestore Emulator reais', () => {
         ?.monthlyPriceCents,
     ).toBe(20000);
   });
+  it('lista de usuários traz nome e e-mail só dos membros da própria empresa', async () => {
+    await f.firebase.auth.updateUser(f.ownerA.uid, { displayName: 'Ana Administradora' });
+    const seller = await newUser(f, 'seller-profile');
+    expect((await join(f, seller, 'seller')).status).toBe(200);
+    const list = await request(f.app)
+      .get('/api/v1/users')
+      .set(tenantHeaders(f.ownerA, f.tenantA.tenant.id))
+      .expect(200);
+    const items = list.body.data.items as {
+      id: string;
+      name: string | null;
+      email: string | null;
+    }[];
+    expect(items.find((m) => m.id === f.ownerA.uid)).toMatchObject({
+      name: 'Ana Administradora',
+      email: f.ownerA.email.toLowerCase(),
+    });
+    expect(items.find((m) => m.id === seller.uid)).toMatchObject({
+      name: null,
+      email: seller.email.toLowerCase(),
+    });
+    expect(items.map((m) => m.id)).not.toContain(f.ownerB.uid);
+  });
   it('permite administrador e vendedor com permissões atuais no servidor', async () => {
     const seller = await newUser(f, 'seller');
     expect((await join(f, seller, 'seller')).status).toBe(200);

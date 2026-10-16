@@ -35,6 +35,7 @@ export class CustomerService {
   }
   async list(actor: Actor, tenantId: string, input: z.infer<typeof s.customerQuery>) {
     const ctx = await this.access.tenant(actor, tenantId, 'customers:own:manage');
+    if (input.document) return this.findByDocument(actor, tenantId, input, ctx.membership.role);
     return this.repo.list(
       actor,
       tenantId,
@@ -43,6 +44,33 @@ export class CustomerService {
       input,
       ctx.membership.role === 'seller',
     );
+  }
+  /** Same visibility as the list: sellers only see their own portfolio, status filter applies. */
+  private async findByDocument(
+    actor: Actor,
+    tenantId: string,
+    input: z.infer<typeof s.customerQuery>,
+    role: string,
+  ) {
+    const empty = { items: [], nextCursor: null };
+    const reservation = await this.repo.foundation.read(
+      this.repo.ref(tenantId, 'customerDocuments', digest(input.document!)),
+      s.reservationSchema,
+    );
+    if (!reservation) return empty;
+    const customer = await this.repo.foundation.read(
+      this.repo.ref(tenantId, 'customers', reservation.resourceId),
+      s.customerSchema,
+    );
+    const status = input.status ?? 'active';
+    const assignedTo = input.assignedTo === 'unassigned' ? null : input.assignedTo;
+    const visible =
+      customer?.tenantId === tenantId &&
+      customer.document === input.document &&
+      (role === 'administrator' || customer.assignedTo === actor.uid) &&
+      (status === 'all' || customer.status === status) &&
+      (input.assignedTo === undefined || customer.assignedTo === assignedTo);
+    return visible ? { items: [customer], nextCursor: null } : empty;
   }
   private async assignee(tenantId: string, uid: string | null, tx: Transaction) {
     if (!uid) return;

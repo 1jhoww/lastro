@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { registerFixture, tenantHeaders, bearer } from '../helpers/fixture.js';
-import { seller, extraSeats, productInput, png } from '../helpers/commercial.js';
+import { seller, extraSeats, productInput, png, validAddress } from '../helpers/commercial.js';
 const f = registerFixture();
 const ah = () => tenantHeaders(f.ownerA, f.tenantA.tenant.id);
 const bh = () => tenantHeaders(f.ownerB, f.tenantB.tenant.id);
 describe('Autorização dos módulos comerciais', () => {
   it('nega BOLA entre tenants em todos os recursos e no contexto manipulado', async () => {
     for (const [collection, body] of [
-      ['customers', { name: 'Privado B' }],
+      ['customers', { name: 'Privado B', address: validAddress }],
       ['products', productInput()],
       ['categories', { name: 'Privado B' }],
     ] as const) {
@@ -40,7 +40,7 @@ describe('Autorização dos módulos comerciais', () => {
     const other = await request(f.app)
       .post('/api/v1/customers')
       .set(ah())
-      .send({ name: 'Outro vendedor', assignedTo: second.uid })
+      .send({ address: validAddress, name: 'Outro vendedor', assignedTo: second.uid })
       .expect(201);
     await request(f.app).get(`/api/v1/customers/${other.body.data.id}`).set(sh).expect(404);
     await request(f.app)
@@ -57,12 +57,12 @@ describe('Autorização dos módulos comerciais', () => {
     await request(f.app)
       .post('/api/v1/customers')
       .set(sh)
-      .send({ name: 'Forjado', assignedTo: user.uid })
+      .send({ address: validAddress, name: 'Forjado', assignedTo: user.uid })
       .expect(403);
     const own = await request(f.app)
       .post('/api/v1/customers')
       .set(sh)
-      .send({ name: 'Próprio' })
+      .send({ address: validAddress, name: 'Próprio' })
       .expect(201);
     const path = `/api/v1/customers/${own.body.data.id}`;
     await request(f.app)
@@ -94,12 +94,12 @@ describe('Autorização dos módulos comerciais', () => {
       await request(f.app)
         .post('/api/v1/customers')
         .set(ah())
-        .send({ name: 'Tentativa', assignedTo })
+        .send({ address: validAddress, name: 'Tentativa', assignedTo })
         .expect(422);
     const created = await request(f.app)
       .post('/api/v1/customers')
       .set(ah())
-      .send({ name: 'Sem responsável' })
+      .send({ address: validAddress, name: 'Sem responsável' })
       .expect(201);
     await request(f.app)
       .patch(`/api/v1/customers/${created.body.data.id}/assignment`)
@@ -120,7 +120,7 @@ describe('Autorização dos módulos comerciais', () => {
       await request(f.app)
         .post('/api/v1/customers')
         .set(ah())
-        .send({ name: 'Teste', [field]: 'forjado' })
+        .send({ address: validAddress, name: 'Teste', [field]: 'forjado' })
         .expect(422);
       await request(f.app)
         .post('/api/v1/products')
@@ -140,7 +140,11 @@ describe('Autorização dos módulos comerciais', () => {
   });
   it('cursores são vinculados a filtro, coleção e ator', async () => {
     for (const name of ['Nome A', 'Nome B'])
-      await request(f.app).post('/api/v1/customers').set(ah()).send({ name }).expect(201);
+      await request(f.app)
+        .post('/api/v1/customers')
+        .set(ah())
+        .send({ address: validAddress, name })
+        .expect(201);
     const result = await request(f.app).get('/api/v1/customers?limit=1').set(ah()).expect(200);
     await request(f.app)
       .get('/api/v1/customers')

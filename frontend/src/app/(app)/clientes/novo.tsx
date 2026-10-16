@@ -18,24 +18,24 @@ export default function NewCustomer() {
       title="Novo cliente"
       description={
         admin
-          ? 'Começa sem responsável. Você define o vendedor depois, no cadastro.'
+          ? 'Começa sem responsável; o vendedor é definido depois, na ficha.'
           : 'O cliente entra na sua carteira.'
       }
     >
       <CustomerForm
         defaultValues={emptyCustomerForm}
-        submitLabel="Cadastrar cliente"
         submitting={create.isPending}
         error={create.error}
         onCancel={() => router.back()}
-        onSubmit={(values) =>
+        onSubmit={(values) => {
+          if (create.isPending) return;
           create.mutate(formToCreate(values), {
             onSuccess: (customer) => {
               toast.show('Cliente cadastrado');
               router.replace(`/clientes/${customer.id}` as Href);
             },
-          })
-        }
+          });
+        }}
       />
     </Screen>
   );

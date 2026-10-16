@@ -22,6 +22,7 @@ import {
   report,
   seedPassword,
   signIn,
+  e2eAddress,
 } from './e2eSupport';
 
 const DUE = '2099-01-10';
@@ -77,13 +78,13 @@ async function main() {
   const mine = await unwrap(
     seller.POST('/api/v1/customers', {
       params: { header: h },
-      body: { name: 'Cliente do Vendedor' },
+      body: { address: e2eAddress, name: 'Cliente do Vendedor' },
     }),
   );
   const other = await unwrap(
     admin.POST('/api/v1/customers', {
       params: { header: h },
-      body: { name: 'Cliente sem carteira' },
+      body: { address: e2eAddress, name: 'Cliente sem carteira' },
     }),
   );
 

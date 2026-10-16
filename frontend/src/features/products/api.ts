@@ -123,42 +123,55 @@ export type PickedImage = { uri: string; type: ImageType; sizeBytes?: number };
 /**
  * Upload pelo único fluxo do contrato: PUT com os bytes crus e o Content-Type da imagem
  * (sem multipart, URL ou SVG). O backend valida, converte para WebP e grava no Storage da
- * empresa; a resposta é o produto com a nova versão.
+ * empresa; a resposta é o produto com a nova versão. Usado pelo hook abaixo e pelo cadastro,
+ * logo depois de criar o produto.
  */
+export async function uploadProductImage(
+  api: ApiClient,
+  tenantId: string,
+  id: string,
+  image: PickedImage,
+  expectedVersion: number,
+): Promise<Product> {
+  if (image.sizeBytes !== undefined && image.sizeBytes > IMAGE_MAX_BYTES)
+    throw new ApiError(422, 'INVALID_IMAGE', 'Imagem acima de 5 MB');
+  let bytes: Blob;
+  try {
+    bytes = await (await fetch(image.uri)).blob();
+  } catch (e) {
+    throw toApiError(e);
+  }
+  if (bytes.size > IMAGE_MAX_BYTES)
+    throw new ApiError(422, 'INVALID_IMAGE', 'Imagem acima de 5 MB');
+  return unwrap(
+    api.PUT('/api/v1/products/{id}/image', {
+      params: {
+        header: tenantHeader(tenantId),
+        path: { id },
+        query: { expectedVersion: String(expectedVersion) },
+      },
+      body: bytes as never,
+      bodySerializer: (b: unknown) => b as BodyInit,
+      headers: { 'Content-Type': image.type },
+    }),
+  );
+}
+
 export function useUploadProductImage(id: string) {
-  const { api, header } = useTenantApi();
+  const { api, tenantId } = useTenantApi();
   const store = useProductCache();
   const reload = useReloadOnConflict(id);
   return useMutation({
-    mutationFn: async ({
-      image,
-      expectedVersion,
-    }: {
-      image: PickedImage;
-      expectedVersion: number;
-    }) => {
-      if (image.sizeBytes !== undefined && image.sizeBytes > IMAGE_MAX_BYTES)
-        throw new ApiError(422, 'INVALID_IMAGE', 'Imagem acima de 5 MB');
-      let bytes: Blob;
-      try {
-        bytes = await (await fetch(image.uri)).blob();
-      } catch (e) {
-        throw toApiError(e);
-      }
-      if (bytes.size > IMAGE_MAX_BYTES)
-        throw new ApiError(422, 'INVALID_IMAGE', 'Imagem acima de 5 MB');
-      return unwrap(
-        api.PUT('/api/v1/products/{id}/image', {
-          params: { header, path: { id }, query: { expectedVersion: String(expectedVersion) } },
-          body: bytes as never,
-          bodySerializer: (b: unknown) => b as BodyInit,
-          headers: { 'Content-Type': image.type },
-        }),
-      );
-    },
+    mutationFn: ({ image, expectedVersion }: { image: PickedImage; expectedVersion: number }) =>
+      uploadProductImage(api, tenantId, id, image, expectedVersion),
     onSuccess: store,
     onError: reload,
   });
+}
+
+/** Grava o produto devolvido por uma operação feita fora dos hooks (ex.: imagem no cadastro). */
+export function useStoreProduct() {
+  return useProductCache();
 }
 
 export function useRemoveProductImage(id: string) {
@@ -197,5 +210,37 @@ export function useProductImage(product: Pick<Product, 'id' | 'image'> | undefin
         throw new ApiError(res.response.status, 'IMAGE_UNAVAILABLE', 'Imagem indisponível');
       return blobToDataUri(res.data as Blob);
     },
+  });
+}
+
+const skuPattern = /^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/;
+
+/**
+ * Busca exata por SKU, ao lado da busca por início do nome (o contrato tem as duas, mas não
+ * combinadas). Só consulta quando o texto tem forma de SKU; devolve no máximo um produto.
+ */
+export function useProductSkuMatch(filters: ProductFilters) {
+  const { api, tenantId, header } = useTenantApi();
+  const sku = filters.q.trim();
+  const enabled = skuPattern.test(sku);
+  return useQuery({
+    queryKey: queryKeys.productList(tenantId, { ...filters, q: '', sku: sku.toUpperCase() }),
+    enabled,
+    queryFn: ({ signal }) =>
+      unwrap(
+        api.GET('/api/v1/products', {
+          params: {
+            header,
+            query: {
+              ...listParams({ status: filters.status }, 1),
+              sku,
+              ...(filters.categoryId ? { categoryId: filters.categoryId } : {}),
+              ...(filters.catalogVisible ? { catalogVisible: filters.catalogVisible } : {}),
+            },
+          },
+          signal,
+        }),
+      ).then((page) => page.items),
+    select: (items) => (enabled ? items : []),
   });
 }

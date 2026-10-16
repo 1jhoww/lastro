@@ -19,6 +19,7 @@ import {
   results,
   seedPassword,
   signIn,
+  e2eAddress,
 } from './e2eSupport';
 const base = process.env.API_URL ?? 'http://127.0.0.1:3000';
 const url = new URL(base);
@@ -83,6 +84,7 @@ async function main() {
     admin.POST('/api/v1/customers', {
       params: { header: h },
       body: {
+        address: e2eAddress,
         name: '=SOMA(1;1)',
         assignedTo: sellerUser.uid,
         notes: 'Nota privada que nunca aparece no catálogo',
@@ -92,7 +94,7 @@ async function main() {
   await unwrap(
     admin.POST('/api/v1/customers', {
       params: { header: h },
-      body: { name: 'Cliente E7 adicional' },
+      body: { address: e2eAddress, name: 'Cliente E7 adicional' },
     }),
   );
   await unwrap(

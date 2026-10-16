@@ -72,6 +72,9 @@ export const tenantView = z.object({
 });
 export const memberView = z.object({
   id: opaqueId,
+  /** From the sign-in provider, listing only; null when the account has no such data. */
+  name: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
   role,
   status: z.enum(['active', 'disabled']),
   version: z.number(),

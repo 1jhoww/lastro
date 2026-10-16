@@ -24,8 +24,18 @@ export async function extraSeats(f: Fixture) {
     .send({ expectedVersion: 1, userLimit: 5, reason: 'Capacidade sintética de teste' })
     .expect(200);
 }
+/** Complete address: required on every customer created or edited through the API. */
+export const validAddress = {
+  postalCode: '01310-100',
+  street: 'Avenida Paulista',
+  number: '1000',
+  district: 'Bela Vista',
+  city: 'São Paulo',
+  state: 'SP',
+};
 export const customerInput = {
   name: 'Cliente Sintético',
+  address: validAddress,
   document: '529.982.247-25',
   phone: '(11) 99999-0000',
 };

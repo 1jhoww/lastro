@@ -41,6 +41,8 @@ export const productFormSchema = z
       .min(0, 'Preço não pode ser negativo.')
       .max(100_000_000, 'Preço acima do limite (R$ 1.000.000,00).'),
     catalogVisible: z.boolean(),
+    /** Só muda na edição; o cadastro sempre nasce ativo. */
+    status: z.enum(['active', 'inactive']),
     /** Texto como o usuário digita ("1,5"); validado contra a unidade abaixo. */
     minimumStock: z.string().trim(),
   })
@@ -66,6 +68,7 @@ export const emptyProductForm: ProductFormValues = {
   unit: 'UN',
   priceCents: 0,
   catalogVisible: false,
+  status: 'active',
   minimumStock: '',
 };
 
@@ -79,6 +82,7 @@ export function productToForm(p: Product): ProductFormValues {
     unit: p.unit,
     priceCents: p.priceCents,
     catalogVisible: p.catalogVisible,
+    status: p.status,
     minimumStock: min ? formatQuantity(min).replace(/\./g, '') : '',
   };
 }
@@ -111,5 +115,6 @@ export function formToUpdate(v: ProductFormValues, p: Product): ProductUpdate {
   if (next.priceCents !== p.priceCents) body.priceCents = next.priceCents;
   if (next.catalogVisible !== p.catalogVisible) body.catalogVisible = next.catalogVisible;
   if (next.minimumStock !== p.minimumStock) body.minimumStock = next.minimumStock;
+  if (v.status !== p.status) body.status = v.status;
   return body;
 }

@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { toApiError } from '@/api/errors';
 import type { Customer } from '@/api/types';
 import { useCustomerList } from '@/features/customers/api';
+import { customerSubtitle } from '@/features/customers/presentation';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
 import { color, layout, space } from '@/theme';
 import { Alert, Button, Dialog, SearchField, Skeleton, Text } from '@/ui';
@@ -82,9 +83,9 @@ export function CustomerSelection({ onPick, includeInactive = false }: CustomerS
               <Text variant="bodyStrong" numberOfLines={1}>
                 {c.name}
               </Text>
-              {c.tradeName ? (
+              {customerSubtitle(c) ? (
                 <Text variant="small" color={color.textSecondary} numberOfLines={1}>
-                  {c.tradeName}
+                  {customerSubtitle(c)}
                 </Text>
               ) : null}
             </Touchable>

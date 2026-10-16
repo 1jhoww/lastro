@@ -4,7 +4,7 @@ import { writeFile, mkdir } from 'node:fs/promises';
 import { registerFixture, tenantHeaders } from '../helpers/fixture.js';
 import { draft, confirm, command, orderHeaders, orderDocs } from '../helpers/orders.js';
 import { largeProducts, largeDraft } from '../helpers/largeOrders.js';
-import { seller } from '../helpers/commercial.js';
+import { seller, validAddress } from '../helpers/commercial.js';
 import { financePost, versions, financialOrder, receiptBody } from '../helpers/finance.js';
 import { orderView } from '../../src/shared/schemas/orders.js';
 import { PdfRenderer } from '../../src/modules/documents/pdfRenderer.js';
@@ -176,7 +176,7 @@ describe('Downloads PDF privados G nos emuladores', () => {
       .send({
         expectedVersion: 1,
         name: 'Novo nome do cliente',
-        address: { street: 'Endereço atual não histórico' },
+        address: { ...validAddress, street: 'Endereço atual não histórico' },
       })
       .expect(200);
     await request(f.app)

@@ -29,6 +29,13 @@ type Props<T> = {
   hrefOf?: (row: T) => Href;
   /** Força as linhas empilhadas mesmo no desktop (ex.: dentro de uma coluna estreita). */
   stacked?: boolean;
+  /**
+   * Ações discretas por linha (ex.: botão de ícone "Editar"), fora do link da linha para não
+   * aninhar controles. Ficam na última coluna no desktop e à direita no celular.
+   */
+  actions?: (row: T) => ReactNode;
+  /** Largura da coluna de ações no desktop. */
+  actionsWidth?: number;
 };
 
 /**
@@ -44,6 +51,8 @@ export function DataTable<T>({
   renderCompact,
   hrefOf,
   stacked,
+  actions,
+  actionsWidth = layout.hitTarget,
 }: Props<T>) {
   const compact = useLayoutSize() === 'compact' || stacked;
 
@@ -53,6 +62,7 @@ export function DataTable<T>({
         {rows.map((row, i) => (
           <View key={keyOf(row)} style={[styles.compactRow, i < rows.length - 1 && styles.divider]}>
             <View style={styles.flex}>{renderCompact(row)}</View>
+            {actions ? actions(row) : null}
           </View>
         ))}
       </View>
@@ -62,22 +72,34 @@ export function DataTable<T>({
   if (compact && hrefOf) {
     return (
       <View accessibilityLabel={label}>
-        {rows.map((row, i) => (
-          <Link key={keyOf(row)} href={hrefOf(row)} asChild>
-            <Touchable
-              accessibilityRole="link"
-              pressStyle={(s: InteractionState) => [
-                styles.compactRow,
-                i < rows.length - 1 && styles.divider,
-                (s.hovered || s.pressed) && styles.hover,
-                showFocusRing(s) && focusRing(),
-              ]}
+        {rows.map((row, i) => {
+          const link = (
+            <Link key={keyOf(row)} href={hrefOf(row)} asChild>
+              <Touchable
+                accessibilityRole="link"
+                pressStyle={(s: InteractionState) => [
+                  styles.compactRow,
+                  actions ? styles.flex : i < rows.length - 1 && styles.divider,
+                  (s.hovered || s.pressed) && styles.hover,
+                  showFocusRing(s) && focusRing(),
+                ]}
+              >
+                <View style={styles.flex}>{renderCompact(row)}</View>
+                {actions ? null : <ChevronRight size={18} color={color.textSecondary} />}
+              </Touchable>
+            </Link>
+          );
+          if (!actions) return link;
+          return (
+            <View
+              key={keyOf(row)}
+              style={[styles.withActions, i < rows.length - 1 && styles.divider]}
             >
-              <View style={styles.flex}>{renderCompact(row)}</View>
-              <ChevronRight size={18} color={color.textSecondary} />
-            </Touchable>
-          </Link>
-        ))}
+              {link}
+              <View style={styles.compactActions}>{actions(row)}</View>
+            </View>
+          );
+        })}
       </View>
     );
   }
@@ -96,6 +118,13 @@ export function DataTable<T>({
             </Text>
           </View>
         ))}
+        {actions ? (
+          <View role="columnheader" style={{ width: actionsWidth }}>
+            <Text variant="smallStrong" color={color.textSecondary} style={styles.srOnly}>
+              Ações
+            </Text>
+          </View>
+        ) : null}
       </View>
       {rows.map((row, i) =>
         !hrefOf ? (
@@ -109,6 +138,40 @@ export function DataTable<T>({
                 {c.render(row)}
               </View>
             ))}
+            {actions ? (
+              <View role="cell" style={[styles.plainActions, { width: actionsWidth }]}>
+                {actions(row)}
+              </View>
+            ) : null}
+          </View>
+        ) : actions ? (
+          <View
+            key={keyOf(row)}
+            role="row"
+            style={[styles.withActions, i < rows.length - 1 && styles.divider]}
+          >
+            <Link href={hrefOf(row)} asChild>
+              <Touchable
+                accessibilityRole="link"
+                pressStyle={(s: InteractionState) => [
+                  styles.row,
+                  styles.bodyRow,
+                  styles.flex,
+                  styles.linkWithActions,
+                  (s.hovered || s.pressed) && styles.hover,
+                  showFocusRing(s) && focusRing(),
+                ]}
+              >
+                {columns.map((c) => (
+                  <View key={c.key} role="cell" style={cellStyle(c)}>
+                    {c.render(row)}
+                  </View>
+                ))}
+              </Touchable>
+            </Link>
+            <View role="cell" style={[styles.tableActions, { width: actionsWidth }]}>
+              {actions(row)}
+            </View>
           </View>
         ) : (
           <Link key={keyOf(row)} href={hrefOf(row)} asChild>
@@ -164,4 +227,15 @@ const styles = StyleSheet.create({
     paddingVertical: space[3],
   },
   flex: { flex: 1, minWidth: 0 },
+  withActions: { flexDirection: 'row', alignItems: 'center' },
+  linkWithActions: { paddingRight: space[4] },
+  tableActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginRight: space[5],
+  },
+  plainActions: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center' },
+  compactActions: { flexDirection: 'row', alignItems: 'center', paddingRight: space[2] },
+  srOnly: { opacity: 0 },
 });

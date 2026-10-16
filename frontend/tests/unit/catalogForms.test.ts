@@ -37,13 +37,31 @@ describe('CPF/CNPJ (mesma regra do backend)', () => {
 });
 
 describe('formulário de cliente', () => {
+  const address = {
+    postalCode: '01310-100',
+    street: 'Avenida Paulista',
+    number: '1000',
+    district: 'Bela Vista',
+    city: 'São Paulo',
+    state: 'SP',
+  };
   const parse = (v: Partial<typeof emptyCustomerForm>) =>
-    customerFormSchema.safeParse({ ...emptyCustomerForm, ...v });
+    customerFormSchema.safeParse({ ...emptyCustomerForm, ...address, ...v });
 
-  it('só o nome é obrigatório; CPF/CNPJ é opcional', () => {
+  it('nome e endereço são obrigatórios; CPF/CNPJ e complemento são opcionais', () => {
     expect(parse({ name: 'Mercado Bom Preço' }).success).toBe(true);
     expect(parse({ name: 'A' }).success).toBe(false);
     expect(parse({ name: '' }).success).toBe(false);
+    const missing = customerFormSchema.safeParse({ ...emptyCustomerForm, name: 'Mercado' });
+    expect(missing.success).toBe(false);
+    expect(missing.error?.issues.map((i) => i.path[0])).toEqual(
+      expect.arrayContaining(['postalCode', 'street', 'number', 'district', 'city', 'state']),
+    );
+  });
+
+  it('"Sem número" dispensa o número', () => {
+    expect(parse({ name: 'Mercado', number: '' }).success).toBe(false);
+    expect(parse({ name: 'Mercado', number: '', noNumber: true }).success).toBe(true);
   });
 
   it('valida documento, e-mail, telefone, UF e CEP quando informados', () => {
@@ -65,22 +83,30 @@ describe('formulário de cliente', () => {
   it('criação omite vazios e normaliza documento, CEP e UF', () => {
     const body = customerCreate({
       ...emptyCustomerForm,
+      ...address,
       name: '  Mercado Bom Preço ',
       document: '529.982.247-25',
-      postalCode: '01310-100',
       state: 'sp',
-      city: 'São Paulo',
+      noNumber: true,
+      number: '',
     });
     expect(body).toEqual({
       name: 'Mercado Bom Preço',
       document: '52998224725',
-      address: { city: 'São Paulo', state: 'SP', postalCode: '01310100' },
+      address: {
+        postalCode: '01310100',
+        street: 'Avenida Paulista',
+        number: 'S/N',
+        district: 'Bela Vista',
+        city: 'São Paulo',
+        state: 'SP',
+      },
     });
     expect(body).not.toHaveProperty('assignedTo');
   });
 
-  it('edição envia null para limpar e nunca envia status ou responsável', () => {
-    const body = customerUpdate({ ...emptyCustomerForm, name: 'Mercado' }, 3);
+  it('edição envia null para limpar opcionais e nunca envia status ou responsável', () => {
+    const body = customerUpdate({ ...emptyCustomerForm, ...address, name: 'Mercado' }, 3);
     expect(body).toEqual({
       expectedVersion: 3,
       name: 'Mercado',
@@ -88,7 +114,14 @@ describe('formulário de cliente', () => {
       document: null,
       email: null,
       phone: null,
-      address: null,
+      address: {
+        postalCode: '01310100',
+        street: 'Avenida Paulista',
+        number: '1000',
+        district: 'Bela Vista',
+        city: 'São Paulo',
+        state: 'SP',
+      },
       notes: null,
     });
     expect(body).not.toHaveProperty('status');

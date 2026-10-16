@@ -15,6 +15,7 @@ import {
   results,
   seedPassword,
   signIn,
+  e2eAddress,
 } from './e2eSupport';
 const url = new URL(process.env.API_URL ?? 'http://127.0.0.1:3000');
 if (url.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(url.hostname))
@@ -29,7 +30,7 @@ async function main() {
   const customer = await unwrap(
     api.POST('/api/v1/customers', {
       params: { header: h },
-      body: { name: 'Cliente complemento C' },
+      body: { address: e2eAddress, name: 'Cliente complemento C' },
     }),
   );
   const product = await unwrap(

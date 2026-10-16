@@ -4,6 +4,7 @@ import type { Fixture, TestUser } from './fixture.js';
 import { tenantHeaders } from './fixture.js';
 import { stockProduct, enter } from './inventory.js';
 import { orderView, type Order } from '../../src/shared/schemas/orders.js';
+import { validAddress } from './commercial.js';
 export const orderHeaders = (
   f: Fixture,
   user: TestUser = f.ownerA,
@@ -17,7 +18,7 @@ export async function orderCustomer(
   const result = await request(f.app)
     .post('/api/v1/customers')
     .set(orderHeaders(f, user, tenantId))
-    .send({ name: 'Cliente pedido sintético' })
+    .send({ address: validAddress, name: 'Cliente pedido sintético' })
     .expect(201);
   return result.body.data.id as string;
 }

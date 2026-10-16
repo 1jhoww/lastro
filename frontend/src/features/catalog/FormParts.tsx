@@ -21,6 +21,46 @@ export function FormSection({
   );
 }
 
+/**
+ * Grupo de campos dos cadastros: título discreto sobre uma linha, sem cartão em volta (mesmo
+ * padrão do formulário de pedido). `aside` fica à direita do título (ex.: aviso curto).
+ */
+export function FormGroup({
+  title,
+  description,
+  aside,
+  children,
+}: {
+  title: string;
+  description?: string;
+  aside?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <View style={styles.group}>
+      <View style={styles.groupHead}>
+        <View style={styles.groupTitle}>
+          <Text variant="h3" accessibilityRole="header">
+            {title}
+          </Text>
+          {description ? (
+            <Text variant="small" color={color.textSecondary}>
+              {description}
+            </Text>
+          ) : null}
+        </View>
+        {aside}
+      </View>
+      {children}
+    </View>
+  );
+}
+
+/** Corpo de um formulário de cadastro: grupos empilhados com respiro constante. */
+export function FormBody({ children }: { children: ReactNode }) {
+  return <View style={styles.body}>{children}</View>;
+}
+
 /** Campos lado a lado no desktop, empilhados no celular. `weights` define a proporção. */
 export function FieldRow({ children, weights }: { children: ReactNode[]; weights?: number[] }) {
   const compact = useLayoutSize() === 'compact';
@@ -85,6 +125,18 @@ export function Hint({ children }: { children: string }) {
 }
 
 const styles = StyleSheet.create({
+  body: { gap: space[8] },
+  group: { gap: space[4] },
+  groupHead: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    gap: space[3],
+    paddingBottom: space[2],
+    borderBottomWidth: 1,
+    borderBottomColor: color.border,
+  },
+  groupTitle: { flex: 1, minWidth: 0, gap: 2 },
   section: { gap: space[4], paddingTop: space[1] },
   row: { flexDirection: 'row', gap: space[4], alignItems: 'flex-start' },
   actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: space[2] },

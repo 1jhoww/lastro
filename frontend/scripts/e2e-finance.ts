@@ -16,6 +16,7 @@ import {
   results,
   seedPassword,
   signIn,
+  e2eAddress,
 } from './e2eSupport';
 
 const url = new URL(process.env.API_URL ?? 'http://127.0.0.1:3000');
@@ -36,7 +37,7 @@ async function main() {
   const customer = await unwrap(
     admin.POST('/api/v1/customers', {
       params: { header: h },
-      body: { name: 'Cliente E2E financeiro' },
+      body: { address: e2eAddress, name: 'Cliente E2E financeiro' },
     }),
   );
   const product = await unwrap(

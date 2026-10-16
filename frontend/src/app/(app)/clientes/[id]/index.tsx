@@ -6,10 +6,11 @@ import type { Customer } from '@/api/types';
 import { DetailColumns, Fact, Facts } from '@/features/catalog/DetailParts';
 import { RecordError, RecordLoading } from '@/features/catalog/RecordStates';
 import { useAssignCustomer, useCustomer, useSetCustomerStatus } from '@/features/customers/api';
-import { shortId, useAssigneeLabel, useMembers } from '@/features/users/api';
+import { addressComplete, addressLine as formatAddress } from '@/features/customers/presentation';
+import { memberLabel, useAssigneeLabel, useMembers } from '@/features/users/api';
 import { Screen } from '@/layout/Screen';
 import { formatDate } from '@/lib/dates';
-import { documentKind, formatDocument, formatPhone, formatPostalCode } from '@/lib/document';
+import { documentKind, formatDocument, formatPhone } from '@/lib/document';
 import { useSession } from '@/session/SessionContext';
 import { color, space, useLayoutSize } from '@/theme';
 import { Alert, Badge, Button, ConfirmDialog, Panel, Select, Text, useToast } from '@/ui';
@@ -43,18 +44,7 @@ function CustomerView({ customer: c }: { customer: Customer }) {
   const active = c.status === 'active';
   const kind = documentKind(c.document);
 
-  const address = c.address;
-  const addressLine = address
-    ? [
-        [address.street, address.number].filter(Boolean).join(', '),
-        address.complement,
-        address.district,
-        [address.city, address.state].filter(Boolean).join('/'),
-        formatPostalCode(address.postalCode),
-      ]
-        .filter(Boolean)
-        .join(', ')
-    : '';
+  const addressLine = formatAddress(c.address);
 
   return (
     <Screen
@@ -80,6 +70,20 @@ function CustomerView({ customer: c }: { customer: Customer }) {
       {!active ? (
         <Alert tone="warning" title="Cliente inativo">
           Não aparece nas listas padrão nem pode receber novos pedidos. O histórico continua salvo.
+        </Alert>
+      ) : null}
+      {active && !addressComplete(c.address) ? (
+        <Alert
+          tone="warning"
+          title="Endereço incompleto"
+          action={
+            <Link href={`/clientes/${c.id}/editar` as Href} asChild>
+              <Button label="Completar endereço" size="sm" variant="outline" />
+            </Link>
+          }
+        >
+          Cadastro anterior à obrigatoriedade do endereço. Consultas e pedidos seguem normais; o
+          endereço será pedido na próxima edição.
         </Alert>
       ) : null}
       {setStatus.isError ? (
@@ -172,7 +176,7 @@ function Assignment({ customer: c }: { customer: Customer }) {
       .filter((m) => m.role === 'seller' && (m.status === 'active' || m.id === c.assignedTo))
       .map((m) => ({
         value: m.id,
-        label: `Vendedor ${shortId(m.id)}`,
+        label: memberLabel(m),
         description: m.status === 'active' ? undefined : 'Desativado',
       })),
   ];

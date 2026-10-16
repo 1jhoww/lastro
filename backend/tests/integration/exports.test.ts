@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import request from 'supertest';
 import { registerFixture, bearer, tenantHeaders } from '../helpers/fixture.js';
-import { seller, productInput } from '../helpers/commercial.js';
+import { seller, productInput, validAddress } from '../helpers/commercial.js';
 import { orderHeaders, draft, confirm, orderDocs } from '../helpers/orders.js';
 import { financialOrder, financePost, receiptBody } from '../helpers/finance.js';
 import { CustomerService } from '../../src/modules/customers/customerService.js';
@@ -33,7 +33,7 @@ describe('CSV administrativo G nos emuladores', () => {
       await request(f.app)
         .post('/api/v1/customers')
         .set(orderHeaders(f))
-        .send({ name: 'Cliente 000', notes: 'Comercial' })
+        .send({ address: validAddress, name: 'Cliente 000', notes: 'Comercial' })
         .expect(201)
     ).body.data;
     const original = (await orderDocs(f, 'customers').doc(customer.id).get()).data()!;
@@ -88,13 +88,13 @@ describe('CSV administrativo G nos emuladores', () => {
         name: '=HYPERLINK("https://example.invalid")',
         notes: '+SUM(1;2)',
         tradeName: '@SUM(1)',
-        address: { street: '-1+1' },
+        address: { ...validAddress, street: '-1+1' },
       })
       .expect(201);
     await request(f.app)
       .post('/api/v1/customers')
       .set(orderHeaders(f))
-      .send({ name: 'Outro cliente' })
+      .send({ address: validAddress, name: 'Outro cliente' })
       .expect(201);
     const page = await csv('customers', { q: '=hyperlink', status: 'active' }).expect(200);
     expect(page.headers['x-export-row-count']).toBe('1');
@@ -179,12 +179,12 @@ describe('CSV administrativo G nos emuladores', () => {
     await request(f.app)
       .post('/api/v1/customers')
       .set(orderHeaders(f))
-      .send({ name: 'Cliente A' })
+      .send({ address: validAddress, name: 'Cliente A' })
       .expect(201);
     await request(f.app)
       .post('/api/v1/customers')
       .set(orderHeaders(f))
-      .send({ name: 'Cliente B' })
+      .send({ address: validAddress, name: 'Cliente B' })
       .expect(201);
     const cursor = (await csv('customers', { limit: '1' }).expect(200)).headers['x-next-cursor'];
     expect(cursor).toBeTruthy();

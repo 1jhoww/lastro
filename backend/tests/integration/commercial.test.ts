@@ -1,11 +1,21 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { registerFixture, tenantHeaders, bearer } from '../helpers/fixture.js';
-import { seller, extraSeats, customerInput, productInput, png } from '../helpers/commercial.js';
+import {
+  seller,
+  extraSeats,
+  customerInput,
+  productInput,
+  png,
+  validAddress,
+} from '../helpers/commercial.js';
 const f = registerFixture();
 const headers = () => tenantHeaders(f.ownerA, f.tenantA.tenant.id);
 const createCustomer = (body: object = customerInput) =>
-  request(f.app).post('/api/v1/customers').set(headers()).send(body);
+  request(f.app)
+    .post('/api/v1/customers')
+    .set(headers())
+    .send({ address: validAddress, ...body });
 const createProduct = (body: object = productInput()) =>
   request(f.app).post('/api/v1/products').set(headers()).send(body);
 describe('Clientes e carteiras', () => {
@@ -27,20 +37,29 @@ describe('Clientes e carteiras', () => {
       ).body.data.version,
     ).toBe(1);
   });
-  it('normaliza cadastro, aceita endereço parcial e registra autores', async () => {
+  it('normaliza cadastro, exige endereço completo e registra autores', async () => {
+    await createCustomer({
+      ...customerInput,
+      address: { city: 'São Paulo', state: 'SP' },
+    }).expect(422);
+    await request(f.app)
+      .post('/api/v1/customers')
+      .set(headers())
+      .send({ name: 'Sem endereço' })
+      .expect(422);
     const result = await createCustomer({
       ...customerInput,
-      address: { city: ' São Paulo ', state: 'sp' },
+      address: { ...validAddress, number: 'S/N', city: ' São Paulo ', state: 'sp' },
     }).expect(201);
     expect(result.body.data).toMatchObject({
       document: '52998224725',
       assignedTo: null,
       phone: '11999990000',
       createdBy: f.ownerA.uid,
-      address: { city: 'São Paulo', state: 'SP' },
+      address: { number: 'S/N', city: 'São Paulo', state: 'SP', postalCode: '01310100' },
     });
     expect(result.body.data.tenantId).toBeUndefined();
-    const without = await createCustomer({ name: 'Sem documento e endereço' }).expect(201);
+    const without = await createCustomer({ name: 'Sem documento' }).expect(201);
     expect(without.body.data.document).toBeNull();
   });
   it('preserva unicidade por tenant e permite mesmo documento em outra empresa', async () => {
@@ -114,7 +133,7 @@ describe('Clientes e carteiras', () => {
     const own = await request(f.app)
       .post('/api/v1/customers')
       .set(sellerHeaders)
-      .send({ name: 'Da carteira', notes: 'Nota comercial' })
+      .send({ name: 'Da carteira', notes: 'Nota comercial', address: validAddress })
       .expect(201);
     const privateCustomer = await createCustomer({ name: 'Sem responsável' }).expect(201);
     expect(own.body.data.assignedTo).toBe(user.uid);
@@ -132,6 +151,85 @@ describe('Clientes e carteiras', () => {
     expect(
       (await request(f.app).get('/api/v1/customers').set(headers()).expect(200)).body.data.items,
     ).toHaveLength(2);
+  });
+  it('cliente antigo sem endereço segue legível e só completa o endereço ao editar', async () => {
+    const created = await createCustomer({ name: 'Cadastro antigo' }).expect(201);
+    const id = created.body.data.id as string;
+    const path = `/api/v1/customers/${id}`;
+    // Simula um registro gravado antes da obrigatoriedade.
+    await f.firebase.db
+      .doc(`tenants/${f.tenantA.tenant.id}/customers/${id}`)
+      .update({ address: null });
+    expect(
+      (await request(f.app).get(path).set(headers()).expect(200)).body.data.address,
+    ).toBeNull();
+    const list = await request(f.app).get('/api/v1/customers').set(headers()).expect(200);
+    expect(list.body.data.items.map((v: { id: string }) => v.id)).toContain(id);
+    await request(f.app).delete(path).set(headers()).send({ expectedVersion: 1 }).expect(200);
+    await request(f.app)
+      .patch(path)
+      .set(headers())
+      .send({ expectedVersion: 2, status: 'active', notes: 'Sem tocar no endereço' })
+      .expect(200);
+    for (const address of [
+      null,
+      {},
+      { city: 'São Paulo', state: 'SP' },
+      { ...validAddress, number: '' },
+    ])
+      await request(f.app)
+        .patch(path)
+        .set(headers())
+        .send({ expectedVersion: 3, address })
+        .expect(422);
+    const completed = await request(f.app)
+      .patch(path)
+      .set(headers())
+      .send({ expectedVersion: 3, address: { ...validAddress, number: 'S/N' } })
+      .expect(200);
+    expect(completed.body.data.address).toMatchObject({ number: 'S/N', postalCode: '01310100' });
+    await request(f.app)
+      .patch(path)
+      .set(headers())
+      .send({ expectedVersion: 4, address: null })
+      .expect(422);
+  });
+  it('busca exata por CPF/CNPJ respeita carteira, situação e empresa', async () => {
+    const user = await seller(f);
+    const sellerHeaders = tenantHeaders(user, f.tenantA.tenant.id);
+    const mine = await request(f.app)
+      .post('/api/v1/customers')
+      .set(sellerHeaders)
+      .send(customerInput)
+      .expect(201);
+    const other = await createCustomer({
+      name: 'Outra carteira',
+      document: '11222333000181',
+    }).expect(201);
+    const find = (h: Record<string, string>, document: string, extra: object = {}) =>
+      request(f.app)
+        .get('/api/v1/customers')
+        .query({ document, ...extra })
+        .set(h);
+    const ids = (r: { body: { data: { items: { id: string }[] } } }) =>
+      r.body.data.items.map((v) => v.id);
+    expect(ids(await find(headers(), '529.982.247-25').expect(200))).toEqual([mine.body.data.id]);
+    expect(ids(await find(sellerHeaders, '52998224725').expect(200))).toEqual([mine.body.data.id]);
+    expect(ids(await find(headers(), '11.222.333/0001-81').expect(200))).toEqual([
+      other.body.data.id,
+    ]);
+    // Fora da carteira do vendedor: nada, sem revelar que existe.
+    expect(ids(await find(sellerHeaders, '11222333000181').expect(200))).toEqual([]);
+    expect(
+      ids(await find(headers(), '11222333000181', { status: 'inactive' }).expect(200)),
+    ).toEqual([]);
+    expect(
+      ids(await find(headers(), '11222333000181', { assignedTo: 'unassigned' }).expect(200)),
+    ).toEqual([other.body.data.id]);
+    await find(headers(), '123').expect(422);
+    expect(
+      ids(await find(tenantHeaders(f.ownerB, f.tenantB.tenant.id), '52998224725').expect(200)),
+    ).toEqual([]);
   });
   it('transferência é auditada, imediatamente altera acesso e admite cliente sem vendedor', async () => {
     await extraSeats(f);

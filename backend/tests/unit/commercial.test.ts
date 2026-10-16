@@ -19,12 +19,22 @@ describe('Documentos e valores comerciais', () => {
     'ABCDEFGHIJKLMN',
   ])('rejeita %s', (value) => expect(validDocument(value)).toBe(false));
   it('normaliza sem apagar caracteres inesperados', () => {
+    const address = {
+      postalCode: '01310-100',
+      street: 'Avenida Paulista',
+      number: 'S/N',
+      district: 'Bela Vista',
+      city: 'São Paulo',
+      state: 'sp',
+    };
     expect(normalizeDocument(' 12.abc.345/01de-35 ')).toBe('12ABC34501DE35');
     expect(s.sku.parse(' abc-01 ')).toBe('ABC-01');
-    expect(s.customerCreate.parse({ name: ' Exemplo ', phone: '(11) 99999-0000' }).phone).toBe(
-      '11999990000',
-    );
-    expect(s.customerCreate.safeParse({ name: 'Exemplo', address: {} }).success).toBe(true);
+    expect(
+      s.customerCreate.parse({ name: ' Exemplo ', phone: '(11) 99999-0000', address }).phone,
+    ).toBe('11999990000');
+    expect(s.customerCreate.safeParse({ name: 'Exemplo', address: {} }).success).toBe(false);
+    expect(s.customerUpdate.safeParse({ expectedVersion: 1, address: null }).success).toBe(false);
+    expect(s.customerUpdate.safeParse({ expectedVersion: 1, status: 'active' }).success).toBe(true);
   });
   it.each([-1, 0.5, 100_000_001])('rejeita preço %s', (priceCents) =>
     expect(

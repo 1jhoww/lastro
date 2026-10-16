@@ -3,6 +3,7 @@ import { RecordError, RecordLoading } from '@/features/catalog/RecordStates';
 import { CustomerForm } from '@/features/customers/CustomerForm';
 import { useCustomer, useUpdateCustomer } from '@/features/customers/api';
 import { customerToForm, formToUpdate } from '@/features/customers/form';
+import { addressComplete } from '@/features/customers/presentation';
 import { Screen } from '@/layout/Screen';
 import { useToast } from '@/ui';
 
@@ -32,7 +33,7 @@ export default function EditCustomer() {
         // Nova versão (após conflito e recarga) remonta o formulário com os dados atuais.
         key={c.version}
         defaultValues={customerToForm(c)}
-        submitLabel="Salvar alterações"
+        incompleteAddress={!addressComplete(c.address)}
         submitting={update.isPending}
         error={update.error}
         onCancel={() => router.back()}
@@ -40,14 +41,15 @@ export default function EditCustomer() {
           update.reset();
           await customer.refetch();
         }}
-        onSubmit={(values) =>
+        onSubmit={(values) => {
+          if (update.isPending) return;
           update.mutate(formToUpdate(values, c.version), {
             onSuccess: () => {
               toast.show('Cliente salvo');
               router.replace(`/clientes/${c.id}` as Href);
             },
-          })
-        }
+          });
+        }}
       />
     </Screen>
   );

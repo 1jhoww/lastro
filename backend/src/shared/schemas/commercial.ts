@@ -60,6 +60,20 @@ export const address = z.strictObject({
     .optional(),
   country: z.literal('BR').optional(),
 });
+const filled = (size: number) => z.string().trim().min(1).max(size);
+/**
+ * Address written by the API: everything except the complement is mandatory. "S/N" is the
+ * explicit "no number" value. Stored records keep the lenient `address` shape, so customers
+ * registered before this rule stay readable and are only asked to complete it when edited.
+ */
+export const requiredAddress = address.extend({
+  street: filled(160),
+  number: filled(20),
+  district: filled(100),
+  city: filled(100),
+  state: address.shape.state.unwrap(),
+  postalCode: address.shape.postalCode.unwrap(),
+});
 export const customerFields = {
   name,
   tradeName: text(160).nullable().optional(),
@@ -80,10 +94,14 @@ export const expectedVersion = z.number().int().positive();
 export const versionInput = z.strictObject({ expectedVersion });
 export const customerCreate = z.strictObject({
   ...customerFields,
+  address: requiredAddress,
   assignedTo: opaqueId.nullable().optional(),
 });
 export const customerUpdate = z.strictObject({
   ...customerFields,
+  // Omitted keeps the stored address (status-only changes on legacy records); when sent, it
+  // must be complete and can no longer be cleared.
+  address: requiredAddress.optional(),
   name: name.optional(),
   status: status.optional(),
   expectedVersion,
@@ -191,6 +209,8 @@ const listShape = {
 export const customerQuery = z.strictObject({
   ...listShape,
   assignedTo: z.union([opaqueId, z.literal('unassigned')]).optional(),
+  /** Exact CPF/CNPJ lookup through the uniqueness reservation; returns at most one customer. */
+  document: document.optional(),
 });
 export const productQuery = z.strictObject({
   ...listShape,

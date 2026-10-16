@@ -65,3 +65,62 @@ export function formatPostalCode(value: string | null | undefined): string {
   if (!value) return '';
   return /^\d{8}$/.test(value) ? `${value.slice(0, 5)}-${value.slice(5)}` : value;
 }
+
+/** Valor gravado quando o endereço não tem número (alternativa explícita no formulário). */
+export const NO_NUMBER = 'S/N';
+
+export const isNoNumber = (value: string | null | undefined) =>
+  /^s\/?n$/i.test((value ?? '').trim());
+
+/** Máscara de digitação do CEP: "01310100" → "01310-100". */
+export function maskPostalCode(input: string): string {
+  const d = input.replace(/\D/g, '').slice(0, 8);
+  return d.length > 5 ? `${d.slice(0, 5)}-${d.slice(5)}` : d;
+}
+
+/**
+ * Máscara de digitação do telefone brasileiro: "(11) 98765-4321" ou "(11) 3456-7890".
+ * Número internacional (começa com +) fica como digitado.
+ */
+export function maskPhone(input: string): string {
+  if (input.trimStart().startsWith('+')) return input;
+  const d = input.replace(/\D/g, '').slice(0, 11);
+  if (d.length <= 2) return d.length ? `(${d}` : '';
+  const ddd = d.slice(0, 2);
+  const rest = d.slice(2);
+  const split = rest.length > 8 ? 5 : 4;
+  return rest.length > split
+    ? `(${ddd}) ${rest.slice(0, split)}-${rest.slice(split)}`
+    : `(${ddd}) ${rest}`;
+}
+
+/** Siglas das unidades federativas, em ordem alfabética. */
+export const brazilianStates = [
+  'AC',
+  'AL',
+  'AM',
+  'AP',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MG',
+  'MS',
+  'MT',
+  'PA',
+  'PB',
+  'PE',
+  'PI',
+  'PR',
+  'RJ',
+  'RN',
+  'RO',
+  'RR',
+  'RS',
+  'SC',
+  'SE',
+  'SP',
+  'TO',
+] as const;

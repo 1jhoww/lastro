@@ -11,6 +11,8 @@ export type CustomerFilters = {
   status: StatusFilter;
   /** Só administrador: UID de vendedor ou 'unassigned'. */
   assignedTo?: string;
+  /** CPF/CNPJ normalizado: busca exata, no lugar da busca por nome. */
+  document?: string;
 };
 
 /**
@@ -27,6 +29,7 @@ export function useCustomerList(filters: CustomerFilters) {
           query: {
             ...listParams(filters),
             ...(filters.assignedTo ? { assignedTo: filters.assignedTo } : {}),
+            ...(filters.document ? { document: filters.document } : {}),
             ...(cursor ? { cursor } : {}),
           },
         },

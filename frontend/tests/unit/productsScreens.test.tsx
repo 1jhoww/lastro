@@ -56,7 +56,7 @@ describe('produtos: lista e permissões', () => {
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/produtos', overrides });
     expect(await screen.findByText('Água 500 ml')).toBeTruthy();
     expect(screen.getByText('R$ 2,50')).toBeTruthy();
-    expect(await screen.findByText('SKU-P1, Bebidas')).toBeTruthy();
+    expect(await screen.findByText('SKU-P1 · Bebidas')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Novo produto' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Categorias' })).toBeTruthy();
   });
@@ -85,7 +85,7 @@ describe('produtos: lista e permissões', () => {
     await screen.findByRole('header', { name: 'Produto p1' });
     expect(screen.queryByRole('link', { name: 'Editar' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Desativar' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Enviar imagem' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Adicionar imagem' })).toBeNull();
     expect(screen.queryByText('Estoque mínimo')).toBeNull();
   });
 
@@ -117,11 +117,11 @@ describe('produtos: cadastro', () => {
       .on('GET', '/api/v1/products/p9', () => ok(product('p9', { name: 'Queijo minas' })));
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/produtos/novo', overrides });
     await fillBasics();
-    await fireEvent.press(screen.getByLabelText('Unidade: Unidade (UN)'));
+    await fireEvent.press(screen.getByLabelText('Unidade de venda: Unidade (UN)'));
     await fireEvent.press(await screen.findByRole('radio', { name: 'Quilo (KG)' }));
     await fireEvent.changeText(screen.getByLabelText('Preço por kg'), '4590');
     await fireEvent.changeText(screen.getByLabelText('Estoque mínimo'), '1,25');
-    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar produto' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar produto' }));
     expect(await screen.findByRole('header', { name: 'Queijo minas' })).toBeTruthy();
     expect(sent).toEqual({
       name: 'Queijo minas',
@@ -139,7 +139,7 @@ describe('produtos: cadastro', () => {
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/produtos/novo', overrides });
     await fillBasics();
     await fireEvent.changeText(screen.getByLabelText('Estoque mínimo'), '1,5');
-    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar produto' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar produto' }));
     expect(await screen.findByText('Use um número inteiro para esta unidade.')).toBeTruthy();
     expect(server.calls.some((c) => c.method === 'POST')).toBe(false);
   });
@@ -157,7 +157,7 @@ describe('produtos: cadastro', () => {
     server.on('POST', '/api/v1/products', () => fail(409, 'DUPLICATE_SKU'));
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/produtos/novo', overrides });
     await fillBasics();
-    await fireEvent.press(screen.getByRole('button', { name: 'Cadastrar produto' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar produto' }));
     expect(
       await screen.findByText('Já existe um produto com este SKU nesta empresa.'),
     ).toBeTruthy();
@@ -172,9 +172,9 @@ describe('produtos: cadastro', () => {
         return fail(409, 'UNIT_LOCKED');
       });
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/produtos/p1/editar', overrides });
-    await fireEvent.press(await screen.findByLabelText('Unidade: Unidade (UN)'));
+    await fireEvent.press(await screen.findByLabelText('Unidade de venda: Unidade (UN)'));
     await fireEvent.press(await screen.findByRole('radio', { name: 'Caixa (CX)' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Salvar alterações' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar produto' }));
     expect(
       await screen.findByText(
         'A unidade não pode mudar: o produto já tem movimentação de estoque.',
@@ -214,8 +214,8 @@ describe('produtos: imagem', () => {
       blob: async () => new Blob([new Uint8Array(1234)], { type: 'image/png' }),
     })) as never;
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/produtos/p1', overrides });
-    await fireEvent.press(await screen.findByRole('button', { name: 'Enviar imagem' }));
-    expect(await screen.findByRole('button', { name: 'Trocar imagem' })).toBeTruthy();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Adicionar imagem' }));
+    expect(await screen.findByRole('button', { name: 'Substituir' })).toBeTruthy();
     expect(server.calls.some((c) => c.method === 'PUT')).toBe(true);
   });
 
@@ -227,7 +227,7 @@ describe('produtos: imagem', () => {
       assets: [{ uri: 'file:///grande.jpg', mimeType: 'image/jpeg', fileSize: 6 * 1024 * 1024 }],
     });
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/produtos/p1', overrides });
-    await fireEvent.press(await screen.findByRole('button', { name: 'Enviar imagem' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Adicionar imagem' }));
     expect(await screen.findByText('A imagem tem mais de 5 MB. Escolha uma menor.')).toBeTruthy();
     expect(server.calls.some((c) => c.method === 'PUT')).toBe(false);
   });
@@ -245,7 +245,7 @@ describe('produtos: imagem', () => {
       blob: async () => new Blob([new Uint8Array(10)], { type: 'image/jpeg' }),
     })) as never;
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/produtos/p1', overrides });
-    await fireEvent.press(await screen.findByRole('button', { name: 'Enviar imagem' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Adicionar imagem' }));
     expect(await screen.findByText(/A imagem não foi aceita/)).toBeTruthy();
   });
 });

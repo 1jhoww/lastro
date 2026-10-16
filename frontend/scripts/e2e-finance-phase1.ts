@@ -26,6 +26,7 @@ import {
   results,
   seedPassword,
   signIn,
+  e2eAddress,
 } from './e2eSupport';
 
 const localUrl = new URL(process.env.API_URL ?? 'http://127.0.0.1:3000');
@@ -43,7 +44,10 @@ async function main() {
   const key = () => ({ ...h, 'Idempotency-Key': randomUUID() });
   const today = todayIn('America/Sao_Paulo');
   const customer = await unwrap(
-    admin.POST('/api/v1/customers', { params: { header: h }, body: { name: 'Cliente Fase 1' } }),
+    admin.POST('/api/v1/customers', {
+      params: { header: h },
+      body: { address: e2eAddress, name: 'Cliente Fase 1' },
+    }),
   );
   const product = await unwrap(
     admin.POST('/api/v1/products', {

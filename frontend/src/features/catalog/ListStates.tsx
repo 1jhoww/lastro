@@ -22,6 +22,12 @@ type Props = {
   children: ReactNode;
 };
 
+/** Contagem do que já foi carregado (o contrato não traz total); com mais páginas, "50+". */
+export function countLabel(count: number, more: boolean, singular: string, plural: string) {
+  if (more) return `${count}+ ${plural}`;
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
 /** Painel de lista com os estados de carregamento, erro, vazio e "carregar mais". */
 export function ListPanel({ query, count, empty, children }: Props) {
   return (

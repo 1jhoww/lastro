@@ -160,9 +160,15 @@ export class UserService {
     ]);
     const docs = members.docs.slice(0, limit);
     const last = docs.at(-1);
+    const profiles = await this.profiles(docs.map((doc) => doc.id));
     return {
       items: docs.map((doc) =>
-        memberView.parse({ ...membershipSchema.parse(doc.data()), id: doc.id }),
+        memberView.parse({
+          ...membershipSchema.parse(doc.data()),
+          id: doc.id,
+          name: profiles.get(doc.id)?.name ?? null,
+          email: profiles.get(doc.id)?.email ?? null,
+        }),
       ),
       pendingInvitations: invites.docs.map((doc) =>
         invitationView.parse(invitationSchema.parse(doc.data())),
@@ -172,6 +178,27 @@ export class UserService {
           ? encodeCursor(this.config.invitationSecret, scope, last.id)
           : null,
     };
+  }
+  /**
+   * Display name and e-mail for the team list. Read-only and best effort: the provider being
+   * unavailable never blocks the list, which then falls back to the role alone.
+   */
+  private async profiles(uids: string[]) {
+    const profiles = new Map<string, { name: string | null; email: string | null }>();
+    if (!uids.length) return profiles;
+    try {
+      for (let i = 0; i < uids.length; i += 100) {
+        const result = await this.auth.getUsers(uids.slice(i, i + 100).map((uid) => ({ uid })));
+        for (const user of result.users)
+          profiles.set(user.uid, {
+            name: user.displayName?.trim() || null,
+            email: user.email?.trim().toLowerCase() || null,
+          });
+      }
+    } catch {
+      // Listing without names is still correct; permissions never depend on this data.
+    }
+    return profiles;
   }
   async invite(actor: Actor, tenantId: string, input: z.infer<typeof inviteInput>) {
     const id = randomUUID();

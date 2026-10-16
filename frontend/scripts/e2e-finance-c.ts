@@ -31,6 +31,7 @@ import {
   results,
   seedPassword,
   signIn,
+  e2eAddress,
 } from './e2eSupport';
 const localUrl = new URL(process.env.API_URL ?? 'http://127.0.0.1:3000');
 if (localUrl.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(localUrl.hostname))
@@ -83,7 +84,7 @@ async function main() {
   const customer = await unwrap(
     admin.POST('/api/v1/customers', {
       params: { header: h },
-      body: { name: 'Cliente C sintético' },
+      body: { address: e2eAddress, name: 'Cliente C sintético' },
     }),
   );
   const product = await unwrap(

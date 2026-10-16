@@ -131,3 +131,13 @@ export async function createSeller(admin: ApiClient, tenantId: string) {
   );
   return user;
 }
+
+/** Endereço completo: obrigatório ao cadastrar cliente pela API. */
+export const e2eAddress = {
+  postalCode: '01310100',
+  street: 'Avenida Paulista',
+  number: 'S/N',
+  district: 'Bela Vista',
+  city: 'São Paulo',
+  state: 'SP',
+};

@@ -1,7 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { registerFixture, tenantHeaders } from '../helpers/fixture.js';
-import { seller, extraSeats, customerInput, productInput, png } from '../helpers/commercial.js';
+import {
+  seller,
+  extraSeats,
+  customerInput,
+  productInput,
+  png,
+  validAddress,
+} from '../helpers/commercial.js';
 const f = registerFixture();
 const headers = () => tenantHeaders(f.ownerA, f.tenantA.tenant.id);
 describe('Invariantes concorrentes comerciais', () => {
@@ -39,7 +46,7 @@ describe('Invariantes concorrentes comerciais', () => {
     const result = await request(f.app)
       .post('/api/v1/customers')
       .set(headers())
-      .send({ name: 'Transferível' })
+      .send({ address: validAddress, name: 'Transferível' })
       .expect(201);
     const path = `/api/v1/customers/${result.body.data.id}/assignment`;
     const outcomes = await Promise.all(
@@ -60,7 +67,7 @@ describe('Invariantes concorrentes comerciais', () => {
     const created = await request(f.app)
       .post('/api/v1/customers')
       .set(headers())
-      .send({ name: 'Carteira', assignedTo: user.uid })
+      .send({ address: validAddress, name: 'Carteira', assignedTo: user.uid })
       .expect(201);
     const path = `/api/v1/customers/${created.body.data.id}`;
     const results = await Promise.all([

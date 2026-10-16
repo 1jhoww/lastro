@@ -6,7 +6,7 @@ import type { Order, OrderCreate, OrderUpdate, Product } from '@/api/types';
 import { FieldRow } from '@/features/catalog/FormParts';
 import { useAvailability } from '@/features/inventory/api';
 import { useTenant } from '@/features/session/useTenant';
-import { shortId, useMembers } from '@/features/users/api';
+import { memberLabel, shortId, useMembers } from '@/features/users/api';
 import { Screen } from '@/layout/Screen';
 import { formatCents } from '@/lib/money';
 import { useSession } from '@/session/SessionContext';
@@ -218,10 +218,7 @@ export function OrderEditor({
           .filter((m) => m.status === 'active' || m.id === sellerUid)
           .map((m) => ({
             value: m.id,
-            label:
-              m.id === user?.uid
-                ? 'Você'
-                : `${m.role === 'seller' ? 'Vendedor' : 'Administrador'} ${shortId(m.id)}`,
+            label: m.id === user?.uid ? 'Você' : memberLabel(m),
           }))
       : [
           {
@@ -342,7 +339,7 @@ export function OrderEditor({
         </Section>
 
         <View style={[styles.columns, wide && styles.columnsWide]}>
-          <View style={styles.main}>
+          <View style={[styles.main, wide && styles.grow]}>
             <Section title="Produtos">
               <ProductSearch quantities={quantities} onQuantity={setProductQuantity} />
               {wide ? null : (
@@ -529,7 +526,8 @@ const styles = StyleSheet.create({
   raised: { zIndex: 20 },
   columns: { gap: space[8] },
   columnsWide: { flexDirection: 'row', alignItems: 'flex-start' },
-  main: { flex: 1, minWidth: 0, gap: space[8] },
+  main: { minWidth: 0, gap: space[8] },
+  grow: { flex: 1 },
   aside: {
     width: 380,
     gap: space[3],
