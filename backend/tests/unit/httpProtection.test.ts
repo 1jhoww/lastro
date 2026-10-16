@@ -29,7 +29,7 @@ describe('F03: proteção HTTP antes do parser', () => {
     const app = createApp(config, firebase);
     const responses = await Promise.all(
       Array.from({ length: 12 }, () =>
-        request(app).post('/api/v1/admin/plans').type('json').send('{'),
+        request(app).post('/api/v1/admin/tenants').type('json').send('{'),
       ),
     );
     expect(responses.filter((r) => r.status === 400)).toHaveLength(2);
@@ -38,8 +38,8 @@ describe('F03: proteção HTTP antes do parser', () => {
   it('contabiliza JSON malformado sem depender de autenticação', async () => {
     const app = createApp(config, firebase);
     for (let i = 0; i < 2; i++)
-      await request(app).post('/api/v1/admin/plans').type('json').send('{').expect(400);
-    await request(app).post('/api/v1/admin/plans').type('json').send('{').expect(429);
+      await request(app).post('/api/v1/admin/tenants').type('json').send('{').expect(400);
+    await request(app).post('/api/v1/admin/tenants').type('json').send('{').expect(429);
   });
   it('preserva requests válidos e impede spoofing por cabeçalhos de IP', async () => {
     const app = createApp(config, firebase);
@@ -62,7 +62,7 @@ describe('F03: proteção HTTP antes do parser', () => {
     const app = createApp(config, firebase);
     for (let i = 0; i < 2; i++)
       await request(app)
-        .post('/api/v1/admin/plans')
+        .post('/api/v1/admin/tenants')
         .send({ name: 'x'.repeat(70_000) })
         .expect(413);
     await request(app).get('/api/v1/me').expect(429);

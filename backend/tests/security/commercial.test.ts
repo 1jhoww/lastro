@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
-import { registerFixture, tenantHeaders, bearer } from '../helpers/fixture.js';
+import { registerFixture, tenantHeaders, bearer, blockSubscription } from '../helpers/fixture.js';
 import { seller, extraSeats, productInput, png, validAddress } from '../helpers/commercial.js';
 const f = registerFixture();
 const ah = () => tenantHeaders(f.ownerA, f.tenantA.tenant.id);
@@ -295,11 +295,7 @@ describe('Imagens privadas', () => {
       .set('Content-Type', 'image/png')
       .send(await png())
       .expect(200);
-    await request(f.app)
-      .patch(`/api/v1/admin/subscriptions/${f.tenantA.subscription.id}`)
-      .set(bearer(f.platform))
-      .send({ expectedVersion: 1, status: 'suspended', reason: 'Bloqueio de teste' })
-      .expect(200);
+    await blockSubscription(f, 'suspended');
     await request(f.app).get(path).set(ah()).expect(403);
     await request(f.app)
       .put(`${path}?expectedVersion=2`)

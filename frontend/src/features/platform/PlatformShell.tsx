@@ -7,24 +7,33 @@ import { NavMarker } from '@/layout/NavMarker';
 import { useSession } from '@/session/SessionContext';
 import { color, fontFamily, layout, radius, space, useLayoutSize } from '@/theme';
 import { Button, Text } from '@/ui';
-import { ArrowLeft, Building, CreditCard, Layers, LogOut } from '@/ui/icons';
+import { ArrowLeft, Banknote, Building, CreditCard, House, LogOut, Mail } from '@/ui/icons';
 import { Touchable } from '@/ui/Touchable';
 import { focusRing, showFocusRing, type InteractionState } from '@/ui/interaction';
 import { ReauthGate } from './ReauthGate';
 
 const items = [
-  { href: '/plataforma', label: 'Empresas', icon: Building },
+  { href: '/plataforma', label: 'Visão geral', icon: House },
+  { href: '/plataforma/empresas', label: 'Empresas', icon: Building },
   { href: '/plataforma/assinaturas', label: 'Assinaturas', icon: CreditCard },
-  { href: '/plataforma/planos', label: 'Planos', icon: Layers },
+  { href: '/plataforma/cobrancas', label: 'Cobranças', icon: Banknote },
+  { href: '/plataforma/convites', label: 'Convites', icon: Mail },
 ] as const;
 
+/** "Nova empresa" é o fluxo de convite: fica marcada em Convites. */
 const activeHref = (pathname: string) =>
-  [...items].reverse().find((i) => pathname === i.href || pathname.startsWith(`${i.href}/`))
-    ?.href ?? '/plataforma';
+  pathname.startsWith('/plataforma/nova-empresa')
+    ? '/plataforma/convites'
+    : ([...items]
+        .reverse()
+        .find(
+          (i) =>
+            i.href !== '/plataforma' && (pathname === i.href || pathname.startsWith(`${i.href}/`)),
+        )?.href ?? '/plataforma');
 
 /**
- * Área da plataforma Hepta, separada da área da empresa. Usa só rotas /admin do backend:
- * empresas, planos e assinaturas. Não lê clientes, produtos, estoque ou pedidos de ninguém.
+ * Painel do Super Admin, separado da área da empresa. Usa só rotas /admin do backend: empresas,
+ * assinaturas, cobranças e convites. Não lê clientes, produtos, estoque ou pedidos de ninguém.
  */
 export function PlatformShell({ children }: { children: ReactNode }) {
   const size = useLayoutSize();
@@ -54,7 +63,7 @@ export function PlatformShell({ children }: { children: ReactNode }) {
             <View>
               <Wordmark size={22} tone="onDark" />
               <Text variant="caption" color={color.onStructureMuted}>
-                Plataforma Hepta
+                Super Admin
               </Text>
             </View>
             <Button
@@ -78,7 +87,7 @@ export function PlatformShell({ children }: { children: ReactNode }) {
         <View style={styles.brand}>
           <Wordmark size={28} tone="onDark" />
           <Text variant="small" color={color.onStructureSecondary}>
-            Plataforma Hepta
+            Super Admin
           </Text>
         </View>
         <View style={styles.list}>

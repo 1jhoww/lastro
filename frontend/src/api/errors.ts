@@ -131,6 +131,9 @@ const messages: Record<string, string> = {
   USER_LIMIT_REACHED:
     'Todas as vagas do plano estão ocupadas. Revogue um convite ou desative um usuário.',
   LAST_ADMIN_REQUIRED: 'A empresa precisa de pelo menos um administrador ativo.',
+  FEATURE_NOT_IN_PLAN: 'Este recurso não está incluído no plano contratado pela empresa.',
+  CUSTOMER_ADMIN_REQUIRED:
+    'O primeiro administrador precisa ser alguém da empresa cliente, não a conta de Super Admin.',
   INVITATION_EXPIRED: 'Este convite venceu. Peça um novo ao administrador.',
   INVITATION_INVALID: 'Convite inválido, já usado ou revogado.',
   DUPLICATE_DOCUMENT: 'Já existe um cliente com este CPF/CNPJ.',

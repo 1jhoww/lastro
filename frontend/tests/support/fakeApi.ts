@@ -118,6 +118,15 @@ export const membership = (
   role,
   access,
   permissions: access !== 'allowed' ? [] : role === 'administrator' ? administrator : seller,
+  // Legacy contract: every existing capability, as before the official plans.
+  plan: {
+    code: null,
+    name: null,
+    userLimit: 2,
+    features: ['users.invite', 'catalog.public', 'commercial.sellers'] as (
+      'users.invite' | 'catalog.public' | 'commercial.sellers'
+    )[],
+  },
 });
 
 export const tenant = (id: string, name: string) => ({

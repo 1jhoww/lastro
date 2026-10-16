@@ -17,12 +17,12 @@ export async function seller(f: Fixture, label = 'seller', tenantId = f.tenantA.
     .expect(200);
   return user;
 }
+/**
+ * Synthetic capacity for scenarios with several sellers. No official plan offers 5 users, so
+ * the contract snapshot is written directly; enforcement reads this same snapshot.
+ */
 export async function extraSeats(f: Fixture) {
-  await request(f.app)
-    .patch(`/api/v1/admin/subscriptions/${f.tenantA.subscription.id}`)
-    .set(bearer(f.platform))
-    .send({ expectedVersion: 1, userLimit: 5, reason: 'Capacidade sintética de teste' })
-    .expect(200);
+  await f.firebase.db.doc(`subscriptions/${f.tenantA.subscription.id}`).update({ userLimit: 5 });
 }
 /** Complete address: required on every customer created or edited through the API. */
 export const validAddress = {

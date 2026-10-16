@@ -33,16 +33,32 @@ Proposta de vínculo destinada a uma identidade com email verificado, válida po
 _Avoid_: Usuário ativo, cadastro automático.
 
 **Vaga ocupada**:
-Capacidade contratada utilizada por um vínculo ativo ou convite pendente ainda válido.
+Capacidade contratada utilizada por um vínculo ativo ou convite pendente ainda válido; vínculos e convites do Super Admin não ocupam vaga.
 _Avoid_: Quantidade de administradores.
 
+**Acesso de suporte**:
+Vínculo do Super Admin a uma empresa, que não ocupa vaga e só vale enquanto ele mantiver o papel de plataforma.
+_Avoid_: Usuário da empresa, administrador da empresa.
+
 **Plano**:
-Oferta comercial versionada da plataforma.
-_Avoid_: Contrato vigente de uma empresa.
+Oferta comercial oficial definida pelo sistema (Essencial, Profissional), com limite de usuários e recursos.
+_Avoid_: Contrato vigente de uma empresa, plano cadastrado livremente.
+
+**Recurso do plano**:
+Capacidade existente liberada ou não pelo plano (convites adicionais, vitrine, vendedores e carteiras).
+_Avoid_: Módulo novo, permissão de perfil.
 
 **Assinatura**:
-Condições contratadas e estado de acesso de uma empresa.
-_Avoid_: Pagamento bancário, plano global.
+Condições contratadas (plano, valor, dia de vencimento, início da cobrança) e estado administrativo de acesso de uma empresa.
+_Avoid_: Pagamento bancário, plano global, situação financeira.
+
+**Cobrança**:
+Valor de uma competência de uma assinatura, acompanhado manualmente pelo Super Admin, com estado financeiro próprio.
+_Avoid_: Recebível de cliente comercial, bloqueio de acesso.
+
+**Competência**:
+Mês (AAAA-MM) a que uma cobrança se refere; no máximo uma cobrança por assinatura e competência.
+_Avoid_: Data de pagamento, mês de vencimento.
 
 **Cliente comercial**:
 Pessoa ou organização atendida pela empresa, com contato e documento fiscal opcional.

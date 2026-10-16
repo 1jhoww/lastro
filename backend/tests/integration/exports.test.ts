@@ -280,12 +280,11 @@ describe('CSV administrativo G nos emuladores', () => {
     expect(setup.order.totalCents).toBe(2050);
   });
   it('administração existente mantém duas vagas, contrato histórico, auditoria e ausência de acesso comercial', async () => {
-    expect(f.plan.userLimit).toBe(2);
-    expect(f.tenantA.subscription.userLimit).toBe(2);
+    expect(f.tenantA.subscription).toMatchObject({ planCode: 'profissional', userLimit: 2 });
     await request(f.app)
-      .patch(`/api/v1/admin/plans/${f.plan.id}`)
+      .post(`/api/v1/admin/subscriptions/${f.tenantB.subscription.id}/terms`)
       .set(bearer(f.platform))
-      .send({ expectedVersion: 1, monthlyPriceCents: 21000 })
+      .send({ expectedVersion: 1, monthlyPriceCents: 21000, reason: 'Condição de outra empresa' })
       .expect(200);
     const subscriptions = await request(f.app)
       .get('/api/v1/admin/subscriptions')
@@ -294,7 +293,7 @@ describe('CSV administrativo G nos emuladores', () => {
     expect(
       subscriptions.body.data.items.find((s: { id: string }) => s.id === f.tenantA.subscription.id)
         .monthlyPriceCents,
-    ).toBe(20000);
+    ).toBe(19900);
     const tenants = await request(f.app)
       .get('/api/v1/admin/tenants')
       .set(bearer(f.platform))
@@ -303,9 +302,10 @@ describe('CSV administrativo G nos emuladores', () => {
     const audits = (await f.firebase.db.collection('auditLogs').get()).docs.map(
       (d) => d.data().action,
     );
-    expect(audits).toContain('plan.version.created');
+    expect(audits).toContain('subscription.terms.updated');
     expect(audits).toContain('tenant.created');
     await request(f.app).get('/api/v1/admin/plans').set(bearer(f.ownerA)).expect(403);
+    await request(f.app).get('/api/v1/admin/plan-catalog').set(bearer(f.ownerA)).expect(403);
     await csv('orders', {}, f.platform).expect(403);
   });
 });

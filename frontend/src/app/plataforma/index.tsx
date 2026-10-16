@@ -1,88 +1,202 @@
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-import { unwrap } from '@/api/client';
-import { toApiError } from '@/api/errors';
-import { queryKeys } from '@/api/queryKeys';
+import type { PlatformOverview } from '@/api/types';
+import { MetricStrip } from '@/features/finance/FinanceParts';
+import { useOverview } from '@/features/platform/api';
+import { chargeCopy, competenceLabel, dateOrDash } from '@/features/platform/copy';
 import { PlatformHeader } from '@/features/platform/PlatformHeader';
-import { usePlatformQuery } from '@/features/platform/platformQuery';
-import { formatDate } from '@/lib/dates';
-import { useSession } from '@/session/SessionContext';
+import { LoadError, LoadingRows, Stat } from '@/features/platform/PlatformParts';
+import { formatCents } from '@/lib/money';
 import { color, space } from '@/theme';
-import { Alert, Badge, Button, EmptyState, Panel, Skeleton, Text } from '@/ui';
-import { Building, Plus } from '@/ui/icons';
+import { Alert, Badge, Button, DataTable, EmptyState, Panel, Skeleton, Text } from '@/ui';
+import { CalendarClock, Plus } from '@/ui/icons';
 
-/** Empresas da plataforma: só nome, situação e data. Nenhum dado comercial. */
-export default function PlatformTenants() {
-  const { api, user } = useSession();
-  const tenants = usePlatformQuery(queryKeys.platform(user?.uid ?? '', 'tenants'), () =>
-    unwrap(api.GET('/api/v1/admin/tenants', { params: { query: { limit: '100' } } })),
-  );
-  const items = tenants.data?.items ?? [];
+type Upcoming = PlatformOverview['upcoming'][number];
+
+/**
+ * Visão geral do Super Admin. Todos os números vêm de dados gravados: MRR é a receita contratada
+ * dos contratos ativos; "recebido no mês" soma os pagamentos registrados. Os dois nunca se somam.
+ */
+export default function PlatformOverviewScreen() {
+  const overview = useOverview();
+  const data = overview.data;
 
   return (
     <>
       <PlatformHeader
-        title="Empresas"
-        description="Contratantes do Lastro. Daqui não se acessa nenhum dado comercial delas."
+        title="Visão geral"
+        description="Empresas, assinaturas e cobranças do Lastro."
         action={
           <Link href="/plataforma/nova-empresa" asChild>
             <Button label="Nova empresa" icon={Plus} variant="strong" />
           </Link>
         }
       />
-      {tenants.isError && toApiError(tenants.error).code !== 'FORBIDDEN' ? (
-        <Alert tone="danger" title="Não foi possível carregar as empresas">
-          {toApiError(tenants.error).userMessage}
-        </Alert>
+      {overview.isError ? (
+        <LoadError
+          title="Não foi possível carregar os indicadores"
+          error={overview.error}
+          onRetry={() => overview.refetch()}
+        />
       ) : null}
-      <Panel flush>
-        {tenants.isPending ? (
-          <View style={styles.loading}>
-            <Skeleton width="50%" height={16} />
-            <Skeleton width="40%" height={16} />
-          </View>
-        ) : items.length === 0 ? (
+      {overview.isPending ? (
+        <Skeleton width="100%" height={88} />
+      ) : data ? (
+        <>
+          <MetricStrip>
+            {[
+              <Stat key="companies" label="Empresas" value={String(data.totalCompanies)} />,
+              <Stat
+                key="active"
+                label="Assinaturas ativas"
+                value={String(data.subscriptions.active)}
+                caption={
+                  data.subscriptions.pending
+                    ? `${data.subscriptions.pending} aguardando ativação`
+                    : undefined
+                }
+              />,
+              <Stat key="essencial" label="No Essencial" value={String(data.plans.essencial)} />,
+              <Stat
+                key="profissional"
+                label="No Profissional"
+                value={String(data.plans.profissional)}
+                caption={data.plans.legacy ? `${data.plans.legacy} em contrato legado` : undefined}
+              />,
+            ]}
+          </MetricStrip>
+          <MetricStrip>
+            {[
+              <Stat
+                key="mrr"
+                label="Receita mensal contratada"
+                value={formatCents(data.mrrCents)}
+                caption="Contratos ativos (MRR)"
+              />,
+              <Stat
+                key="received"
+                label="Recebido no mês"
+                value={formatCents(data.receivedThisMonthCents)}
+                caption="Pagamentos registrados"
+                tone="success"
+              />,
+              <Stat
+                key="open"
+                label="Cobranças em aberto"
+                value={formatCents(data.openCharges.amountCents)}
+                caption={`${data.openCharges.count} ${data.openCharges.count === 1 ? 'cobrança' : 'cobranças'}`}
+              />,
+              <Stat
+                key="overdue"
+                label="Vencidas"
+                value={formatCents(data.overdueCharges.amountCents)}
+                caption={`${data.overdueCharges.count} ${data.overdueCharges.count === 1 ? 'cobrança' : 'cobranças'}`}
+                tone={data.overdueCharges.count ? 'danger' : 'default'}
+              />,
+            ]}
+          </MetricStrip>
+          {data.overdueCharges.count ? (
+            <Alert
+              tone="warning"
+              title={`${data.overdueCharges.count} ${data.overdueCharges.count === 1 ? 'cobrança vencida' : 'cobranças vencidas'}`}
+              action={
+                <Link href="/plataforma/cobrancas" asChild>
+                  <Button label="Ver cobranças" size="sm" variant="outline" />
+                </Link>
+              }
+            >
+              O acesso dessas empresas continua liberado. Suspender é sempre uma decisão sua.
+            </Alert>
+          ) : null}
+          {data.subscriptions.pending ? (
+            <Alert
+              title={`${data.subscriptions.pending} ${data.subscriptions.pending === 1 ? 'assinatura aguarda' : 'assinaturas aguardam'} ativação da cobrança`}
+              action={
+                <Link href="/plataforma/assinaturas" asChild>
+                  <Button label="Ver assinaturas" size="sm" variant="outline" />
+                </Link>
+              }
+            >
+              Nenhuma cobrança é gerada antes de você definir valor, vencimento e início.
+            </Alert>
+          ) : null}
+        </>
+      ) : null}
+      <Panel
+        title="Próximos vencimentos"
+        description="Cobranças em aberto, das mais antigas para as mais novas."
+        flush
+      >
+        {overview.isPending ? (
+          <LoadingRows />
+        ) : !data?.upcoming.length ? (
           <EmptyState
-            icon={Building}
-            title="Nenhuma empresa ainda"
-            description="Crie a primeira empresa e envie o convite ao administrador dela."
+            size="compact"
+            icon={CalendarClock}
+            title="Nenhuma cobrança em aberto"
+            description="As cobranças são geradas até 10 dias antes de cada vencimento."
           />
         ) : (
-          items.map((t, i) => (
-            <View key={t.id} style={[styles.row, i < items.length - 1 && styles.divider]}>
-              <View style={styles.copy}>
-                <Text variant="bodyStrong">{t.name}</Text>
+          <DataTable<Upcoming>
+            label="Próximos vencimentos"
+            rows={data.upcoming}
+            keyOf={(c) => c.id}
+            hrefOf={(c) => `/plataforma/empresas/${c.tenantId}`}
+            columns={[
+              {
+                key: 'company',
+                label: 'Empresa',
+                flex: 2,
+                render: (c) => <Text variant="bodyStrong">{c.tenantName}</Text>,
+              },
+              {
+                key: 'competence',
+                label: 'Competência',
+                flex: 1,
+                render: (c) => <Text variant="body">{competenceLabel(c.competence)}</Text>,
+              },
+              {
+                key: 'due',
+                label: 'Vencimento',
+                flex: 1,
+                render: (c) => <Text variant="body">{dateOrDash(c.dueDate)}</Text>,
+              },
+              {
+                key: 'amount',
+                label: 'Valor',
+                flex: 1,
+                align: 'right',
+                render: (c) => <Text variant="figure">{formatCents(c.amountCents)}</Text>,
+              },
+              {
+                key: 'situation',
+                label: 'Situação',
+                flex: 1,
+                render: (c) => <Badge {...chargeCopy[c.situation]} />,
+              },
+            ]}
+            renderCompact={(c) => (
+              <View style={styles.compact}>
+                <View style={styles.compactTop}>
+                  <Text variant="bodyStrong" style={styles.flex}>
+                    {c.tenantName}
+                  </Text>
+                  <Badge {...chargeCopy[c.situation]} />
+                </View>
                 <Text variant="small" color={color.textSecondary}>
-                  Desde {formatDate(t.createdAt)}, fuso {t.timezone}
+                  {`${formatCents(c.amountCents)}, vence ${dateOrDash(c.dueDate)}`}
                 </Text>
               </View>
-              <Badge
-                label={t.status === 'active' ? 'Ativa' : 'Aguardando administrador'}
-                tone={t.status === 'active' ? 'success' : 'neutral'}
-              />
-            </View>
-          ))
+            )}
+          />
         )}
       </Panel>
-      {tenants.data?.nextCursor ? (
-        <Text variant="small" color={color.textSecondary}>
-          Mostrando as primeiras 100 empresas.
-        </Text>
-      ) : null}
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: space[3],
-    paddingHorizontal: space[5],
-    paddingVertical: space[4],
-  },
-  divider: { borderBottomWidth: 1, borderBottomColor: color.border },
-  copy: { flex: 1, minWidth: 200, gap: 2 },
-  loading: { padding: space[5], gap: space[3] },
+  compact: { gap: 2, flex: 1 },
+  compactTop: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
+  flex: { flex: 1 },
 });

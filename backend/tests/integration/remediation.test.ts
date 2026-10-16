@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import request from 'supertest';
 import { randomUUID } from 'node:crypto';
 import { Timestamp, Transaction } from 'firebase-admin/firestore';
-import { registerFixture, bearer, tenantHeaders } from '../helpers/fixture.js';
+import { registerFixture, bearer, tenantHeaders, tenantInput } from '../helpers/fixture.js';
 import { png, productInput } from '../helpers/commercial.js';
 import { draft } from '../helpers/orders.js';
 import { FoundationRepository } from '../../src/infrastructure/repositories/foundationRepository.js';
@@ -61,25 +61,25 @@ async function productWithImage() {
 describe('F03–F07: regressões nos emuladores', () => {
   it('TTL destina-se somente aos contadores e expiração administrativa conserva bloqueio de replay', async () => {
     const key = randomUUID(),
-      body = { name: 'Plano retido', signupFeeCents: 0, monthlyPriceCents: 100, userLimit: 2 };
+      body = tenantInput('Empresa retida', f.outsider.email);
     const call = () =>
       request(f.app)
-        .post('/api/v1/admin/plans')
+        .post('/api/v1/admin/tenants')
         .set(bearer(f.platform))
         .set('Idempotency-Key', key)
         .send(body);
-    const first = (await call().expect(201)).body.data;
-    expect((await call().expect(201)).body.data.id).toBe(first.id);
+    const first = (await call().expect(201)).body.data.tenant;
+    expect((await call().expect(201)).body.data.tenant.id).toBe(first.id);
     const records = await f.firebase.db
       .collection('idempotencyRecords')
       .where('result.id', '==', first.id)
       .get();
     const ref = records.docs[0]!.ref;
     expect((await ref.get()).get('expiresAt')).toBeInstanceOf(Timestamp);
-    const count = (await f.firebase.db.collection('plans').get()).size;
+    const count = (await f.firebase.db.collection('tenants').get()).size;
     await ref.update({ expiresAt: Timestamp.fromMillis(Date.now() - 1) });
     expect((await call().expect(410)).body.error.code).toBe('IDEMPOTENCY_EXPIRED');
-    expect((await f.firebase.db.collection('plans').get()).size).toBe(count);
+    expect((await f.firebase.db.collection('tenants').get()).size).toBe(count);
     expect((await ref.get()).exists).toBe(true);
     // Legacy textual expiry is readable and has the same fail-closed replay behavior.
     await ref.update({ expiresAt: new Date(Date.now() - 1).toISOString() });

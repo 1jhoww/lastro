@@ -73,10 +73,23 @@ describe('Segurança e isolamento real entre empresas', () => {
       .set(tenantHeaders(f.platform, f.tenantA.tenant.id))
       .expect(403);
     await request(f.app)
-      .patch(`/api/v1/admin/plans/${f.plan.id}`)
+      .post(`/api/v1/admin/subscriptions/${f.tenantA.subscription.id}/plan`)
       .set(bearer(f.ownerA))
-      .send({ expectedVersion: 1, userLimit: 100 })
+      .send({
+        expectedVersion: 1,
+        planCode: 'essencial',
+        acknowledgedLostFeatures: [],
+        reason: 'Tentativa',
+      })
       .expect(403);
+    await request(f.app)
+      .post(`/api/v1/admin/subscriptions/${f.tenantA.subscription.id}/terms`)
+      .set(bearer(f.ownerA))
+      .send({ expectedVersion: 1, monthlyPriceCents: 1, reason: 'Tentativa' })
+      .expect(403);
+    expect(
+      (await f.firebase.db.doc(`subscriptions/${f.tenantA.subscription.id}`).get()).get('version'),
+    ).toBe(1);
   });
   it('vendedor não se promove nem adiciona permissões', async () => {
     const seller = await newUser(f, 'seller');

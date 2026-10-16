@@ -44,6 +44,11 @@ export function inviteFailure(e: unknown, email: string | null): InviteFailure {
         title: 'Empresa ainda em configuração',
         body: 'O primeiro acesso precisa ser de um administrador. Aguarde o administrador aceitar o convite dele.',
       };
+    case 'CUSTOMER_ADMIN_REQUIRED':
+      return {
+        title: 'Convite inicial é da empresa cliente',
+        body: 'Sua conta é de Super Admin e não ocupa vaga. O primeiro administrador precisa ser um usuário da própria empresa.',
+      };
     case 'SUBSCRIPTION_SUSPENDED':
     case 'SUBSCRIPTION_INACTIVE':
       return {

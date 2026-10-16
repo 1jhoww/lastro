@@ -9,7 +9,8 @@ import {
 } from '../../shared/schemas/models.js';
 import type { Actor, TenantContext } from '../../shared/types/context.js';
 import { requireCondition } from '../../shared/errors/appError.js';
-import { enforceSubscription, permissionsFor, type Permission } from '../users/permissions.js';
+import { enforceSubscription, requirePermission, type Permission } from '../users/permissions.js';
+import { entitlementsFor } from '../plans/catalog.js';
 
 export const platformAdminSchema = z.strictObject({
   uid: z.string(),
@@ -19,13 +20,16 @@ export const platformAdminSchema = z.strictObject({
 });
 export class AccessService {
   constructor(readonly repo: FoundationRepository) {}
-  async platform(actor: Actor, tx?: Transaction): Promise<void> {
+  async isPlatformAdmin(uid: string, tx?: Transaction): Promise<boolean> {
     const [admin, identity] = await Promise.all([
-      this.repo.read(this.repo.global('platformAdmins', actor.uid), platformAdminSchema, tx),
-      this.repo.read(this.repo.global('identities', actor.uid), identitySchema, tx),
+      this.repo.read(this.repo.global('platformAdmins', uid), platformAdminSchema, tx),
+      this.repo.read(this.repo.global('identities', uid), identitySchema, tx),
     ]);
+    return admin?.status === 'active' && identity?.status === 'active';
+  }
+  async platform(actor: Actor, tx?: Transaction): Promise<void> {
     requireCondition(
-      admin?.status === 'active' && identity?.status === 'active',
+      await this.isPlatformAdmin(actor.uid, tx),
       403,
       'FORBIDDEN',
       'Operação não permitida',
@@ -53,6 +57,13 @@ export class AccessService {
       'TENANT_ACCESS_DENIED',
       'Contexto de empresa não autorizado',
     );
+    // A seat-exempt (support) membership is valid only while its holder is a Super Admin.
+    requireCondition(
+      !membership.seatExempt || (await this.isPlatformAdmin(actor.uid, tx)),
+      403,
+      'TENANT_ACCESS_DENIED',
+      'Contexto de empresa não autorizado',
+    );
     const subscription = await this.repo.read(
       this.repo.global('subscriptions', tenant.subscriptionId),
       subscriptionSchema,
@@ -65,12 +76,8 @@ export class AccessService {
       'Contexto de empresa não autorizado',
     );
     enforceSubscription(subscription.status);
-    requireCondition(
-      !permission || permissionsFor(membership.role).includes(permission),
-      403,
-      'FORBIDDEN',
-      'Operação não permitida',
-    );
-    return { actor, tenant, membership, subscription };
+    const entitlements = entitlementsFor(subscription);
+    if (permission) requirePermission(membership.role, entitlements, permission);
+    return { actor, tenant, membership, subscription, entitlements };
   }
 }

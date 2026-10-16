@@ -139,7 +139,7 @@ export function openApiDocument() {
     openapi: '3.1.0',
     info: {
       title: 'Lastro — Fases A, B, C, D, E, F e G',
-      version: '0.8.1',
+      version: '0.9.0',
       description:
         'Firebase Client SDK: login, signOut e recuperação de senha. Não há login JWT paralelo. Headers de tenant não concedem autorização. Operações sensíveis exigem autenticação recente (5 minutos). Convites exigem email verificado e não enviam email automaticamente. Pedidos sem teto comercial de linhas ou valor mínimo; rascunhos podem estar incompletos. Confirmar exige cliente autorizado, linhas e quantidades válidas, total positivo, estoque e condição válida, verificados no servidor. Refinamentos transacionais não são expressos integralmente em JSON Schema. Financeiro administrativo: condições empresariais até 12 parcelas, forma prevista separada da efetiva, alocações restritas a um pedido, recebimentos sem excedente. Centavos determinísticos; parcelas zero sem liquidação fictícia. Devoluções físicas parciais referenciam expedição, danificados ficam fora do disponível e exigem decisão administrativa. Bloqueio financeiro desde intenção até encerramento físico e resolução. Todos os efeitos críticos são atômicos e versionados; replay exige autorização atual. Limites técnicos: JSON 64 KiB, documento Firestore 1 MiB; excedentes são recusados integralmente.',
     },

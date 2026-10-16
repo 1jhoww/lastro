@@ -1,6 +1,23 @@
 # Integração do frontend futuro
 
-Contrato vigente local: OpenAPI 0.8.1, 114 operações, Fases A–G e endpoints opt-in F02. Seções D descrevem o fluxo histórico; financeiro/retornos E usam comandos próprios. Tipos para integração do frontend estão em generated-types.ts. A validação estrutural final F02 está registrada em [validation-f02](../validation-f02.md).
+Contrato vigente local: OpenAPI 0.9.0, 131 operações, Fases A–G, endpoints opt-in F02 e administração de planos, assinaturas e cobranças. Seções D descrevem o fluxo histórico; financeiro/retornos E usam comandos próprios. Tipos para integração do frontend estão em generated-types.ts. A validação estrutural final F02 está registrada em [validation-f02](../validation-f02.md).
+
+## Planos, assinaturas e cobranças (0.9.0)
+
+Mudanças incompatíveis para o painel Super Admin: `POST/PATCH /admin/plans` e `PATCH /admin/subscriptions/{id}` foram removidos. `POST /admin/tenants` não aceita mais `planId`: envia `planCode` (`essencial|profissional`), `billingDay` (1–28), `billingStartsOn` (AAAA-MM-DD, hoje até +1 ano em America/Sao_Paulo) e, opcionalmente, `monthlyPriceCents` (padrão: preço de referência), `billingContact` e `commercialNotes`. O token do convite inicial continua sendo devolvido como antes, e convites já emitidos continuam válidos.
+
+Empresa (todas as rotas privadas): `/me` devolve em cada vínculo `plan {code, name, userLimit, features}` e as `permissions` já filtradas pelo plano. Use `features` para explicar ações indisponíveis ("disponível no Profissional"); a autorização final é do servidor (`FEATURE_NOT_IN_PLAN`, 403). `GET /users` devolve `capacity {userLimit, activeUsers, reservedInvitations, available}`, e membros e convites têm `seatExempt` (acesso de suporte Lastro, sem ocupar vaga). Esconda "Convidar" quando `users.invite` estiver ausente ou `available` for 0. `USER_LIMIT_REACHED` continua sendo a recusa por capacidade. `CUSTOMER_ADMIN_REQUIRED` (409) recusa o Super Admin como primeiro administrador.
+
+Super Admin (todas exigem login recente, como as demais rotas `/admin`):
+
+- `GET /admin/overview`: indicadores e próximos vencimentos. `mrrCents` é a receita contratada dos contratos ativos; `receivedThisMonthCents` é a soma dos pagamentos registrados no mês. Não somar um ao outro.
+- `GET /admin/companies?q&planCode=essencial|profissional|legacy&status&attention=overdue|open` e `GET /admin/companies/{id}`: empresas, assinatura, próximo vencimento, vagas, contato, cobranças em aberto, usuários (nome/e-mail do provedor), convites e vitrine. Nenhum dado comercial da empresa.
+- `GET /admin/plan-catalog`; `GET /admin/subscriptions/{id}/plan-change?planCode` (prévia de vagas excedentes e recursos perdidos); `POST /admin/subscriptions/{id}/plan` `{expectedVersion, planCode, monthlyPriceCents?, acknowledgedLostFeatures, reason}`.
+- `POST /admin/subscriptions/{id}/activate|terms|suspend|reactivate` com `expectedVersion` e `reason`; `GET /admin/subscriptions/{id}/history`.
+- `GET /admin/charges?situation=all|open|overdue|due_soon|paid|canceled&tenantId&limit&cursor`; `POST /admin/charges` (competência manual, `CHARGE_EXISTS` 409); `POST /admin/charges/generate`; `POST /admin/charges/{id}/pay|correct|cancel`; `GET /admin/charges/{id}/history`. `situation` é derivada (vencida, vence em até 5 dias) e só serve para alerta.
+- `GET /admin/invitations` (empresas aguardando o primeiro administrador, com o link vigente quando houver) e `POST /admin/companies/{id}/invitations/{invitationId}/revoke` `{reason}`.
+
+Todo comando com `expectedVersion` responde 409 `CONFLICT` quando a versão está desatualizada: recarregue e peça nova confirmação. Downgrade: `USER_LIMIT_REACHED` (libere vagas antes) e `FEATURE_LOSS_UNCONFIRMED` (confirme os recursos da prévia). Regras de vigência em [ADR 0010](../adr/0010-cobranca-manual-e-vigencia.md).
 
 ## F02 - execuções financeiras retomáveis
 

@@ -22,13 +22,13 @@ Todas as rotas `/api/v1` compartilham autenticação; o registro exige escopo. R
 
 Não há papel Super Admin dentro dos perfis empresariais. Um operador de plataforma só acessa dados empresariais se também tiver recebido e aceitado um vínculo legítimo; seu papel de plataforma sozinho é insuficiente.
 
-Empresa é ativada ao aceitar o primeiro convite de administrador. `active` e `past_due` permitem acesso; `suspended` e `canceled` negam. Cancelamento é terminal neste contrato: uma futura contratação requer fluxo explícito, sem reutilizar silenciosamente a assinatura cancelada.
+Empresa é ativada ao aceitar o primeiro convite de administrador, que precisa ser um usuário dela, nunca o Super Admin. `pending`, `active` e `past_due` permitem acesso; `suspended` e `canceled` negam. Cancelamento é terminal e não há comando para cancelar: uma futura contratação requer fluxo explícito, sem reutilizar silenciosamente a assinatura cancelada.
 
-Assinatura: `active → past_due/suspended/canceled`; `past_due → active/suspended/canceled`; `suspended → active/canceled`. Manter o mesmo estado é permitido com nova versão e motivo. O catálogo futuro deverá usar `publicCatalogAllowed`; nesta fase somente a política é implementada e testada, sem rota pública fictícia.
+Assinatura (comandos do Super Admin, cada um com versão esperada, motivo e auditoria): `pending → active` (ativar cobrança), `pending/active/past_due → suspended`, `suspended → active` (ou `pending`, se a cobrança nunca foi ativada). `past_due` é legado e não é mais atribuído. O catálogo público usa `publicCatalogAllowed` e o recurso `catalog.public` do plano.
 
-Planos possuem versões imutáveis. Assinaturas armazenam snapshots dos preços e limites; PATCH do plano não atualiza contratos. Alteração explícita de assinatura exige versão esperada e motivo. Datas de início são metadados administrativos, não um agendador automático de ativação.
+Planos oficiais ficam no código, com versão (ADR 0009). Assinaturas armazenam snapshots de valor e limite; troca de plano, valor ou vencimento exige comando explícito e nunca altera cobranças já emitidas (ADR 0010). Cobranças são geradas por job agendado e idempotente, sem depender do painel.
 
-Capacidade: usuários ativos + convites pendentes não vencidos. As operações de admissão leem e escrevem o documento da empresa, serializando alterações de baixa frequência. A capacidade não depende do número de administradores: dois administradores cabem no plano de duas vagas. Contadores de usuários/administradores são internos e atualizados somente nas transações correspondentes.
+Capacidade: usuários ativos + convites pendentes não vencidos, sem contar vínculos e convites do Super Admin (`seatExempt`). As operações de admissão leem e escrevem o documento da empresa, e a troca de plano lê assinatura, empresa e convites na mesma transação, serializando alterações de baixa frequência. A capacidade não depende do número de administradores: dois administradores cabem no plano de duas vagas. Contadores de usuários/administradores são internos e atualizados somente nas transações correspondentes. Permissões do perfil são filtradas pelos recursos do plano (`FEATURE_NOT_IN_PLAN`).
 
 A organização sob tenant ajuda a limitar consultas, mas o Admin SDK ignora Security Rules. As regras fornecidas negam acesso direto de clientes; as permissões comerciais são verificadas no backend. IAM produtivo não fornece isolamento por documento para este serviço compartilhado; comprometimento do serviço permanece risco residual.
 
