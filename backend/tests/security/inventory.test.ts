@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { randomUUID } from 'node:crypto';
-import { registerFixture, bearer, tenantHeaders } from '../helpers/fixture.js';
+import { registerFixture, tenantHeaders, blockSubscription } from '../helpers/fixture.js';
 import { seller, productInput } from '../helpers/commercial.js';
 import { stockProduct, stockHeaders, enter, adjust, balance } from '../helpers/inventory.js';
 const f = registerFixture();
@@ -145,15 +145,8 @@ describe('Segurança do estoque', () => {
     const id = await stockProduct(f);
     const key = randomUUID();
     await enter(f, id, '1', key).expect(201);
-    for (const [status, expectedVersion] of [
-      ['suspended', 1],
-      ['canceled', 2],
-    ] as const) {
-      await request(f.app)
-        .patch(`/api/v1/admin/subscriptions/${f.tenantA.subscription.id}`)
-        .set(bearer(f.platform))
-        .send({ status, expectedVersion, reason: 'Bloqueio de teste' })
-        .expect(200);
+    for (const status of ['suspended', 'canceled'] as const) {
+      await blockSubscription(f, status);
       for (const path of [
         '/inventory',
         `/inventory/${id}`,

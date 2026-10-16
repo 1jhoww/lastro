@@ -3,7 +3,7 @@ import { FieldPath } from 'firebase-admin/firestore';
 import type { Auth } from 'firebase-admin/auth';
 import { z } from 'zod';
 import { FoundationRepository } from '../../infrastructure/repositories/foundationRepository.js';
-import { AccessService, platformAdminSchema } from '../auth/accessService.js';
+import { AccessService } from '../auth/accessService.js';
 import type { Config } from '../../config/env.js';
 import type { Actor } from '../../shared/types/context.js';
 import { requireCondition } from '../../shared/errors/appError.js';
@@ -23,7 +23,9 @@ import {
   invitationView,
   tenantView,
 } from '../../shared/schemas/http.js';
-import { permissionsFor, enforceSubscription } from './permissions.js';
+import { effectivePermissions, enforceSubscription, featureNotInPlan } from './permissions.js';
+import { entitlementsFor, hasFeature, planSummary } from '../plans/catalog.js';
+import { pendingInvitations, reservedSeats } from './capacity.js';
 import { recordAudit } from '../../shared/audit/audit.js';
 import {
   digest,
@@ -54,14 +56,7 @@ export class UserService {
       'CONFLICT',
       'Quantidade de vínculos acima do limite suportado',
     );
-    const admin = await this.repo.read(
-      this.repo.global('platformAdmins', actor.uid),
-      platformAdminSchema,
-    );
-    const identity = await this.repo.read(
-      this.repo.global('identities', actor.uid),
-      identitySchema,
-    );
+    const platformAdmin = await this.access.isPlatformAdmin(actor.uid);
     const views = await Promise.all(
       memberships.docs.map(async (doc) => {
         const member = membershipSchema.parse(doc.data());
@@ -71,6 +66,8 @@ export class UserService {
           'INTERNAL_ERROR',
           'Erro interno',
         );
+        // Support access ends with the Super Admin role; access.tenant denies it as well.
+        if (member.seatExempt && !platformAdmin) return null;
         const tenant = await this.repo.read(
           this.repo.global('tenants', member.tenantId),
           tenantSchema,
@@ -95,19 +92,21 @@ export class UserService {
               : subscription.status === 'canceled'
                 ? ('canceled' as const)
                 : ('allowed' as const);
+        const entitlements = entitlementsFor(subscription);
         return {
           tenantId: member.tenantId,
           role: member.role,
-          permissions: access === 'allowed' ? [...permissionsFor(member.role)] : [],
+          permissions: access === 'allowed' ? effectivePermissions(member.role, entitlements) : [],
           access,
+          plan: planSummary(entitlements),
         };
       }),
     );
     return {
       uid: actor.uid,
       email: actor.email,
-      platformAdmin: admin?.status === 'active' && identity?.status === 'active',
-      memberships: views,
+      platformAdmin,
+      memberships: views.filter((view) => view !== null),
     };
   }
   async current(actor: Actor, tenantId: string) {
@@ -141,7 +140,7 @@ export class UserService {
     });
   }
   async list(actor: Actor, tenantId: string, limit: number, cursor?: string) {
-    await this.access.tenant(actor, tenantId, 'users:manage');
+    const ctx = await this.access.tenant(actor, tenantId, 'users:manage');
     const scope = `users:${tenantId}:${actor.uid}`;
     const after = decodeCursor(this.config.invitationSecret, scope, cursor);
     let query = this.repo.db
@@ -160,39 +159,65 @@ export class UserService {
     ]);
     const docs = members.docs.slice(0, limit);
     const last = docs.at(-1);
+    const pending = pendingInvitations(invites);
+    const reserved = reservedSeats(pending);
+    const userLimit = ctx.entitlements.userLimit;
     return {
       items: docs.map((doc) =>
         memberView.parse({ ...membershipSchema.parse(doc.data()), id: doc.id }),
       ),
-      pendingInvitations: invites.docs.map((doc) =>
-        invitationView.parse(invitationSchema.parse(doc.data())),
-      ),
+      pendingInvitations: pending.map((invitation) => invitationView.parse(invitation)),
+      capacity: {
+        userLimit,
+        activeUsers: ctx.tenant.activeUsers,
+        reservedInvitations: reserved,
+        available: Math.max(0, userLimit - ctx.tenant.activeUsers - reserved),
+      },
       nextCursor:
         members.size > limit && last
           ? encodeCursor(this.config.invitationSecret, scope, last.id)
           : null,
     };
   }
+  /** Firebase Auth uid registered for an email, if any. */
+  private async uidForEmail(email: string): Promise<string | null> {
+    try {
+      return (await this.auth.getUserByEmail(email)).uid;
+    } catch (error) {
+      const code = error && typeof error === 'object' && 'code' in error ? error.code : '';
+      if (code === 'auth/user-not-found') return null;
+      throw error;
+    }
+  }
   async invite(actor: Actor, tenantId: string, input: z.infer<typeof inviteInput>) {
     const id = randomUUID();
     const now = this.clock().toISOString();
+    // Super Admin recipients reserve no seat; the role is confirmed again inside the transaction.
+    const recipientUid = await this.uidForEmail(input.email);
     return this.repo.db.runTransaction(async (tx) => {
       const ctx = await this.access.tenant(actor, tenantId, 'users:manage', tx);
-      const pending = await tx.get(
-        this.repo.db
-          .collection(`tenants/${tenantId}/invitations`)
-          .where('status', '==', 'pending')
-          .where('expiresAt', '>', now)
-          .limit(101),
+      const seatExempt =
+        recipientUid !== null && (await this.access.isPlatformAdmin(recipientUid, tx));
+      if (input.role === 'seller' && !hasFeature(ctx.entitlements, 'commercial.sellers'))
+        throw featureNotInPlan();
+      if (!seatExempt && !hasFeature(ctx.entitlements, 'users.invite')) throw featureNotInPlan();
+      const pending = pendingInvitations(
+        await tx.get(
+          this.repo.db
+            .collection(`tenants/${tenantId}/invitations`)
+            .where('status', '==', 'pending')
+            .where('expiresAt', '>', now)
+            .limit(101),
+        ),
       );
       requireCondition(
-        !pending.docs.some((doc) => invitationSchema.parse(doc.data()).email === input.email),
+        !pending.some((invitation) => invitation.email === input.email),
         409,
         'CONFLICT',
         'Já existe convite pendente para este destinatário',
       );
       requireCondition(
-        ctx.tenant.activeUsers + pending.size < ctx.subscription.userLimit,
+        seatExempt || ctx.tenant.activeUsers + reservedSeats(pending) < ctx.entitlements.userLimit,
         409,
         'USER_LIMIT_REACHED',
         'Limite de usuários atingido',
@@ -207,6 +232,7 @@ export class UserService {
         expiresAt: new Date(this.clock().getTime() + 7 * 86400000).toISOString(),
         createdBy: actor.uid,
         acceptedBy: null,
+        seatExempt,
         createdAt: now,
         updatedAt: now,
         schemaVersion: 1,
@@ -219,6 +245,7 @@ export class UserService {
       tx.update(this.repo.global('tenants', tenantId), { updatedAt: now });
       recordAudit(this.repo, tx, actor, tenantId, 'invitation.created', id, now, {
         role: input.role,
+        seatExempt,
       });
       return { invitation: invitationView.parse(invitation), token };
     });
@@ -237,11 +264,12 @@ export class UserService {
     const verifiedEmail = authUser.email.trim().toLowerCase();
     const now = this.clock().toISOString();
     return this.repo.db.runTransaction(async (tx) => {
-      const [invitation, tenant, identity, previous] = await Promise.all([
+      const [invitation, tenant, identity, previous, platformAdmin] = await Promise.all([
         this.repo.read(this.repo.tenant(tenantId, 'invitations', id), invitationSchema, tx),
         this.repo.read(this.repo.global('tenants', tenantId), tenantSchema, tx),
         this.repo.read(this.repo.global('identities', actor.uid), identitySchema, tx),
         this.repo.read(this.repo.tenant(tenantId, 'memberships', actor.uid), membershipSchema, tx),
+        this.access.isPlatformAdmin(actor.uid, tx),
       ]);
       requireCondition(
         invitation &&
@@ -249,7 +277,8 @@ export class UserService {
           invitation.tenantId === tenantId &&
           invitation.status === 'pending' &&
           invitation.email === verifiedEmail &&
-          equalDigest(invitation.tokenHash, digest(token)),
+          equalDigest(invitation.tokenHash, digest(token)) &&
+          (!invitation.seatExempt || platformAdmin),
         403,
         'INVITATION_INVALID',
         'Convite inválido',
@@ -279,8 +308,16 @@ export class UserService {
         'Convite inválido',
       );
       enforceSubscription(subscription.status);
+      // A Super Admin never occupies a seat, so the first administrator must be the customer's.
+      const seatExempt = platformAdmin;
       requireCondition(
-        tenant.activeUsers < subscription.userLimit,
+        !seatExempt || tenant.status !== 'provisioning',
+        409,
+        'CUSTOMER_ADMIN_REQUIRED',
+        'O primeiro administrador deve ser um usuário da empresa cliente',
+      );
+      requireCondition(
+        seatExempt || tenant.activeUsers < entitlementsFor(subscription).userLimit,
         409,
         'USER_LIMIT_REACHED',
         'Limite de usuários atingido',
@@ -296,6 +333,7 @@ export class UserService {
         tenantId,
         role: invitation.role,
         status: 'active',
+        seatExempt,
         version: (previous?.version ?? 0) + 1,
         createdAt: previous?.createdAt ?? now,
         updatedAt: now,
@@ -315,15 +353,21 @@ export class UserService {
         acceptedBy: actor.uid,
         updatedAt: now,
       });
-      tx.update(this.repo.global('tenants', tenantId), {
-        status: 'active',
-        activeUsers: tenant.activeUsers + 1,
-        activeAdmins: tenant.activeAdmins + (member.role === 'administrator' ? 1 : 0),
-        updatedAt: now,
-      });
+      tx.update(
+        this.repo.global('tenants', tenantId),
+        seatExempt
+          ? { updatedAt: now }
+          : {
+              status: 'active',
+              activeUsers: tenant.activeUsers + 1,
+              activeAdmins: tenant.activeAdmins + (member.role === 'administrator' ? 1 : 0),
+              updatedAt: now,
+            },
+      );
       recordAudit(this.repo, tx, actor, tenantId, 'invitation.accepted', id, now, {
         memberUid: actor.uid,
         role: member.role,
+        seatExempt,
       });
       return { tenantId, user: memberView.parse({ ...member, id: actor.uid }) };
     });
@@ -345,17 +389,18 @@ export class UserService {
         'RESOURCE_NOT_FOUND',
         'Recurso não encontrado',
       );
-      const identity = await this.repo.read(
-        this.repo.global('identities', uid),
-        identitySchema,
-        tx,
-      );
-      const pending = await tx.get(
-        this.repo.db
-          .collection(`tenants/${tenantId}/invitations`)
-          .where('status', '==', 'pending')
-          .where('expiresAt', '>', now)
-          .limit(101),
+      const [identity, holderIsPlatformAdmin] = await Promise.all([
+        this.repo.read(this.repo.global('identities', uid), identitySchema, tx),
+        previous.seatExempt ? this.access.isPlatformAdmin(uid, tx) : Promise.resolve(false),
+      ]);
+      const pending = pendingInvitations(
+        await tx.get(
+          this.repo.db
+            .collection(`tenants/${tenantId}/invitations`)
+            .where('status', '==', 'pending')
+            .where('expiresAt', '>', now)
+            .limit(101),
+        ),
       );
       requireCondition(
         previous.version === input.expectedVersion,
@@ -363,14 +408,23 @@ export class UserService {
         'CONFLICT',
         'Versão desatualizada',
       );
+      if (
+        'role' in input &&
+        input.role === 'seller' &&
+        previous.role !== 'seller' &&
+        !hasFeature(ctx.entitlements, 'commercial.sellers')
+      )
+        throw featureNotInPlan();
       const next = membershipSchema.parse({
         ...previous,
         ...('role' in input ? { role: input.role } : { status: input.status }),
         version: previous.version + 1,
         updatedAt: now,
       });
-      const beforeActive = previous.status === 'active';
-      const afterActive = next.status === 'active';
+      // Seat-exempt support access never changes the company's seat or admin counters.
+      const counted = !previous.seatExempt;
+      const beforeActive = counted && previous.status === 'active';
+      const afterActive = counted && next.status === 'active';
       const activeUsers = ctx.tenant.activeUsers + Number(afterActive) - Number(beforeActive);
       const activeAdmins =
         ctx.tenant.activeAdmins +
@@ -383,13 +437,14 @@ export class UserService {
         'Mantenha pelo menos um administrador ativo',
       );
       requireCondition(
-        !afterActive || identity?.status === 'active',
+        next.status !== 'active' ||
+          (identity?.status === 'active' && (counted || holderIsPlatformAdmin)),
         403,
         'FORBIDDEN',
         'Identidade indisponível',
       );
       requireCondition(
-        activeUsers + pending.size <= ctx.subscription.userLimit,
+        activeUsers + reservedSeats(pending) <= ctx.entitlements.userLimit,
         409,
         'USER_LIMIT_REACHED',
         'Limite de usuários atingido',

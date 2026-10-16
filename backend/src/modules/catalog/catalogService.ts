@@ -14,6 +14,7 @@ import type { AccessService } from '../auth/accessService.js';
 import type { Actor } from '../../shared/types/context.js';
 import type { Firebase } from '../../infrastructure/firebase/client.js';
 import { publicCatalogAllowed } from '../users/permissions.js';
+import { entitlementsFor, hasFeature } from '../plans/catalog.js';
 import { AppError, requireCondition } from '../../shared/errors/appError.js';
 import { recordAudit } from '../../shared/audit/audit.js';
 import { digest, stableJson, equalDigest } from '../../shared/utils/crypto.js';
@@ -162,7 +163,8 @@ export class CatalogService {
     requireCondition(
       subscription?.id === tenant.subscriptionId &&
         subscription.tenantId === tenant.id &&
-        publicCatalogAllowed(subscription.status),
+        publicCatalogAllowed(subscription.status) &&
+        hasFeature(entitlementsFor(subscription), 'catalog.public'),
       404,
       'CATALOG_UNAVAILABLE',
       'Catálogo indisponível',

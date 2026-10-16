@@ -11,7 +11,7 @@ import {
   decodeCursor,
   invitationToken,
 } from '../../src/shared/utils/crypto.js';
-import { inviteInput, updateSubscriptionInput } from '../../src/shared/schemas/http.js';
+import { inviteInput, subscriptionTermsInput } from '../../src/shared/schemas/http.js';
 import { openApiDocument } from '../../src/modules/auth/openapi.js';
 import { routeDefinitions } from '../../src/app/routes.js';
 describe('Contratos e políticas da fundação', () => {
@@ -62,7 +62,7 @@ describe('Contratos e políticas da fundação', () => {
   });
   it('valores comerciais inválidos são rejeitados', () =>
     expect(
-      updateSubscriptionInput.safeParse({
+      subscriptionTermsInput.safeParse({
         expectedVersion: 1,
         monthlyPriceCents: 1.5,
         reason: 'Teste',

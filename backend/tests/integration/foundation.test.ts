@@ -8,6 +8,8 @@ import {
   newUser,
   issue,
   join,
+  tenantInput,
+  blockSubscription,
 } from '../helpers/fixture.js';
 const f = registerFixture();
 describe('Fundação com Auth e Firestore Emulator reais', () => {
@@ -44,7 +46,7 @@ describe('Fundação com Auth e Firestore Emulator reais', () => {
     expect(
       (await f.firebase.db.doc(`subscriptions/${f.tenantA.tenant.id}`).get()).data()
         ?.monthlyPriceCents,
-    ).toBe(20000);
+    ).toBe(19900);
   });
   it('permite administrador e vendedor com permissões atuais no servidor', async () => {
     const seller = await newUser(f, 'seller');
@@ -183,11 +185,7 @@ describe('Fundação com Auth e Firestore Emulator reais', () => {
   it.each(['suspended', 'canceled'] as const)(
     '%s bloqueia todas as rotas privadas e não bloqueia plataforma',
     async (status) => {
-      await request(f.app)
-        .patch(`/api/v1/admin/subscriptions/${f.tenantA.subscription.id}`)
-        .set(bearer(f.platform))
-        .send({ expectedVersion: 1, status, reason: 'Teste de política' })
-        .expect(200);
+      await blockSubscription(f, status);
       for (const path of ['/tenants/current', '/users']) {
         const denied = await request(f.app)
           .get(`/api/v1${path}`)
@@ -210,51 +208,38 @@ describe('Fundação com Auth e Firestore Emulator reais', () => {
       expect(me.body.data.memberships[0]).not.toHaveProperty('monthlyPriceCents');
     },
   );
-  it('past_due mantém acesso e reativação restaura permissões atuais', async () => {
+  it('past_due legado mantém acesso e reativação restaura permissões atuais', async () => {
     const path = `/api/v1/admin/subscriptions/${f.tenantA.subscription.id}`;
-    await request(f.app)
-      .patch(path)
-      .set(bearer(f.platform))
-      .send({ expectedVersion: 1, status: 'past_due', reason: 'Teste' })
-      .expect(200);
+    await f.firebase.db.doc(`subscriptions/${f.tenantA.subscription.id}`).update({
+      status: 'past_due',
+    });
     await request(f.app)
       .get('/api/v1/users')
       .set(tenantHeaders(f.ownerA, f.tenantA.tenant.id))
       .expect(200);
     await request(f.app)
-      .patch(path)
+      .post(`${path}/suspend`)
       .set(bearer(f.platform))
-      .send({ expectedVersion: 2, status: 'suspended', reason: 'Teste' })
+      .send({ expectedVersion: 1, reason: 'Teste' })
       .expect(200);
-    await request(f.app)
-      .patch(path)
+    const reactivated = await request(f.app)
+      .post(`${path}/reactivate`)
       .set(bearer(f.platform))
-      .send({ expectedVersion: 3, status: 'active', reason: 'Teste' })
+      .send({ expectedVersion: 2, reason: 'Teste' })
       .expect(200);
+    expect(reactivated.body.data.status).toBe('active');
     await request(f.app)
       .get('/api/v1/users')
       .set(tenantHeaders(f.ownerA, f.tenantA.tenant.id))
       .expect(200);
   });
-  it('plano versionado não altera contrato; condições especiais só mudam assinatura explicitamente', async () => {
+  it('condições especiais só mudam a assinatura indicada, explicitamente', async () => {
+    expect(f.tenantA.subscription.monthlyPriceCents).toBe(19900);
     await request(f.app)
-      .patch(`/api/v1/admin/plans/${f.plan.id}`)
-      .set(bearer(f.platform))
-      .send({ expectedVersion: 1, monthlyPriceCents: 30000 })
-      .expect(200);
-    expect(
-      (await f.firebase.db.doc(`subscriptions/${f.tenantA.subscription.id}`).get()).data()
-        ?.monthlyPriceCents,
-    ).toBe(20000);
-    expect(
-      (await f.firebase.db.doc(`plans/${f.plan.id}/versions/1`).get()).data()?.monthlyPriceCents,
-    ).toBe(20000);
-    await request(f.app)
-      .patch(`/api/v1/admin/subscriptions/${f.tenantA.subscription.id}`)
+      .post(`/api/v1/admin/subscriptions/${f.tenantA.subscription.id}/terms`)
       .set(bearer(f.platform))
       .send({
         expectedVersion: 1,
-        signupFeeCents: 0,
         monthlyPriceCents: 18000,
         commercialNotes:
           'Condição sintética para teste do piloto; não é uma condição real aprovada',
@@ -262,20 +247,17 @@ describe('Fundação com Auth e Firestore Emulator reais', () => {
       })
       .expect(200);
     expect(
+      (await f.firebase.db.doc(`subscriptions/${f.tenantA.subscription.id}`).get()).data()
+        ?.monthlyPriceCents,
+    ).toBe(18000);
+    expect(
       (await f.firebase.db.doc(`subscriptions/${f.tenantB.subscription.id}`).get()).data()
         ?.monthlyPriceCents,
-    ).toBe(20000);
-    expect((await f.firebase.db.doc(`plans/${f.plan.id}`).get()).data()?.monthlyPriceCents).toBe(
-      30000,
-    );
+    ).toBe(19900);
   });
   it('idempotência impede criação duplicada e conflito de payload', async () => {
     const key = randomUUID();
-    const body = {
-      name: 'Nova empresa sintética',
-      planId: f.plan.id,
-      ownerEmail: f.outsider.email,
-    };
+    const body = tenantInput('Nova empresa sintética', f.outsider.email);
     const first = await request(f.app)
       .post('/api/v1/admin/tenants')
       .set(bearer(f.platform))
@@ -332,7 +314,7 @@ describe('Fundação com Auth e Firestore Emulator reais', () => {
       .post('/api/v1/admin/tenants')
       .set(bearer(f.platform))
       .set('Idempotency-Key', randomUUID())
-      .send({ name: 'Provisionamento sintético', planId: f.plan.id, ownerEmail: f.outsider.email })
+      .send(tenantInput('Provisionamento sintético', f.outsider.email))
       .expect(201);
     const id = created.body.data.tenant.id;
     const key = randomUUID();

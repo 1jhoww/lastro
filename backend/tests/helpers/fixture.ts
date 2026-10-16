@@ -7,7 +7,9 @@ import type { Express } from 'express';
 import { loadConfig, type Config } from '../../src/config/env.js';
 import { createFirebase, type Firebase } from '../../src/infrastructure/firebase/client.js';
 import { createApp } from '../../src/app/app.js';
-import { createdTenantView, planView } from '../../src/shared/schemas/http.js';
+import { createdTenantView } from '../../src/shared/schemas/http.js';
+import { billingDate } from '../../src/modules/billing/calendar.js';
+import type { PlanCode } from '../../src/modules/plans/catalog.js';
 import type { z } from 'zod';
 export interface TestUser {
   uid: string;
@@ -22,7 +24,6 @@ export interface Fixture {
   ownerA: TestUser;
   ownerB: TestUser;
   outsider: TestUser;
-  plan: z.infer<typeof planView>;
   tenantA: z.infer<typeof createdTenantView>;
   tenantB: z.infer<typeof createdTenantView>;
   offset: number;
@@ -52,10 +53,61 @@ export async function newUser(f: Fixture, label: string, verified = true): Promi
   return { uid, email, token: body.idToken };
 }
 export const bearer = (user: TestUser) => ({ Authorization: `Bearer ${user.token}` });
+/** Awaits an async request helper and asserts its status with the error code in the message. */
+export async function expectStatus(pending: PromiseLike<request.Response>, status: number) {
+  const response = await pending;
+  if (response.status !== status)
+    throw new Error(
+      `Esperado ${status}, recebido ${response.status}: ${response.body?.error?.code}`,
+    );
+  return response;
+}
 export const tenantHeaders = (user: TestUser, tenantId: string) => ({
   ...bearer(user),
   'X-Tenant-Id': tenantId,
 });
+/** POST /admin/tenants body on an official plan, billing from today. */
+export const tenantInput = (
+  name: string,
+  ownerEmail: string,
+  planCode: PlanCode = 'profissional',
+  extra: object = {},
+) => ({
+  name,
+  ownerEmail,
+  planCode,
+  billingDay: 10,
+  billingStartsOn: billingDate(new Date()),
+  ...extra,
+});
+/** Current subscription version, for commands that require `expectedVersion`. */
+export async function subscriptionVersion(f: Fixture, tenantId = f.tenantA.tenant.id) {
+  return (await f.firebase.db.doc(`subscriptions/${tenantId}`).get()).get('version') as number;
+}
+/**
+ * Blocks the company's access. Suspension uses the Super Admin command; `canceled` is a legacy
+ * state with no command (cancellation is not offered), so it is written directly.
+ */
+export async function blockSubscription(
+  f: Fixture,
+  status: 'suspended' | 'canceled',
+  tenantId = f.tenantA.tenant.id,
+) {
+  if (status === 'canceled') {
+    await f.firebase.db.doc(`subscriptions/${tenantId}`).update({ status });
+    return;
+  }
+  await expectStatus(
+    request(f.app)
+      .post(`/api/v1/admin/subscriptions/${tenantId}/suspend`)
+      .set(bearer(f.platform))
+      .send({
+        expectedVersion: await subscriptionVersion(f, tenantId),
+        reason: 'Bloqueio de teste',
+      }),
+    200,
+  );
+}
 async function clearLocalFixture(url: string) {
   // Emulator locks can outlive the completed request. Retry only its known
   // clearData lock-timeout response; never retry assertions/application commands.
@@ -122,18 +174,7 @@ export function registerFixture(options: { rateLimitMax?: number } = {}): Fixtur
     await f.firebase.db
       .doc(`platformAdmins/${f.platform.uid}`)
       .set({ uid: f.platform.uid, status: 'active', createdAt: now, schemaVersion: 1 });
-    const plan = await request(f.app)
-      .post('/api/v1/admin/plans')
-      .set(bearer(f.platform))
-      .set('Idempotency-Key', randomUUID())
-      .send({
-        name: 'Lastro Inicial',
-        signupFeeCents: 15000,
-        monthlyPriceCents: 20000,
-        userLimit: 2,
-      })
-      .expect(201);
-    f.plan = planView.parse(plan.body.data);
+    // Profissional: 2 users and every existing capability, as the former test plan.
     for (const [name, owner, field] of [
       ['Empresa A', f.ownerA, 'tenantA'],
       ['Empresa B', f.ownerB, 'tenantB'],
@@ -142,7 +183,7 @@ export function registerFixture(options: { rateLimitMax?: number } = {}): Fixtur
         .post('/api/v1/admin/tenants')
         .set(bearer(f.platform))
         .set('Idempotency-Key', randomUUID())
-        .send({ name, planId: f.plan.id, ownerEmail: owner.email })
+        .send(tenantInput(name, owner.email))
         .expect(201);
       f[field] = createdTenantView.parse(response.body.data);
       await request(f.app)

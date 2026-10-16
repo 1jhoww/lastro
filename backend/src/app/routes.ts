@@ -48,6 +48,13 @@ import type { Download } from '../modules/documents/download.js';
 import { executionRoutes } from './executionRoutes.js';
 import { FinancialExecutions } from '../modules/finance/resolution/executionService.js';
 import * as executionSchemas from '../modules/finance/resolution/executionModel.js';
+import { platformRoutes } from './platformRoutes.js';
+import { billingRoutes } from './billingRoutes.js';
+import * as billingSchemas from '../shared/schemas/billing.js';
+import { BillingService } from '../modules/billing/billingService.js';
+import { CompanyService } from '../modules/platformAdmin/companyService.js';
+import * as platformSchemas from '../shared/schemas/platform.js';
+import { SubscriptionService } from '../modules/platformAdmin/subscriptionService.js';
 
 export interface Route {
   method: 'get' | 'post' | 'patch' | 'delete' | 'put';
@@ -77,6 +84,8 @@ export const routeDefinitions: Route[] = [
   ...orderRoutes,
   ...inventoryRoutes,
   ...commercialRoutes,
+  ...platformRoutes,
+  ...billingRoutes,
   { method: 'get', path: '/me', operationId: 'getMe', scope: 'identity', output: s.meView },
   {
     method: 'get',
@@ -187,25 +196,8 @@ export const routeDefinitions: Route[] = [
     scope: 'platform',
     query: s.pageQuery,
     output: s.pageOf(s.planView),
-  },
-  {
-    method: 'post',
-    path: '/admin/plans',
-    operationId: 'createPlan',
-    scope: 'platform',
-    body: s.createPlanInput,
-    output: s.planView,
-    status: 201,
-    idempotent: true,
-  },
-  {
-    method: 'patch',
-    path: '/admin/plans/:id',
-    operationId: 'updatePlan',
-    scope: 'platform',
-    params: s.idParams,
-    body: s.updatePlanInput,
-    output: s.planView,
+    description:
+      'Planos personalizados anteriores ao catálogo oficial (somente leitura). Planos oficiais: /admin/plan-catalog.',
   },
   {
     method: 'get',
@@ -214,15 +206,6 @@ export const routeDefinitions: Route[] = [
     scope: 'platform',
     query: s.pageQuery,
     output: s.pageOf(s.subscriptionView),
-  },
-  {
-    method: 'patch',
-    path: '/admin/subscriptions/:id',
-    operationId: 'updateSubscription',
-    scope: 'platform',
-    params: s.idParams,
-    body: s.updateSubscriptionInput,
-    output: s.subscriptionView,
   },
 ];
 
@@ -256,6 +239,15 @@ export function createRoutes(
 ): Router {
   const router = Router();
   const executions = new FinancialExecutions(finance, returns);
+  const subscriptions = new SubscriptionService(platform.repo, platform.access, clock);
+  const billing = new BillingService(platform.repo, platform.access, platform.config, clock);
+  const companies = new CompanyService(
+    platform.repo,
+    platform.access,
+    users.auth,
+    platform.config,
+    clock,
+  );
   const handlers: Record<string, (req: Request) => Promise<unknown>> = {
     startFinancialCancellationExecution: (req) =>
       executions.startCancellation(
@@ -788,18 +780,64 @@ export function createRoutes(
         idempotencyKey(req),
       ),
     listPlans: (req) => platform.list(actorFor(req), 'plans', limitFor(req), cursorFor(req)),
-    createPlan: (req) =>
-      platform.createPlan(actorFor(req), s.createPlanInput.parse(req.body), idempotencyKey(req)),
-    updatePlan: (req) =>
-      platform.updatePlan(actorFor(req), idFor(req), s.updatePlanInput.parse(req.body)),
     listSubscriptions: (req) =>
       platform.list(actorFor(req), 'subscriptions', limitFor(req), cursorFor(req)),
-    updateSubscription: (req) =>
-      platform.updateSubscription(
+    getPlanCatalog: (req) => subscriptions.catalog(actorFor(req)),
+    previewPlanChange: (req) =>
+      subscriptions.previewPlanChange(
         actorFor(req),
         idFor(req),
-        s.updateSubscriptionInput.parse(req.body),
+        s.planChangeQuery.parse(req.query).planCode,
       ),
+    changeSubscriptionPlan: (req) =>
+      subscriptions.changePlan(actorFor(req), idFor(req), s.changePlanInput.parse(req.body)),
+    activateSubscription: (req) =>
+      subscriptions.activate(
+        actorFor(req),
+        idFor(req),
+        s.activateSubscriptionInput.parse(req.body),
+      ),
+    updateSubscriptionTerms: (req) =>
+      subscriptions.updateTerms(
+        actorFor(req),
+        idFor(req),
+        s.subscriptionTermsInput.parse(req.body),
+      ),
+    suspendSubscription: (req) =>
+      subscriptions.suspend(actorFor(req), idFor(req), s.subscriptionCommandInput.parse(req.body)),
+    reactivateSubscription: (req) =>
+      subscriptions.reactivate(
+        actorFor(req),
+        idFor(req),
+        s.subscriptionCommandInput.parse(req.body),
+      ),
+    getSubscriptionHistory: (req) => subscriptions.history(actorFor(req), idFor(req)),
+    listCharges: (req) =>
+      billing.list(actorFor(req), billingSchemas.chargeListQuery.parse(req.query)),
+    createCharge: (req) =>
+      billing.create(actorFor(req), billingSchemas.createChargeInput.parse(req.body)),
+    generateCharges: (req) => billing.generateNow(actorFor(req)),
+    payCharge: (req) =>
+      billing.pay(actorFor(req), idFor(req), billingSchemas.payChargeInput.parse(req.body)),
+    correctCharge: (req) =>
+      billing.correct(actorFor(req), idFor(req), billingSchemas.correctChargeInput.parse(req.body)),
+    cancelCharge: (req) =>
+      billing.cancel(actorFor(req), idFor(req), billingSchemas.cancelChargeInput.parse(req.body)),
+    getChargeHistory: (req) => billing.history(actorFor(req), idFor(req)),
+    getPlatformOverview: (req) => companies.overview(actorFor(req)),
+    listCompanies: (req) =>
+      companies.companies(actorFor(req), platformSchemas.companyQuery.parse(req.query)),
+    getCompany: (req) => companies.company(actorFor(req), idFor(req)),
+    revokeCompanyInvitation: (req) => {
+      const params = platformSchemas.companyInvitationParams.parse(req.params);
+      return companies.revokeInvitation(
+        actorFor(req),
+        params.id,
+        params.invitationId,
+        platformSchemas.revokeInvitationInput.parse(req.body).reason,
+      );
+    },
+    listOwnerInvitations: (req) => companies.ownerInvitations(actorFor(req)),
   };
   for (const definition of routeDefinitions) {
     if (definition.scope === 'public') continue;

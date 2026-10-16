@@ -3,8 +3,6 @@ import { deleteApp } from 'firebase-admin/app';
 import { loadConfig } from '../src/config/env.js';
 import { createFirebase } from '../src/infrastructure/firebase/client.js';
 import { FoundationRepository } from '../src/infrastructure/repositories/foundationRepository.js';
-import { AccessService } from '../src/modules/auth/accessService.js';
-import { PlatformService } from '../src/modules/platformAdmin/platformService.js';
 import { recordAudit } from '../src/shared/audit/audit.js';
 const config = loadConfig();
 if (config.mode !== 'emulator' || config.projectId !== 'demo-lastro-phase-a')
@@ -75,22 +73,7 @@ try {
       `Email local: platform.demo@lastro.invalid\nSenha temporária local (não reutilizar): ${password}`,
     );
   }
-  const plans = await firebase.db.collection('plans').limit(1).get();
-  if (plans.empty) {
-    const service = new PlatformService(repo, new AccessService(repo), config);
-    await service.createPlan(
-      {
-        uid,
-        email: 'platform.demo@lastro.invalid',
-        emailVerified: true,
-        authTime: Date.now() / 1000,
-        requestId: randomUUID(),
-      },
-      { name: 'Lastro Inicial', signupFeeCents: 15000, monthlyPriceCents: 20000, userLimit: 2 },
-      randomUUID(),
-    );
-    console.log('Plano inicial criado como dados configuráveis; nenhuma empresa real criada.');
-  }
+  // Plans are the official catalog in code (Essencial, Profissional); nothing to seed.
 } finally {
   await firebase.db.terminate();
   await deleteApp(firebase.app);

@@ -1,5 +1,6 @@
 import type { Role, Subscription } from '../../shared/schemas/models.js';
 import { AppError } from '../../shared/errors/appError.js';
+import { withinPlan, type Entitlements } from '../plans/catalog.js';
 const seller = [
   'tenant:read',
   'products:read',
@@ -37,6 +38,23 @@ export type Permission = (typeof administrator)[number];
 export function permissionsFor(role: Role): readonly Permission[] {
   return role === 'administrator' ? administrator : seller;
 }
+/** Role permissions limited to what the contracted plan includes. */
+export function effectivePermissions(role: Role, entitlements: Entitlements): Permission[] {
+  return withinPlan(permissionsFor(role), entitlements);
+}
+/** Distinguishes "the role cannot" (FORBIDDEN) from "the plan does not include" it. */
+export function requirePermission(
+  role: Role,
+  entitlements: Entitlements,
+  permission: Permission,
+): void {
+  if (!permissionsFor(role).includes(permission))
+    throw new AppError(403, 'FORBIDDEN', 'Operação não permitida');
+  if (!effectivePermissions(role, entitlements).includes(permission)) throw featureNotInPlan();
+}
+export function featureNotInPlan(): AppError {
+  return new AppError(403, 'FEATURE_NOT_IN_PLAN', 'Recurso indisponível no plano contratado');
+}
 export function enforceSubscription(status: Subscription['status']): void {
   if (status === 'suspended')
     throw new AppError(403, 'SUBSCRIPTION_SUSPENDED', 'Acesso indisponível para esta empresa');
@@ -45,5 +63,5 @@ export function enforceSubscription(status: Subscription['status']): void {
 }
 // Shared by private endpoints and, in a future phase, the public catalog.
 export function publicCatalogAllowed(status: Subscription['status']): boolean {
-  return status === 'active' || status === 'past_due';
+  return status === 'pending' || status === 'active' || status === 'past_due';
 }

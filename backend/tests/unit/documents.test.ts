@@ -173,11 +173,11 @@ describe('CSV G', () => {
   });
   it('publica seis downloads privados com mídias e paginação', () => {
     const api = openApiDocument();
-    expect(api.info.version).toBe('0.8.1');
+    expect(api.info.version).toBe('0.9.0');
     const json = JSON.stringify(api);
     expect(json).toContain('application/pdf');
     expect(json).toContain('text/csv');
     expect(json).toContain('X-Next-Cursor');
-    expect(Object.values(api.paths).reduce((n, p) => n + Object.keys(p).length, 0)).toBe(114);
+    expect(Object.values(api.paths).reduce((n, p) => n + Object.keys(p).length, 0)).toBe(131);
   });
 });

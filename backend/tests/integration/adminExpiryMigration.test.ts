@@ -3,28 +3,23 @@ import request from 'supertest';
 import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { Timestamp } from 'firebase-admin/firestore';
-import { registerFixture, bearer } from '../helpers/fixture.js';
+import { registerFixture, bearer, tenantInput } from '../helpers/fixture.js';
 import { digest } from '../../src/shared/utils/crypto.js';
 
 const f = registerFixture();
 describe('F04: conversão administrativa local supervisionada', () => {
   it('dry-run e páginas com checkpoint conservam registros, resultados e replay', async () => {
     const key = randomUUID();
-    const body = {
-      name: 'Migração preservada',
-      signupFeeCents: 0,
-      monthlyPriceCents: 100,
-      userLimit: 2,
-    };
+    const body = tenantInput('Migração preservada', f.outsider.email);
     const call = () =>
       request(f.app)
-        .post('/api/v1/admin/plans')
+        .post('/api/v1/admin/tenants')
         .set(bearer(f.platform))
         .set('Idempotency-Key', key)
         .send(body);
-    const plan = (await call().expect(201)).body.data;
+    const created = (await call().expect(201)).body.data.tenant;
     const ref = f.firebase.db.doc(
-      `idempotencyRecords/${digest(`${f.platform.uid}:plan.create:${key}`)}`,
+      `idempotencyRecords/${digest(`${f.platform.uid}:tenant.create:${key}`)}`,
     );
     const deadline = new Date(Date.now() + 30 * 86400000).toISOString();
     await ref.update({ expiresAt: deadline });
@@ -32,9 +27,9 @@ describe('F04: conversão administrativa local supervisionada', () => {
     for (let i = 0; i < 103; i++)
       batch.create(f.firebase.db.doc(`idempotencyRecords/${digest(`migration-${i}`)}`), {
         actorUid: f.platform.uid,
-        operation: 'plan.create',
+        operation: 'tenant.create',
         payloadHash: digest(`input-${i}`),
-        result: { id: plan.id },
+        result: { id: created.id },
         createdAt: new Date().toISOString(),
         expiresAt: deadline,
         schemaVersion: 1,
@@ -76,7 +71,7 @@ describe('F04: conversão administrativa local supervisionada', () => {
         typeof old === 'string' ? old : old.toDate().toISOString(),
       );
     }
-    expect((await call().expect(201)).body.data.id).toBe(plan.id);
+    expect((await call().expect(201)).body.data.tenant.id).toBe(created.id);
     expect(run().converted).toBe(0);
   }, 60_000);
 });

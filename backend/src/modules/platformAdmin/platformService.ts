@@ -11,13 +11,9 @@ import {
   subscriptionSchema,
   invitationSchema,
   idempotencySchema,
-  type Subscription,
 } from '../../shared/schemas/models.js';
 import {
-  createPlanInput,
-  updatePlanInput,
   createTenantInput,
-  updateSubscriptionInput,
   ownerInviteInput,
   planView,
   tenantView,
@@ -26,6 +22,8 @@ import {
 } from '../../shared/schemas/http.js';
 import type { Actor } from '../../shared/types/context.js';
 import { recordAudit } from '../../shared/audit/audit.js';
+import { planCatalog } from '../plans/catalog.js';
+import { requireBillingStart } from './subscriptionService.js';
 import {
   digest,
   stableJson,
@@ -58,81 +56,10 @@ export class PlatformService {
     );
     return { ref, existing, hash: digest(stableJson(input)) };
   }
-  async createPlan(actor: Actor, input: z.infer<typeof createPlanInput>, key: string) {
-    const id = randomUUID();
-    const now = this.clock().toISOString();
-    return this.repo.db.runTransaction(async (tx) => {
-      await this.access.platform(actor, tx);
-      const replay = await this.replay(tx, actor, 'plan.create', key, input);
-      if (replay.existing) {
-        const p = await this.repo.read(
-          this.repo.global('plans', replay.existing.result.id ?? ''),
-          planSchema,
-          tx,
-        );
-        requireCondition(p, 409, 'CONFLICT', 'Resultado indisponível');
-        return planView.parse(p);
-      }
-      const plan = planSchema.parse({
-        ...input,
-        id,
-        version: 1,
-        status: 'active',
-        createdAt: now,
-        updatedAt: now,
-        schemaVersion: 1,
-      });
-      const ref = this.repo.global('plans', id);
-      tx.create(ref, plan);
-      tx.create(ref.collection('versions').doc('1'), plan);
-      tx.create(replay.ref, {
-        actorUid: actor.uid,
-        operation: 'plan.create',
-        payloadHash: replay.hash,
-        result: { id },
-        createdAt: now,
-        expiresAt: Timestamp.fromMillis(this.clock().getTime() + 30 * 86400000),
-        schemaVersion: 1,
-      });
-      recordAudit(this.repo, tx, actor, null, 'plan.created', id, now, { version: 1 });
-      return planView.parse(plan);
-    });
-  }
-  async updatePlan(actor: Actor, id: string, input: z.infer<typeof updatePlanInput>) {
-    const now = this.clock().toISOString();
-    return this.repo.db.runTransaction(async (tx) => {
-      await this.access.platform(actor, tx);
-      const ref = this.repo.global('plans', id);
-      const previous = await this.repo.read(ref, planSchema, tx);
-      requireCondition(previous, 404, 'RESOURCE_NOT_FOUND', 'Recurso não encontrado');
-      requireCondition(
-        previous.version === input.expectedVersion,
-        409,
-        'CONFLICT',
-        'Versão desatualizada',
-      );
-      const { expectedVersion: _version, ...changes } = input;
-      requireCondition(
-        Object.keys(changes).length > 0,
-        422,
-        'VALIDATION_ERROR',
-        'Informe uma alteração',
-      );
-      const next = planSchema.parse({
-        ...previous,
-        ...changes,
-        version: previous.version + 1,
-        updatedAt: now,
-      });
-      tx.set(ref, next);
-      tx.create(ref.collection('versions').doc(String(next.version)), next);
-      recordAudit(this.repo, tx, actor, null, 'plan.version.created', id, now, {
-        previousVersion: previous.version,
-        version: next.version,
-      });
-      return planView.parse(next);
-    });
-  }
+  /**
+   * Creates the company, its contract on an official plan and the first administrator's
+   * invitation in one transaction. Billing starts on `billingStartsOn`, never before today.
+   */
   async createTenant(actor: Actor, input: z.infer<typeof createTenantInput>, key: string) {
     const id = randomUUID();
     const inviteId = randomUUID();
@@ -167,8 +94,9 @@ export class PlatformService {
           },
         };
       }
-      const plan = await this.repo.read(this.repo.global('plans', input.planId), planSchema, tx);
-      requireCondition(plan?.status === 'active', 422, 'VALIDATION_ERROR', 'Plano indisponível');
+      const plan = planCatalog[input.planCode];
+      requireCondition(plan.offered, 422, 'VALIDATION_ERROR', 'Plano indisponível');
+      requireBillingStart(input.billingStartsOn, this.clock());
       const tenant = tenantSchema.parse({
         id,
         name: input.name,
@@ -185,14 +113,23 @@ export class PlatformService {
       const subscription = subscriptionSchema.parse({
         id,
         tenantId: id,
-        planId: plan.id,
+        planId: plan.code,
         planVersion: plan.version,
+        planCode: plan.code,
         status: 'active',
-        signupFeeCents: plan.signupFeeCents,
-        monthlyPriceCents: plan.monthlyPriceCents,
+        signupFeeCents: 0,
+        monthlyPriceCents: input.monthlyPriceCents ?? plan.referencePriceCents,
         userLimit: plan.userLimit,
         startsAt: now,
-        commercialNotes: null,
+        billingDay: input.billingDay,
+        billingStartsOn: input.billingStartsOn,
+        // The first administrator is the default contact until the Super Admin sets another.
+        billingContact: input.billingContact ?? {
+          name: null,
+          email: input.ownerEmail,
+          phone: null,
+        },
+        commercialNotes: input.commercialNotes ?? null,
         version: 1,
         createdAt: now,
         updatedAt: now,
@@ -229,84 +166,18 @@ export class PlatformService {
         schemaVersion: 1,
       });
       recordAudit(this.repo, tx, actor, null, 'tenant.created', id, now, {
-        planId: plan.id,
+        planCode: plan.code,
         planVersion: plan.version,
+        monthlyPriceCents: subscription.monthlyPriceCents,
+        userLimit: subscription.userLimit,
+        billingDay: subscription.billingDay,
+        billingStartsOn: subscription.billingStartsOn,
       });
       return {
         tenant: tenantView.parse(tenant),
         subscription: subscriptionView.parse(subscription),
         ownerInvitation: { invitation: invitationView.parse(invite), token },
       };
-    });
-  }
-  async updateSubscription(
-    actor: Actor,
-    id: string,
-    input: z.infer<typeof updateSubscriptionInput>,
-  ) {
-    const now = this.clock().toISOString();
-    return this.repo.db.runTransaction(async (tx) => {
-      await this.access.platform(actor, tx);
-      const ref = this.repo.global('subscriptions', id);
-      const previous = await this.repo.read(ref, subscriptionSchema, tx);
-      requireCondition(previous, 404, 'RESOURCE_NOT_FOUND', 'Recurso não encontrado');
-      const tenant = await this.repo.read(
-        this.repo.global('tenants', previous.tenantId),
-        tenantSchema,
-        tx,
-      );
-      requireCondition(tenant, 404, 'RESOURCE_NOT_FOUND', 'Recurso não encontrado');
-      const pending = await tx.get(
-        this.repo.db
-          .collection(`tenants/${tenant.id}/invitations`)
-          .where('status', '==', 'pending')
-          .where('expiresAt', '>', now)
-          .limit(101),
-      );
-      requireCondition(
-        previous.version === input.expectedVersion,
-        409,
-        'CONFLICT',
-        'Versão desatualizada',
-      );
-      const transitions: Record<Subscription['status'], readonly Subscription['status'][]> = {
-        active: ['active', 'past_due', 'suspended', 'canceled'],
-        past_due: ['past_due', 'active', 'suspended', 'canceled'],
-        suspended: ['suspended', 'active', 'canceled'],
-        canceled: ['canceled'],
-      };
-      requireCondition(
-        !input.status || transitions[previous.status].includes(input.status),
-        409,
-        'CONFLICT',
-        'Transição de assinatura inválida',
-      );
-      requireCondition(
-        (input.userLimit ?? previous.userLimit) >= tenant.activeUsers + pending.size,
-        409,
-        'USER_LIMIT_REACHED',
-        'Limite inferior à capacidade já ocupada',
-      );
-      const { expectedVersion: _version, reason, ...changes } = input;
-      requireCondition(
-        Object.keys(changes).length > 0,
-        422,
-        'VALIDATION_ERROR',
-        'Informe uma alteração',
-      );
-      const next = subscriptionSchema.parse({
-        ...previous,
-        ...changes,
-        version: previous.version + 1,
-        updatedAt: now,
-      });
-      tx.set(ref, next);
-      recordAudit(this.repo, tx, actor, null, 'subscription.updated', id, now, {
-        previous: subscriptionView.parse(previous),
-        current: subscriptionView.parse(next),
-        reason,
-      });
-      return subscriptionView.parse(next);
     });
   }
   async list(
@@ -365,7 +236,10 @@ export class PlatformService {
         tx,
       );
       requireCondition(
-        subscription && (subscription.status === 'active' || subscription.status === 'past_due'),
+        subscription &&
+          (subscription.status === 'pending' ||
+            subscription.status === 'active' ||
+            subscription.status === 'past_due'),
         403,
         'SUBSCRIPTION_INACTIVE',
         'Empresa indisponível',

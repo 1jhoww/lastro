@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
-import { registerFixture, tenantHeaders, bearer } from '../helpers/fixture.js';
+import { registerFixture, tenantHeaders, blockSubscription } from '../helpers/fixture.js';
 import { seller, extraSeats, customerInput, productInput, png } from '../helpers/commercial.js';
 const f = registerFixture();
 const headers = () => tenantHeaders(f.ownerA, f.tenantA.tenant.id);
@@ -364,15 +364,8 @@ describe('Produtos, categorias e imagens privadas', () => {
   it('suspensão/cancelamento bloqueiam todos os novos grupos', async () => {
     const customer = await createCustomer().expect(201);
     const product = await createProduct().expect(201);
-    for (const [status, expectedVersion] of [
-      ['suspended', 1],
-      ['canceled', 2],
-    ] as const) {
-      await request(f.app)
-        .patch(`/api/v1/admin/subscriptions/${f.tenantA.subscription.id}`)
-        .set(bearer(f.platform))
-        .send({ expectedVersion, status, reason: 'Teste de bloqueio' })
-        .expect(200);
+    for (const status of ['suspended', 'canceled'] as const) {
+      await blockSubscription(f, status);
       for (const path of [
         '/customers',
         `/customers/${customer.body.data.id}`,
