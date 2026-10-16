@@ -207,3 +207,7 @@ Navegação autenticada, dados úteis, renderização e atualização visual nã
 ## Fechamento Git/deploy
 
 O commit de documentação desta auditoria será identificado no relatório final da execução. A branch de preservação é o destino remoto; main permanece no SHA inicial. Evidências brutas locais ficam em `frontend/.local/audit-*`; resumo sanitizado versionado acompanha este relatório. CI, auditoria arquitetural preexistente e GraphiFy permanecem preservados na árvore local, sem inclusão automática.
+
+### Atualização após instrução final do proprietário
+
+O proprietário pediu commitar os itens restantes e adiar a consulta de variáveis Vercel. O commit 6b9cece preservou .github/workflows/ci.yml, a auditoria arquitetural preexistente e graphify-out/GRAPH_REPORT.md. As menções anteriores a esses três arquivos como não commitados descrevem a primeira etapa, antes dessa instrução. CI foi preservado, não certificado por execução remota. Grafos JSON/HTML pesados, manifest e caches continuam locais, conforme exclusões originais. A verificação de ambiente remoto ficou adiada por decisão do proprietário.
