@@ -223,17 +223,28 @@ describe('pedidos: criação', () => {
     return w;
   }
 
-  async function buildCart() {
-    await fireEvent.press(await screen.findByRole('button', { name: 'Escolher Mercado Central' }));
-    await fireEvent.press(await screen.findByRole('button', { name: 'Adicionar Água 500 ml' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Adicionar Queijo' }));
-    const water = screen.getByLabelText('Quantidade de Água 500 ml');
-    await fireEvent.changeText(water, '3');
-    await fireEvent(water, 'blur');
-    const cheese = screen.getByLabelText('Quantidade de Queijo');
-    await fireEvent.changeText(cheese, '1,255');
-    await fireEvent(cheese, 'blur');
+  /** Cliente pelo combobox: o foco abre a lista e um toque escolhe. */
+  async function pickCustomer(name = 'Mercado Central') {
+    await fireEvent(await screen.findByLabelText('Cliente'), 'focus');
+    await fireEvent.press(await screen.findByRole('button', { name: `Escolher ${name}` }));
   }
+
+  /** Quantidade digitada na linha do catálogo (1ª ocorrência; o carrinho repete o controle). */
+  async function setCatalogQuantity(name: string, text: string) {
+    const input = (await screen.findAllByLabelText(`Quantidade de ${name}`))[0]!;
+    await fireEvent.changeText(input, text);
+    await fireEvent(input, 'blur');
+  }
+
+  async function buildCart() {
+    await pickCustomer();
+    await setCatalogQuantity('Água 500 ml', '3');
+    await setCatalogQuantity('Queijo', '1,255');
+  }
+
+  /** O total aparece no carrinho e, no celular, também na barra inferior. */
+  const totalShown = (label: string) =>
+    expect(screen.getAllByLabelText(label).length).toBeGreaterThan(0);
 
   it('vendedor: cliente, carrinho com UN e KG, prévia, vencimento manual e rascunho', async () => {
     const { gateway, server } = creationWorld();
@@ -247,23 +258,28 @@ describe('pedidos: criação', () => {
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/novo', overrides });
     await buildCart();
 
+    // Cliente escolhido fica fixo, com a opção de trocar.
+    expect(screen.getByRole('button', { name: 'Trocar cliente Mercado Central' })).toBeTruthy();
     // 3 × 2,50 + 1,255 kg × 45,90 (5.760,45 → 5.760) = 65,10
-    expect(screen.getByLabelText('Total previsto R$ 65,10')).toBeTruthy();
+    totalShown('Total previsto R$ 65,10');
     expect(screen.getByLabelText('Subtotal R$ 57,60')).toBeTruthy();
     // Disponível conhecido: 0,5 kg < 1,255 kg pedido.
     expect(
       screen.getByText('Disponível agora: 0,5 kg. A confirmação pode ser recusada.'),
     ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Queijo já está no carrinho' })).toBeDisabled();
+    // A linha do catálogo marca o que já está no carrinho.
+    expect(screen.getByLabelText('Queijo, no carrinho')).toBeTruthy();
+    // Vendedor vê o responsável (ele mesmo), sem poder trocar.
+    expect(screen.getByLabelText('Responsável: Você')).toBeDisabled();
+    // Sem condição de pagamento só dá para salvar o rascunho.
+    expect(screen.getByRole('button', { name: 'Confirmar pedido' })).toBeDisabled();
 
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar pedido' }));
-    expect(screen.queryByText('Responsável pelo pedido')).toBeNull();
     await fireEvent.press(screen.getByLabelText('Condição de pagamento: Definir depois'));
     await fireEvent.press(
       await screen.findByRole('radio', { name: /Definir vencimentos manualmente/ }),
     );
     await fireEvent.changeText(screen.getByLabelText('Vencimento'), '10/01/2099');
-    await fireEvent.press(screen.getByRole('button', { name: 'Criar rascunho' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar rascunho' }));
 
     expect(await screen.findByRole('header', { name: /PED-O9/ })).toBeTruthy();
     expect(sent).toEqual({
@@ -276,6 +292,27 @@ describe('pedidos: criação', () => {
       payment: { type: 'cash', dueDates: ['2099-01-10'] },
     });
     expect(calls(server, 'POST', '/api/v1/orders')).toHaveLength(1);
+  });
+
+  it('cliente escolhido mostra fantasia, documento e cidade do cadastro', async () => {
+    const { gateway, server } = creationWorld();
+    server.on('GET', '/api/v1/customers', () =>
+      ok(
+        page([
+          customer('c1', {
+            name: 'Mercado Central',
+            tradeName: 'Central',
+            document: '52998224725',
+            address: { city: 'São Paulo', state: 'SP' },
+          }),
+        ]),
+      ),
+    );
+    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/novo', overrides });
+    await pickCustomer();
+    expect(screen.getByText('Central · 529.982.247-25 · São Paulo/SP')).toBeTruthy();
+    // A busca do pedido só lista clientes ativos.
+    expect(calls(server, 'GET', '/api/v1/customers').at(-1)?.query.status).toBe('active');
   });
 
   it('condição cadastrada vai com ID e versão; admin escolhe o responsável', async () => {
@@ -303,13 +340,14 @@ describe('pedidos: criação', () => {
       })
       .on('GET', '/api/v1/orders/o9/history', () => ok(page([])));
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/novo', overrides });
-    await fireEvent.press(await screen.findByLabelText('Responsável pelo pedido: Você'));
+    // A lista de membros habilita a escolha do responsável (só administrador).
+    await waitFor(() => expect(screen.getByLabelText('Responsável: Você')).not.toBeDisabled());
+    await fireEvent.press(await screen.findByLabelText('Responsável: Você'));
     await fireEvent.press(await screen.findByRole('radio', { name: 'Vendedor V9ABCD' }));
     await buildCart();
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar pedido' }));
     await fireEvent.press(screen.getByLabelText('Condição de pagamento: Definir depois'));
     await fireEvent.press(await screen.findByRole('radio', { name: /30\/60 dias/ }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Criar rascunho' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar rascunho' }));
     await screen.findByRole('header', { name: /PED-O9/ });
     expect(sent).toMatchObject({
       paymentConditionId: 'cond1',
@@ -323,13 +361,12 @@ describe('pedidos: criação', () => {
     const { gateway, server } = creationWorld();
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/novo', overrides });
     await buildCart();
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar pedido' }));
     await fireEvent.press(screen.getByLabelText('Condição de pagamento: Definir depois'));
     await fireEvent.press(
       await screen.findByRole('radio', { name: /Definir vencimentos manualmente/ }),
     );
     await fireEvent.changeText(screen.getByLabelText('Vencimento'), '01/01/2000');
-    await fireEvent.press(screen.getByRole('button', { name: 'Criar rascunho' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar rascunho' }));
     expect(await screen.findByText('O vencimento não pode ser no passado.')).toBeTruthy();
     expect(calls(server, 'POST', '/api/v1/orders')).toHaveLength(0);
   });
@@ -341,8 +378,7 @@ describe('pedidos: criação', () => {
     });
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/novo', overrides });
     await buildCart();
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar pedido' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Criar rascunho' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar rascunho' }));
     expect(await screen.findByText('Não sabemos se o rascunho foi criado')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Ver rascunhos' })).toBeTruthy();
     expect(calls(server, 'POST', '/api/v1/orders')).toHaveLength(1);
@@ -353,8 +389,7 @@ describe('pedidos: criação', () => {
     server.on('POST', '/api/v1/orders', () => fail(409, 'PRODUCT_UNAVAILABLE'));
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/novo', overrides });
     await buildCart();
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar pedido' }));
-    await fireEvent.press(screen.getByRole('button', { name: 'Criar rascunho' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar rascunho' }));
     expect(
       await screen.findByText(
         'Um dos produtos foi desativado ou mudou de unidade. Remova-o do carrinho e salve de novo.',
@@ -379,7 +414,6 @@ describe('pedidos: edição de rascunho', () => {
     const qty = await screen.findByLabelText('Quantidade de Produto p1');
     await fireEvent.changeText(qty, '4');
     await fireEvent(qty, 'blur');
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar pedido' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar rascunho' }));
     await screen.findByRole('header', { name: /PED-O1/ });
     expect(sent).toMatchObject({
@@ -404,7 +438,6 @@ describe('pedidos: edição de rascunho', () => {
       });
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/o1/editar', overrides });
     await screen.findByLabelText('Quantidade de Produto p1');
-    await fireEvent.press(screen.getByRole('button', { name: 'Revisar pedido' }));
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar rascunho' }));
     expect(await screen.findByRole('button', { name: 'Carregar versão atual' })).toBeTruthy();
     await fireEvent.press(screen.getByRole('button', { name: 'Carregar versão atual' }));
@@ -876,7 +909,7 @@ describe('pedidos: carrinhos grandes', () => {
         initialUrl: '/pedidos/o1/editar',
         overrides,
       });
-      expect(await screen.findByText(`Carrinho (${n} ${n === 1 ? 'item' : 'itens'})`)).toBeTruthy();
+      expect(await screen.findByText(`Carrinho · ${n} ${n === 1 ? 'item' : 'itens'}`)).toBeTruthy();
       expect(screen.getAllByLabelText(/^Remover Produto p/)).toHaveLength(n);
 
       const last = screen.getByLabelText(`Quantidade de Produto p${n}`);
@@ -885,12 +918,11 @@ describe('pedidos: carrinhos grandes', () => {
       // Prévia: soma de (100 + i) centavos, com a última linha ×7.
       const expected = lines.reduce((a, l, i) => a + l.unitPriceCents * (i === n - 1 ? 7 : 1), 0);
       expect(
-        screen.getByLabelText(
+        screen.getAllByLabelText(
           `Total previsto ${`R$ ${Math.trunc(expected / 100).toLocaleString('pt-BR')},${String(expected % 100).padStart(2, '0')}`}`,
-        ),
-      ).toBeTruthy();
+        ).length,
+      ).toBeGreaterThan(0);
 
-      await fireEvent.press(screen.getByRole('button', { name: 'Revisar pedido' }));
       await fireEvent.press(screen.getByRole('button', { name: 'Salvar rascunho' }));
       await screen.findByRole('header', { name: /PED-O1/ });
       expect(saved?.lines).toHaveLength(n);

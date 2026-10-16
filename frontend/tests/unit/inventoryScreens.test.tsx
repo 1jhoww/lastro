@@ -771,9 +771,12 @@ describe('estoque: reposição', () => {
     });
     expect(await screen.findByText('Feijão 1 kg')).toBeTruthy();
     expect(screen.getByText('Faltam 4 un')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Ver reposição' })).toBeTruthy();
+    // Frase de atenção e atalho para a reposição completa.
+    expect(screen.getByText('1 produto precisa de atenção no estoque.')).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Ver estoque' })).toBeTruthy();
+    // Uma página de até 50 itens, maior falta primeiro (contagem mostra 50+ quando há mais).
     expect(calls(server, 'GET', '/api/v1/inventory/replenishment')[0]!.query).toMatchObject({
-      limit: '5',
+      limit: '50',
       sort: 'shortfall',
       direction: 'desc',
     });

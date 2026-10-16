@@ -75,5 +75,5 @@ it('trocar de empresa não mostra clientes da empresa anterior', async () => {
   const last = server.calls.filter((c) => c.path === '/api/v1/customers').at(-1);
   expect(last?.headers['x-tenant-id']).toBe('t2');
   // Perfil da empresa B (vendedor): a tela já reflete as permissões novas.
-  expect(screen.getByText('Os clientes da sua carteira.')).toBeTruthy();
+  expect(screen.queryByLabelText(/Responsável/)).toBeNull();
 });

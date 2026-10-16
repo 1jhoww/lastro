@@ -1,4 +1,4 @@
-import { Pressable, Text } from 'react-native';
+import { Linking, Pressable, Text } from 'react-native';
 import { fireEvent, screen, waitFor } from 'expo-router/testing-library';
 import { router, type Href } from 'expo-router';
 import Reports from '@/app/(app)/relatorios';
@@ -160,37 +160,76 @@ it('visitante abre catálogo sem login e sem cabeçalhos privados', async () => 
   }
   expect(server.calls.some((call) => call.path === '/api/v1/me')).toBe(false);
 });
-it('prévia usa linhas e quantidades canônicas; preços vêm do servidor', async () => {
+const whatsappUrl = 'https://wa.me/5511999999999?text=Or%C3%A7amento';
+/** Quantidade digitada no card do produto (o resumo do orçamento repete o controle). */
+async function chooseQuantity(text: string) {
+  const input = (await screen.findAllByLabelText('Quantidade de Café público'))[0]!;
+  await fireEvent.changeText(input, text);
+  await fireEvent(input, 'blur');
+}
+/** No celular o resumo fica num painel; no tablet/desktop, ao lado. */
+async function requestQuote() {
+  const open = screen.queryByRole('button', { name: 'Ver orçamento' });
+  if (open) await fireEvent.press(open);
+  await fireEvent.press(await screen.findByRole('button', { name: 'Solicitar orçamento' }));
+}
+const callsTo = (server: ReturnType<typeof createFakeApi>, suffix: string) =>
+  server.calls.filter((call) => call.path.endsWith(suffix));
+
+it('orçamento usa linhas e quantidades canônicas; preços vêm do servidor', async () => {
+  const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
   const { gateway, server } = world();
+  const price = 1600;
+  server
+    .on('POST', '/api/v1/public/catalogs/teste/quote-preview', () =>
+      ok({
+        ...preview,
+        lines: preview.lines.map((line) => ({ ...line, unitPriceCents: price })),
+      }),
+    )
+    .on('POST', '/api/v1/public/catalogs/teste/whatsapp', () => ok({ whatsappUrl }));
   await renderApp({ gateway, fetch: server.fetch, initialUrl: '/catalogo/teste', overrides });
-  await fireEvent.press(await screen.findByRole('button', { name: 'Selecionar Café público' }));
-  await fireEvent.changeText(screen.getByLabelText('Quantidade de Café público'), '0,125');
-  await fireEvent.press(screen.getByRole('button', { name: 'Revisar orçamento no servidor' }));
-  await screen.findByText('Total estimado: R$ 1,88');
-  expect(server.calls.find((call) => call.path.endsWith('/quote-preview'))?.body).toEqual({
+  await chooseQuantity('0,125');
+  await requestQuote();
+  // Preço mudou no servidor: avisa, atualiza o orçamento e não abre o WhatsApp.
+  expect(await screen.findByText('Um preço foi atualizado')).toBeTruthy();
+  expect(callsTo(server, '/quote-preview')[0]?.body).toEqual({
     lines: [{ productId: 'p1', quantity: '0.125' }],
   });
-  expect(server.calls.some((call) => call.path === '/api/v1/orders')).toBe(false);
-  await fireEvent.changeText(screen.getByLabelText('Quantidade de Café público'), '2');
-  expect(screen.queryByText('Total estimado: R$ 1,88')).toBeNull();
+  expect(callsTo(server, '/whatsapp')).toHaveLength(0);
+  expect(openURL).not.toHaveBeenCalled();
+  // Segunda tentativa, já com o preço vigente no orçamento: confere de novo e abre a mensagem.
+  await fireEvent.press(screen.getByRole('button', { name: 'Solicitar orçamento' }));
+  expect(await screen.findByText('Orçamento pronto para enviar pelo WhatsApp')).toBeTruthy();
+  expect(callsTo(server, '/whatsapp')[0]?.body).toEqual({
+    lines: [{ productId: 'p1', quantity: '0.125' }],
+    reviewToken: 'a'.repeat(64),
+  });
+  expect(openURL).toHaveBeenCalledWith(whatsappUrl);
+  // Orçamento público nunca cria pedido.
+  expect(
+    server.calls.some((call) => call.path === '/api/v1/orders' && call.method === 'POST'),
+  ).toBe(false);
+  openURL.mockRestore();
 });
-it('QUOTE_CHANGED invalida resumo e exige nova revisão; não abre link antigo', async () => {
+it('QUOTE_CHANGED pede nova conferência e não abre link antigo', async () => {
+  const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
   const { gateway, server } = world();
   server.on('POST', '/api/v1/public/catalogs/teste/whatsapp', () => fail(409, 'QUOTE_CHANGED'));
   await renderApp({ gateway, fetch: server.fetch, initialUrl: '/catalogo/teste', overrides });
-  await fireEvent.press(await screen.findByRole('button', { name: 'Selecionar Café público' }));
-  await fireEvent.press(screen.getByRole('button', { name: 'Revisar orçamento no servidor' }));
-  await fireEvent.press(
-    await screen.findByRole('button', { name: 'Preparar mensagem para WhatsApp' }),
-  );
-  await screen.findByText('Orçamento mudou. Faça nova revisão antes de continuar.');
-  expect(screen.queryByText('Revisão do orçamento')).toBeNull();
-  expect(server.calls.find((call) => call.path.endsWith('/whatsapp'))?.body).toEqual({
+  await chooseQuantity('1');
+  await requestQuote();
+  expect(await screen.findByText('Os valores mudaram agora há pouco')).toBeTruthy();
+  expect(callsTo(server, '/whatsapp')[0]?.body).toEqual({
     lines: [{ productId: 'p1', quantity: '1' }],
     reviewToken: 'a'.repeat(64),
   });
+  expect(openURL).not.toHaveBeenCalled();
+  expect(screen.queryByRole('button', { name: 'Abrir WhatsApp de novo' })).toBeNull();
+  openURL.mockRestore();
 });
-it('preços ocultos não são reconstruídos no carrinho ou revisão', async () => {
+it('preços ocultos não são reconstruídos no orçamento', async () => {
+  const openURL = jest.spyOn(Linking, 'openURL').mockResolvedValue(true);
   const { gateway, server } = world();
   server.on('GET', '/api/v1/public/catalogs/teste', () => ok({ ...profile, showPrices: false }));
   server.on('GET', '/api/v1/public/catalogs/teste/products', () =>
@@ -203,12 +242,15 @@ it('preços ocultos não são reconstruídos no carrinho ou revisão', async () 
       lines: preview.lines.map((line) => ({ ...line, unitPriceCents: null, subtotalCents: null })),
     }),
   );
+  server.on('POST', '/api/v1/public/catalogs/teste/whatsapp', () => ok({ whatsappUrl }));
   await renderApp({ gateway, fetch: server.fetch, initialUrl: '/catalogo/teste', overrides });
   await screen.findByText('Preço sob consulta');
-  await fireEvent.press(screen.getByRole('button', { name: 'Selecionar Café público' }));
-  await fireEvent.press(screen.getByRole('button', { name: 'Revisar orçamento no servidor' }));
-  await screen.findByText('Total sob consulta');
+  await chooseQuantity('2');
+  await requestQuote();
+  expect(await screen.findByText('Orçamento pronto para enviar pelo WhatsApp')).toBeTruthy();
+  expect(screen.getAllByText('Sob consulta').length).toBeGreaterThan(0);
   expect(screen.queryByText(/R\$/)).toBeNull();
+  openURL.mockRestore();
 });
 it('troca de empresa desmonta filtros e consulta privada anterior', async () => {
   const { gateway, server } = world();
