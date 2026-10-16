@@ -1,0 +1,835 @@
+{
+  "method": "nearest-rank; retrospective 2xx; warm proxy >=60 seconds after TCP readiness for same instance",
+  "retrospective": {
+    "periodUTC": [
+      "2026-10-15T22:15:07.726413Z",
+      "2026-10-16T01:48:07.788038Z"
+    ],
+    "nonOptionsRecords": 1349,
+    "startupDurationsMs": [
+      4157,
+      2226,
+      3353,
+      3611,
+      4869,
+      2831
+    ],
+    "groups": {
+      "warm-proxy GET /api/v1/orders/:id/financial-state": {
+        "n": 67,
+        "p50": 1863.5420519999998,
+        "p90": 5090.0407589999995,
+        "p95": 6785.956386999999
+      },
+      "warm-proxy GET /api/v1/receivables/:id": {
+        "n": 58,
+        "p50": 3365.49008,
+        "p90": 7850.650057,
+        "p95": 8880.857383
+      },
+      "warm-proxy GET /api/v1/tenants/current": {
+        "n": 17,
+        "p50": 1634.052783,
+        "p90": 3652.340605,
+        "p95": 4207.931117
+      },
+      "warm-proxy GET /api/v1/refund-obligations": {
+        "n": 45,
+        "p50": 2710.0581620000003,
+        "p90": 6978.753355,
+        "p95": 9144.970932
+      },
+      "warm-proxy GET /api/v1/financial-executions": {
+        "n": 143,
+        "p50": 1855.901636,
+        "p90": 6188.477244000001,
+        "p95": 7612.537112
+      },
+      "warm-proxy GET /api/v1/payments": {
+        "n": 48,
+        "p50": 2517.407228,
+        "p90": 6382.285290999999,
+        "p95": 6942.088957
+      },
+      "warm-proxy GET /api/v1/receivables": {
+        "n": 74,
+        "p50": 3028.1349689999997,
+        "p90": 5232.348747,
+        "p95": 6940.827884
+      },
+      "warm-proxy GET /api/v1/payment-conditions": {
+        "n": 32,
+        "p50": 2099.265892,
+        "p90": 7094.582602,
+        "p95": 10969.215795
+      },
+      "warm-proxy GET /api/v1/orders": {
+        "n": 131,
+        "p50": 1631.3598869999998,
+        "p90": 3619.1636470000003,
+        "p95": 4934.963879
+      },
+      "warm-proxy GET /api/v1/orders/:id/financial-history": {
+        "n": 29,
+        "p50": 3369.1608,
+        "p90": 7842.442596,
+        "p95": 8095.452724
+      },
+      "warm-proxy GET /api/v1/customers": {
+        "n": 49,
+        "p50": 1204.965254,
+        "p90": 4643.164996,
+        "p95": 7417.348252
+      },
+      "warm-proxy GET /api/v1/customers/:id/credits": {
+        "n": 19,
+        "p50": 3192.123122,
+        "p90": 10599.493993,
+        "p95": 11069.9834
+      },
+      "warm-proxy GET /api/v1/returns": {
+        "n": 17,
+        "p50": 1958.8788749999999,
+        "p90": 6960.994081,
+        "p95": 8233.969051
+      },
+      "warm-proxy GET /api/v1/credit-applications": {
+        "n": 18,
+        "p50": 3580.9477479999996,
+        "p90": 10373.145213000002,
+        "p95": 10574.845163999998
+      },
+      "warm-proxy GET /api/v1/me": {
+        "n": 39,
+        "p50": 976.466365,
+        "p90": 1955.355636,
+        "p95": 3284.925526
+      },
+      "warm-proxy GET /api/v1/payment-methods": {
+        "n": 29,
+        "p50": 2457.315079,
+        "p90": 7174.146059,
+        "p95": 7972.681460000001
+      },
+      "warm-proxy GET /api/v1/inventory/replenishment": {
+        "n": 43,
+        "p50": 1921.18422,
+        "p90": 4768.387658,
+        "p95": 6530.884812
+      },
+      "warm-proxy GET /api/v1/orders/:id": {
+        "n": 44,
+        "p50": 2271.9989680000003,
+        "p90": 6418.88217,
+        "p95": 7981.812814000001
+      },
+      "warm-proxy GET /api/v1/orders/:id/history": {
+        "n": 38,
+        "p50": 1694.7560079999998,
+        "p90": 6674.782198,
+        "p95": 10325.992447999999
+      },
+      "warm-proxy POST /api/v1/orders/:id/receipts": {
+        "n": 5,
+        "p50": 2035.830165,
+        "p90": 2284.9582960000002,
+        "p95": 2284.9582960000002
+      },
+      "warm-proxy GET /api/v1/orders/payment-options/methods": {
+        "n": 19,
+        "p50": 1610.6073000000001,
+        "p90": 4493.1286979999995,
+        "p95": 7028.417065000001
+      },
+      "warm-proxy POST /api/v1/orders/:id/confirm": {
+        "n": 5,
+        "p50": 662.7991370000001,
+        "p90": 2306.469896,
+        "p95": 2306.469896
+      },
+      "warm-proxy POST /api/v1/orders": {
+        "n": 5,
+        "p50": 561.278903,
+        "p90": 1509.6993089999999,
+        "p95": 1509.6993089999999
+      },
+      "warm-proxy GET /api/v1/inventory": {
+        "n": 17,
+        "p50": 1819.3078620000001,
+        "p90": 7743.0261900000005,
+        "p95": 11871.615015
+      },
+      "warm-proxy GET /api/v1/products": {
+        "n": 30,
+        "p50": 1271.348542,
+        "p90": 4478.205765000001,
+        "p95": 6034.966361999999
+      },
+      "warm-proxy GET /api/v1/orders/payment-options/conditions": {
+        "n": 16,
+        "p50": 1397.847587,
+        "p90": 9889.511467,
+        "p95": 9918.208943
+      },
+      "warm-proxy GET /api/v1/users": {
+        "n": 20,
+        "p50": 2001.8768040000002,
+        "p90": 4677.256222,
+        "p95": 10667.033087
+      },
+      "warm-proxy POST /api/v1/payment-conditions": {
+        "n": 1,
+        "p50": 1539.143739,
+        "p90": 1539.143739,
+        "p95": 1539.143739
+      },
+      "warm-proxy POST /api/v1/payments/:id/reversals": {
+        "n": 1,
+        "p50": 2197.384081,
+        "p90": 2197.384081,
+        "p95": 2197.384081
+      },
+      "warm-proxy GET /api/v1/payments/:id": {
+        "n": 1,
+        "p50": 1072.4494120000002,
+        "p90": 1072.4494120000002,
+        "p95": 1072.4494120000002
+      },
+      "warm-proxy GET /api/v1/catalog-settings": {
+        "n": 30,
+        "p50": 1026.608129,
+        "p90": 4057.3220189999997,
+        "p95": 6199.470531
+      },
+      "warm-proxy GET /api/v1/categories": {
+        "n": 20,
+        "p50": 1546.9262239999998,
+        "p90": 3928.139754,
+        "p95": 4860.170396
+      },
+      "warm-proxy GET /api/v1/customers/:id": {
+        "n": 15,
+        "p50": 2123.779579,
+        "p90": 4938.790005999999,
+        "p95": 7056.923837
+      },
+      "warm-proxy GET /api/v1/inventory/:id": {
+        "n": 24,
+        "p50": 1187.270814,
+        "p90": 4479.611405,
+        "p95": 6516.175671
+      },
+      "warm-proxy GET /api/v1/inventory/movements": {
+        "n": 15,
+        "p50": 1712.994526,
+        "p90": 5986.7801070000005,
+        "p95": 8246.308562999999
+      },
+      "warm-proxy GET /api/v1/products/:id": {
+        "n": 13,
+        "p50": 1631.8722,
+        "p90": 4438.51034,
+        "p95": 4628.202846
+      },
+      "warm-proxy PATCH /api/v1/products/:id": {
+        "n": 2,
+        "p50": 519.932692,
+        "p90": 1286.993262,
+        "p95": 1286.993262
+      },
+      "warm-proxy PATCH /api/v1/orders/:id": {
+        "n": 1,
+        "p50": 614.796331,
+        "p90": 614.796331,
+        "p95": 614.796331
+      },
+      "warm-proxy GET /api/v1/orders/:id/financial-reconciliation": {
+        "n": 1,
+        "p50": 685.063164,
+        "p90": 685.063164,
+        "p95": 685.063164
+      },
+      "warm-proxy PUT /api/v1/catalog-settings": {
+        "n": 2,
+        "p50": 452.102852,
+        "p90": 521.97754,
+        "p95": 521.97754
+      },
+      "warm-proxy GET /api/v1/exports/customers.csv": {
+        "n": 2,
+        "p50": 531.314571,
+        "p90": 572.306356,
+        "p95": 572.306356
+      },
+      "warm-proxy POST /api/v1/payment-methods": {
+        "n": 2,
+        "p50": 472.88165300000003,
+        "p90": 629.112286,
+        "p95": 629.112286
+      },
+      "warm-proxy POST /api/v1/orders/:id/dispatch": {
+        "n": 2,
+        "p50": 529.436824,
+        "p90": 726.9614779999999,
+        "p95": 726.9614779999999
+      },
+      "warm-proxy POST /api/v1/inventory/entries": {
+        "n": 2,
+        "p50": 490.665177,
+        "p90": 515.9281639999999,
+        "p95": 515.9281639999999
+      },
+      "warm-proxy GET /api/v1/orders/:id/documents/packing.pdf": {
+        "n": 2,
+        "p50": 737.532399,
+        "p90": 746.452644,
+        "p95": 746.452644
+      },
+      "warm-proxy GET /api/v1/orders/:id/documents/commercial.pdf": {
+        "n": 3,
+        "p50": 801.783711,
+        "p90": 845.2727530000001,
+        "p95": 845.2727530000001
+      },
+      "warm-proxy POST /api/v1/customers": {
+        "n": 3,
+        "p50": 520.530909,
+        "p90": 574.079691,
+        "p95": 574.079691
+      },
+      "warm-proxy GET /api/v1/products/:id/image": {
+        "n": 3,
+        "p50": 672.5845539999999,
+        "p90": 1481.408435,
+        "p95": 1481.408435
+      },
+      "warm-proxy PUT /api/v1/products/:id/image": {
+        "n": 3,
+        "p50": 1159.035436,
+        "p90": 1196.880129,
+        "p95": 1196.880129
+      },
+      "warm-proxy DELETE /api/v1/products/:id/image": {
+        "n": 1,
+        "p50": 435.969219,
+        "p90": 435.969219,
+        "p95": 435.969219
+      },
+      "warm-proxy POST /api/v1/products": {
+        "n": 2,
+        "p50": 532.044463,
+        "p90": 533.710122,
+        "p95": 533.710122
+      },
+      "warm-proxy POST /api/v1/users/invitations/accept": {
+        "n": 3,
+        "p50": 786.6751079999999,
+        "p90": 909.6952670000001,
+        "p95": 909.6952670000001
+      },
+      "warm-proxy POST /api/v1/orders/:id/cancel": {
+        "n": 1,
+        "p50": 592.828521,
+        "p90": 592.828521,
+        "p95": 592.828521
+      },
+      "warm-proxy GET /api/v1/exports/receivables.csv": {
+        "n": 1,
+        "p50": 826.350615,
+        "p90": 826.350615,
+        "p95": 826.350615
+      },
+      "warm-proxy GET /api/v1/exports/orders.csv": {
+        "n": 1,
+        "p50": 658.654686,
+        "p90": 658.654686,
+        "p95": 658.654686
+      },
+      "warm-proxy POST /api/v1/users/invitations": {
+        "n": 1,
+        "p50": 655.8418419999999,
+        "p90": 655.8418419999999,
+        "p95": 655.8418419999999
+      }
+    }
+  },
+  "monitoring": {
+    "cpu-utilizations": {
+      "nonemptyIntervals": 132,
+      "minIntervalMean": 0.002152866057842512,
+      "maxIntervalMean": 0.15811411930157926
+    },
+    "memory-utilizations": {
+      "nonemptyIntervals": 131,
+      "minIntervalMean": 0.0650177001953125,
+      "maxIntervalMean": 0.22424697875976562
+    },
+    "max_request_concurrencies": {
+      "nonemptyIntervals": 160,
+      "minIntervalMean": 0,
+      "maxIntervalMean": 40
+    }
+  },
+  "live": {
+    "client": "Node 22.16 fetch; local operator network; no artificial throttle; no credentials",
+    "samples": [
+      {
+        "path": "/health/live",
+        "mode": "first",
+        "startUTC": "2026-10-16T01:54:12.370Z",
+        "status": 200,
+        "clientMs": 270.4561,
+        "expressMs": 2
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.644Z",
+        "status": 200,
+        "clientMs": 84.7353,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.728Z",
+        "status": 200,
+        "clientMs": 16.01370000000003,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.744Z",
+        "status": 200,
+        "clientMs": 17.892200000000003,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.762Z",
+        "status": 200,
+        "clientMs": 15.920999999999992,
+        "expressMs": 2
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.778Z",
+        "status": 200,
+        "clientMs": 16.87360000000001,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.795Z",
+        "status": 200,
+        "clientMs": 17.853499999999997,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.813Z",
+        "status": 200,
+        "clientMs": 17.267899999999997,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.830Z",
+        "status": 200,
+        "clientMs": 15.69640000000004,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.846Z",
+        "status": 200,
+        "clientMs": 14.865999999999985,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.861Z",
+        "status": 200,
+        "clientMs": 14.44360000000006,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.876Z",
+        "status": 200,
+        "clientMs": 16.542599999999993,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/live",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:12.892Z",
+        "status": 200,
+        "clientMs": 14.516900000000078,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/ready",
+        "mode": "first",
+        "startUTC": "2026-10-16T01:54:12.907Z",
+        "status": 200,
+        "clientMs": 146.19640000000004,
+        "expressMs": 129
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.053Z",
+        "status": 200,
+        "clientMs": 14.988299999999981,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.068Z",
+        "status": 200,
+        "clientMs": 20.160499999999956,
+        "expressMs": 2
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.088Z",
+        "status": 200,
+        "clientMs": 20.14760000000001,
+        "expressMs": 2
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.108Z",
+        "status": 200,
+        "clientMs": 16.925100000000043,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.125Z",
+        "status": 200,
+        "clientMs": 15.756200000000035,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.141Z",
+        "status": 200,
+        "clientMs": 18.125800000000027,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.159Z",
+        "status": 200,
+        "clientMs": 15.221599999999967,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.174Z",
+        "status": 200,
+        "clientMs": 15.244200000000092,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.190Z",
+        "status": 200,
+        "clientMs": 14.75890000000004,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.204Z",
+        "status": 200,
+        "clientMs": 14.663800000000037,
+        "expressMs": 2
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.219Z",
+        "status": 200,
+        "clientMs": 14.899299999999926,
+        "expressMs": 1
+      },
+      {
+        "path": "/health/ready",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.234Z",
+        "status": 200,
+        "clientMs": 14.55970000000002,
+        "expressMs": 1
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "first",
+        "startUTC": "2026-10-16T01:54:13.249Z",
+        "status": 401,
+        "clientMs": 114.13249999999994,
+        "expressMs": 100
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.363Z",
+        "status": 401,
+        "clientMs": 79.44650000000001,
+        "expressMs": 65
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.442Z",
+        "status": 401,
+        "clientMs": 52.86810000000014,
+        "expressMs": 38
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.495Z",
+        "status": 401,
+        "clientMs": 66.06389999999988,
+        "expressMs": 46
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.561Z",
+        "status": 401,
+        "clientMs": 47.493400000000065,
+        "expressMs": 31
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.609Z",
+        "status": 401,
+        "clientMs": 76.15819999999985,
+        "expressMs": 63
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.685Z",
+        "status": 401,
+        "clientMs": 69.61740000000009,
+        "expressMs": 55
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.755Z",
+        "status": 401,
+        "clientMs": 75.26639999999998,
+        "expressMs": 59
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.830Z",
+        "status": 401,
+        "clientMs": 71.36770000000001,
+        "expressMs": 57
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.901Z",
+        "status": 401,
+        "clientMs": 65.64429999999993,
+        "expressMs": 49
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:13.967Z",
+        "status": 401,
+        "clientMs": 69.25920000000019,
+        "expressMs": 55
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:14.036Z",
+        "status": 401,
+        "clientMs": 46.13729999999987,
+        "expressMs": 32
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "serial",
+        "startUTC": "2026-10-16T01:54:14.082Z",
+        "status": 401,
+        "clientMs": 43.76729999999998,
+        "expressMs": 32
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:14.126Z",
+        "status": 401,
+        "clientMs": 48.615099999999984,
+        "expressMs": 32
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:14.132Z",
+        "status": 401,
+        "clientMs": 160.25610000000006,
+        "expressMs": 81
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:14.128Z",
+        "status": 401,
+        "clientMs": 783.5232999999998,
+        "expressMs": 707
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:14.130Z",
+        "status": 401,
+        "clientMs": 797.5936999999999,
+        "expressMs": 714
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:14.127Z",
+        "status": 401,
+        "clientMs": 1255.3064000000002,
+        "expressMs": 1169
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:14.133Z",
+        "status": 401,
+        "clientMs": 1489.4717,
+        "expressMs": 1412
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:15.623Z",
+        "status": 401,
+        "clientMs": 88.8753999999999,
+        "expressMs": 76
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:15.624Z",
+        "status": 401,
+        "clientMs": 641.9555999999998,
+        "expressMs": 622
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:15.624Z",
+        "status": 401,
+        "clientMs": 940.3283999999999,
+        "expressMs": 924
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:15.624Z",
+        "status": 401,
+        "clientMs": 952.8284999999996,
+        "expressMs": 934
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:15.623Z",
+        "status": 401,
+        "clientMs": 1031.4121999999998,
+        "expressMs": 1007
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:15.623Z",
+        "status": 401,
+        "clientMs": 1443.0735999999997,
+        "expressMs": 1421
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:17.067Z",
+        "status": 401,
+        "clientMs": 79.02019999999993,
+        "expressMs": 66
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:17.067Z",
+        "status": 401,
+        "clientMs": 701.3964999999998,
+        "expressMs": 677
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:17.067Z",
+        "status": 401,
+        "clientMs": 857.5452000000005,
+        "expressMs": 842
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:17.066Z",
+        "status": 401,
+        "clientMs": 1032.4426000000003,
+        "expressMs": 1018
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:17.067Z",
+        "status": 401,
+        "clientMs": 1494.0378,
+        "expressMs": 1474
+      },
+      {
+        "path": "/api/v1/payment-methods",
+        "mode": "parallel-6",
+        "startUTC": "2026-10-16T01:54:17.068Z",
+        "status": 401,
+        "clientMs": 1512.6274999999996,
+        "expressMs": 1492
+      }
+    ],
+    "limitations": "401 samples exclude Firebase auth, tenant and endpoint handler. health/ready caches readiness. No authenticated browser measurements."
+  }
+}
