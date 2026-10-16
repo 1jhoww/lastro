@@ -22,6 +22,8 @@ type Props = {
   /** Mínimo técnico. Pedido não tem quantidade mínima comercial. */
   min?: number;
   max?: number;
+  /** Compacto (36 px) para listas densas no desktop; no celular use o padrão de 44 px. */
+  size?: 'md' | 'sm';
 };
 
 /** Texto editável sem separador de milhar, para não confundir com decimal. */
@@ -31,7 +33,8 @@ const editable = (milli: number) => formatQuantity(milli).replace(/\./g, '');
  * Stepper com digitação livre. Botões somam uma unidade inteira; KG/L aceitam até três casas
  * digitadas. Texto inválido não altera o valor confirmado.
  */
-export function QuantityInput({ value, onChange, unit, label, min = 0, max }: Props) {
+export function QuantityInput({ value, onChange, unit, label, min = 0, max, size = 'md' }: Props) {
+  const small = size === 'sm';
   // Texto em edição; null mostra o valor confirmado (que pode mudar pelos botões).
   const [draft, setDraft] = useState<string | null>(null);
 
@@ -47,6 +50,7 @@ export function QuantityInput({ value, onChange, unit, label, min = 0, max }: Pr
       <StepButton
         icon="minus"
         label={`Diminuir ${label}`}
+        small={small}
         disabled={value <= min}
         onPress={() => step(-1)}
       />
@@ -59,7 +63,11 @@ export function QuantityInput({ value, onChange, unit, label, min = 0, max }: Pr
           inputMode={decimalsFor(unit) ? 'decimal' : 'numeric'}
           accessibilityLabel={label}
           selectTextOnFocus
-          style={[styles.input, Platform.OS === 'web' && ({ outlineStyle: 'none' } as object)]}
+          style={[
+            styles.input,
+            small && styles.inputSmall,
+            Platform.OS === 'web' && ({ outlineStyle: 'none' } as object),
+          ]}
         />
         <Text variant="small" color={color.textSecondary}>
           {unitLabel[unit]}
@@ -68,6 +76,7 @@ export function QuantityInput({ value, onChange, unit, label, min = 0, max }: Pr
       <StepButton
         icon="plus"
         label={`Aumentar ${label}`}
+        small={small}
         disabled={max !== undefined && value >= max}
         onPress={() => step(1)}
       />
@@ -83,6 +92,7 @@ function StepButton(props: {
   icon: 'minus' | 'plus';
   label: string;
   disabled: boolean;
+  small?: boolean;
   onPress: () => void;
 }) {
   const Icon = props.icon === 'minus' ? Minus : Plus;
@@ -95,12 +105,13 @@ function StepButton(props: {
       onPress={props.onPress}
       style={(s: InteractionState) => [
         styles.step,
+        props.small && styles.stepSmall,
         (s.hovered || s.pressed) && { backgroundColor: color.surfaceSunken },
         props.disabled && { opacity: 0.35 },
         showFocusRing(s) && focusRing(),
       ]}
     >
-      <Icon size={18} color={color.text} strokeWidth={2} />
+      <Icon size={props.small ? 16 : 18} color={color.text} strokeWidth={2} />
     </Pressable>
   );
 }
@@ -122,6 +133,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderRadius: radius.md,
   },
+  stepSmall: { width: 36, height: 36 },
   field: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -136,4 +148,5 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     paddingVertical: space[2],
   },
+  inputSmall: { minWidth: 36, maxWidth: 72, paddingVertical: space[1] },
 });

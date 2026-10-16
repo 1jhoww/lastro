@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, type Href } from 'expo-router';
+import { Link, router, useLocalSearchParams, type Href } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import type { ApiError } from '@/api/errors';
 import type { Order } from '@/api/types';
@@ -88,7 +88,16 @@ export function OrderActions({ order, onRefresh }: { order: Order; onRefresh: ()
   const toast = useToast();
   const compact = useLayoutSize() === 'compact';
   const command = useOrderCommand();
-  const [open, setOpen] = useState<OrderCommandKind | null>(null);
+  // Vindo de "Confirmar pedido" no editor: abre a confirmação uma vez, já com a versão salva.
+  const { confirmar } = useLocalSearchParams<{ confirmar?: string }>();
+  const [open, setOpen] = useState<OrderCommandKind | null>(() =>
+    confirmar === '1' && actionsFor(order.status, permissions).includes('confirm')
+      ? 'confirm'
+      : null,
+  );
+  useEffect(() => {
+    if (confirmar) router.setParams({ confirmar: undefined });
+  }, [confirmar]);
   const [reason, setReason] = useState('');
   const [discard, setDiscard] = useState<OrderCommandKind | null>(null);
   const [lastKind, setLastKind] = useState<OrderCommandKind | null>(null);
@@ -251,7 +260,7 @@ export function OrderActions({ order, onRefresh }: { order: Order; onRefresh: ()
       ) : null}
 
       <ConfirmDialog
-        visible={open === 'confirm'}
+        visible={open === 'confirm' && !locked}
         title="Confirmar pedido?"
         description="O estoque de todos os itens será reservado agora e os títulos a receber serão gerados. Depois de confirmado, o pedido não pode ser editado."
         confirmLabel="Confirmar e reservar"

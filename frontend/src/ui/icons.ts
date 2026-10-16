@@ -33,7 +33,9 @@ export { default as ClipboardList } from 'lucide-react-native/icons/clipboard-li
 export { default as CloudOff } from 'lucide-react-native/icons/cloud-off';
 export { default as Copy } from 'lucide-react-native/icons/copy';
 export { default as CreditCard } from 'lucide-react-native/icons/credit-card';
+export { default as Download } from 'lucide-react-native/icons/download';
 export { default as Ellipsis } from 'lucide-react-native/icons/ellipsis';
+export { default as EllipsisVertical } from 'lucide-react-native/icons/ellipsis-vertical';
 export { default as Eye } from 'lucide-react-native/icons/eye';
 export { default as EyeOff } from 'lucide-react-native/icons/eye-off';
 export { default as House } from 'lucide-react-native/icons/house';
@@ -58,6 +60,7 @@ export { default as RotateCcw } from 'lucide-react-native/icons/rotate-ccw';
 export { default as Search } from 'lucide-react-native/icons/search';
 export { default as SearchX } from 'lucide-react-native/icons/search-x';
 export { default as Settings } from 'lucide-react-native/icons/settings';
+export { default as Share2 } from 'lucide-react-native/icons/share-2';
 export { default as SlidersHorizontal } from 'lucide-react-native/icons/sliders-horizontal';
 export { default as ListClock } from 'lucide-react-native/icons/list-clock';
 export { default as PackagePlus } from 'lucide-react-native/icons/package-plus';

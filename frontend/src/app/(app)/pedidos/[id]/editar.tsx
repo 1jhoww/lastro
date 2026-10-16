@@ -32,30 +32,30 @@ function EditOrder() {
       />
     );
   const o = order.data;
+  const title = `Editar ${shortOrderId(o.commercialId)}`;
+  if (o.status === 'draft')
+    return (
+      <OrderEditor
+        key={`${o.id}:${reloads}`}
+        title={title}
+        description={o.customerName ?? undefined}
+        order={o}
+        onReload={() => order.refetch().then(() => setReloads((n) => n + 1))}
+      />
+    );
   return (
-    <Screen
-      title={`Editar ${shortOrderId(o.commercialId)}`}
-      description={o.customerName ?? undefined}
-    >
-      {o.status === 'draft' ? (
-        <OrderEditor
-          key={`${o.id}:${reloads}`}
-          order={o}
-          onReload={() => order.refetch().then(() => setReloads((n) => n + 1))}
-        />
-      ) : (
-        <Alert
-          tone="warning"
-          title={`Pedido ${statusLabel[o.status].toLowerCase()} não pode ser editado`}
-          action={
-            <Link href={`/pedidos/${o.id}` as Href} asChild>
-              <Button label="Ver pedido" size="sm" variant="outline" />
-            </Link>
-          }
-        >
-          Só rascunhos aceitam alterações de cliente, itens ou pagamento.
-        </Alert>
-      )}
+    <Screen title={title} description={o.customerName ?? undefined}>
+      <Alert
+        tone="warning"
+        title={`Pedido ${statusLabel[o.status].toLowerCase()} não pode ser editado`}
+        action={
+          <Link href={`/pedidos/${o.id}` as Href} asChild>
+            <Button label="Ver pedido" size="sm" variant="outline" />
+          </Link>
+        }
+      >
+        Só rascunhos aceitam alterações de cliente, itens ou pagamento.
+      </Alert>
     </Screen>
   );
 }

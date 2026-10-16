@@ -41,3 +41,14 @@ Backend, contratos, infraestrutura e dados reais não foram alterados. Os artefa
 - Melhorias no conteúdo dos PDFs ficam para a fase de Documentos; arquivos oficiais do backend são preservados.
 
 Commit e push deste checkpoint foram solicitados explicitamente depois da orientação inicial de manter tudo local. Nenhum merge na `main` ou comando de deploy faz parte desta entrega.
+
+## Refinamento de Pedidos e Documentos (2026-10-16)
+
+- Novo pedido e edição em uma página contínua: Dados do pedido, Produtos, Pagamento e Finalização. Os passos numerados foram removidos.
+- Cliente em combobox (65%) e responsável em select compacto (35%). O responsável só é editável por administradores.
+- Catálogo com preço alinhado e controle −/+ com digitação. Quantidade zero retira o produto do carrinho.
+- No desktop largo, o carrinho fica em coluna lateral fixa durante a rolagem. No celular, uma barra inferior mostra itens e total e abre o resumo.
+- Prévia de parcelas em tabela abaixo da condição. Rodapé com total, "Salvar rascunho" e "Confirmar pedido". Confirmar salva o rascunho e abre na ficha a confirmação com reserva de estoque.
+- Documentos em duas linhas: Pedido comercial e Romaneio, com ações de visualizar, baixar e compartilhar. Cada ação obtém o PDF e executa a intenção. Arquivos salvos como `pedido-PED-XXXXXXXX.pdf` e `romaneio-PED-XXXXXXXX.pdf`.
+- Melhorias visuais dos PDFs ficaram registradas para o backend em `backend/docs/proposals/order-documents-layout.md`.
+- Verificação feita: typecheck, lint, quatro suítes de testes relacionadas (26 testes) e build web. A inspeção visual das telas autenticadas não foi feita.

@@ -215,9 +215,7 @@ function OrderView({ order: o, onRefresh }: { order: Order; onRefresh: () => voi
             <Disclosure label="Histórico do pedido">
               <OrderHistoryPanel orderId={o.id} />
             </Disclosure>
-            <Disclosure label="Documentos" summary="Pedido em PDF e romaneio sem preços">
-              <OrderDocuments id={o.id} />
-            </Disclosure>
+            <OrderDocuments id={o.id} number={shortOrderId(o.commercialId)} version={o.version} />
           </>
         }
       />

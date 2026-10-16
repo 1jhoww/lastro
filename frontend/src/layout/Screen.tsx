@@ -11,13 +11,15 @@ type Props = {
   /** Ações do cabeçalho; a principal vem por último (à direita no desktop). */
   actions?: ReactNode;
   children: ReactNode;
+  /** Barra presa à base, fora da rolagem (ex.: resumo do carrinho no celular). */
+  footer?: ReactNode;
 };
 
 /**
  * Tela padrão: cabeçalho com título da seção e conteúdo com largura máxima. No celular, o
  * wordmark fica no topo e as ações descem para baixo do título, em largura total.
  */
-export function Screen({ title, description, actions, children }: Props) {
+export function Screen({ title, description, actions, children, footer }: Props) {
   const size = useLayoutSize();
   const insets = useSafeAreaInsets();
   const compact = size === 'compact';
@@ -63,6 +65,7 @@ export function Screen({ title, description, actions, children }: Props) {
           {children}
         </View>
       </ScrollView>
+      {footer}
     </KeyboardAvoidingView>
   );
 }

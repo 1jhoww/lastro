@@ -7,22 +7,24 @@ import { useProductList } from '@/features/products/api';
 import { formatCents } from '@/lib/money';
 import { formatQuantity, fromApiQuantity, unitLabel } from '@/lib/quantity';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
-import { color, layout, space } from '@/theme';
-import { Alert, Button, SearchField, Skeleton, Text } from '@/ui';
-import { Check, Plus } from '@/ui/icons';
+import { color, space, useLayoutSize } from '@/theme';
+import { Alert, Button, QuantityInput, SearchField, Skeleton, Text } from '@/ui';
 
 /**
  * Busca de produtos ativos para o carrinho. Preço e unidade vêm de `GET /products`; o disponível,
  * de `GET /inventory` com o mesmo filtro (as duas listas usam nome crescente, então os itens se
  * correspondem). Os saldos recebidos alimentam o cache por produto do estoque.
+ * Cada linha tem o mesmo controle de quantidade do carrinho: zero = fora do pedido.
  */
 export function ProductSearch({
-  inCart,
-  onAdd,
+  quantities,
+  onQuantity,
 }: {
-  inCart: ReadonlySet<string>;
-  onAdd: (product: Product) => void;
+  /** Quantidade no carrinho por produto (milésimos). Ausente = fora do carrinho. */
+  quantities: ReadonlyMap<string, number>;
+  onQuantity: (product: Product, milli: number) => void;
 }) {
+  const compact = useLayoutSize() === 'compact';
   const [search, setSearch] = useState('');
   const q = useDebouncedValue(search).trim();
   const products = useProductList({ q, status: 'active' });
@@ -68,8 +70,9 @@ export function ProductSearch({
               key={p.id}
               product={p}
               available={available.get(p.id)}
-              added={inCart.has(p.id)}
-              onAdd={onAdd}
+              quantity={quantities.get(p.id) ?? 0}
+              compact={compact}
+              onQuantity={onQuantity}
             />
           ))}
           {products.query.hasNextPage ? (
@@ -93,41 +96,54 @@ export function ProductSearch({
 const ResultRow = memo(function ResultRow({
   product: p,
   available,
-  added,
-  onAdd,
+  quantity,
+  compact,
+  onQuantity,
 }: {
   product: Product;
   available: number | undefined;
-  added: boolean;
-  onAdd: (product: Product) => void;
+  quantity: number;
+  compact: boolean;
+  onQuantity: (product: Product, milli: number) => void;
 }) {
   const out = available !== undefined && available <= 0;
+  const added = quantity > 0;
+  const price = (
+    <Text variant="figure" style={compact ? undefined : styles.price}>
+      {formatCents(p.priceCents)}
+    </Text>
+  );
   return (
-    <View style={styles.row}>
+    <View
+      style={[styles.row, compact && styles.rowCompact, added && styles.added]}
+      accessibilityLabel={added ? `${p.name}, no carrinho` : undefined}
+    >
       <View style={styles.flex}>
         <Text variant="bodyStrong" numberOfLines={1}>
           {p.name}
         </Text>
         <Text variant="small" color={color.textSecondary} numberOfLines={1}>
-          {`${p.sku} · ${formatCents(p.priceCents)} por ${unitLabel[p.unit]}`}
-        </Text>
-        <Text variant="caption" color={out ? color.danger : color.textSecondary}>
-          {available === undefined
-            ? 'Disponível: consultando'
-            : out
-              ? 'Sem disponível no estoque'
-              : `Disponível: ${formatQuantity(available, p.unit)}`}
+          {`${p.sku} · ${unitLabel[p.unit]} · `}
+          <Text variant="small" color={out ? color.danger : color.textSecondary}>
+            {available === undefined
+              ? 'consultando estoque'
+              : out
+                ? 'sem disponível'
+                : `${formatQuantity(available, p.unit)} disponível`}
+          </Text>
         </Text>
       </View>
-      <Button
-        label={added ? 'No carrinho' : 'Adicionar'}
-        accessibilityLabel={added ? `${p.name} já está no carrinho` : `Adicionar ${p.name}`}
-        icon={added ? Check : Plus}
-        size="sm"
-        variant={added ? 'ghost' : 'outline'}
-        disabled={added}
-        onPress={() => onAdd(p)}
-      />
+      <View style={[styles.controls, compact && styles.controlsCompact]}>
+        {price}
+        <QuantityInput
+          label={`Quantidade de ${p.name}`}
+          unit={p.unit}
+          value={quantity}
+          min={0}
+          size={compact ? 'md' : 'sm'}
+          onChange={(milli) => onQuantity(p, milli)}
+        />
+      </View>
     </View>
   );
 });
@@ -139,10 +155,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: space[3],
-    minHeight: layout.hitTarget + 12,
     paddingVertical: space[2],
+    paddingHorizontal: space[2],
     borderBottomWidth: 1,
     borderBottomColor: color.border,
+    borderLeftWidth: 3,
+    borderLeftColor: 'transparent',
   },
+  rowCompact: { flexDirection: 'column', alignItems: 'stretch', gap: space[2] },
+  // Seleção discreta: filete amarelo e fundo levemente quente.
+  added: { borderLeftColor: color.accent, backgroundColor: 'rgba(243,184,0,0.07)' },
   flex: { flex: 1, minWidth: 0, gap: 1 },
+  controls: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
+  controlsCompact: { justifyContent: 'space-between' },
+  price: { minWidth: 92, textAlign: 'right' },
 });

@@ -7,8 +7,10 @@ export type Download = {
   nextCursor: string | null;
   rowCount: number | null;
 };
+/** Janela aberta no toque (web), antes da espera, para o navegador não bloquear a abertura. */
+export type Viewer = { show: (url: string) => boolean; close: () => void };
 export type FilePresentation = {
-  open: () => Promise<void>;
+  open: (viewer?: Viewer | null) => Promise<void>;
   save: () => Promise<void>;
   share: () => Promise<void>;
   dispose: () => void;

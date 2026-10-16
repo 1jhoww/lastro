@@ -17,6 +17,7 @@ export function CartList({
   onQuantity,
   onRemove,
   disabled,
+  dense = false,
 }: {
   lines: readonly CartLine[];
   /** Disponível conhecido por produto (milésimos). Ausente = não consultado. */
@@ -24,8 +25,11 @@ export function CartList({
   onQuantity: (productId: string, milli: number) => void;
   onRemove: (productId: string) => void;
   disabled?: boolean;
+  /** Coluna estreita (resumo lateral): empilha como no celular, com controles de 36 px. */
+  dense?: boolean;
 }) {
-  const compact = useLayoutSize() === 'compact';
+  const phone = useLayoutSize() === 'compact';
+  const compact = phone || dense;
   return (
     <View accessibilityRole="list" accessibilityLabel="Itens do pedido">
       {lines.map((line, i) => (
@@ -35,6 +39,7 @@ export function CartList({
           available={available.get(line.productId)}
           last={i === lines.length - 1}
           compact={compact}
+          small={!phone}
           onQuantity={onQuantity}
           onRemove={onRemove}
           disabled={disabled}
@@ -49,6 +54,7 @@ const CartRow = memo(function CartRow({
   available,
   last,
   compact,
+  small,
   onQuantity,
   onRemove,
   disabled,
@@ -57,6 +63,7 @@ const CartRow = memo(function CartRow({
   available: number | undefined;
   last: boolean;
   compact: boolean;
+  small: boolean;
   onQuantity: (productId: string, milli: number) => void;
   onRemove: (productId: string) => void;
   disabled?: boolean;
@@ -76,11 +83,11 @@ const CartRow = memo(function CartRow({
     <View style={[styles.row, compact && styles.rowCompact, !last && styles.divider]}>
       <View style={[styles.info, compact && styles.infoCompact]}>
         <View style={styles.flex}>
-          <Text variant="bodyStrong" numberOfLines={2}>
+          <Text variant="smallStrong" numberOfLines={2}>
             {line.name}
           </Text>
           <Text variant="small" color={color.textSecondary} numberOfLines={1}>
-            {`${line.sku} · ${formatCents(line.unitPriceCents)} por ${unitLabel[line.unit]}`}
+            {`${line.sku} · ${formatCents(line.unitPriceCents)}/${unitLabel[line.unit]}`}
           </Text>
           {short ? (
             <Text variant="caption" color={color.danger}>
@@ -101,6 +108,7 @@ const CartRow = memo(function CartRow({
           unit={line.unit}
           value={line.quantityMilli}
           min={line.unit === 'KG' || line.unit === 'L' ? 1 : 1000}
+          size={small ? 'sm' : 'md'}
           onChange={(milli) => !disabled && onQuantity(line.productId, milli)}
         />
         {compact ? null : subtotalText}
@@ -116,7 +124,7 @@ const CartRow = memo(function CartRow({
 });
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: space[4], paddingVertical: space[3] },
+  row: { flexDirection: 'row', alignItems: 'center', gap: space[4], paddingVertical: space[2] },
   rowCompact: { flexDirection: 'column', alignItems: 'stretch', gap: space[2] },
   divider: { borderBottomWidth: 1, borderBottomColor: color.border },
   info: { flex: 1, minWidth: 0 },

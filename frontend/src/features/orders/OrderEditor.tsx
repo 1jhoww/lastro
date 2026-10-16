@@ -1,38 +1,26 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Link, router, type Href } from 'expo-router';
-import { StyleSheet, View } from 'react-native';
+import { Platform, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { toApiError, type ApiError } from '@/api/errors';
-import type { Customer, Order, OrderCreate, OrderUpdate, Product } from '@/api/types';
-import { FormActions } from '@/features/catalog/FormParts';
+import type { Order, OrderCreate, OrderUpdate, Product } from '@/api/types';
+import { FieldRow } from '@/features/catalog/FormParts';
 import { useAvailability } from '@/features/inventory/api';
 import { useTenant } from '@/features/session/useTenant';
 import { shortId, useMembers } from '@/features/users/api';
+import { Screen } from '@/layout/Screen';
 import { formatCents } from '@/lib/money';
-import { QUANTITY_SCALE } from '@/lib/quantity';
 import { useSession } from '@/session/SessionContext';
 import { color, space, useLayoutSize } from '@/theme';
-import {
-  Alert,
-  Button,
-  EmptyState,
-  Disclosure,
-  Panel,
-  Segmented,
-  Select,
-  Text,
-  TextField,
-  useToast,
-} from '@/ui';
-import { Package, UserRound } from '@/ui/icons';
+import { Alert, Button, Dialog, EmptyState, Select, Text, TextField, useToast } from '@/ui';
+import { Package } from '@/ui/icons';
 import { useConditionOptions, useCreateOrder, useMethodOptions, useUpdateOrder } from './api';
 import { CartList } from './CartList';
-import { CustomerPicker, CustomerSelection } from './CustomerPicker';
+import { CustomerCombobox, type PickedCustomer } from './CustomerCombobox';
 import { PaymentFields } from './PaymentFields';
 import { paymentPreview } from './paymentPreview';
 import { ProductSearch } from './ProductSearch';
 import {
   cartFromOrder,
-  formatCalendarDate,
   cartTotalPreview,
   paymentBody,
   paymentChoiceOf,
@@ -41,8 +29,6 @@ import {
   type CartLine,
   type PaymentChoice,
 } from './rules';
-
-type Step = 'cliente' | 'produtos' | 'revisao';
 
 /** Mensagens de recusa ao salvar o rascunho, pelo código estável do servidor. */
 export function saveErrorMessage(e: ApiError): string {
@@ -66,31 +52,65 @@ export function saveErrorMessage(e: ApiError): string {
   }
 }
 
+const itemsLabel = (n: number) => `${n} ${n === 1 ? 'item' : 'itens'}`;
+
+/** Título discreto de seção, sem cartão em volta. */
+function Section({
+  title,
+  aside,
+  children,
+  style,
+}: {
+  title: string;
+  aside?: ReactNode;
+  children: ReactNode;
+  style?: ViewStyle;
+}) {
+  return (
+    <View style={[styles.section, style]}>
+      <View style={styles.sectionHead}>
+        <Text variant="h3" accessibilityRole="header">
+          {title}
+        </Text>
+        {aside}
+      </View>
+      {children}
+    </View>
+  );
+}
+
 /**
- * Montagem do pedido em três passos curtos. Novo pedido: o rascunho só é criado ao salvar (POST
- * sem Idempotency-Key, nunca repetido sozinho). Rascunho existente: salva com `expectedVersion`.
+ * Pedido em uma página contínua: dados, produtos, pagamento e finalização, todos editáveis a
+ * qualquer momento. Novo pedido: o rascunho só é criado ao salvar (POST sem Idempotency-Key,
+ * nunca repetido sozinho). Rascunho existente: salva com `expectedVersion`. "Confirmar pedido"
+ * salva e abre a confirmação (reserva de estoque) na ficha, com o resumo oficial do servidor.
  * Preços e totais aqui são prévia; os valores oficiais são os do servidor após salvar.
  */
 export function OrderEditor({
   order: current,
   onReload,
+  title,
+  description,
 }: {
   order?: Order;
   /** Recarrega o editor a partir da versão atual do servidor (após conflito). */
   onReload?: () => void;
+  title: string;
+  description?: string;
 }) {
   // Versão base fixada ao abrir: salvar nunca sobrescreve uma versão que a pessoa não viu.
   const [order] = useState(current);
   const { user, permissions } = useSession();
   const tenant = useTenant();
   const toast = useToast();
-  const compact = useLayoutSize() === 'compact';
-  const wide = useLayoutSize() === 'expanded';
+  const size = useLayoutSize();
+  const compact = size === 'compact';
+  const wide = size === 'expanded';
   const admin = permissions.includes('orders:all:manage');
+  const canConfirm = permissions.includes('orders:own:confirm');
   const today = todayIn(tenant.data?.timezone);
 
-  const [step, setStep] = useState<Step>(order ? 'produtos' : 'cliente');
-  const [customer, setCustomer] = useState<{ id: string; name: string } | null>(
+  const [customer, setCustomer] = useState<PickedCustomer | null>(
     order?.customerId ? { id: order.customerId, name: order.customerName ?? 'Cliente' } : null,
   );
   const [sellerUid, setSellerUid] = useState(order?.sellerUid ?? user?.uid ?? '');
@@ -98,11 +118,11 @@ export function OrderEditor({
   const [payment, setPayment] = useState<PaymentChoice>(() => paymentChoiceOf(order));
   const [methodId, setMethodId] = useState<string | null>(order?.intendedPaymentMethod?.id ?? null);
   const [notes, setNotes] = useState(order?.notes ?? '');
-  const [picking, setPicking] = useState(false);
   const [paymentError, setPaymentError] = useState<string>();
+  const [summaryOpen, setSummaryOpen] = useState(false);
 
-  const conditions = useConditionOptions(step === 'revisao');
-  const methods = useMethodOptions(step === 'revisao');
+  const conditions = useConditionOptions();
+  const methods = useMethodOptions();
   const members = useMembers(admin);
   const create = useCreateOrder();
   const update = useUpdateOrder(order?.id ?? '');
@@ -111,25 +131,31 @@ export function OrderEditor({
 
   const productIds = useMemo(() => lines.map((l) => l.productId), [lines]);
   const available = useAvailability(productIds);
-  const inCart = useMemo(() => new Set(productIds), [productIds]);
+  const quantities = useMemo(
+    () => new Map(lines.map((l) => [l.productId, l.quantityMilli])),
+    [lines],
+  );
   const total = cartTotalPreview(lines);
+  const preview = paymentPreview(total, payment, conditions.data ?? [], today);
 
-  const add = useCallback((p: Product) => {
-    setLines((current) =>
-      current.some((l) => l.productId === p.id)
-        ? current
-        : [
-            ...current,
-            {
-              productId: p.id,
-              name: p.name,
-              sku: p.sku,
-              unit: p.unit,
-              unitPriceCents: p.priceCents,
-              quantityMilli: QUANTITY_SCALE,
-            },
-          ],
-    );
+  /** Catálogo: zero retira do carrinho; acima de zero inclui ou ajusta. */
+  const setProductQuantity = useCallback((p: Product, milli: number) => {
+    setLines((current) => {
+      if (milli <= 0) return current.filter((l) => l.productId !== p.id);
+      if (current.some((l) => l.productId === p.id))
+        return current.map((l) => (l.productId === p.id ? { ...l, quantityMilli: milli } : l));
+      return [
+        ...current,
+        {
+          productId: p.id,
+          name: p.name,
+          sku: p.sku,
+          unit: p.unit,
+          unitPriceCents: p.priceCents,
+          quantityMilli: milli,
+        },
+      ];
+    });
   }, []);
   const setQuantity = useCallback((productId: string, milli: number) => {
     setLines((current) =>
@@ -140,7 +166,7 @@ export function OrderEditor({
     setLines((current) => current.filter((l) => l.productId !== productId));
   }, []);
 
-  const save = () => {
+  const save = (then: 'view' | 'confirm') => {
     const pay = paymentBody(
       payment,
       conditions.data ?? [],
@@ -161,8 +187,14 @@ export function OrderEditor({
       ...(admin && sellerUid && sellerUid !== (order?.sellerUid ?? user?.uid) ? { sellerUid } : {}),
     };
     const onSuccess = (saved: Order) => {
-      toast.show(order ? 'Rascunho salvo!' : 'Pedido criado!');
-      router.replace(`/pedidos/${saved.id}` as Href);
+      setSummaryOpen(false);
+      if (then === 'confirm') {
+        toast.show('Rascunho salvo. Revise e confirme a reserva.');
+        router.replace(`/pedidos/${saved.id}?confirmar=1` as Href);
+      } else {
+        toast.show(order ? 'Rascunho salvo!' : 'Rascunho criado!');
+        router.replace(`/pedidos/${saved.id}` as Href);
+      }
     };
     if (order)
       update.mutate({ ...common, expectedVersion: order.version } as OrderUpdate, { onSuccess });
@@ -177,279 +209,370 @@ export function OrderEditor({
 
   const createUnknown =
     !order && create.isError && ['network', 'server'].includes(toApiError(create.error).kind);
+  const incomplete = !customer || lines.length === 0;
+  const blocked = incomplete || createUnknown;
 
-  const steps: { value: Step; label: string }[] = [
-    { value: 'cliente', label: '1 Cliente' },
-    { value: 'produtos', label: `2 Produtos (${lines.length})` },
-    { value: 'revisao', label: '3 Revisão' },
-  ];
+  const responsibleOptions =
+    admin && members.data
+      ? members.data
+          .filter((m) => m.status === 'active' || m.id === sellerUid)
+          .map((m) => ({
+            value: m.id,
+            label:
+              m.id === user?.uid
+                ? 'Você'
+                : `${m.role === 'seller' ? 'Vendedor' : 'Administrador'} ${shortId(m.id)}`,
+          }))
+      : [
+          {
+            value: sellerUid,
+            label: sellerUid === user?.uid ? 'Você' : `Vendedor ${shortId(sellerUid)}`,
+          },
+        ];
 
-  const customerPanel = (
-    <Panel
-      title="Cliente"
-      action={
-        customer ? (
-          <Button label="Trocar" size="sm" variant="outline" onPress={() => setPicking(true)} />
-        ) : null
-      }
-    >
-      {customer ? (
-        <View style={styles.customer}>
-          <UserRound size={20} color={color.textSecondary} />
-          <Text variant="bodyStrong">{customer.name}</Text>
-        </View>
-      ) : (
-        <CustomerSelection
-          onPick={(c) => {
-            setCustomer({ id: c.id, name: c.name });
-            setStep('produtos');
-          }}
-        />
-      )}
-      {admin && members.data ? (
-        <View style={styles.responsible}>
-          <Select
-            label="Responsável pelo pedido"
-            value={sellerUid}
-            onChange={setSellerUid}
-            options={members.data
-              .filter((m) => m.status === 'active')
-              .map((m) => ({
-                value: m.id,
-                label:
-                  m.id === user?.uid
-                    ? 'Você'
-                    : `${m.role === 'seller' ? 'Vendedor' : 'Administrador'} ${shortId(m.id)}`,
-              }))}
-          />
-        </View>
-      ) : null}
-    </Panel>
+  const cart =
+    lines.length === 0 ? (
+      <EmptyState
+        size="compact"
+        icon={Package}
+        title="Carrinho vazio"
+        description="Ajuste a quantidade de um produto para incluí-lo."
+      />
+    ) : (
+      <CartList
+        lines={lines}
+        available={available}
+        onQuantity={setQuantity}
+        onRemove={remove}
+        disabled={saving}
+        dense={wide}
+      />
+    );
+
+  const totalLine = (
+    <View style={styles.totalLine}>
+      <Text variant="body" color={color.textSecondary}>
+        Total previsto
+      </Text>
+      <Text variant="figureLarge" accessibilityLabel={`Total previsto ${formatCents(total)}`}>
+        {formatCents(total)}
+      </Text>
+    </View>
   );
 
-  const cartPanel = (
-    <Panel
-      title={`Carrinho (${lines.length} ${lines.length === 1 ? 'item' : 'itens'})`}
-      description="Confira quantidades e valores antes de salvar."
-    >
-      {lines.length === 0 ? (
-        <EmptyState
-          size="compact"
-          icon={Package}
-          title="Carrinho vazio"
-          description="Busque e adicione produtos. Não há limite de itens por pedido."
+  const paymentLabel =
+    payment.mode === 'later'
+      ? 'Definir depois'
+      : payment.mode === 'manual'
+        ? payment.type === 'cash'
+          ? 'À vista'
+          : `${payment.count} parcelas`
+        : (conditions.data?.find((c) => c.id === payment.conditionId)?.name ?? 'Condição');
+
+  const confirmHint = !canConfirm
+    ? null
+    : payment.mode === 'later'
+      ? 'Para confirmar, escolha a condição de pagamento.'
+      : null;
+
+  const footerActions = (
+    <View style={[styles.actions, compact && styles.actionsCompact]}>
+      <Button
+        label="Salvar rascunho"
+        variant="outline"
+        loading={saving}
+        disabled={blocked}
+        fullWidth={compact}
+        onPress={() => save('view')}
+      />
+      {canConfirm ? (
+        <Button
+          label="Confirmar pedido"
+          variant="strong"
+          disabled={blocked || saving || payment.mode === 'later'}
+          fullWidth={compact}
+          onPress={() => save('confirm')}
         />
-      ) : (
-        <CartList
-          lines={lines}
-          available={available}
-          onQuantity={setQuantity}
-          onRemove={remove}
-          disabled={saving}
-        />
-      )}
-      <View style={styles.total}>
-        <Text variant="body" color={color.textSecondary}>
-          Total previsto
+      ) : null}
+    </View>
+  );
+
+  const mobileBar = compact ? (
+    <View style={styles.bar}>
+      <View style={styles.flex}>
+        <Text variant="caption" color={color.textSecondary}>
+          {itemsLabel(lines.length)}
         </Text>
-        <Text variant="figureLarge" accessibilityLabel={`Total previsto ${formatCents(total)}`}>
+        <Text variant="figure" accessibilityLabel={`Total previsto ${formatCents(total)}`}>
           {formatCents(total)}
         </Text>
       </View>
-    </Panel>
-  );
+      <Button
+        label="Ver resumo"
+        size="sm"
+        variant="outline"
+        icon={Package}
+        onPress={() => setSummaryOpen(true)}
+      />
+    </View>
+  ) : undefined;
 
   return (
-    <>
-      <Segmented<Step> label="Passos do pedido" options={steps} value={step} onChange={setStep} />
+    <Screen title={title} description={description} footer={mobileBar}>
+      <View style={styles.form}>
+        <Section title="Dados do pedido" style={styles.raised}>
+          <FieldRow weights={[65, 35]}>
+            {[
+              <CustomerCombobox
+                key="customer"
+                value={customer}
+                onChange={setCustomer}
+                disabled={saving}
+              />,
+              <Select
+                key="seller"
+                label="Responsável"
+                value={sellerUid}
+                onChange={setSellerUid}
+                disabled={!admin || !members.data || saving}
+                options={responsibleOptions}
+              />,
+            ]}
+          </FieldRow>
+        </Section>
 
-      {step === 'cliente' ? (
-        <>
-          {customerPanel}
-          <FormActions>
-            <Button
-              label="Continuar para produtos"
-              variant="strong"
-              disabled={!customer}
-              onPress={() => setStep('produtos')}
-            />
-          </FormActions>
-        </>
-      ) : null}
+        <View style={[styles.columns, wide && styles.columnsWide]}>
+          <View style={styles.main}>
+            <Section title="Produtos">
+              <ProductSearch quantities={quantities} onQuantity={setProductQuantity} />
+              {wide ? null : (
+                <View style={styles.inlineCart}>
+                  <Text variant="smallStrong">{`Carrinho · ${itemsLabel(lines.length)}`}</Text>
+                  {cart}
+                  {totalLine}
+                </View>
+              )}
+            </Section>
 
-      {step === 'produtos' ? (
-        <>
-          {customerPanel}
-          <View style={[styles.columns, wide && styles.columnsWide]}>
-            <View style={[styles.col, wide && { flex: 2 }]}>
-              <Panel title="Produtos">
-                <ProductSearch inCart={inCart} onAdd={add} />
-              </Panel>
-            </View>
-            <View style={[styles.col, wide && { flex: 3 }]}>{cartPanel}</View>
-          </View>
-          <FormActions>
-            <Button label="Voltar" variant="ghost" onPress={() => setStep('cliente')} />
-            <Button
-              label="Revisar pedido"
-              variant="strong"
-              disabled={lines.length === 0}
-              onPress={() => setStep('revisao')}
-            />
-          </FormActions>
-        </>
-      ) : null}
+            <Section title="Pagamento">
+              {conditions.isError ? (
+                <Alert tone="danger" title="Condições indisponíveis">
+                  {toApiError(conditions.error).userMessage}
+                </Alert>
+              ) : null}
+              {methods.isError ? (
+                <Alert
+                  tone="danger"
+                  title="Formas indisponíveis"
+                  action={<Button label="Recarregar formas" onPress={() => methods.refetch()} />}
+                >
+                  {toApiError(methods.error).userMessage}
+                </Alert>
+              ) : null}
+              <PaymentFields
+                choice={payment}
+                onChange={setPayment}
+                conditions={conditions.data ?? []}
+                methods={methods.data ?? []}
+                methodId={methodId}
+                onMethod={setMethodId}
+                preview={preview}
+                today={today}
+                error={paymentError}
+                disabled={saving}
+              />
+            </Section>
 
-      {step === 'revisao' ? (
-        <>
-          {customerPanel}
-          <View style={[styles.columns, wide && styles.columnsWide]}>
-            <View style={[styles.col, { flex: 1, minWidth: 0 }]}>
-              <Disclosure
-                label={`Revisar ${lines.length} itens`}
-                summary={formatCents(total)}
-                defaultOpen
-              >
-                {cartPanel}
-              </Disclosure>
-            </View>
-            <View style={[styles.col, { flex: 1, minWidth: 0 }]}>
-              <Panel title="Pagamento">
-                {conditions.isError ? (
-                  <Alert tone="danger" title="Condições indisponíveis">
-                    {toApiError(conditions.error).userMessage}
-                  </Alert>
-                ) : null}
-                {methods.isError ? (
-                  <Alert
-                    tone="danger"
-                    title="Formas indisponíveis"
-                    action={<Button label="Recarregar formas" onPress={() => methods.refetch()} />}
-                  >
-                    {toApiError(methods.error).userMessage}
-                  </Alert>
-                ) : null}
-                <PaymentFields
-                  choice={payment}
-                  onChange={setPayment}
-                  conditions={conditions.data ?? []}
-                  methods={methods.data ?? []}
-                  methodId={methodId}
-                  onMethod={setMethodId}
-                  error={paymentError}
-                  disabled={saving}
+            <Section title="Finalização">
+              <TextField
+                label="Observações"
+                optional
+                multiline
+                maxLength={1000}
+                value={notes}
+                onChangeText={setNotes}
+                placeholder="Instruções de entrega, combinados com o cliente…"
+                style={styles.notes}
+              />
+              <View style={styles.summary} accessibilityLabel="Resumo financeiro">
+                <SummaryLine label="Cliente" value={customer?.name ?? 'Não escolhido'} />
+                <SummaryLine label="Itens" value={itemsLabel(lines.length)} />
+                <SummaryLine
+                  label="Pagamento"
+                  value={preview.length > 1 ? `${paymentLabel} · ${preview.length}x` : paymentLabel}
                 />
-                {paymentPreview(total, payment, conditions.data ?? [], today).map((p, i) => (
-                  <View
-                    key={i}
-                    style={{ flexDirection: 'row', justifyContent: 'space-between', gap: space[2] }}
-                  >
-                    <Text variant="small">
-                      {i + 1}ª · {formatCalendarDate(p.date)}
-                    </Text>
-                    <Text variant="smallStrong">{formatCents(p.amountCents)}</Text>
-                  </View>
-                ))}
-                {payment.mode !== 'later' ? (
-                  <Text variant="caption" color={color.textSecondary}>
-                    Prévia de vencimentos e valores. Confira as parcelas registradas após salvar.
+              </View>
+
+              {createUnknown ? (
+                <Alert
+                  tone="warning"
+                  title="Não sabemos se o rascunho foi criado"
+                  action={
+                    <Link href={'/pedidos?situacao=draft' as Href} asChild>
+                      <Button label="Ver rascunhos" size="sm" variant="outline" />
+                    </Link>
+                  }
+                >
+                  A conexão falhou antes da resposta. Confira a lista de rascunhos antes de salvar
+                  de novo: a criação não tem proteção contra duplicidade no servidor.
+                </Alert>
+              ) : saveError ? (
+                <Alert
+                  tone={toApiError(saveError).code === 'CONFLICT' ? 'warning' : 'danger'}
+                  title="Rascunho não salvo"
+                  action={
+                    toApiError(saveError).code === 'CONFLICT' && onReload ? (
+                      <Button
+                        label="Carregar versão atual"
+                        size="sm"
+                        variant="outline"
+                        onPress={onReload}
+                      />
+                    ) : null
+                  }
+                >
+                  {saveErrorMessage(toApiError(saveError))}
+                </Alert>
+              ) : null}
+
+              <View style={[styles.footer, compact && styles.footerCompact]}>
+                <View>
+                  <Text variant="small" color={color.textSecondary}>
+                    Total do pedido
                   </Text>
-                ) : null}
-              </Panel>
-              <Panel title="Observações">
-                <TextField
-                  label="Observações do pedido"
-                  hideLabel
-                  optional
-                  multiline
-                  maxLength={1000}
-                  value={notes}
-                  onChangeText={setNotes}
-                  style={styles.notes}
-                />
-              </Panel>
-            </View>
+                  <Text variant="figureLarge">{formatCents(total)}</Text>
+                </View>
+                {footerActions}
+              </View>
+              {incomplete ? (
+                <Text
+                  variant="caption"
+                  color={color.textSecondary}
+                  align={compact ? 'left' : 'right'}
+                >
+                  Escolha o cliente e inclua ao menos um produto para salvar.
+                </Text>
+              ) : confirmHint ? (
+                <Text
+                  variant="caption"
+                  color={color.textSecondary}
+                  align={compact ? 'left' : 'right'}
+                >
+                  {confirmHint}
+                </Text>
+              ) : null}
+            </Section>
           </View>
 
-          {createUnknown ? (
-            <Alert
-              tone="warning"
-              title="Não sabemos se o rascunho foi criado"
-              action={
-                <Link href={'/pedidos?situacao=draft' as Href} asChild>
-                  <Button label="Ver rascunhos" size="sm" variant="outline" />
-                </Link>
-              }
-            >
-              A conexão falhou antes da resposta. Confira a lista de rascunhos antes de salvar de
-              novo: a criação não tem proteção contra duplicidade no servidor.
-            </Alert>
-          ) : saveError ? (
-            <Alert
-              tone={toApiError(saveError).code === 'CONFLICT' ? 'warning' : 'danger'}
-              title="Rascunho não salvo"
-              action={
-                toApiError(saveError).code === 'CONFLICT' && onReload ? (
-                  <Button
-                    label="Carregar versão atual"
-                    size="sm"
-                    variant="outline"
-                    onPress={onReload}
-                  />
-                ) : null
-              }
-            >
-              {saveErrorMessage(toApiError(saveError))}
-            </Alert>
+          {wide ? (
+            <View style={[styles.aside, sticky]}>
+              <View style={styles.sectionHead}>
+                <Text variant="h3" accessibilityRole="header">
+                  Carrinho
+                </Text>
+                <Text variant="small" color={color.textSecondary}>
+                  {itemsLabel(lines.length)}
+                </Text>
+              </View>
+              <ScrollView style={asideScroll}>{cart}</ScrollView>
+              {totalLine}
+            </View>
           ) : null}
+        </View>
+      </View>
 
-          <FormActions>
-            <Button
-              label="Voltar"
-              variant="ghost"
-              disabled={saving}
-              onPress={() => setStep('produtos')}
-            />
-            <Button
-              label={order ? 'Salvar rascunho' : 'Criar rascunho'}
-              variant="strong"
-              loading={saving}
-              disabled={!customer || lines.length === 0 || createUnknown}
-              onPress={save}
-            />
-          </FormActions>
-          <Text variant="caption" color={color.textSecondary} align={compact ? 'center' : 'right'}>
-            A confirmação (com reserva de estoque) é feita na ficha do pedido, depois de salvar.
-          </Text>
-        </>
-      ) : null}
-
-      <CustomerPicker
-        visible={picking}
-        onClose={() => setPicking(false)}
-        onPick={(c: Customer) => {
-          setCustomer({ id: c.id, name: c.name });
-          setPicking(false);
-        }}
-      />
-    </>
+      <Dialog
+        visible={summaryOpen}
+        title={`Carrinho · ${itemsLabel(lines.length)}`}
+        onClose={() => setSummaryOpen(false)}
+        actions={<Button label="Fechar" variant="ghost" onPress={() => setSummaryOpen(false)} />}
+      >
+        {cart}
+        {totalLine}
+      </Dialog>
+    </Screen>
   );
 }
 
+function SummaryLine({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.summaryLine}>
+      <Text variant="small" color={color.textSecondary}>
+        {label}
+      </Text>
+      <Text variant="smallStrong" numberOfLines={1} style={styles.summaryValue}>
+        {value}
+      </Text>
+    </View>
+  );
+}
+
+// Web: resumo lateral acompanha a rolagem; a lista rola sozinha quando passa da altura da tela.
+const sticky = (Platform.OS === 'web' ? { position: 'sticky', top: space[6] } : {}) as ViewStyle;
+const asideScroll = (
+  Platform.OS === 'web' ? { maxHeight: 'calc(100vh - 220px)' } : {}
+) as ViewStyle;
+
 const styles = StyleSheet.create({
-  customer: { flexDirection: 'row', alignItems: 'center', gap: space[2], paddingTop: space[1] },
-  responsible: { paddingTop: space[4] },
-  columns: { gap: space[5] },
+  form: { gap: space[8] },
+  section: { gap: space[4] },
+  sectionHead: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: space[3],
+    paddingBottom: space[2],
+    borderBottomWidth: 1,
+    borderBottomColor: color.border,
+  },
+  // Lista de clientes flutua sobre as seções seguintes.
+  raised: { zIndex: 20 },
+  columns: { gap: space[8] },
   columnsWide: { flexDirection: 'row', alignItems: 'flex-start' },
-  col: { gap: space[5] },
-  total: {
+  main: { flex: 1, minWidth: 0, gap: space[8] },
+  aside: {
+    width: 380,
+    gap: space[3],
+    padding: space[4],
+    borderWidth: 1,
+    borderColor: color.border,
+    borderRadius: 14,
+    backgroundColor: color.surface,
+  },
+  inlineCart: { gap: space[2], paddingTop: space[2] },
+  totalLine: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
-    paddingTop: space[4],
-    marginTop: space[3],
+    paddingTop: space[3],
     borderTopWidth: 1,
     borderTopColor: color.border,
   },
-  notes: { minHeight: 72, textAlignVertical: 'top' },
+  notes: { minHeight: 56, textAlignVertical: 'top' },
+  summary: { gap: space[1] },
+  summaryLine: { flexDirection: 'row', justifyContent: 'space-between', gap: space[3] },
+  summaryValue: { flexShrink: 1, textAlign: 'right' },
+  footer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: space[4],
+    paddingTop: space[4],
+    borderTopWidth: 1,
+    borderTopColor: color.border,
+  },
+  footerCompact: { flexDirection: 'column', alignItems: 'stretch' },
+  actions: { flexDirection: 'row', gap: space[2], alignItems: 'center' },
+  actionsCompact: { flexDirection: 'column-reverse', alignItems: 'stretch' },
+  flex: { flex: 1, minWidth: 0 },
+  bar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[3],
+    paddingHorizontal: space[4],
+    paddingVertical: space[2],
+    borderTopWidth: 1,
+    borderTopColor: color.border,
+    backgroundColor: color.surface,
+  },
 });

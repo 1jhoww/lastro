@@ -1,7 +1,7 @@
 import { Directory, File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { randomUUID } from 'expo-crypto';
-import type { Download, FilePresentation } from './contracts';
+import type { Download, FilePresentation, Viewer } from './contracts';
 import { fileLease, trackPrivateFile } from './fileEpoch';
 
 const directory = () => new Directory(Paths.cache, 'lastro-private-documents');
@@ -10,6 +10,10 @@ export function clearOrphanFiles() {
   const folder = directory();
   if (folder.exists) folder.delete();
   initialized = true;
+}
+/** Nativo abre pela folha do sistema; não há aba a reservar. */
+export function reserveViewer(): Viewer | null {
+  return null;
 }
 export function stageFile(download: Download): FilePresentation {
   if (!initialized) clearOrphanFiles();
