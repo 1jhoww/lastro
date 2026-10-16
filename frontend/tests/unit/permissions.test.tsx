@@ -3,7 +3,7 @@ import AppLayout from '@/app/(app)/_layout';
 import Inventory from '@/app/(app)/estoque/index';
 import Settings from '@/app/(app)/configuracoes/index';
 import PlatformLayout from '@/app/plataforma/_layout';
-import PlatformTenants from '@/app/plataforma/index';
+import PlatformCompanies from '@/app/plataforma/empresas/index';
 import { createFakeApi, membership, ok, page, tenant } from '../support/fakeApi';
 import { FakeGateway } from '../support/fakeGateway';
 import { renderApp } from '../support/renderApp';
@@ -93,27 +93,47 @@ describe('permissões vindas do /me', () => {
   });
 });
 
+/** Campos de uma linha de /admin/companies além dos dados da empresa. */
+const companyFields = {
+  tenantStatus: 'active',
+  subscriptionId: 't1',
+  subscriptionVersion: 1,
+  subscriptionStatus: 'active',
+  planCode: 'profissional',
+  planName: 'Profissional',
+  monthlyPriceCents: 19900,
+  billingDay: 10,
+  nextDueDate: null,
+  activeUsers: 1,
+  userLimit: 2,
+  contact: null,
+  openCharges: { count: 0, overdueCount: 0, amountCents: 0 },
+};
+
 describe('Super Admin', () => {
   it('login antigo pede a senha antes de chamar rotas da plataforma', async () => {
     const { gateway, server } = world('administrator', true);
-    server.on('GET', '/api/v1/admin/tenants', () =>
-      ok({ items: [tenant('t1', 'Distribuidora Teste')], nextCursor: null }),
+    server.on('GET', '/api/v1/admin/companies', () =>
+      ok({ items: [{ ...tenant('t1', 'Distribuidora Teste'), ...companyFields }], total: 1 }),
     );
     gateway.authTimeSeconds = Math.floor(Date.now() / 1000) - 3600;
     await renderApp({
       gateway,
       fetch: server.fetch,
-      initialUrl: '/plataforma',
-      overrides: { 'plataforma/_layout': PlatformLayout, 'plataforma/index': PlatformTenants },
+      initialUrl: '/plataforma/empresas',
+      overrides: {
+        'plataforma/_layout': PlatformLayout,
+        'plataforma/empresas/index': PlatformCompanies,
+      },
     });
     expect(await screen.findByText('Confirme sua senha')).toBeTruthy();
-    expect(server.calls.some((c) => c.path === '/api/v1/admin/tenants')).toBe(false);
+    expect(server.calls.some((c) => c.path === '/api/v1/admin/companies')).toBe(false);
 
     await fireEvent.changeText(screen.getByLabelText('Senha'), ana.password);
     await fireEvent.press(screen.getByRole('button', { name: 'Confirmar' }));
     expect(await screen.findByText('Distribuidora Teste')).toBeTruthy();
     // A área da plataforma não envia empresa: usa só rotas /admin.
-    const call = server.calls.find((c) => c.path === '/api/v1/admin/tenants');
+    const call = server.calls.find((c) => c.path === '/api/v1/admin/companies');
     expect(call?.headers['x-tenant-id']).toBeUndefined();
   });
 });

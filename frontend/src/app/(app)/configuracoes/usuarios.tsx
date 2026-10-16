@@ -7,8 +7,9 @@ import { z } from 'zod';
 import { unwrap } from '@/api/client';
 import { toApiError } from '@/api/errors';
 import { queryKeys } from '@/api/queryKeys';
-import type { Member, PendingInvitation, Role } from '@/api/types';
+import type { Member, MembershipPlan, PendingInvitation, Role, UsersPage } from '@/api/types';
 import { IssuedInviteCard } from '@/features/invitations/IssuedInviteCard';
+import { featureLabel } from '@/features/platform/copy';
 import { RequirePermission } from '@/features/session/RequirePermission';
 import { Screen } from '@/layout/Screen';
 import { formatDate } from '@/lib/dates';
@@ -49,15 +50,29 @@ function Users() {
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });
   const members = users.data?.pages.flatMap((p) => p.items) ?? [];
-  // Convites pendentes vêm completos na primeira página.
+  // Convites pendentes e vagas vêm completos na primeira página.
   const pending = users.data?.pages[0]?.pendingInvitations ?? [];
+  const capacity = users.data?.pages[0]?.capacity ?? null;
+  const { membership } = useSession();
+  const plan = membership?.plan ?? null;
 
   return (
     <Screen
       title="Usuários e convites"
       description="Cada pessoa ativa e cada convite pendente ocupam uma vaga do plano."
     >
-      <InvitePanel />
+      {plan && capacity ? <SeatsPanel plan={plan} capacity={capacity} /> : null}
+      {users.isPending || !plan || !capacity ? null : !plan.features.includes('users.invite') ? (
+        <Alert title="Convites adicionais não fazem parte do seu plano">
+          {`O plano ${plan.name ?? 'contratado'} permite ${plan.userLimit === 1 ? '1 usuário' : `${plan.userLimit} usuários`}. Para convidar mais pessoas, fale com o Lastro sobre o plano Profissional.`}
+        </Alert>
+      ) : capacity.available === 0 ? (
+        <Alert tone="warning" title="Todas as vagas do plano estão ocupadas">
+          Revogue um convite pendente para liberar uma vaga.
+        </Alert>
+      ) : (
+        <InvitePanel sellers={plan.features.includes('commercial.sellers')} />
+      )}
       {users.isError ? (
         <Alert
           tone="danger"
@@ -113,13 +128,37 @@ const inviteSchema = z.object({
 });
 type InviteValues = z.infer<typeof inviteSchema>;
 
-function InvitePanel() {
+/** Vagas do plano: usuários ativos e convites pendentes. O suporte Lastro não ocupa vaga. */
+function SeatsPanel({ plan, capacity }: { plan: MembershipPlan; capacity: UsersPage['capacity'] }) {
+  const used = capacity.activeUsers + capacity.reservedInvitations;
+  return (
+    <Panel
+      title={`Plano ${plan.name ?? 'contratado'}`}
+      description={`${used} de ${capacity.userLimit} ${capacity.userLimit === 1 ? 'vaga em uso' : 'vagas em uso'}: ${capacity.activeUsers} ${capacity.activeUsers === 1 ? 'usuário ativo' : 'usuários ativos'} e ${capacity.reservedInvitations} ${capacity.reservedInvitations === 1 ? 'convite pendente' : 'convites pendentes'}.`}
+      action={
+        <Badge
+          label={capacity.available ? `${capacity.available} livre(s)` : 'Sem vagas livres'}
+          tone={capacity.available ? 'success' : 'warning'}
+        />
+      }
+    >
+      <Text variant="small" color={color.textSecondary}>
+        {plan.features.length
+          ? `Recursos do plano: ${plan.features.map((f) => featureLabel[f]).join(', ')}.`
+          : 'Inclui clientes, produtos, pedidos, financeiro, relatórios e documentos. Convites adicionais, vitrine e vendedores fazem parte do Profissional.'}
+      </Text>
+    </Panel>
+  );
+}
+
+function InvitePanel({ sellers }: { sellers: boolean }) {
   const { api, tenantId, header } = useTenantApi();
   const queryClient = useQueryClient();
   const [issued, setIssued] = useState<{ email: string; token: string } | null>(null);
+  const defaultRole: Role = sellers ? 'seller' : 'administrator';
   const { control, handleSubmit, reset, formState } = useForm<InviteValues>({
     resolver: zodResolver(inviteSchema),
-    defaultValues: { email: '', role: 'seller' },
+    defaultValues: { email: '', role: defaultRole },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
@@ -133,7 +172,7 @@ function InvitePanel() {
       ),
     onSuccess: (result) => {
       setIssued({ email: result.invitation.email, token: result.token });
-      reset({ email: '', role: 'seller' });
+      reset({ email: '', role: defaultRole });
       queryClient.invalidateQueries({ queryKey: queryKeys.users(tenantId) });
     },
   });
@@ -184,15 +223,20 @@ function InvitePanel() {
           render={({ field }) => (
             <View style={styles.roleField}>
               <Text variant="smallStrong">Perfil</Text>
-              <Segmented<Role>
-                label="Perfil"
-                value={field.value}
-                onChange={field.onChange}
-                options={[
-                  { value: 'seller', label: 'Vendedor' },
-                  { value: 'administrator', label: 'Administrador' },
-                ]}
-              />
+              {/* Vendedores e carteiras dependem do plano; sem o recurso, só administrador. */}
+              {sellers ? (
+                <Segmented<Role>
+                  label="Perfil"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: 'seller', label: 'Vendedor' },
+                    { value: 'administrator', label: 'Administrador' },
+                  ]}
+                />
+              ) : (
+                <Text variant="body">Administrador</Text>
+              )}
               <Text variant="small" color={color.textSecondary}>
                 {field.value === 'seller'
                   ? 'Vê só a própria carteira de clientes e os próprios pedidos.'
@@ -251,6 +295,7 @@ function PendingRow({ invitation, last }: { invitation: PendingInvitation; last:
           </Text>
         ) : null}
       </View>
+      {invitation.seatExempt ? <Badge label="Suporte Lastro" tone="accent" /> : null}
       {confirming ? (
         <View style={styles.inline}>
           <Button label="Manter" size="sm" variant="ghost" onPress={() => setConfirming(false)} />
@@ -275,11 +320,14 @@ function MemberRow({ member, last }: { member: Member; last: boolean }) {
   return (
     <View style={[styles.row, !last && styles.divider]}>
       <View style={styles.copy}>
-        <Text variant="bodyStrong">{you ? `Você (${user?.email ?? ''})` : 'Usuário'}</Text>
+        <Text variant="bodyStrong">
+          {you ? `Você (${user?.email ?? ''})` : member.seatExempt ? 'Suporte Lastro' : 'Usuário'}
+        </Text>
         <Text variant="small" color={color.textSecondary} selectable>
           {you ? roleLabel[member.role] : `${roleLabel[member.role]}, ID ${member.id.slice(0, 8)}`}
         </Text>
       </View>
+      {member.seatExempt ? <Badge label="Não ocupa vaga" tone="accent" /> : null}
       <Badge
         label={member.status === 'active' ? 'Ativo' : 'Desativado'}
         tone={member.status === 'active' ? 'success' : 'neutral'}

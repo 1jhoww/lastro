@@ -6,6 +6,11 @@ export const subscriptionCopy: Record<
   SubscriptionStatus,
   { label: string; tone: BadgeTone; access: string }
 > = {
+  pending: {
+    label: 'Aguardando ativação',
+    tone: 'neutral',
+    access: 'Acesso liberado; cobrança ainda não ativada.',
+  },
   active: { label: 'Ativa', tone: 'success', access: 'Acesso liberado.' },
   past_due: {
     label: 'Em atraso',

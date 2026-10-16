@@ -44,6 +44,27 @@ export type Plan = PlansPage['items'][number];
 export type SubscriptionsPage = DataOf<'/api/v1/admin/subscriptions', 'get'>;
 export type Subscription = SubscriptionsPage['items'][number];
 export type SubscriptionStatus = Subscription['status'];
+export type MembershipPlan = Membership['plan'];
+export type PlanCode = NonNullable<MembershipPlan['code']>;
+export type PlanFeature = MembershipPlan['features'][number];
+
+export type PlatformOverview = DataOf<'/api/v1/admin/overview', 'get'>;
+export type CompanyList = DataOf<'/api/v1/admin/companies', 'get'>;
+export type CompanyRow = CompanyList['items'][number];
+export type CompanyDetail = DataOf<'/api/v1/admin/companies/{id}', 'get'>;
+export type CompanySubscription = CompanyDetail['subscription'];
+export type PlanCatalog = DataOf<'/api/v1/admin/plan-catalog', 'get'>;
+export type PlanChangePreview = DataOf<'/api/v1/admin/subscriptions/{id}/plan-change', 'get'>;
+export type HistoryEntry = DataOf<
+  '/api/v1/admin/subscriptions/{id}/history',
+  'get'
+>['items'][number];
+export type ChargePage = DataOf<'/api/v1/admin/charges', 'get'>;
+export type Charge = ChargePage['items'][number];
+export type ChargeSituation = Charge['situation'];
+export type GenerationResult = DataOf<'/api/v1/admin/charges/generate', 'post'>;
+export type OwnerInvitations = DataOf<'/api/v1/admin/invitations', 'get'>;
+export type OwnerInvitationRow = OwnerInvitations['items'][number];
 
 type BodyOf<P extends keyof paths, M extends keyof paths[P]> = paths[P][M] extends {
   requestBody?: { content: { 'application/json': infer B } };

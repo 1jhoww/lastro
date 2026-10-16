@@ -1,87 +1,216 @@
+import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { unwrap } from '@/api/client';
-import { toApiError } from '@/api/errors';
-import { queryKeys } from '@/api/queryKeys';
+import type { CompanyRow, SubscriptionStatus } from '@/api/types';
+import { FilterTabs } from '@/features/finance/FinanceParts';
+import { useCompanies, usePlanCatalog, type CompanyFilters } from '@/features/platform/api';
+import { dateOrDash, planLabel } from '@/features/platform/copy';
 import { PlatformHeader } from '@/features/platform/PlatformHeader';
-import { usePlatformQuery } from '@/features/platform/platformQuery';
+import { LoadError, LoadingRows } from '@/features/platform/PlatformParts';
 import { subscriptionCopy } from '@/features/platform/subscriptionCopy';
 import { formatCents } from '@/lib/money';
-import { useSession } from '@/session/SessionContext';
-import { color, space } from '@/theme';
-import { Alert, Badge, EmptyState, Panel, Skeleton, Text } from '@/ui';
+import { color, radius, space } from '@/theme';
+import { Badge, DataTable, EmptyState, Panel, Skeleton, Text } from '@/ui';
 import { CreditCard } from '@/ui/icons';
 
+type Tab = 'all' | 'active' | 'pending' | 'suspended' | 'to_charge' | 'overdue';
+
+const views: Record<Tab, { label: string; filters: CompanyFilters }> = {
+  all: { label: 'Todas', filters: {} },
+  active: { label: 'Ativas', filters: { status: 'active' as SubscriptionStatus } },
+  pending: { label: 'Aguardando ativação', filters: { status: 'pending' as SubscriptionStatus } },
+  suspended: { label: 'Suspensas', filters: { status: 'suspended' as SubscriptionStatus } },
+  to_charge: { label: 'A cobrar', filters: { attention: 'open' } },
+  overdue: { label: 'Vencidas', filters: { attention: 'overdue' } },
+};
+
 /**
- * Assinaturas com a situação real do backend. Somente leitura nesta etapa: suspender,
- * reativar ou alterar condições é uma decisão comercial manual, ainda sem tela.
+ * Contratos de todas as empresas. Situação da assinatura (administrativa) e situação das
+ * cobranças (financeira) aparecem separadas: atraso nunca suspende sozinho.
  */
 export default function PlatformSubscriptions() {
-  const { api, user } = useSession();
-  const uid = user?.uid ?? '';
-  const subs = usePlatformQuery(queryKeys.platform(uid, 'subscriptions'), () =>
-    unwrap(api.GET('/api/v1/admin/subscriptions', { params: { query: { limit: '100' } } })),
-  );
-  // Nome da empresa: mesma lista da tela de empresas (cache compartilhado).
-  const tenants = usePlatformQuery(queryKeys.platform(uid, 'tenants'), () =>
-    unwrap(api.GET('/api/v1/admin/tenants', { params: { query: { limit: '100' } } })),
-  );
-  const nameOf = (id: string) =>
-    tenants.data?.items.find((t) => t.id === id)?.name ?? `Empresa ${id.slice(0, 8)}`;
-  const items = subs.data?.items ?? [];
+  const [view, setView] = useState<Tab>('all');
+  const companies = useCompanies(views[view].filters);
+  const catalog = usePlanCatalog();
+  const items = companies.data?.items ?? [];
+  const mrr = items
+    .filter((c) => c.subscriptionStatus === 'active' || c.subscriptionStatus === 'past_due')
+    .reduce((total, c) => total + c.monthlyPriceCents, 0);
 
   return (
     <>
       <PlatformHeader
         title="Assinaturas"
-        description="Em atraso mantém o acesso. Suspensa e cancelada bloqueiam a empresa."
+        description="Plano, valor e vencimento de cada empresa. Alterações são feitas no detalhe da empresa."
       />
-      {subs.isError && toApiError(subs.error).code !== 'FORBIDDEN' ? (
-        <Alert tone="danger" title="Não foi possível carregar as assinaturas">
-          {toApiError(subs.error).userMessage}
-        </Alert>
+      <Panel
+        title="Planos oficiais"
+        description="Valores de referência; cada contrato tem o próprio valor."
+      >
+        {catalog.isPending ? <Skeleton width="100%" height={72} /> : null}
+        <View style={styles.plans}>
+          {catalog.data?.items.map((p) => (
+            <View key={p.code} style={styles.plan}>
+              <View style={styles.planTop}>
+                <Text variant="h3">{p.name}</Text>
+                <Text variant="figure">{`${formatCents(p.referencePriceCents)}/mês`}</Text>
+              </View>
+              <Text variant="small" color={color.textSecondary}>
+                {p.userLimit === 1 ? '1 usuário ativo' : `Até ${p.userLimit} usuários ativos`}
+              </Text>
+              {catalog.data.features.map((f) => {
+                const included = p.features.some((pf) => pf.code === f.code);
+                return (
+                  <Text
+                    key={f.code}
+                    variant="small"
+                    color={included ? color.text : color.textSecondary}
+                  >
+                    {`${included ? '✓' : '—'} ${f.label}`}
+                  </Text>
+                );
+              })}
+            </View>
+          ))}
+        </View>
+      </Panel>
+      <FilterTabs<Tab>
+        label="Filtrar assinaturas"
+        value={view}
+        onChange={setView}
+        options={(Object.keys(views) as Tab[]).map((value) => ({
+          value,
+          label: views[value].label,
+        }))}
+      />
+      {companies.isError ? (
+        <LoadError
+          title="Não foi possível carregar as assinaturas"
+          error={companies.error}
+          onRetry={() => companies.refetch()}
+        />
       ) : null}
       <Panel flush>
-        {subs.isPending ? (
-          <View style={styles.loading}>
-            <Skeleton width="50%" height={16} />
-            <Skeleton width="40%" height={16} />
-          </View>
+        {companies.isPending ? (
+          <LoadingRows />
         ) : items.length === 0 ? (
-          <EmptyState icon={CreditCard} title="Nenhuma assinatura" />
+          <EmptyState size="compact" icon={CreditCard} title="Nenhuma assinatura neste filtro" />
         ) : (
-          items.map((s, i) => {
-            const copy = subscriptionCopy[s.status];
-            return (
-              <View key={s.id} style={[styles.row, i < items.length - 1 && styles.divider]}>
-                <View style={styles.copy}>
-                  <Text variant="bodyStrong">{nameOf(s.tenantId)}</Text>
-                  <Text variant="small" color={color.textSecondary}>
-                    {`${formatCents(s.monthlyPriceCents)} por mês, até ${s.userLimit} usuários, plano versão ${s.planVersion}`}
+          <DataTable<CompanyRow>
+            label="Assinaturas"
+            rows={items}
+            keyOf={(c) => c.id}
+            hrefOf={(c) => `/plataforma/empresas/${c.id}`}
+            columns={[
+              {
+                key: 'name',
+                label: 'Empresa',
+                flex: 2,
+                render: (c) => (
+                  <Text variant="bodyStrong" numberOfLines={1}>
+                    {c.name}
                   </Text>
-                  <Text variant="small" color={color.textSecondary}>
-                    {copy.access}
+                ),
+              },
+              {
+                key: 'plan',
+                label: 'Plano',
+                flex: 1,
+                render: (c) => <Text variant="body">{planLabel(c.planCode, c.planName)}</Text>,
+              },
+              {
+                key: 'status',
+                label: 'Assinatura',
+                flex: 1.3,
+                render: (c) => <Badge {...subscriptionCopy[c.subscriptionStatus]} />,
+              },
+              {
+                key: 'price',
+                label: 'Mensal',
+                flex: 1,
+                align: 'right',
+                render: (c) => <Text variant="figure">{formatCents(c.monthlyPriceCents)}</Text>,
+              },
+              {
+                key: 'day',
+                label: 'Vencimento',
+                flex: 0.9,
+                render: (c) => (
+                  <Text variant="body">{c.billingDay === null ? '—' : `Dia ${c.billingDay}`}</Text>
+                ),
+              },
+              {
+                key: 'next',
+                label: 'Próximo',
+                flex: 1,
+                render: (c) => <Text variant="body">{dateOrDash(c.nextDueDate)}</Text>,
+              },
+              {
+                key: 'charges',
+                label: 'Cobranças',
+                flex: 1.4,
+                render: (c) =>
+                  c.openCharges.count ? (
+                    <View style={styles.badges}>
+                      <Badge
+                        label={`${formatCents(c.openCharges.amountCents)} em aberto`}
+                        tone={c.openCharges.overdueCount ? 'danger' : 'warning'}
+                      />
+                    </View>
+                  ) : (
+                    <Text variant="small" color={color.textSecondary}>
+                      Em dia
+                    </Text>
+                  ),
+              },
+            ]}
+            renderCompact={(c) => (
+              <View style={styles.compact}>
+                <View style={styles.compactTop}>
+                  <Text variant="bodyStrong" style={styles.flex} numberOfLines={1}>
+                    {c.name}
                   </Text>
+                  <Badge {...subscriptionCopy[c.subscriptionStatus]} />
                 </View>
-                <Badge label={copy.label} tone={copy.tone} />
+                <Text variant="small" color={color.textSecondary}>
+                  {`${planLabel(c.planCode, c.planName)}, ${formatCents(c.monthlyPriceCents)}, próximo ${dateOrDash(c.nextDueDate)}`}
+                </Text>
+                {c.openCharges.count ? (
+                  <Text
+                    variant="small"
+                    color={c.openCharges.overdueCount ? color.danger : color.textSecondary}
+                  >
+                    {`${formatCents(c.openCharges.amountCents)} em aberto`}
+                  </Text>
+                ) : null}
               </View>
-            );
-          })
+            )}
+          />
         )}
       </Panel>
+      {companies.data && view === 'all' ? (
+        <Text variant="small" color={color.textSecondary}>
+          {`Receita mensal contratada (ativas): ${formatCents(mrr)}`}
+        </Text>
+      ) : null}
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    gap: space[3],
-    paddingHorizontal: space[5],
-    paddingVertical: space[4],
+  plans: { flexDirection: 'row', flexWrap: 'wrap', gap: space[3], paddingTop: space[2] },
+  plan: {
+    flexGrow: 1,
+    flexBasis: 260,
+    gap: space[1],
+    padding: space[4],
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: color.border,
+    backgroundColor: color.surface,
   },
-  divider: { borderBottomWidth: 1, borderBottomColor: color.border },
-  copy: { flex: 1, minWidth: 220, gap: 2 },
-  loading: { padding: space[5], gap: space[3] },
+  planTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: space[1] },
+  compact: { gap: 2, flex: 1 },
+  compactTop: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
+  flex: { flex: 1 },
 });
