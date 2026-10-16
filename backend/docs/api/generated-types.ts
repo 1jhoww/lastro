@@ -4565,6 +4565,7 @@ export interface operations {
                 sort?: "name" | "createdAt";
                 direction?: "asc" | "desc";
                 assignedTo?: string | "unassigned";
+                document?: string;
             };
             header: {
                 /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
@@ -22692,6 +22693,7 @@ export interface operations {
                 sort?: "name" | "createdAt";
                 direction?: "asc" | "desc";
                 assignedTo?: string | "unassigned";
+                document?: string;
             };
             header: {
                 /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
@@ -22971,17 +22973,17 @@ export interface operations {
                     document?: string | null;
                     email?: string | null;
                     phone?: string | null;
-                    address?: {
-                        street?: string;
-                        number?: string;
+                    address: {
+                        street: string;
+                        number: string;
                         complement?: string;
-                        district?: string;
-                        city?: string;
-                        state?: string;
-                        postalCode?: string;
+                        district: string;
+                        city: string;
+                        state: string;
+                        postalCode: string;
                         /** @constant */
                         country?: "BR";
-                    } | null;
+                    };
                     notes?: string | null;
                     assignedTo?: string | null;
                 };
@@ -23787,16 +23789,16 @@ export interface operations {
                     email?: string | null;
                     phone?: string | null;
                     address?: {
-                        street?: string;
-                        number?: string;
+                        street: string;
+                        number: string;
                         complement?: string;
-                        district?: string;
-                        city?: string;
-                        state?: string;
-                        postalCode?: string;
+                        district: string;
+                        city: string;
+                        state: string;
+                        postalCode: string;
                         /** @constant */
                         country?: "BR";
-                    } | null;
+                    };
                     notes?: string | null;
                     /** @enum {string} */
                     status?: "active" | "inactive";
@@ -28465,6 +28467,8 @@ export interface operations {
                         data: {
                             items: {
                                 id: string;
+                                name?: string | null;
+                                email?: string | null;
                                 /** @enum {string} */
                                 role: "administrator" | "seller";
                                 /** @enum {string} */
@@ -28974,6 +28978,8 @@ export interface operations {
                             tenantId: string;
                             user: {
                                 id: string;
+                                name?: string | null;
+                                email?: string | null;
                                 /** @enum {string} */
                                 role: "administrator" | "seller";
                                 /** @enum {string} */
@@ -29464,6 +29470,8 @@ export interface operations {
                     "application/json": {
                         data: {
                             id: string;
+                            name?: string | null;
+                            email?: string | null;
                             /** @enum {string} */
                             role: "administrator" | "seller";
                             /** @enum {string} */
@@ -29716,6 +29724,8 @@ export interface operations {
                     "application/json": {
                         data: {
                             id: string;
+                            name?: string | null;
+                            email?: string | null;
                             /** @enum {string} */
                             role: "administrator" | "seller";
                             /** @enum {string} */
