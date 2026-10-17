@@ -22,6 +22,7 @@ import {
   Share2,
   type LucideIcon,
 } from '@/ui/icons';
+import type { OrderStatus } from '@/api/types';
 import { orderDocument } from './api';
 import { downloadMessage, type FilePresentation } from './contracts';
 import { fileLease } from './fileEpoch';
@@ -37,7 +38,12 @@ const documents: { kind: Kind; title: string; description: string; prefix: strin
     description: 'PDF com valores',
     prefix: 'pedido',
   },
-  { kind: 'packing', title: 'Romaneio', description: 'PDF sem valores', prefix: 'romaneio' },
+  {
+    kind: 'packing',
+    title: 'Romaneio de entrega',
+    description: 'Comprovante de recebimento para assinatura',
+    prefix: 'romaneio',
+  },
 ];
 
 const intentLabel: Record<Intent, string> = {
@@ -55,31 +61,37 @@ export function OrderDocuments({
   id,
   number,
   version,
+  status,
 }: {
   id: string;
   /** Número comercial curto, usado no nome do arquivo (ex.: PED-1A2B3C4D). */
   number: string;
   version: number;
+  status: OrderStatus;
 }) {
   const session = useSession();
   if (session.isPlatformAdmin || !session.permissions.includes('documents:own:read')) return null;
+  // Romaneio só existe para mercadoria que sai: pedido confirmado ou expedido (o servidor confere).
+  const available = documents.filter(
+    (d) => d.kind === 'commercial' || status === 'confirmed' || status === 'dispatched',
+  );
   return (
     <Fragment key={`${session.user?.uid}:${session.tenantId}:${id}:${version}`}>
       <Panel title="Documentos">
         <View accessibilityRole="list">
-          {documents.map((d, i) => (
+          {available.map((d, i) => (
             <DocumentRow
               key={d.kind}
               id={id}
               number={number}
               doc={d}
-              last={i === documents.length - 1}
+              last={i === available.length - 1}
             />
           ))}
         </View>
         <Text variant="caption" color={color.textSecondary} style={styles.note}>
-          Sem valor fiscal. O romaneio não comprova entrega. Para WhatsApp, compartilhe e escolha o
-          contato.
+          Documentos não fiscais. O romaneio é assinado no recebimento; gerar ou assinar não altera a
+          situação do pedido. Para WhatsApp, compartilhe e escolha o contato.
         </Text>
       </Panel>
     </Fragment>

@@ -83,7 +83,7 @@ export function LoadingRows({ rows = 3 }: { rows?: number }) {
   );
 }
 
-/** Falha de carregamento; login antigo (FORBIDDEN) já abre o pedido de senha e não aparece aqui. */
+/** Falha de carregamento; login antigo (REAUTHENTICATION_REQUIRED) já abre o pedido de senha e não aparece aqui. */
 export function LoadError({
   title,
   error,
@@ -93,7 +93,7 @@ export function LoadError({
   error: unknown;
   onRetry: () => void;
 }) {
-  if (toApiError(error).code === 'FORBIDDEN') return null;
+  if (toApiError(error).code === 'REAUTHENTICATION_REQUIRED') return null;
   return (
     <Alert
       tone="danger"

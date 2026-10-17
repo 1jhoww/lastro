@@ -500,14 +500,18 @@ export class OrderService {
   async authorizedSnapshot(tx: Transaction, actor: Actor, tenantId: string, id: string) {
     const ctx = await this.access.tenant(actor, tenantId, 'documents:own:read', tx);
     const order = await this.load(tx, tenantId, id);
-    await this.customer(tx, ctx, order.customerId, false, order.sellerUid);
+    const customer = await this.customer(tx, ctx, order.customerId, false, order.sellerUid);
     await this.financialLocks.assertOrderAvailable(
       tx,
       tenantId,
       id,
       ctx.membership.role === 'seller',
     );
-    return { order, tenant: { name: ctx.tenant.name, timezone: ctx.tenant.timezone } };
+    return {
+      order,
+      customer,
+      tenant: { name: ctx.tenant.name, timezone: ctx.tenant.timezone },
+    };
   }
   async command(
     actor: Actor,

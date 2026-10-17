@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTenant } from '@/features/session/useTenant';
+import { NameEditor } from '@/features/session/NameEditor';
 import { roleLabel, useSession } from '@/session/SessionContext';
 import { color, space } from '@/theme';
 import { Button, IconButton, Skeleton, Text } from '@/ui';
@@ -34,13 +35,16 @@ export function AccountMenu({ rail = false }: { rail?: boolean }) {
           </Text>
         )}
         <Text variant="caption" color={color.onStructureSecondary} numberOfLines={1}>
-          {session.role ? roleLabel[session.role] : ''}
+          {[session.me?.name, session.role ? roleLabel[session.role] : null]
+            .filter(Boolean)
+            .join(' · ')}
         </Text>
         <Text variant="caption" color={color.onStructureMuted} numberOfLines={1}>
           {session.user?.email}
         </Text>
       </View>
       <View style={styles.actions}>
+        <NameEditor variant="onStructure" />
         {many ? (
           <Link href="/empresas" asChild>
             <Button label="Trocar empresa" variant="onStructure" size="sm" icon={ArrowLeftRight} />

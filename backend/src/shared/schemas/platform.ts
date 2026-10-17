@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   billingContactSchema,
   calendarDate,
+  email,
   instant,
   opaqueId,
   planCode,
@@ -10,7 +11,7 @@ import {
 } from './models.js';
 import { planFeatures } from '../../modules/plans/catalog.js';
 import { chargeView } from './billing.js';
-import { subscriptionView, tenantView } from './http.js';
+import { emailChangeView, subscriptionView, tenantView } from './http.js';
 
 const money = z.object({ count: z.number(), amountCents: z.number() });
 
@@ -81,7 +82,18 @@ export const companyDetail = z.object({
       role,
       status: z.enum(['active', 'disabled']),
       seatExempt: z.boolean(),
+      /** Membership version, required by status commands. */
+      version: z.number(),
+      /** Account blocked at platform level (Lastro identity or sign-in provider), every company. */
+      accountBlocked: z.boolean(),
       createdAt: instant,
+      /** Pending e-mail change of this account, if any. */
+      emailChange: emailChangeView
+        .extend({
+          /** The identity provider already holds the new address (holder confirmed it). */
+          appliedByProvider: z.boolean(),
+        })
+        .nullable(),
     }),
   ),
   invitations: z.array(
@@ -94,13 +106,32 @@ export const companyDetail = z.object({
       seatExempt: z.boolean(),
       expiresAt: instant,
       createdAt: instant,
+      replacedBy: opaqueId.nullable(),
     }),
   ),
   publicCatalogEnabled: z.boolean(),
 });
 export const companyInvitationParams = z.strictObject({ id: opaqueId, invitationId: opaqueId });
-export const revokeInvitationInput = z.strictObject({
-  reason: z.string().trim().min(3).max(200),
+const reason = z.string().trim().min(3).max(200);
+export const revokeInvitationInput = z.strictObject({ reason });
+/** New access invitation for an existing company; always bounded by the contracted seats. */
+export const companyInviteInput = z.strictObject({ email, role, reason });
+/** Resend a pending invitation (new link, same seat) or correct its e-mail. */
+export const companyReissueInput = z.strictObject({ email: email.optional(), reason });
+export const companyMemberParams = z.strictObject({ id: opaqueId, uid: opaqueId });
+export const companyMemberStatusInput = z.strictObject({
+  status: z.enum(['active', 'disabled']),
+  expectedVersion: z.number().int().positive(),
+  reason,
+});
+export const emailChangeInput = z.strictObject({ newEmail: email, reason });
+export const emailChangeCancelInput = z.strictObject({ reason });
+export const accountUnblockedView = z.object({ uid: opaqueId, blocked: z.literal(false) });
+export const companyMemberView = z.object({
+  uid: opaqueId,
+  role,
+  status: z.enum(['active', 'disabled']),
+  version: z.number(),
 });
 
 export const ownerInvitationList = z.object({

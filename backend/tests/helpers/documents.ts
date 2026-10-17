@@ -70,6 +70,19 @@ export function documentSource(count = 1): DocumentSource {
       dispatchReference: null,
       schemaVersion: 1,
     }),
-    returned: [],
+    customer: {
+      tradeName: null,
+      document: '12345678909',
+      email: 'compras@cliente.example',
+      phone: '+5511987654321',
+      address: {
+        street: 'Rua das Flores',
+        number: '120',
+        district: 'Centro',
+        city: 'São Paulo',
+        state: 'SP',
+        postalCode: '01001000',
+      },
+    },
   };
 }

@@ -11,6 +11,7 @@ import {
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut,
+  verifyBeforeUpdateEmail,
   type Auth,
   type User,
 } from 'firebase/auth';
@@ -72,6 +73,9 @@ export function createFirebaseGateway(env: Env): AuthGateway {
       // Força novo token para o claim email_verified chegar atualizado ao backend.
       await u.getIdToken(true);
       return toUser(auth.currentUser);
+    },
+    async requestEmailChange(newEmail) {
+      await verifyBeforeUpdateEmail(current(), newEmail.trim().toLowerCase());
     },
     async reauthenticate(password) {
       const u = current();

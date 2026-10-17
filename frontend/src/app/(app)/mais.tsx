@@ -1,6 +1,7 @@
 import type { Href } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTenant } from '@/features/session/useTenant';
+import { NameEditor } from '@/features/session/NameEditor';
 import { Screen } from '@/layout/Screen';
 import { visibleDestinations } from '@/navigation/destinations';
 import { roleLabel, useSession } from '@/session/SessionContext';
@@ -59,11 +60,16 @@ export default function More() {
             <Text variant="bodyStrong">{tenant.data?.name ?? 'Empresa'}</Text>
           )}
           <Text variant="small" color={color.textSecondary}>
-            {session.role ? roleLabel[session.role] : ''}
+            {[session.me?.name, session.role ? roleLabel[session.role] : null]
+              .filter(Boolean)
+              .join(' · ')}
           </Text>
           <Text variant="small" color={color.textSecondary}>
             {session.user?.email}
           </Text>
+          <View style={styles.nameAction}>
+            <NameEditor />
+          </View>
         </View>
       </Panel>
       {extras.length ? (
@@ -84,4 +90,7 @@ export default function More() {
   );
 }
 
-const styles = StyleSheet.create({ account: { gap: space[1] } });
+const styles = StyleSheet.create({
+  account: { gap: space[1] },
+  nameAction: { alignItems: 'flex-start', marginLeft: -space[3] },
+});

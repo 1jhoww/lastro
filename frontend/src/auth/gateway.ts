@@ -24,6 +24,11 @@ export interface AuthGateway {
   sendEmailVerification(): Promise<void>;
   /** Relê o usuário no provedor (ex.: depois de confirmar o e-mail em outra aba). */
   reloadUser(): Promise<AuthUser | null>;
+  /**
+   * Pede ao provedor que verifique um novo e-mail da conta logada: o endereço só muda depois
+   * que o link enviado a ele é aberto. Exige login recente (reautenticar antes).
+   */
+  requestEmailChange(newEmail: string): Promise<void>;
   /** Pede nova senha ao usuário logado; renova `auth_time` para rotas da plataforma. */
   reauthenticate(password: string): Promise<void>;
   /** ID Token atual; `force` ignora o cache e pede um novo ao provedor. */

@@ -4,6 +4,7 @@ import { membership } from '../support/fakeApi';
 const me = (memberships: ReturnType<typeof membership>[], platformAdmin = false) => ({
   uid: 'u1',
   email: 'ana@lastro.test',
+  name: 'Ana Carolina',
   platformAdmin,
   memberships,
 });

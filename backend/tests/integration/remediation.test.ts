@@ -215,7 +215,7 @@ describe('F03–F07: regressões nos emuladores', () => {
   it('PDF lento limita leitura inicial e conserva cota até SDK terminar', async () => {
     const order = await draft(f);
     const renderer = new PdfRenderer();
-    const service = new DocumentService(undefined!, undefined!, renderer, new ReadGate(1, 15));
+    const service = new DocumentService(undefined!, renderer, new ReadGate(1, 15));
     let release!: () => void;
     const realSource = DocumentService.prototype.source;
     // Obtain a real authorized source through the app service before injecting latency.

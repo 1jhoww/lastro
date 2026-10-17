@@ -11,6 +11,10 @@ import { opaqueId } from '../../shared/schemas/models.js';
 import { AppError, requireCondition } from '../../shared/errors/appError.js';
 import { decodeCursor, encodeCursor, digest, stableJson } from '../../shared/utils/crypto.js';
 import { searchKey, type CommercialQuery } from '../../shared/schemas/commercial.js';
+import { checkReadBudget } from '../../shared/operations/readBudget.js';
+
+/** Most customers one seller portfolio may hold for a single aggregated read. */
+export const PORTFOLIO_CAP = 5000;
 export type CommercialCollection =
   | 'customers'
   | 'products'
@@ -71,6 +75,27 @@ export class CommercialRepository {
       .global('tenants', tenantId)
       .collection(collection)
       .doc(opaqueId.parse(id));
+  }
+  /**
+   * Ids of the customers currently assigned to a seller (the official portfolio relation,
+   * `customer.assignedTo`, the same one the customer list and order access use). Any status:
+   * history of an inactive customer of the portfolio stays visible to its seller.
+   */
+  async portfolio(tenantId: string, uid: string, tx: Transaction): Promise<Set<string>> {
+    checkReadBudget();
+    const page = await tx.get(
+      this.ref(tenantId, 'customers', 'placeholder')
+        .parent.where('assignedTo', '==', opaqueId.parse(uid))
+        .select()
+        .limit(PORTFOLIO_CAP + 1),
+    );
+    requireCondition(
+      page.size <= PORTFOLIO_CAP,
+      422,
+      'REPORT_TOO_LARGE',
+      `A carteira passa de ${PORTFOLIO_CAP} clientes para esta consulta.`,
+    );
+    return new Set(page.docs.map((doc) => doc.id));
   }
   async list<T extends { id: string; tenantId: string; assignedTo?: string | null }>(
     actor: Actor,

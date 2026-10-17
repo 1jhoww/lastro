@@ -78,7 +78,7 @@ export function createApp(
     paymentSettings,
   );
   const downloadBudget = new ReadGate();
-  const documents = new DocumentService(orders, returns, undefined, downloadBudget);
+  const documents = new DocumentService(orders, undefined, downloadBudget);
   const exports = new ExportService(
     customers,
     products,

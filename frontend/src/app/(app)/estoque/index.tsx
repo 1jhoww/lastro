@@ -6,6 +6,7 @@ import { useCategoryLookup } from '@/features/categories/api';
 import { ListPanel } from '@/features/catalog/ListStates';
 import { useInventoryList, type InventoryFilters } from '@/features/inventory/api';
 import { StockLegend } from '@/features/inventory/StockLegend';
+import { InventoryOverview } from '@/features/inventory/InventoryOverview';
 import { InventoryNav, qty, StockStatus } from '@/features/inventory/StockParts';
 import { isAdminStock } from '@/features/inventory/stock';
 import { RequirePermission } from '@/features/session/RequirePermission';
@@ -16,6 +17,7 @@ import { useSession } from '@/session/SessionContext';
 import { color, space, useLayoutSize } from '@/theme';
 import {
   Button,
+  Badge,
   DataTable,
   EmptyState,
   Panel,
@@ -48,12 +50,15 @@ export default function InventoryRoute() {
 function Inventory() {
   const { permissions } = useSession();
   const manage = permissions.includes('inventory:manage');
-  const compact = useLayoutSize() === 'compact';
+  const layoutSize = useLayoutSize();
+  const compact = layoutSize === 'compact';
   const [mode, setMode] = useState<SearchMode>('name');
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('active');
   const [categoryId, setCategoryId] = useState('any');
   const [order, setOrder] = useState<InventoryFilters['order']>('name');
+  const [stockState, setStockState] = useState<NonNullable<InventoryFilters['stockState']>>('all');
+  const [showLegend, setShowLegend] = useState(false);
   const term = useDebouncedValue(search).trim();
   const categories = useCategoryLookup();
   // Celular: categoria, situação e ordem ficam recolhidas para a lista aparecer logo.
@@ -70,8 +75,9 @@ function Inventory() {
       status: manage ? status : 'active',
       ...(categoryId !== 'any' ? { categoryId } : {}),
       order,
+      stockState,
     }),
-    [mode, term, skuInvalid, manage, status, categoryId, order],
+    [mode, term, skuInvalid, manage, status, categoryId, order, stockState],
   );
   const { query, items } = useInventoryList(filters, !skuInvalid);
 
@@ -88,6 +94,7 @@ function Inventory() {
           <Text variant="small" color={color.textSecondary} numberOfLines={1}>
             {s.sku}
           </Text>
+          {isAdminStock(s) ? <StockStatus stock={s} /> : Number(s.available) === 0 ? <Badge label="Sem disponível" tone="danger" /> : null}
         </View>
       ),
     },
@@ -96,13 +103,6 @@ function Inventory() {
           figureColumn('available', 'Disponível', true),
           figureColumn('reserved', 'Reservado'),
           figureColumn('physical', 'Físico'),
-          figureColumn('minimumStock', 'Mínimo'),
-          {
-            key: 'status',
-            label: 'Situação',
-            width: 150,
-            render: (s: InventoryItem) => (isAdminStock(s) ? <StockStatus stock={s} /> : null),
-          },
         ]
       : [
           {
@@ -115,7 +115,10 @@ function Inventory() {
         ]),
   ];
 
-  const filtered = term.length > 0 || status !== 'active' || categoryId !== 'any';
+  const filtered = term.length > 0 || status !== 'active' || categoryId !== 'any' || stockState !== 'all';
+  const resetFilters = () => {
+    setSearch(''); setStatus('active'); setCategoryId('any'); setOrder('name'); setStockState('all');
+  };
   const categoryOptions = [
     { value: 'any', label: 'Todas as categorias' },
     ...(categories.data ?? []).map((c) => ({
@@ -151,6 +154,7 @@ function Inventory() {
       }
     >
       {manage ? <InventoryNav current="saldos" /> : null}
+      {manage ? <InventoryOverview /> : null}
 
       <View style={[styles.toolbar, compact && styles.toolbarCompact]}>
         <View style={styles.search}>
@@ -225,6 +229,29 @@ function Inventory() {
         ) : null}
       </View>
 
+      <View style={styles.toolbar}>
+        <View style={styles.select}>
+          <Select<NonNullable<InventoryFilters['stockState']>>
+            label="Saldo" value={stockState} onChange={setStockState}
+            options={[
+              { value: 'all', label: 'Todos os saldos' },
+              { value: 'empty', label: 'Sem disponível' },
+              { value: 'available', label: 'Com disponível' },
+              ...(manage ? [
+                { value: 'low' as const, label: 'Estoque baixo' },
+                { value: 'reserved' as const, label: 'Com reservas' },
+              ] : []),
+            ]}
+          />
+        </View>
+        <Text variant="caption" color={color.textSecondary}>
+          {`${items.length} produto${items.length === 1 ? '' : 's'} carregado${items.length === 1 ? '' : 's'}${query.hasNextPage ? ' · há mais produtos' : ''}`}
+        </Text>
+        {filtered ? <Button label="Limpar filtros" size="sm" variant="ghost" onPress={resetFilters} /> : null}
+        <Button label="Atualizar lista" size="sm" variant="ghost" loading={query.isFetching} onPress={() => query.refetch()} />
+      </View>
+
+      {!skuInvalid ? (
       <ListPanel
         query={query}
         count={items.length}
@@ -232,9 +259,9 @@ function Inventory() {
           filtered ? (
             <EmptyState
               icon={SearchX}
-              title="Nenhum produto encontrado"
+              title={query.hasNextPage ? 'Ainda há produtos para consultar' : 'Nenhum produto encontrado'}
               description={
-                mode === 'sku'
+                query.hasNextPage ? 'Carregue mais para continuar buscando produtos com este saldo.' : mode === 'sku'
                   ? 'O SKU precisa ser exato. Confira a digitação ou mude os filtros.'
                   : 'A busca considera o início do nome. Confira a grafia ou mude os filtros.'
               }
@@ -258,6 +285,13 @@ function Inventory() {
           keyOf={(s) => s.productId}
           hrefOf={(s) => `/estoque/${s.productId}` as Href}
           columns={columns}
+          stacked={layoutSize !== 'expanded'}
+          actionsWidth={90}
+          actions={manage && layoutSize === 'expanded' ? (s) => (
+            <Link href={`/estoque/movimentacoes?produto=${s.productId}` as Href} asChild>
+              <Button label="Histórico" size="sm" variant="ghost" />
+            </Link>
+          ) : undefined}
           renderCompact={(s) => (
             <View style={styles.compactRow}>
               <View style={styles.flex}>
@@ -265,9 +299,12 @@ function Inventory() {
                   {s.name}
                 </Text>
                 <Text variant="small" color={color.textSecondary} numberOfLines={1}>
+                  {s.sku}
+                </Text>
+                <Text variant="small" color={color.textSecondary}>
                   {isAdminStock(s)
                     ? `Físico ${qty(s.physical, s.unit)} · Reservado ${qty(s.reserved, s.unit)}`
-                    : s.sku}
+                    : Number(s.available) === 0 ? 'Sem disponível' : 'Pronto para vender'}
                 </Text>
                 {isAdminStock(s) ? (
                   <View style={styles.badge}>
@@ -285,11 +322,13 @@ function Inventory() {
           )}
         />
       </ListPanel>
+      ) : null}
 
       {manage ? (
-        <Panel title="Como ler os saldos">
-          <StockLegend />
-        </Panel>
+        <View>
+          <Button label={showLegend ? 'Ocultar ajuda' : 'Entender os saldos'} size="sm" variant="ghost" onPress={() => setShowLegend((value) => !value)} />
+          {showLegend ? <Panel title="Como ler os saldos"><StockLegend /></Panel> : null}
+        </View>
       ) : null}
     </Screen>
   );
@@ -301,7 +340,7 @@ function figureColumn(key: FigureKey, label: string, strong = false): Column<Inv
   return {
     key,
     label,
-    width: 120,
+    width: 100,
     align: 'right',
     render: (s) => {
       const text = key === 'available' ? s.available : isAdminStock(s) ? s[key] : null;

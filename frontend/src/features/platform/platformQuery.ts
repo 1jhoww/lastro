@@ -11,9 +11,8 @@ import { queryKeys } from '@/api/queryKeys';
 import { useReauth } from './ReauthGate';
 
 /**
- * Consulta da plataforma. Um 403 FORBIDDEN aqui significa, na prática, login antigo: o backend
- * usa o mesmo código para "não é Super Admin" e "reautenticação recente necessária". Como só
- * Super Admins chegam a esta área (pelo /me), tratamos como pedido de senha.
+ * Consulta da plataforma. Só REAUTHENTICATION_REQUIRED (login antigo) pede a senha de novo;
+ * FORBIDDEN e as demais recusas aparecem com a própria mensagem.
  */
 export function usePlatformQuery<T>(
   queryKey: QueryKey,
@@ -22,10 +21,10 @@ export function usePlatformQuery<T>(
 ) {
   const { requireReauth } = useReauth();
   const query = useQuery({ queryKey, queryFn, retry: false, ...options });
-  const forbidden = query.isError && toApiError(query.error).code === 'FORBIDDEN';
+  const stale = query.isError && toApiError(query.error).code === 'REAUTHENTICATION_REQUIRED';
   useEffect(() => {
-    if (forbidden) requireReauth();
-  }, [forbidden, requireReauth]);
+    if (stale) requireReauth();
+  }, [stale, requireReauth]);
   return query;
 }
 
@@ -42,10 +41,10 @@ export function usePlatformInfiniteQuery<T extends { nextCursor: string | null }
     getNextPageParam: (last) => last.nextCursor ?? undefined,
     retry: false,
   });
-  const forbidden = query.isError && toApiError(query.error).code === 'FORBIDDEN';
+  const stale = query.isError && toApiError(query.error).code === 'REAUTHENTICATION_REQUIRED';
   useEffect(() => {
-    if (forbidden) requireReauth();
-  }, [forbidden, requireReauth]);
+    if (stale) requireReauth();
+  }, [stale, requireReauth]);
   return query;
 }
 
@@ -72,7 +71,8 @@ export function usePlatformMutation<V, T>(
       queryClient.invalidateQueries({ queryKey: queryKeys.platformRoot });
     },
     onError: (error) => {
-      if (toApiError(error).code === 'FORBIDDEN') requireReauth();
+      // Only a stale login asks for the password; any other refusal shows its own message.
+      if (toApiError(error).code === 'REAUTHENTICATION_REQUIRED') requireReauth();
     },
   });
 }

@@ -12,6 +12,7 @@ import { recordAudit } from '../../shared/audit/audit.js';
 import { parseQuantity, formatQuantity, transition } from './quantities.js';
 import { projectStock } from './stockProjection.js';
 import { readCheckpoint, signCheckpoint } from './reconciliationCursor.js';
+import { holds } from '../users/permissions.js';
 
 const operationSchema = z.strictObject({
   actorUid: z.string(),
@@ -98,12 +99,12 @@ export class InventoryService {
         const ctx = await this.access.tenant(actor, tenantId, 'inventory:available:read', tx);
         const { product, stock } = await this.load(tenantId, productId, tx);
         requireCondition(
-          ctx.membership.role === 'administrator' || product.status === 'active',
+          holds(ctx, 'inventory:manage') || product.status === 'active',
           404,
           'RESOURCE_NOT_FOUND',
           'Recurso não encontrado',
         );
-        return ctx.membership.role === 'administrator'
+        return holds(ctx, 'inventory:manage')
           ? stockView(stock)
           : s.availabilityView.parse(stockView(stock));
       },
@@ -114,27 +115,72 @@ export class InventoryService {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {
         const ctx = await this.access.tenant(actor, tenantId, 'inventory:available:read', tx);
-        const page = await this.repo.list(
-          actor,
-          tenantId,
-          'products',
-          productSchema,
-          input,
-          ctx.membership.role === 'seller',
-          tx,
+        requireCondition(
+          holds(ctx, 'inventory:manage') || !['low', 'reserved'].includes(input.stockState ?? ''),
+          403, 'FORBIDDEN', 'Operação não permitida',
         );
-        const items = await Promise.all(
-          page.items.map(async (product) => {
-            const stock = stockView(await this.stockFor(product, tx));
-            return ctx.membership.role === 'administrator'
-              ? stock
-              : s.availabilityView.parse(stock);
-          }),
-        );
-        return { items, nextCursor: page.nextCursor };
+        let cursor = input.cursor;
+        const result: z.infer<typeof s.inventoryView>[] = [];
+        // A sparse filter may need several product pages. Keep request reads bounded and
+        // preserve the underlying cursor so the next request never skips a product.
+        for (let scanned = 0; scanned < 5; scanned++) {
+          const page = await this.repo.list(
+            actor, tenantId, 'products', productSchema,
+            { ...input, cursor }, !holds(ctx, 'inventory:manage'), tx,
+          );
+          const items = await Promise.all(
+            page.items.map(async (product) => {
+              const stock = stockView(await this.stockFor(product, tx));
+              return holds(ctx, 'inventory:manage')
+                ? stock
+                : s.availabilityView.parse(stock);
+            }),
+          );
+          const filtered = items.filter((item) => {
+            switch (input.stockState) {
+              case 'empty':
+                return Number(item.available) === 0;
+              case 'available':
+                return Number(item.available) > 0;
+              case 'low':
+                return 'suggestedQuantity' in item && Number(item.suggestedQuantity) > 0 && Number(item.available) > 0;
+              case 'reserved':
+                return 'reserved' in item && Number(item.reserved) > 0;
+              default:
+                return true;
+            }
+          });
+          result.push(...filtered);
+          cursor = page.nextCursor ?? undefined;
+          if (result.length > 0 || !cursor) break;
+        }
+        return { items: result, nextCursor: cursor ?? null };
       },
       { readOnly: true },
     );
+  }
+  async summary(actor: Actor, tenantId: string) {
+    return this.repo.foundation.db.runTransaction(async (tx) => {
+      await this.access.tenant(actor, tenantId, 'inventory:manage', tx);
+      const result = { total: 0, low: 0, empty: 0, reservedProducts: 0 };
+      let cursor: string | undefined;
+      // Read the same product-backed projection as the list, including products without movements.
+      // Batches bound concurrent reads; one read-only transaction keeps all counts consistent.
+      do {
+        const page = await this.repo.list(actor, tenantId, 'products', productSchema,
+          { status: 'active', limit: '100', ...(cursor ? { cursor } : {}) }, false, tx);
+        const stocks = await Promise.all(page.items.map((product) => this.stockFor(product, tx)));
+        for (const stock of stocks) {
+          result.total++;
+          const available = stock.physicalScaled - stock.reservedScaled;
+          if (available === 0) result.empty++;
+          else if (stock.belowMinimum) result.low++;
+          if (stock.reservedScaled > 0) result.reservedProducts++;
+        }
+        cursor = page.nextCursor ?? undefined;
+      } while (cursor);
+      return result;
+    }, { readOnly: true });
   }
   async entry(actor: Actor, tenantId: string, input: z.infer<typeof s.entryInput>, key: string) {
     return this.move(actor, tenantId, input, key, false);

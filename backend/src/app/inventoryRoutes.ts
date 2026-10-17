@@ -4,6 +4,14 @@ import { pageQuery } from '../shared/schemas/http.js';
 export const inventoryRoutes: Route[] = [
   {
     method: 'get',
+    path: '/inventory/summary',
+    operationId: 'getInventorySummary',
+    scope: 'tenant',
+    permission: 'inventory:manage',
+    output: s.inventorySummary,
+  },
+  {
+    method: 'get',
     path: '/inventory',
     operationId: 'listInventory',
     scope: 'tenant',

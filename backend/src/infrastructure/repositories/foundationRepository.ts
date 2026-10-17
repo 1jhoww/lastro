@@ -66,7 +66,8 @@ export class FoundationRepository {
       | 'idempotencyRecords'
       | 'catalogSlugs'
       | 'rateLimits'
-      | 'billingCharges',
+      | 'billingCharges'
+      | 'emailChanges',
     id: string,
   ): DocumentReference {
     return this.db.collection(collection).doc(opaqueId.parse(id));

@@ -25,8 +25,15 @@ export function safeFilename(disposition: string | null, extension: 'pdf' | 'csv
     : `lastro.${extension}`;
 }
 
-/** A mídia e assinatura são verificadas antes de criar qualquer URL ou arquivo local. */
-export async function readDownload(response: Response, mime: Download['mime']): Promise<Download> {
+/**
+ * A mídia e assinatura são verificadas antes de criar qualquer URL ou arquivo local. Relatórios
+ * completos informam limites próprios: CSV inteiro (sem paginação) de até 8 MiB.
+ */
+export async function readDownload(
+  response: Response,
+  mime: Download['mime'],
+  limits: { maxBytes?: number; maxRows?: number | null } = {},
+): Promise<Download> {
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     throw new ApiError(
@@ -38,7 +45,9 @@ export async function readDownload(response: Response, mime: Download['mime']): 
   }
   if (response.headers.get('Content-Type')?.split(';')[0]?.trim().toLowerCase() !== mime)
     throw new ApiError(502, 'INVALID_DOWNLOAD', 'Resposta não contém o arquivo solicitado.');
-  const maximum = mime === 'application/pdf' ? 8 * 1024 * 1024 : 1024 * 1024;
+  const maximum =
+    limits.maxBytes ?? (mime === 'application/pdf' ? 8 * 1024 * 1024 : 1024 * 1024);
+  const maxRows = limits.maxRows === undefined ? 100 : limits.maxRows;
   const length = Number(response.headers.get('Content-Length'));
   if (length > maximum)
     throw new ApiError(413, 'LOCAL_FILE_LIMIT', 'Arquivo acima do limite permitido.');
@@ -55,7 +64,10 @@ export async function readDownload(response: Response, mime: Download['mime']): 
       'Arquivo incompleto ou incompatível. Solicite novamente.',
     );
   const count = response.headers.get('X-Export-Row-Count');
-  if (mime === 'text/csv' && (count === null || !/^\d+$/.test(count) || Number(count) > 100))
+  if (
+    mime === 'text/csv' &&
+    (count === null || !/^\d+$/.test(count) || (maxRows !== null && Number(count) > maxRows))
+  )
     throw new ApiError(502, 'INVALID_DOWNLOAD', 'Metadados da página CSV ausentes ou inválidos.');
   return {
     bytes,

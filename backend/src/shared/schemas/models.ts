@@ -9,6 +9,8 @@ export const email = z
   .max(254)
   .refine((v) => v === v.trim().toLowerCase(), 'Use email normalizado em minúsculas');
 export const role = z.enum(['administrator', 'seller']);
+/** Permission matrix operation id, such as `orders.confirm`. */
+export const operationId = z.string().regex(/^[a-z]+\.[a-z]+$/);
 /**
  * Administrative state of the contract, independent of each charge's financial state.
  * `pending` keeps access while billing terms are not activated (no charges are generated).
@@ -81,6 +83,11 @@ export const membershipSchema = z.strictObject({
    * company's administrator, and is valid only while the platform role stays active.
    */
   seatExempt: z.boolean().default(false),
+  /**
+   * Seller operations chosen by an administrator (see permissionMatrix); null keeps the role
+   * defaults. Administrators always hold every operation, so theirs stays null.
+   */
+  operations: z.array(operationId).max(50).nullable().default(null),
   version: z.number().int().positive(),
   ...metadata,
 });
@@ -96,6 +103,25 @@ export const invitationSchema = z.strictObject({
   acceptedBy: opaqueId.nullable(),
   /** Addressed to an active Super Admin: reserves no seat (see membership.seatExempt). */
   seatExempt: z.boolean().default(false),
+  /** Invitation issued in place of this one (resend or e-mail correction). */
+  replacedBy: opaqueId.nullable().default(null),
+  ...metadata,
+});
+/**
+ * E-mail change of an active account, started by the Super Admin and applied only by the
+ * identity provider after the holder re-authenticates and verifies the new address. One
+ * document per identity; the history lives in the audit trail.
+ */
+export const emailChangeSchema = z.strictObject({
+  uid: opaqueId,
+  tenantId: opaqueId,
+  currentEmail: email.nullable(),
+  newEmail: email,
+  status: z.enum(['pending', 'completed', 'canceled']),
+  reason: z.string().trim().min(3).max(200),
+  requestedBy: opaqueId,
+  expiresAt: instant,
+  completedAt: instant.nullable(),
   ...metadata,
 });
 export const planSchema = z.strictObject({
@@ -151,6 +177,7 @@ export type Identity = z.infer<typeof identitySchema>;
 export type Tenant = z.infer<typeof tenantSchema>;
 export type Membership = z.infer<typeof membershipSchema>;
 export type Invitation = z.infer<typeof invitationSchema>;
+export type EmailChange = z.infer<typeof emailChangeSchema>;
 export type Plan = z.infer<typeof planSchema>;
 export type Subscription = z.infer<typeof subscriptionSchema>;
 export type Audit = z.infer<typeof auditSchema>;

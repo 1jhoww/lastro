@@ -53,8 +53,8 @@ type Review = {
 };
 
 /**
- * Formulário de entrada ou ajuste de UM produto (o saldo já carregado). Fluxo: preencher →
- * revisar o impacto → confirmar → aguardar a API. Sucesso só aparece com a confirmação do
+ * Formulário de entrada ou ajuste de UM produto (o saldo já carregado). Entradas usam a prévia
+ * inline; ajustes exigem revisão antes do envio. Sucesso só aparece com a confirmação do
  * servidor; resultado incerto trava o formulário até repetir com a mesma chave ou descartar.
  */
 export function MovementForm({ kind, stock }: { kind: MovementKind; stock: StockAdmin }) {
@@ -92,7 +92,8 @@ export function MovementForm({ kind, stock }: { kind: MovementKind; stock: Stock
         ? toEntryBody(stock.productId, v, unit)
         : toAdjustmentBody(stock.productId, v, unit, stock.version);
     record.reset();
-    setReview({ body, delta: d, preview });
+    if (kind === 'entry') send(body);
+    else setReview({ body, delta: d, preview });
   });
 
   const send = (body: StockEntryBody | StockAdjustmentBody) =>
@@ -117,7 +118,7 @@ export function MovementForm({ kind, stock }: { kind: MovementKind; stock: Stock
         ? `Só é possível retirar até ${formatQuantity(current.available, unit)}: o restante (${formatQuantity(current.reserved, unit)}) está reservado para pedidos.`
         : `Só é possível retirar até ${formatQuantity(current.available, unit)}, o saldo físico atual.`
       : live && !live.ok && live.reason === 'limit'
-        ? 'O saldo ultrapassaria o limite técnico de 1.000.000.000.'
+        ? 'O saldo ultrapassaria a quantidade máxima permitida de 1.000.000.000.'
         : null;
 
   return (
@@ -228,7 +229,7 @@ export function MovementForm({ kind, stock }: { kind: MovementKind; stock: Stock
         />
       </FormSection>
 
-      <Panel title="Impacto no saldo" description="Prévia. O servidor confirma o saldo final.">
+      <Panel title="Antes e depois" description="Prévia com o saldo atual. Outras movimentações podem alterar o resultado.">
         <ImpactTable
           unit={unit}
           before={current}
@@ -242,7 +243,8 @@ export function MovementForm({ kind, stock }: { kind: MovementKind; stock: Stock
           <Button label="Cancelar" variant="ghost" disabled={busy} />
         </Link>
         <Button
-          label={text.review}
+          label={kind === 'entry' ? text.confirm : text.review}
+          loading={busy}
           variant="strong"
           disabled={locked || Boolean(insufficient)}
           onPress={onReview}

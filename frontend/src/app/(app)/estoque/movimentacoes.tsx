@@ -56,7 +56,7 @@ function Movements() {
   return (
     <Screen
       title="Movimentações"
-      description="Histórico imutável: entradas, ajustes e movimentos automáticos dos pedidos."
+      description="Entradas, ajustes e movimentações de pedidos, com origem e responsável."
     >
       <InventoryNav current="movimentacoes" />
 
@@ -64,7 +64,7 @@ function Movements() {
         {productId ? (
           <View style={styles.chip}>
             <Text variant="smallStrong" numberOfLines={1} style={styles.flex}>
-              {`Produto: ${product.data?.name ?? 'carregando…'}`}
+              {`Produto: ${product.data?.name ?? (product.isError ? 'não foi possível carregar o nome' : 'carregando…')}`}
             </Text>
             <Button
               label="Remover"
@@ -107,6 +107,13 @@ function Movements() {
             { value: 'asc', label: 'Mais antigas' },
           ]}
         />
+      </View>
+
+      <View style={styles.toolbar}>
+        {filtered ? <Button label="Limpar filtros" size="sm" variant="ghost" onPress={() => {
+          setType('any'); setPeriod('all'); router.setParams({ produto: '' });
+        }} /> : null}
+        <Button label="Atualizar histórico" size="sm" variant="ghost" loading={query.isFetching} onPress={() => query.refetch()} />
       </View>
 
       <ListPanel

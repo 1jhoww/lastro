@@ -4,7 +4,7 @@ import * as s from '../../shared/schemas/finance.js';
 import { orderSchema } from '../../shared/schemas/orders.js';
 import { receivableSchema, financialGuardSchema } from '../receivables/orderReceivables.js';
 import { pageQuery } from '../../shared/schemas/http.js';
-import { checkReadBudget } from '../../shared/operations/readBudget.js';
+import { accountRead, checkReadBudget } from '../../shared/operations/readBudget.js';
 import type { Actor } from '../../shared/types/context.js';
 import { requireCondition } from '../../shared/errors/appError.js';
 import { digest, stableJson, decodeCursor, encodeCursor } from '../../shared/utils/crypto.js';
@@ -282,6 +282,71 @@ export class FinancialReads {
       },
       { readOnly: true },
     );
+  }
+  /**
+   * Every title due in the window, with the same validated projection as the title list. Each
+   * order header is read once for the whole report instead of through the list's small cache.
+   * The caller already holds `receivables:read` in this transaction.
+   */
+  async reportTitles(
+    tx: Transaction,
+    tenantId: string,
+    window: { from?: string | undefined; to?: string | undefined },
+    cap: number,
+  ) {
+    let query: Query = this.repo.ref(tenantId, 'receivables', 'placeholder').parent;
+    if (window.from) query = query.where('dueDate', '>=', window.from);
+    if (window.to) query = query.where('dueDate', '<=', window.to);
+    const page = await tx.get(
+      query
+        .orderBy('dueDate')
+        .orderBy(FieldPath.documentId())
+        .limit(cap + 1),
+    );
+    requireCondition(
+      page.size <= cap,
+      422,
+      'REPORT_TOO_LARGE',
+      `A consulta passa de ${cap} parcelas. Reduza o período ou aplique filtros.`,
+    );
+    const baselines = page.docs.map((d) => {
+      accountRead(d.data());
+      const baseline = receivableSchema.safeParse(d.data());
+      requireCondition(
+        baseline.success && baseline.data.id === d.id && baseline.data.tenantId === tenantId,
+        500,
+        'INTERNAL_ERROR',
+        'Erro interno do servidor',
+      );
+      return baseline.data;
+    });
+    const cache = new Map<string, ReturnType<FinancialReads['header']>>();
+    const orderIds = [...new Set(baselines.map((b) => b.orderId))];
+    for (let i = 0; i < orderIds.length; i += 16) {
+      checkReadBudget();
+      await Promise.all(
+        orderIds.slice(i, i + 16).map((id) => {
+          const load = this.header(tx, tenantId, id);
+          cache.set(id, load);
+          return load;
+        }),
+      );
+    }
+    const titles: (z.infer<typeof s.titleView> & { commercialId: string; sellerUid: string })[] =
+      [];
+    for (let i = 0; i < baselines.length; i += 16) {
+      checkReadBudget();
+      titles.push(
+        ...(await Promise.all(
+          baselines.slice(i, i + 16).map(async (baseline) => {
+            const view = await this.inspect(tx, tenantId, baseline, cache);
+            const { order } = await cache.get(baseline.orderId)!;
+            return { ...view, commercialId: order!.commercialId, sellerUid: order!.sellerUid };
+          }),
+        )),
+      );
+    }
+    return titles;
   }
   async list(
     actor: Actor,

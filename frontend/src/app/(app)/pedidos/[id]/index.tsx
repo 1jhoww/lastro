@@ -215,7 +215,12 @@ function OrderView({ order: o, onRefresh }: { order: Order; onRefresh: () => voi
             <Disclosure label="Histórico do pedido">
               <OrderHistoryPanel orderId={o.id} />
             </Disclosure>
-            <OrderDocuments id={o.id} number={shortOrderId(o.commercialId)} version={o.version} />
+            <OrderDocuments
+              id={o.id}
+              number={shortOrderId(o.commercialId)}
+              version={o.version}
+              status={o.status}
+            />
           </>
         }
       />

@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { PdfRenderer } from '../../src/modules/documents/pdfRenderer.js';
+import {
+  PdfRenderer,
+  RECEIPT_DECLARATION,
+  formatDocument,
+  formatPhone,
+} from '../../src/modules/documents/pdfRenderer.js';
+import { brl } from '../../src/modules/documents/pdfLayout.js';
 import {
   csvCell,
   csvBytes,
@@ -34,19 +40,37 @@ describe('Documentos G: conteúdo e composição real de PDF', () => {
         expect(page).toContain(`Página ${i + 1}`);
         expect(page).toContain('PED-000001');
         expect(page).toContain('Distribuidora São José');
-        expect(page).toContain(kind === 'commercial' ? 'Pedido comercial' : 'Romaneio');
+        expect(page).toContain(kind === 'commercial' ? 'PEDIDO COMERCIAL' : 'ROMANEIO DE ENTREGA');
+        expect(page).toContain(`Página ${i + 1} de ${pdf.pageCount}`);
       }
+      expect(pdf.pages[0]).toContain('CPF 123.456.789-09');
+      expect(pdf.pages[0]).toContain('Data do pedido');
+      expect(pdf.text).not.toContain('Emissão');
       if (count >= 20) expect(pdf.pageCount).toBeGreaterThan(1);
       if (kind === 'commercial') {
-        expect(pdf.text).toContain('não é documento fiscal');
+        expect(pdf.text).toContain('Documento não fiscal');
+        expect(pdf.text).toContain(
+          'Documento comercial gerado pelo Lastro. Não possui valor fiscal.',
+        );
         expect(pdf.text).toContain('09/11/2026');
         expect(pdf.text).toContain('Observação histórica');
-        expect(pdf.text).toContain(`Total do pedido: R$ ${decimalCents(source.order.totalCents)}`);
+        expect(pdf.text).toContain('TOTAL DO PEDIDO');
+        expect(pdf.text).toContain(brl(source.order.totalCents));
+        expect(pdf.text).not.toContain('Assinatura');
       } else {
-        expect(pdf.text).not.toContain('R$');
-        expect(pdf.text).not.toContain('Parcela');
+        expect(pdf.text).toContain('Comprovante de recebimento');
+        expect(pdf.text).toContain('VALOR TOTAL');
+        expect(pdf.text).toContain(brl(source.order.totalCents));
+        expect(pdf.text).toContain(RECEIPT_DECLARATION);
+        expect(pdf.text).toContain('Nome do recebedor');
+        expect(pdf.text).toContain('Data do recebimento');
+        expect(pdf.text).toContain('Assinatura do recebedor');
+        expect(pdf.text).toContain('Gerado pelo Lastro — Documento não fiscal.');
+        for (const removed of ['Solicitada', 'Expedida', 'Devolvida', 'Conferência', 'Parcela'])
+          expect(pdf.text).not.toContain(removed);
         expect(pdf.text).not.toContain('Observação histórica');
-        expect(pdf.text).toContain('Assinatura');
+        // The signature block never sits alone: the last products move with it.
+        expect(pdf.pages.at(-1)).toContain(`SKU${count}`);
       }
     });
   it('recusa caractere sem glifo sem substituir informação por quadrado vazio', async () => {
@@ -69,7 +93,7 @@ describe('Documentos G: conteúdo e composição real de PDF', () => {
       const content = await (await pdf.getPage(1)).getTextContent();
       const items = content.items.filter((i) => 'str' in i);
       const brand = items.filter((i) => /^W+$/.test(i.str));
-      const title = items.find((i) => i.str.startsWith('Pedido comercial'))!;
+      const title = items.find((i) => i.str.includes('PEDIDO COMERCIAL'))!;
       expect(brand.map((i) => i.str).join('')).toBe(source.tenant.name);
       expect(Math.min(...brand.map((i) => i.transform[5]!))).toBeGreaterThan(
         title.transform[5]! + 8,
@@ -103,9 +127,37 @@ describe('Documentos G: conteúdo e composição real de PDF', () => {
     const b = await pdfText(
       await renderer.render(source, 'commercial', new Date('2026-10-10T12:00:00Z')),
     );
-    expect(a.text.replace(/Emissão:.*?Data do pedido \(UTC\):/, '')).toBe(
-      b.text.replace(/Emissão:.*?Data do pedido \(UTC\):/, ''),
-    );
+    expect(a.text).toBe(b.text);
+  });
+  it.each(['draft', 'canceled'] as const)('recusa romaneio de pedido %s', async (status) => {
+    const source = documentSource();
+    source.order.status = status;
+    await expect(new PdfRenderer().render(source, 'packing', new Date())).rejects.toMatchObject({
+      code: 'DOCUMENT_UNAVAILABLE',
+      status: 409,
+    });
+  });
+  it('mostra desconto de forma que o total feche e omite dados inexistentes', async () => {
+    const source = documentSource(2);
+    source.order.discountCents = 500;
+    source.order.totalCents = source.order.subtotalCents - 500;
+    source.order.lines[0]!.discountCents = 500;
+    source.order.lines[0]!.totalCents = 2000;
+    source.customer = null;
+    const pdf = await pdfText(await new PdfRenderer().render(source, 'commercial', new Date()));
+    expect(pdf.text).toContain('Subtotal dos produtos');
+    expect(pdf.text).toContain(`- ${brl(500)}`);
+    expect(pdf.text).toContain(brl(4500));
+    expect(pdf.text).not.toContain('CPF');
+    expect(pdf.text).not.toContain('ENDEREÇO');
+  });
+  it('formata documento, telefone e moeda no padrão brasileiro', () => {
+    expect(formatDocument('12345678909')).toBe('123.456.789-09');
+    expect(formatDocument('12345678000195')).toBe('12.345.678/0001-95');
+    expect(formatPhone('+5511987654321')).toBe('(11) 98765-4321');
+    expect(formatPhone('1133334444')).toBe('(11) 3333-4444');
+    expect(brl(123456789)).toBe('R$ 1.234.567,89');
+    expect(brl(5)).toBe('R$ 0,05');
   });
   it('rejeita limite de tempo sem PDF parcial', async () => {
     let time = 0;
@@ -178,6 +230,6 @@ describe('CSV G', () => {
     expect(json).toContain('application/pdf');
     expect(json).toContain('text/csv');
     expect(json).toContain('X-Next-Cursor');
-    expect(Object.values(api.paths).reduce((n, p) => n + Object.keys(p).length, 0)).toBe(131);
+    expect(Object.values(api.paths).reduce((n, p) => n + Object.keys(p).length, 0)).toBe(146);
   });
 });

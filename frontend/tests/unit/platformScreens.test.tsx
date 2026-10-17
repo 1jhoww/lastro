@@ -5,7 +5,7 @@ import Companies from '@/app/plataforma/empresas/index';
 import Company from '@/app/plataforma/empresas/[id]';
 import Charges from '@/app/plataforma/cobrancas';
 import Invitations from '@/app/plataforma/convites';
-import { createFakeApi, ok } from '../support/fakeApi';
+import { createFakeApi, fail, ok } from '../support/fakeApi';
 import { FakeGateway } from '../support/fakeGateway';
 import { renderApp } from '../support/renderApp';
 
@@ -381,5 +381,69 @@ describe('Super Admin: cobranças e convites', () => {
     const call = server.calls.find((c) => c.method === 'POST')!;
     expect(call.body).toEqual({ ownerEmail: 'dono@nova.test', expectedVersion: 1 });
     expect(call.headers['idempotency-key']).toMatch(/^[0-9a-f-]{36}$/);
+  });
+});
+
+describe('Super Admin: reativação de acessos', () => {
+  const blockedWorld = (code: string, message: string) => {
+    const { gateway, server } = platformWorld();
+    const detail = companyDetail();
+    (detail.users as object[]).push({
+      uid: 'sel',
+      name: 'Bia Vendas',
+      email: 'bia@alfa.test',
+      role: 'seller',
+      status: 'disabled',
+      seatExempt: false,
+      createdAt: now,
+      version: 3,
+      accountBlocked: code === 'IDENTITY_DISABLED',
+      emailChange: null,
+    });
+    server
+      .on('GET', '/api/v1/admin/companies/ta', () => ok(detail))
+      .on('GET', '/api/v1/admin/charges', () => ok({ items: [], nextCursor: null }))
+      .on('GET', '/api/v1/admin/subscriptions/ta/history', () => ok({ items: [] }))
+      .on('POST', '/api/v1/admin/companies/ta/users/sel/status', () => fail(403, code, message));
+    return { gateway, server };
+  };
+  const reactivate = async () => {
+    await fireEvent.press(await screen.findByRole('button', { name: 'Reativar' }));
+    await fireEvent.changeText(screen.getByLabelText('Motivo'), 'Voltou para a equipe');
+    await fireEvent.press(screen.getByRole('button', { name: 'Reativar acesso' }));
+  };
+
+  it('identidade bloqueada mostra o motivo e o desbloqueio, sem pedir senha', async () => {
+    const { gateway, server } = blockedWorld('IDENTITY_DISABLED', 'Conta bloqueada');
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/plataforma/empresas/ta',
+      overrides,
+    });
+    expect(await screen.findByText('Conta bloqueada')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Desbloquear conta' })).toBeTruthy();
+    await reactivate();
+    expect(
+      await screen.findByText(
+        'A conta desta pessoa está bloqueada no Lastro. Use "Desbloquear conta" e depois reative o acesso.',
+      ),
+    ).toBeTruthy();
+    expect(screen.queryByText('Confirme sua senha')).toBeNull();
+  });
+
+  it('falta de autorização não vira pedido de senha', async () => {
+    const { gateway, server } = blockedWorld('FORBIDDEN', 'Operação não permitida');
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/plataforma/empresas/ta',
+      overrides,
+    });
+    await reactivate();
+    expect(
+      await screen.findByText('Sua conta não tem autorização de Super Admin para esta operação.'),
+    ).toBeTruthy();
+    expect(screen.queryByText('Confirme sua senha')).toBeNull();
   });
 });

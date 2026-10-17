@@ -175,7 +175,8 @@ export default function NewTenant() {
               <View style={styles.plans} accessibilityRole="radiogroup" accessibilityLabel="Plano">
                 <Text variant="smallStrong">Plano</Text>
                 {catalog.isPending ? <Skeleton width="60%" height={44} /> : null}
-                {catalog.isError && toApiError(catalog.error).code !== 'FORBIDDEN' ? (
+                {catalog.isError &&
+                toApiError(catalog.error).code !== 'REAUTHENTICATION_REQUIRED' ? (
                   <Alert tone="danger" title="Planos indisponíveis">
                     {toApiError(catalog.error).userMessage}
                   </Alert>

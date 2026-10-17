@@ -235,8 +235,12 @@ describe('usuários', () => {
       initialUrl: '/configuracoes/usuarios',
       overrides,
     });
-    expect(await screen.findByText('Todas as vagas do plano estão ocupadas')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Convidar usuário' })).toBeNull();
+    expect(await screen.findByText('Todos os acessos estão ocupados')).toBeTruthy();
+    expect(screen.getByText('Acessos utilizados: 2 de 2')).toBeTruthy();
+    // Sem vaga o botão continua visível, porém indisponível; o servidor também recusa.
+    expect(
+      screen.getByRole('button', { name: 'Convidar usuário' }).props.accessibilityState.disabled,
+    ).toBe(true);
   });
 
   it('suporte Lastro aparece identificado e não conta como administrador da empresa', async () => {
@@ -266,5 +270,101 @@ describe('usuários', () => {
     });
     expect(await screen.findByText('Você não tem acesso a esta área')).toBeTruthy();
     expect(server.calls.some((c) => c.path === '/api/v1/users')).toBe(false);
+  });
+});
+
+describe('matriz de permissões', () => {
+  const matrix = [
+    {
+      id: 'dashboard.view',
+      module: 'Dashboard',
+      label: 'Visualizar',
+      description: 'Painel.',
+      seller: 'required',
+      requires: [],
+      inPlan: true,
+    },
+    {
+      id: 'orders.view',
+      module: 'Pedidos',
+      label: 'Visualizar',
+      description: 'Pedidos.',
+      seller: 'default',
+      requires: [],
+      inPlan: true,
+    },
+    {
+      id: 'orders.edit',
+      module: 'Pedidos',
+      label: 'Criar e editar',
+      description: 'Rascunhos.',
+      seller: 'default',
+      requires: ['orders.view'],
+      inPlan: true,
+    },
+    {
+      id: 'inventory.manage',
+      module: 'Estoque',
+      label: 'Registrar movimentações',
+      description: 'Estoque.',
+      seller: 'grantable',
+      requires: [],
+      inPlan: true,
+    },
+    {
+      id: 'finance.reverse',
+      module: 'Financeiro',
+      label: 'Estornar',
+      description: 'Estornos.',
+      seller: 'never',
+      requires: [],
+      inPlan: true,
+    },
+  ];
+
+  it('vendedor: bloqueia operações administrativas, resolve dependências e salva com a versão', async () => {
+    const { gateway, server } = world();
+    server.on('GET', '/api/v1/users', () =>
+      ok({
+        items: [
+          member('u1', { role: 'administrator', name: 'Ana Dona' }),
+          member('s1', {
+            name: 'Bruno Vendas',
+            operations: ['dashboard.view', 'orders.view', 'orders.edit'],
+            customOperations: false,
+          }),
+        ],
+        capacity: { userLimit: 4, activeUsers: 2, reservedInvitations: 0, available: 2 },
+        nextCursor: null,
+        pendingInvitations: [],
+        permissionMatrix: matrix,
+      }),
+    );
+    let sent: unknown;
+    server.on('PATCH', '/api/v1/users/s1/permissions', (c) => {
+      sent = c.body;
+      return ok(member('s1', { version: 2, operations: [], customOperations: true }));
+    });
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: '/configuracoes/usuarios',
+      overrides,
+    });
+    await fireEvent.press(
+      await screen.findByRole('button', { name: 'Permissões de Bruno Vendas' }),
+    );
+    expect(await screen.findByText('Permissões do vendedor')).toBeTruthy();
+    expect(screen.getByText('Somente administradores')).toBeTruthy();
+    expect(
+      screen.getByRole('checkbox', { name: 'Estornar' }).props.accessibilityState.disabled,
+    ).toBe(true);
+    // Desmarcar "Visualizar" de Pedidos também desmarca o que depende dele.
+    await fireEvent.press(screen.getAllByRole('checkbox', { name: 'Visualizar' })[1]!);
+    await fireEvent.press(screen.getByRole('checkbox', { name: 'Registrar movimentações' }));
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar permissões' }));
+    await waitFor(() =>
+      expect(sent).toEqual({ operations: ['inventory.manage'], expectedVersion: 1 }),
+    );
   });
 });

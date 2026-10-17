@@ -25,6 +25,7 @@ import {
 /* ---------- Saldos ---------- */
 
 export type InventoryFilters = {
+  stockState?: 'all' | 'low' | 'empty' | 'available' | 'reserved';
   /** Busca por início do nome (exige ordenação por nome crescente no servidor). */
   q: string;
   /** SKU exato; o servidor compara em maiúsculas. */
@@ -48,6 +49,7 @@ export function useInventoryList(filters: InventoryFilters, enabled = true) {
             header,
             query: {
               ...listParams(filters),
+              ...(filters.stockState ? { stockState: filters.stockState } : {}),
               // Mais recentes só sem busca: o servidor exige name asc com `q`.
               ...(filters.order === 'recent' && !searching
                 ? { sort: 'createdAt' as const, direction: 'desc' as const }
@@ -79,6 +81,15 @@ export function useInventoryItem(productId: string | undefined, enabled = true) 
 }
 
 /* ---------- Histórico ---------- */
+export function useInventorySummary(enabled: boolean) {
+  const { api, tenantId, header } = useTenantApi();
+  return useQuery({
+    queryKey: [...queryKeys.inventory(tenantId), 'summary'],
+    enabled,
+    staleTime: 60_000,
+    queryFn: () => unwrap(api.GET('/api/v1/inventory/summary', { params: { header } })),
+  });
+}
 
 export type MovementFilters = {
   productId?: string;

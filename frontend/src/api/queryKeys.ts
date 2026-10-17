@@ -8,6 +8,8 @@ export const queryKeys = {
   tenantRoot: ['tenant'] as const,
   tenant: (tenantId: string) => ['tenant', tenantId] as const,
   tenantCurrent: (tenantId: string) => ['tenant', tenantId, 'current'] as const,
+  report: (tenantId: string, id: string, query: object) =>
+    ['tenant', tenantId, 'reports', id, query] as const,
   /** Nome de cada empresa na tela de escolha (só leitura de tenants/current). */
   tenantSummary: (tenantId: string) => ['tenant', tenantId, 'summary'] as const,
   users: (tenantId: string) => ['tenant', tenantId, 'users'] as const,

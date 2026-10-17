@@ -93,13 +93,14 @@ describe('Downloads PDF privados G nos emuladores', () => {
     const proofReads = vi.spyOn(ReturnService.prototype, 'guards');
     const before = await domainSnapshot(),
       pdf = await pdfDownload(order.id, 'packing');
-    expect(proofReads.mock.calls).toHaveLength(20);
-    expect(proofReads.mock.calls.every((call) => call[2].length <= 20)).toBe(true);
+    // The delivery receipt documents the integral dispatch; returns stay in the system only.
+    expect(proofReads).not.toHaveBeenCalled();
     for (const line of order.lines) expect(pdf.text.replaceAll(' ', '')).toContain(line.sku);
-    expect(pdf.text).toContain('Não autoriza nova expedição');
-    expect(pdf.text).not.toContain('R$');
-    expect((pdf.text.match(/1 UN\s+1\s+1\s+\[/g) ?? []).length).toBe(2);
-    expect((pdf.text.match(/1 UN\s+1\s+0\s+\[/g) ?? []).length).toBe(198);
+    expect(pdf.text).toContain('ROMANEIO DE ENTREGA');
+    expect(pdf.text).toContain('VALOR TOTAL');
+    for (const removed of ['Devolvida', 'Expedida', 'Solicitada', 'Conferência'])
+      expect(pdf.text).not.toContain(removed);
+    expect((pdf.text.match(/1 UN/g) ?? []).length).toBe(200);
     expect(await domainSnapshot()).toBe(before);
   }, 90_000);
   it.each([1, 20, 50, 100, 200])(
@@ -113,9 +114,9 @@ describe('Downloads PDF privados G nos emuladores', () => {
         const response = await pdfRequest(order.id, kind).expect(200);
         const pdf = await pdfText(response.body as Buffer);
         for (const line of order.lines) expect(pdf.text.replaceAll(' ', '')).toContain(line.sku);
-        expect(pdf.text).toContain(order.commercialId);
+        expect(pdf.text).toContain(order.commercialId.slice(0, 12));
         if (count >= 20) expect(pdf.pageCount).toBeGreaterThan(1);
-        if (kind === 'packing') expect(pdf.text).not.toContain('R$');
+        if (kind === 'packing') expect(pdf.text).toContain('VALOR TOTAL');
         if (count === 200) {
           await mkdir('reports/pdf', { recursive: true });
           await writeFile(`reports/pdf/${kind}-200.pdf`, response.body as Buffer);
@@ -147,18 +148,20 @@ describe('Downloads PDF privados G nos emuladores', () => {
             .data,
         );
       const before = await domainSnapshot();
-      const commercial = await pdfDownload(order.id),
-        packing = await pdfDownload(order.id, 'packing');
-      expect(commercial.text).toContain(
-        {
-          draft: 'Rascunho',
-          confirmed: 'Confirmado',
-          canceled: 'Cancelado',
-          dispatched: 'Expedido',
-        }[status],
-      );
-      if (status === 'dispatched') expect(packing.text).toContain('Não autoriza nova expedição');
-      if (status === 'canceled') expect(packing.text).toContain('Não autoriza separação');
+      const commercial = await pdfDownload(order.id);
+      expect(commercial.text).toContain('PEDIDO COMERCIAL');
+      if (status === 'draft') expect(commercial.text).toContain('Rascunho');
+      if (status === 'canceled') expect(commercial.text).toContain('Cancelado');
+      if (status === 'confirmed' || status === 'dispatched') {
+        const packing = await pdfDownload(order.id, 'packing');
+        expect(packing.text).toContain('Declaro o recebimento');
+      } else {
+        // No delivery receipt for goods that never leave.
+        const refused = await pdfRequest(order.id, 'packing').expect(409);
+        expect(JSON.parse((refused.body as Buffer).toString()).error.code).toBe(
+          'DOCUMENT_UNAVAILABLE',
+        );
+      }
       expect(await domainSnapshot()).toBe(before);
     },
   );
@@ -190,7 +193,8 @@ describe('Downloads PDF privados G nos emuladores', () => {
     expect(pdf.text).toContain(setup.condition.name);
     expect(pdf.text).toContain('20,50');
     expect(pdf.text).not.toContain('Novo nome');
-    expect(pdf.text).not.toContain('Endereço atual');
+    // The order keeps only the historical name; contact and address come from the registration.
+    expect(pdf.text).toContain('Endereço atual não histórico');
     expect(pdf.text).not.toContain('999,99');
   });
   it('permite vendedor próprio e bloqueia outra carteira, empresa e plataforma', async () => {
@@ -224,12 +228,15 @@ describe('Downloads PDF privados G nos emuladores', () => {
     const pdf = await pdfText(
       (await pdfRequest(order.id, 'packing', user).expect(200)).body as Buffer,
     );
-    expect(pdf.text).not.toContain('R$');
+    // Line values are part of the delivery receipt; notes and financial records are not.
+    expect(pdf.text).toContain('VALOR TOTAL');
     expect(pdf.text).not.toContain('secreto');
+    expect(pdf.text).not.toContain('987,65');
     expect(pdf.text).not.toContain('Parcela');
+    expect(pdf.text).not.toContain('Recebimento');
   });
   it.each(['partial', 'full', 'damaged'] as const)(
-    'mostra retorno físico %s, não intenção',
+    'romaneio mantém a quantidade entregue após retorno físico %s',
     async (kind) => {
       let order = await confirm(f, await draft(f, f.ownerA, { quantity: '10' }));
       order = orderView.parse((await command(f, order, 'dispatch').expect(200)).body.data);
@@ -241,7 +248,8 @@ describe('Downloads PDF privados G nos emuladores', () => {
         }).expect(201)
       ).body.data;
       const intended = await pdfDownload(order.id, 'packing');
-      expect(intended.text).toMatch(/10 UN\s+10\s+0\s+\[/);
+      expect(intended.text).toContain('10 UN');
+      expect(intended.text).not.toContain('Devolvida');
       const current = (
         await request(f.app)
           .get(`/api/v1/returns/${value.returnId}`)
@@ -263,8 +271,8 @@ describe('Downloads PDF privados G nos emuladores', () => {
       }).expect(200);
       const before = await domainSnapshot();
       const pdf = await pdfDownload(order.id, 'packing');
-      expect(pdf.text).toMatch(new RegExp(`10 UN\\s+10\\s+${kind === 'full' ? '10' : '3'}\\s+\\[`));
-      expect(pdf.text).not.toContain('R$');
+      // What was delivered does not change; the return lives in the order's return records.
+      expect(pdf.text).toBe(intended.text);
       expect(await domainSnapshot()).toBe(before);
     },
   );

@@ -11,6 +11,7 @@ import {
   billingDay,
   calendarDate,
   billingContactSchema,
+  operationId,
 } from './models.js';
 import { planFeatures } from '../../modules/plans/catalog.js';
 export const empty = z.strictObject({});
@@ -84,6 +85,13 @@ export const statusInput = z.strictObject({
   status: z.enum(['active', 'disabled']),
   expectedVersion: z.number().int().positive(),
 });
+/** Seller operations chosen by the administrator (the whole set, replacing the previous one). */
+export const operationsInput = z.strictObject({
+  operations: z.array(operationId).max(50),
+  expectedVersion: z.number().int().positive(),
+});
+/** Resend (new link, same seat) or correct the recipient of a pending invitation. */
+export const reissueInvitationInput = z.strictObject({ email: email.optional() });
 export const tenantView = z.object({
   id: opaqueId,
   name: z.string(),
@@ -102,6 +110,10 @@ export const memberView = z.object({
   status: z.enum(['active', 'disabled']),
   /** Lastro support access: occupies no seat. */
   seatExempt: z.boolean(),
+  /** Permission matrix operations in force (administrators hold all of them). */
+  operations: z.array(z.string()).optional(),
+  /** True when an administrator replaced the seller defaults with a custom choice. */
+  customOperations: z.boolean().optional(),
   version: z.number(),
   createdAt: instant,
   updatedAt: instant,
@@ -112,6 +124,7 @@ export const invitationView = z.object({
   role,
   expiresAt: instant,
   seatExempt: z.boolean(),
+  createdAt: instant.optional(),
 });
 export const issuedInvitationView = z.object({ invitation: invitationView, token: z.string() });
 export const seatCapacityView = z.object({
@@ -125,7 +138,30 @@ export const usersView = z.object({
   nextCursor: z.string().nullable(),
   pendingInvitations: z.array(invitationView),
   capacity: seatCapacityView,
+  /** Modules and existing operations; how each one applies to sellers. */
+  permissionMatrix: z.array(
+    z.object({
+      id: z.string(),
+      module: z.string(),
+      label: z.string(),
+      description: z.string(),
+      seller: z.enum(['required', 'default', 'grantable', 'never']),
+      requires: z.array(z.string()),
+      /** False when the contracted plan does not include the operation. */
+      inPlan: z.boolean(),
+    }),
+  ),
 });
+/** E-mail change of an active account awaiting the holder (see emailChangeSchema). */
+export const emailChangeView = z.object({
+  uid: opaqueId,
+  newEmail: email,
+  status: z.enum(['pending', 'completed', 'canceled']),
+  expiresAt: instant,
+  expired: z.boolean(),
+  createdAt: instant,
+});
+export const myEmailChangeView = z.object({ emailChange: emailChangeView.nullable() });
 export const membershipPlanView = z.object({
   /** Null for legacy contracts created before the official plans. */
   code: planCode.nullable(),
@@ -199,9 +235,26 @@ export const subscriptionHistoryView = z.object({
     }),
   ),
 });
+/**
+ * Person's own display name (Firebase Auth `displayName`, the same source as the team list).
+ * Whitespace collapses; an e-mail-like value is refused so the address never stands in for a name.
+ */
+export const personName = z
+  .string()
+  .transform((v) => v.normalize('NFC').trim().replace(/\s+/g, ' '))
+  .pipe(
+    z
+      .string()
+      .min(2, 'Informe pelo menos 2 caracteres')
+      .max(80, 'Nome deve ter até 80 caracteres')
+      .refine((v) => /\p{L}/u.test(v) && !v.includes('@'), 'Informe um nome de pessoa'),
+  );
+export const profileInput = z.strictObject({ name: personName });
 export const meView = z.object({
   uid: opaqueId,
   email: z.email().nullable(),
+  /** Name as registered by the person; null when never informed. */
+  name: z.string().nullable(),
   platformAdmin: z.boolean(),
   memberships: z.array(
     z.object({

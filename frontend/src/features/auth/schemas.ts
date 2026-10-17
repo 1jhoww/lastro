@@ -15,8 +15,21 @@ export type SignInValues = z.infer<typeof signInSchema>;
 export const resetSchema = z.object({ email });
 export type ResetValues = z.infer<typeof resetSchema>;
 
+/** Mesmas regras de PATCH /me: 2 a 80 caracteres, com letra e sem e-mail. */
+export const personName = z
+  .string()
+  .transform((v) => v.normalize('NFC').trim().replace(/\s+/g, ' '))
+  .pipe(
+    z
+      .string()
+      .min(2, 'Informe seu nome.')
+      .max(80, 'Use até 80 caracteres.')
+      .refine((v) => /\p{L}/u.test(v) && !v.includes('@'), 'Informe seu nome, não o e-mail.'),
+  );
+
 export const signUpSchema = z
   .object({
+    name: personName,
     email,
     password: z.string().min(8, 'Use pelo menos 8 caracteres.').max(128, 'Senha longa demais.'),
     confirm: z.string(),

@@ -9,6 +9,8 @@ for (const file of [
   'fonts/LiberationSans-Regular.ttf',
   'fonts/LiberationSans-Bold.ttf',
   'fonts/LICENSE_LIBERATION',
+  'fonts/Inter-SemiBold.ttf',
+  'fonts/LICENSE_INTER',
 ]) {
   const bytes = await readFile(resolve(root, 'assets', file));
   if (manifest[file] !== createHash('sha256').update(bytes).digest('hex'))
@@ -24,18 +26,32 @@ const source = {
   tenant: { name: 'Artefato São José', timezone: 'America/Sao_Paulo' },
   order: {
     commercialId: 'PED-SMOKE',
-    status: 'draft',
+    status: 'confirmed',
     createdAt: '2026-10-13T12:00:00Z',
     customerName: 'Márcia Ação',
-    lines: [],
+    lines: [
+      {
+        id: 'line',
+        productId: 'product',
+        name: 'Café torrado',
+        sku: 'SMOKE-1',
+        description: '',
+        unit: 'UN',
+        quantity: '1',
+        unitPriceCents: 100,
+        subtotalCents: 100,
+        discountCents: 0,
+        totalCents: 100,
+      },
+    ],
     installments: [],
     notes: '',
-    subtotalCents: 0,
+    subtotalCents: 100,
     discountCents: 0,
-    totalCents: 0,
+    totalCents: 100,
     payment: null,
   },
-  returned: [],
+  customer: null,
 };
 for (const kind of ['commercial', 'packing']) {
   const bytes = await new PdfRenderer().render(source, kind, new Date('2026-10-13T12:00:00Z'));

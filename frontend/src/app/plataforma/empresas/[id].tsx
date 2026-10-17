@@ -1,34 +1,17 @@
 import { useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-import { unwrap } from '@/api/client';
-import { toApiError } from '@/api/errors';
-import type { CompanyDetail } from '@/api/types';
-import {
-  useCharges,
-  useCompany,
-  usePlatformApi,
-  useSubscriptionHistory,
-} from '@/features/platform/api';
+import { useCharges, useCompany, useSubscriptionHistory } from '@/features/platform/api';
 import { ChargeList } from '@/features/platform/ChargeList';
 import { ManualChargeDialog } from '@/features/platform/ChargeDialogs';
 import {
-  dateOrDash,
-  featureLabel,
-  historyLabel,
-  planLabel,
-  seatsLabel,
-} from '@/features/platform/copy';
+  CapacitySummary,
+  CompanyInvitationsPanel,
+  CompanyUsersPanel,
+} from '@/features/platform/CompanyAccess';
+import { dateOrDash, featureLabel, historyLabel, planLabel } from '@/features/platform/copy';
 import { PlatformHeader } from '@/features/platform/PlatformHeader';
-import {
-  BackLink,
-  Detail,
-  LoadError,
-  LoadingRows,
-  ReasonField,
-  validReason,
-} from '@/features/platform/PlatformParts';
-import { usePlatformMutation } from '@/features/platform/platformQuery';
+import { BackLink, Detail, LoadError, LoadingRows } from '@/features/platform/PlatformParts';
 import {
   ActivateDialog,
   ChangePlanDialog,
@@ -38,23 +21,11 @@ import {
 import { subscriptionCopy } from '@/features/platform/subscriptionCopy';
 import { formatDate, formatDateTime } from '@/lib/dates';
 import { formatCents } from '@/lib/money';
-import { roleLabel } from '@/session/SessionContext';
 import { color, space } from '@/theme';
-import {
-  Alert,
-  Badge,
-  Button,
-  ConfirmDialog,
-  EmptyState,
-  Panel,
-  Skeleton,
-  Text,
-  useToast,
-} from '@/ui';
-import { Banknote, Mail } from '@/ui/icons';
+import { Alert, Badge, Button, EmptyState, Panel, Skeleton, Text } from '@/ui';
+import { Banknote } from '@/ui/icons';
 
 type DialogKind = 'plan' | 'terms' | 'activate' | 'suspend' | 'reactivate' | 'charge';
-type Invitation = CompanyDetail['invitations'][number];
 
 /**
  * Detalhe administrativo de uma empresa: contrato, vagas, usuários, convites, cobranças e
@@ -184,8 +155,8 @@ export default function PlatformCompany() {
         title="Vagas e recursos"
         description="O Super Admin não ocupa vaga. Convites pendentes reservam vaga até vencer."
       >
-        <Detail label="Usuários">
-          {`${seatsLabel(data.capacity.activeUsers, data.capacity.userLimit)} ativos, ${data.capacity.reservedInvitations} convite(s) pendente(s), ${data.capacity.available} vaga(s) livre(s)`}
+        <Detail label="Acessos">
+          <CapacitySummary capacity={data.capacity} />
         </Detail>
         {(Object.keys(featureLabel) as (keyof typeof featureLabel)[]).map((f) => (
           <Detail key={f} label={featureLabel[f]}>
@@ -204,33 +175,15 @@ export default function PlatformCompany() {
         </Detail>
       </Panel>
 
-      <Panel title="Usuários" flush>
-        {data.users.length === 0 ? (
-          <EmptyState size="compact" icon={Mail} title="Nenhum usuário ainda" />
-        ) : (
-          data.users.map((u, i) => (
-            <View key={u.uid} style={[styles.row, i < data.users.length - 1 && styles.divider]}>
-              <View style={styles.copy}>
-                <Text variant="bodyStrong" numberOfLines={1}>
-                  {u.name ?? u.email ?? `Usuário ${u.uid.slice(0, 8)}`}
-                </Text>
-                <Text variant="small" color={color.textSecondary} numberOfLines={1}>
-                  {[u.name ? u.email : null, roleLabel[u.role], `desde ${formatDate(u.createdAt)}`]
-                    .filter(Boolean)
-                    .join(' · ')}
-                </Text>
-              </View>
-              {u.seatExempt ? <Badge label="Suporte Lastro" tone="accent" /> : null}
-              <Badge
-                label={u.status === 'active' ? 'Ativo' : 'Desativado'}
-                tone={u.status === 'active' ? 'success' : 'neutral'}
-              />
-            </View>
-          ))
-        )}
-      </Panel>
+      <CompanyUsersPanel tenantId={data.tenant.id} users={data.users} />
 
-      <InvitationsPanel tenantId={data.tenant.id} invitations={data.invitations} />
+      <CompanyInvitationsPanel
+        tenantId={data.tenant.id}
+        invitations={data.invitations}
+        capacity={data.capacity}
+        provisioning={data.tenant.status === 'provisioning'}
+        sellers={s.features.includes('commercial.sellers')}
+      />
 
       <CompanyCharges
         tenantId={data.tenant.id}
@@ -267,104 +220,6 @@ export default function PlatformCompany() {
         />
       ) : null}
     </>
-  );
-}
-
-function InvitationsPanel({
-  tenantId,
-  invitations,
-}: {
-  tenantId: string;
-  invitations: Invitation[];
-}) {
-  const { api } = usePlatformApi();
-  const toast = useToast();
-  const [revoking, setRevoking] = useState<Invitation | null>(null);
-  const [reason, setReason] = useState('');
-  const [tried, setTried] = useState(false);
-  const close = () => {
-    setRevoking(null);
-    setReason('');
-    setTried(false);
-    revoke.reset();
-  };
-  const revoke = usePlatformMutation(
-    () =>
-      unwrap(
-        api.POST('/api/v1/admin/companies/{id}/invitations/{invitationId}/revoke', {
-          params: { path: { id: tenantId, invitationId: (revoking as Invitation).id } },
-          body: { reason: reason.trim() },
-        }),
-      ),
-    {
-      onSuccess: () => {
-        toast.show('Convite revogado');
-        close();
-      },
-    },
-  );
-  const label = (i: Invitation) =>
-    i.status === 'accepted'
-      ? { label: 'Aceito', tone: 'success' as const }
-      : i.status === 'revoked'
-        ? { label: 'Revogado', tone: 'neutral' as const }
-        : i.expired
-          ? { label: 'Vencido', tone: 'warning' as const }
-          : { label: 'Pendente', tone: 'accent' as const };
-  return (
-    <Panel title="Convites" description="Os 50 convites mais recentes da empresa." flush>
-      {invitations.length === 0 ? (
-        <EmptyState size="compact" icon={Mail} title="Nenhum convite" />
-      ) : (
-        invitations.map((inv, i) => (
-          <View key={inv.id} style={[styles.row, i < invitations.length - 1 && styles.divider]}>
-            <View style={styles.copy}>
-              <Text variant="bodyStrong" numberOfLines={1}>
-                {inv.email}
-              </Text>
-              <Text variant="small" color={color.textSecondary}>
-                {`${roleLabel[inv.role]} · criado ${formatDate(inv.createdAt)} · vence ${formatDate(inv.expiresAt)}`}
-              </Text>
-            </View>
-            {inv.seatExempt ? <Badge label="Suporte Lastro" tone="accent" /> : null}
-            <Badge {...label(inv)} />
-            {inv.status === 'pending' && !inv.expired ? (
-              <Button
-                label="Revogar"
-                size="sm"
-                variant="outline"
-                onPress={() => setRevoking(inv)}
-              />
-            ) : null}
-          </View>
-        ))
-      )}
-      <ConfirmDialog
-        visible={revoking !== null}
-        title="Revogar convite?"
-        description={`O convite para ${revoking?.email ?? ''} deixa de funcionar e a vaga reservada é liberada.`}
-        confirmLabel="Revogar convite"
-        loading={revoke.isPending}
-        onCancel={close}
-        onConfirm={() => {
-          setTried(true);
-          if (validReason(reason)) revoke.mutate(undefined);
-        }}
-      >
-        <ReasonField
-          value={reason}
-          onChange={setReason}
-          error={
-            tried && !validReason(reason) ? 'Informe o motivo (mínimo 3 caracteres).' : undefined
-          }
-        />
-        {revoke.isError ? (
-          <Alert tone="danger" title="Convite não revogado">
-            {toApiError(revoke.error).userMessage}
-          </Alert>
-        ) : null}
-      </ConfirmDialog>
-    </Panel>
   );
 }
 

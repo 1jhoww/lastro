@@ -145,11 +145,6 @@ function AdminStock({ stock }: { stock: StockAdmin }) {
                 label="Última movimentação"
                 value={stock.lastMovementAt ? formatDateTime(stock.lastMovementAt) : 'Nenhuma'}
               />
-              <Fact label="Versão do estoque" value={String(stock.version)} />
-              <Text variant="caption" color={color.textSecondary}>
-                A versão do estoque muda a cada movimentação e é diferente da versão do cadastro do
-                produto.
-              </Text>
               <Link href={`/produtos/${stock.productId}` as Href} asChild>
                 <Button label="Ver ficha do produto" icon={Package} variant="outline" />
               </Link>

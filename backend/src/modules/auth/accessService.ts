@@ -77,7 +77,7 @@ export class AccessService {
     );
     enforceSubscription(subscription.status);
     const entitlements = entitlementsFor(subscription);
-    if (permission) requirePermission(membership.role, entitlements, permission);
+    if (permission) requirePermission(membership, entitlements, permission);
     return { actor, tenant, membership, subscription, entitlements };
   }
 }

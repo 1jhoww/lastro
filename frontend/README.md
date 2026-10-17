@@ -37,8 +37,12 @@ $env:Path = "$PWD\.cache\runtime;$env:Path"
    npm run emulators
    ```
 
-2. Backend (terminal 2): seed e API. O seed cria a conta sintética `platform.demo@lastro.invalid`
-   (Super Admin) e mostra a senha **uma vez** no terminal.
+2. Backend (terminal 2): seed e API. O seed cria as contas fixas `platform.demo@lastro.invalid`
+   (Super Admin), `admin.demo@lastro.invalid` (administrador) e `vendedor.demo@lastro.invalid`
+   (vendedor) da **Distribuidora Demo Lastro**, com dados de demonstração. As senhas vêm de
+   `LASTRO_DEMO_*_PASSWORD` no `backend/.env` (veja
+   [ambiente local](../backend/docs/local-environment.md)). Os dados persistem entre reinícios;
+   o seed só é necessário na primeira vez.
 
    ```powershell
    cd ..\backend
@@ -57,8 +61,9 @@ $env:Path = "$PWD\.cache\runtime;$env:Path"
    npm run web
    ```
 
-4. Abra `http://localhost:8081` e entre com a conta do seed. Ela cai em **Plataforma Hepta**.
-5. Em **Nova empresa**, crie uma empresa de teste com um e-mail fictício (ex.:
+4. Abra `http://localhost:8081` e entre com uma conta do seed. `admin.demo` e `vendedor.demo` caem
+   na Distribuidora Demo Lastro; `platform.demo` cai em **Plataforma Hepta**.
+5. Para testar o fluxo de onboarding do zero: em **Nova empresa**, crie uma empresa de teste com um e-mail fictício (ex.:
    `admin.teste@lastro.invalid`) e copie o link do convite.
 6. Clique em **Sair**, abra o link, crie a conta com esse e-mail e confirme o e-mail. No emulador,
    o link de confirmação fica em
@@ -76,7 +81,7 @@ Celular: `npm start` e Expo Go ou development build. No emulador Android, troque
 Com emuladores, seed e API rodando (passos 1 e 2), no frontend:
 
 ```powershell
-$env:SEED_PASSWORD = "<senha mostrada pelo seed>"
+$env:SEED_PASSWORD = "<valor de LASTRO_DEMO_PLATFORM_PASSWORD no backend/.env>"
 node ..\backend\node_modules\tsx\dist\cli.mjs scripts\e2e-inventory.ts
 node ..\backend\node_modules\tsx\dist\cli.mjs scripts\e2e-orders.ts
 ```

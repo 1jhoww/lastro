@@ -32,7 +32,7 @@ export default function PlatformInvitations() {
     <>
       <PlatformHeader
         title="Convites"
-        description="Empresas aguardando o primeiro administrador. O Lastro não envia e-mail: repasse o link por um canal seguro."
+        description="Empresas aguardando o primeiro administrador. Para criar, reenviar ou corrigir convites de empresas já ativas, abra a empresa em Empresas. O Lastro não envia e-mail: repasse o link por um canal seguro."
         action={
           <Link href="/plataforma/nova-empresa" asChild>
             <Button label="Nova empresa e convite" icon={Plus} variant="strong" />

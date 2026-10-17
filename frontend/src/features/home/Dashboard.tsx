@@ -6,12 +6,14 @@ import { canReadFinance } from '@/features/finance/FinanceAccess';
 import { DueBadge, RowLink } from '@/features/finance/FinanceParts';
 import { useFinanceOverview } from '@/features/finance/api';
 import { summarizeTitles } from '@/features/finance/overview';
-import { dueHint, formatDate, installmentLabel, orderCode } from '@/features/finance/presentation';
+import { formatDate, installmentLabel, orderCode } from '@/features/finance/presentation';
 import { useReplenishment } from '@/features/inventory/api';
 import { qty } from '@/features/inventory/StockParts';
 import { useOrderList } from '@/features/orders/api';
-import { shortOrderId, statusLabel, statusTone, todayIn } from '@/features/orders/rules';
+import { shortOrderId, statusLabel, todayIn } from '@/features/orders/rules';
 import { useTenant } from '@/features/session/useTenant';
+import { firstNameOf } from '@/features/session/profile';
+import { useDailyPhrase } from './dailyPhrase';
 import { Screen } from '@/layout/Screen';
 import { addDays } from '@/lib/calendar';
 import { formatDateTime } from '@/lib/dates';
@@ -36,300 +38,141 @@ const countOf = (n: number, more: boolean) => (more ? `${n}+` : String(n));
 const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
 const SCAN = 50;
 
-/**
- * Início: resumo do negócio, o que precisa de atenção e atividade recente. Sem totais inventados:
- * contagens vêm de uma página de até 50 registros e mostram "50+" quando há mais; valores
- * financeiros só aparecem quando a leitura do Financeiro cobre todo o escopo. Cada área só
- * aparece para quem tem a permissão correspondente; o servidor filtra o que o vendedor vê.
- */
+/** Resumo operacional com os mesmos dados e limites de leitura dos módulos de origem. */
 export function Dashboard() {
   const session = useSession();
   const { permissions } = session;
+  const firstName = firstNameOf(session.me?.name);
+  const phrase = useDailyPhrase();
   const tenant = useTenant();
   const size = useLayoutSize();
   const wide = size === 'expanded';
   const today = tenant.data ? todayIn(tenant.data.timezone) : null;
-
-  const seesOrders =
-    permissions.includes('orders:own:read') || permissions.includes('orders:all:manage');
+  const seesOrders = permissions.includes('orders:own:read') || permissions.includes('orders:all:manage');
   const seesInventory = permissions.includes('inventory:manage');
   const seesFinance = canReadFinance(session);
-
   const drafts = useOrderList({ direction: 'desc', status: 'draft' }, SCAN, seesOrders);
   const waiting = useOrderList({ direction: 'asc', status: 'confirmed' }, SCAN, seesOrders);
   const recent = useOrderList({ direction: 'desc' }, 6, seesOrders);
-  const stock = useReplenishment(
-    { q: '', status: 'active', sort: 'shortfall' },
-    SCAN,
-    seesInventory,
-  );
+  const stock = useReplenishment({ q: '', status: 'active', sort: 'shortfall' }, SCAN, seesInventory);
   const finance = useFinanceOverview();
-
   const titles = finance.data && today ? summarizeTitles(finance.data.titles, today) : null;
   const soonEnd = today ? addDays(today, 7) : null;
-  const dueItems =
-    finance.data && today && soonEnd
-      ? finance.data.titles.items.filter((t) => t.outstandingCents > 0 && t.dueDate <= soonEnd)
-      : [];
-
+  const dueItems = finance.data && today && soonEnd
+    ? finance.data.titles.items.filter((t) => t.outstandingCents > 0 && t.dueDate <= soonEnd)
+        .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
+    : [];
+  const overdue = dueItems.filter((t) => today && t.dueDate < today);
+  const upcoming = dueItems.filter((t) => today && t.dueDate >= today);
   const waitingCount = countOf(waiting.items.length, !!waiting.query.hasNextPage);
   const stockCount = countOf(stock.items.length, !!stock.query.hasNextPage);
-
-  /* ---------- Frases de atenção ---------- */
-  const headlines: { icon: LucideIcon; text: string; tone: 'danger' | 'warning' | 'neutral' }[] =
-    [];
-  if (seesOrders && waiting.items.length)
-    headlines.push({
-      icon: Truck,
-      tone: 'neutral',
-      text: `Você tem ${waitingCount} ${waiting.items.length === 1 && !waiting.query.hasNextPage ? 'pedido aguardando' : 'pedidos aguardando'} saída.`,
-    });
-  if (seesInventory && stock.items.length)
-    headlines.push({
-      icon: PackageOpen,
-      tone: 'warning',
-      text: `${stockCount} ${stock.items.length === 1 && !stock.query.hasNextPage ? 'produto precisa' : 'produtos precisam'} de atenção no estoque.`,
-    });
-  if (titles?.overdue?.count)
-    headlines.push({
-      icon: CircleAlert,
-      tone: 'danger',
-      text: `${plural(titles.overdue.count, 'recebimento vencido', 'recebimentos vencidos')}: ${formatCents(titles.overdue.cents)}.`,
-    });
-  if (titles?.dueSoon?.count)
-    headlines.push({
-      icon: CircleDollarSign,
-      tone: 'neutral',
-      text: `${titles.dueSoon.count} ${titles.dueSoon.count === 1 ? 'recebimento vence' : 'recebimentos vencem'} nos próximos 7 dias.`,
-    });
-
-  /* ---------- Indicadores ---------- */
   const kpis: ReactNode[] = [];
-  if (seesOrders) {
-    kpis.push(
-      <Kpi
-        key="drafts"
-        icon={ClipboardList}
-        label="Pedidos em aberto"
-        value={
-          drafts.query.isPending ? null : countOf(drafts.items.length, !!drafts.query.hasNextPage)
-        }
-        caption="Rascunhos a confirmar"
-        href={'/pedidos?situacao=draft' as Href}
-      />,
-      <Kpi
-        key="waiting"
-        icon={Truck}
-        label="Aguardando saída"
-        value={waiting.query.isPending ? null : waitingCount}
-        caption={
-          waiting.items[0]?.confirmedAt
-            ? `Mais antigo: ${formatDateTime(waiting.items[0].confirmedAt)}`
-            : 'Confirmados, com estoque reservado'
-        }
-        href={'/pedidos?situacao=confirmed' as Href}
-      />,
-    );
-  }
-  if (seesFinance) {
-    kpis.push(
-      <Kpi
-        key="open"
-        icon={CircleDollarSign}
-        label="A receber"
-        value={finance.isPending ? null : titles?.open ? formatCents(titles.open.cents) : '—'}
-        caption={
-          titles?.open
-            ? plural(titles.open.count, 'título em aberto', 'títulos em aberto')
-            : 'Muitos títulos para somar aqui'
-        }
-        href={'/financeiro/receber' as Href}
-      />,
-      <Kpi
-        key="overdue"
-        icon={CircleAlert}
-        label="Vencidas"
-        tone={titles?.overdue?.count ? 'danger' : 'default'}
-        value={finance.isPending ? null : titles?.overdue ? formatCents(titles.overdue.cents) : '—'}
-        caption={
-          titles?.overdue
-            ? titles.overdue.count
-              ? plural(titles.overdue.count, 'parcela vencida', 'parcelas vencidas')
-              : 'Nenhuma parcela vencida'
-            : 'Consulte em Contas a receber'
-        }
-        href={'/financeiro/receber' as Href}
-      />,
-    );
-  } else if (seesInventory) {
-    kpis.push(
-      <Kpi
-        key="stock"
-        icon={PackageOpen}
-        label="Abaixo do mínimo"
-        tone={stock.items.length ? 'warning' : 'default'}
-        value={stock.query.isPending ? null : stockCount}
-        caption="Produtos para repor"
-        href={'/estoque/reposicao' as Href}
-      />,
-    );
-  }
+  if (seesOrders) kpis.push(
+    <Kpi key="drafts" icon={ClipboardList} label="Pedidos em aberto"
+      value={drafts.query.isError ? '—' : drafts.query.isPending ? null : countOf(drafts.items.length, !!drafts.query.hasNextPage)}
+      caption={drafts.query.isError ? 'Consulte a lista de pedidos' : 'Rascunhos a confirmar'}
+      href={'/pedidos?situacao=draft' as Href} />,
+    <Kpi key="waiting" icon={Truck} label="Aguardando saída"
+      tone={!waiting.query.isError && waiting.items.length ? 'warning' : 'default'}
+      value={waiting.query.isError ? '—' : waiting.query.isPending ? null : waitingCount}
+      caption={waiting.query.isError ? 'Consulte os pedidos confirmados' : 'Confirmados, com estoque reservado'}
+      href={'/pedidos?situacao=confirmed' as Href} />,
+  );
+  if (seesFinance) kpis.push(
+    <Kpi key="open" icon={CircleDollarSign} label="A receber"
+      value={finance.isError ? '—' : finance.isPending || tenant.isPending ? null : titles?.open ? formatCents(titles.open.cents) : '—'}
+      caption={finance.isError || tenant.isError ? 'Não foi possível atualizar' : titles?.open ? plural(titles.open.count, 'parcela em aberto', 'parcelas em aberto') : 'Consulte o total no Financeiro'}
+      href={'/financeiro/receber' as Href} />,
+    <Kpi key="overdue" icon={CircleAlert} label="Vencidas"
+      tone={!finance.isError && titles?.overdue?.count ? 'danger' : 'default'}
+      value={finance.isError ? '—' : finance.isPending || tenant.isPending ? null : titles?.overdue ? formatCents(titles.overdue.cents) : '—'}
+      caption={finance.isError || tenant.isError ? 'Não foi possível atualizar' : titles?.overdue ? plural(titles.overdue.count, 'parcela vencida', 'parcelas vencidas') : 'Consulte as parcelas vencidas'}
+      href={'/financeiro/receber?situacao=overdue' as Href} />,
+  );
 
-  /* ---------- Atenção ---------- */
-  const attention: ReactNode[] = [];
-  if (seesInventory)
-    attention.push(
-      <Block
-        key="stock"
-        title="Estoque baixo"
-        action={
-          stock.items.length
-            ? { label: 'Ver estoque', href: '/estoque/reposicao' as Href }
-            : undefined
-        }
-        loading={stock.query.isPending}
-        error={stock.query.isError}
-        empty="Nenhum produto abaixo do mínimo."
-        count={stock.items.length}
-      >
-        {stock.items.slice(0, 6).map((s) => (
-          <StockRow key={s.productId} item={s} />
-        ))}
+  const priorities: ReactNode[] = [];
+  if (seesFinance && (finance.isPending || tenant.isPending || finance.isError || tenant.isError || overdue.length || !titles?.overdue)) {
+    priorities.push(
+      <Block key="overdue" title="Recebimentos vencidos" tone={overdue.length && !finance.isError ? 'danger' : 'default'}
+        description={titles?.overdue?.count ? plural(titles.overdue.count, 'parcela para cobrar', 'parcelas para cobrar') : 'Confira os valores que precisam de cobrança.'}
+        action={{ label: 'Ver vencidas', href: '/financeiro/receber?situacao=overdue' as Href }}
+        loading={finance.isPending || tenant.isPending} error={finance.isError || tenant.isError}
+        onRetry={() => { void finance.refetch(); void tenant.refetch(); }}
+        count={overdue.length} empty="A leitura não cobre todos os vencimentos. Consulte o Financeiro.">
+        {overdue.slice(0, 4).map((t) => <DueRow key={t.id} title={t} today={today} />)}
+        {!titles?.overdue && overdue.length > 0 ? <Text variant="caption" color={color.textSecondary}>Lista parcial. Abra o Financeiro para consultar todas as parcelas.</Text> : null}
       </Block>,
     );
-  if (seesOrders)
-    attention.push(
-      <Block
-        key="waiting"
-        title="Aguardando saída"
-        action={
-          waiting.items.length
-            ? { label: 'Ver todos', href: '/pedidos?situacao=confirmed' as Href }
-            : undefined
-        }
-        loading={waiting.query.isPending}
-        error={waiting.query.isError}
-        empty="Nenhum pedido aguardando saída."
-        count={waiting.items.length}
-      >
-        {waiting.items.slice(0, 6).map((o) => (
-          <OrderRow key={o.id} order={o} date={o.confirmedAt ?? o.createdAt} />
-        ))}
+  }
+  if (seesOrders && (waiting.query.isPending || waiting.query.isError || waiting.items.length)) {
+    priorities.push(
+      <Block key="waiting" title="Pedidos aguardando saída" tone={waiting.items.length && !waiting.query.isError ? 'warning' : 'default'}
+        description={waiting.items.length ? waitingCount + ' para preparar · mais antigos primeiro' : undefined}
+        action={{ label: 'Ver pedidos', href: '/pedidos?situacao=confirmed' as Href }}
+        loading={waiting.query.isPending} error={waiting.query.isError} onRetry={() => void waiting.query.refetch()}
+        count={waiting.items.length} empty="Nenhum pedido aguardando saída.">
+        {waiting.items.slice(0, 4).map((o) => <OrderRow key={o.id} order={o} date={o.confirmedAt ?? o.createdAt} />)}
       </Block>,
     );
-  if (seesFinance)
-    attention.push(
-      <Block
-        key="due"
-        title="Recebimentos: vencidos e próximos 7 dias"
-        action={{ label: 'Abrir Financeiro', href: '/financeiro' as Href }}
-        loading={finance.isPending}
-        error={finance.isError}
-        empty="Nada vencido nem vencendo nesta semana."
-        count={dueItems.length}
-      >
-        {dueItems.slice(0, 6).map((t) => (
-          <DueRow key={t.id} title={t} today={today} />
-        ))}
-      </Block>,
-    );
+  }
+  const stockNeedsAttention = seesInventory && (stock.query.isPending || stock.query.isError || stock.items.length > 0);
+  const hasAttention = priorities.length > 0 || stockNeedsAttention;
 
   return (
-    <Screen
-      title="Início"
-      description={tenant.data ? tenant.data.name : undefined}
-      actions={
-        canCreateOrder(permissions) ? (
-          <Link href="/pedidos/novo" asChild>
-            <Button label="Novo pedido" icon={Plus} variant="strong" />
-          </Link>
-        ) : null
-      }
-    >
-      {kpis.length ? (
-        <View style={styles.kpis}>
-          {kpis.map((k, i) => (
-            <View
-              key={i}
-              style={[
-                styles.kpiCell,
-                { width: size === 'expanded' ? `${100 / kpis.length}%` : '50%' },
-              ]}
-            >
-              {k}
-            </View>
-          ))}
-        </View>
-      ) : null}
+    <Screen title={firstName ? 'Olá, ' + firstName + '!' : 'Olá!'}
+      description={phrase} alignActionsEnd
+      actions={canCreateOrder(permissions) ? (
+        <Link href="/pedidos/novo" asChild>
+          <Button label="Novo pedido" icon={Plus} variant="strong" fullWidth={size === 'compact'} />
+        </Link>
+      ) : null}>
+      {kpis.length ? <View style={styles.kpis}>
+        {kpis.map((k, i) => <View key={i} style={[styles.kpiCell,
+          { width: wide ? (100 / kpis.length + '%') as `${number}%` : '50%' }]}>{k}</View>)}
+      </View> : null}
 
-      {attention.length ? (
-        <View style={styles.area}>
-          <Text variant="h3" accessibilityRole="header" style={styles.areaTitle}>
-            O que precisa de atenção
-          </Text>
-          {headlines.length ? (
-            <View style={styles.headlines}>
-              {headlines.map((h) => (
-                <View key={h.text} style={styles.headline}>
-                  <h.icon
-                    size={16}
-                    strokeWidth={2}
-                    color={
-                      h.tone === 'danger'
-                        ? color.danger
-                        : h.tone === 'warning'
-                          ? color.warning
-                          : color.textSecondary
-                    }
-                  />
-                  <Text variant="small" style={styles.flex}>
-                    {h.text}
-                  </Text>
-                </View>
-              ))}
+      {hasAttention ? <View style={styles.area}>
+        <Text variant="h3" accessibilityRole="header">O que precisa de atenção</Text>
+        {priorities.length ? <View style={[styles.blocks, wide && styles.blocksWide]}>
+          {priorities.map((block, i) => <View key={i} style={wide ? styles.priorityColumn : undefined}>{block}</View>)}
+        </View> : null}
+        {stockNeedsAttention ? <View style={styles.stockNotice}>
+          <View style={styles.noticeHead}>
+            <PackageOpen size={18} color={color.warning} />
+            <View style={styles.flex}>
+              <Text variant="smallStrong">Estoque baixo</Text>
+              <Text variant="caption" color={color.textSecondary}>
+                {stock.query.isError ? 'Não foi possível consultar o estoque.' : stock.query.isPending ? 'Consultando produtos…' : stockCount + (stock.items.length === 1 && !stock.query.hasNextPage ? ' produto abaixo do mínimo' : ' produtos abaixo do mínimo')}
+              </Text>
             </View>
-          ) : null}
-          <View style={[styles.blocks, wide && styles.blocksWide]}>
-            {attention.map((b, i) => (
-              <View
-                key={i}
-                style={
-                  wide
-                    ? {
-                        width: attention.length === 3 && i === 2 ? '100%' : '50%',
-                        padding: space[2],
-                      }
-                    : null
-                }
-              >
-                {b}
-              </View>
-            ))}
+            {stock.query.isError ? <Button label="Tentar novamente" size="sm" variant="ghost" onPress={() => stock.query.refetch()} /> :
+              <Link href={'/estoque/reposicao' as Href} asChild><Button label="Ver estoque" size="sm" variant="ghost" /></Link>}
           </View>
-        </View>
-      ) : null}
+          {!stock.query.isPending && !stock.query.isError ? stock.items.slice(0, 2).map((s) => <StockRow key={s.productId} item={s} />) : null}
+        </View> : null}
+      </View> : seesOrders || seesFinance || seesInventory ?
+        <Text variant="small" color={color.textSecondary}>Nenhuma pendência operacional encontrada nas consultas disponíveis.</Text> : null}
 
-      {seesOrders ? (
-        <View style={styles.area}>
-          <Text variant="h3" accessibilityRole="header" style={styles.areaTitle}>
-            Atividade recente
-          </Text>
-          <Block
-            title="Pedidos recentes"
-            action={
-              recent.items.length ? { label: 'Ver pedidos', href: '/pedidos' as Href } : undefined
-            }
-            loading={recent.query.isPending}
-            error={recent.query.isError}
-            empty="Nenhum pedido ainda. Crie o primeiro em “Novo pedido”."
-            count={recent.items.length}
-          >
-            {recent.items.map((o) => (
-              <OrderRow key={o.id} order={o} date={o.createdAt} withStatus />
-            ))}
-          </Block>
-        </View>
-      ) : null}
+      <View style={[styles.blocks, wide && styles.blocksWide]}>
+      {seesFinance ? <View style={wide ? styles.priorityColumn : undefined}><Block title="Próximos 7 dias" quiet
+        description="Recebimentos de hoje e dos próximos sete dias."
+        action={{ label: 'Contas a receber', href: '/financeiro/receber' as Href }}
+        loading={finance.isPending || tenant.isPending} error={finance.isError || tenant.isError}
+        onRetry={() => { void finance.refetch(); void tenant.refetch(); }}
+        count={upcoming.length} empty={titles?.dueSoon ? 'Nenhum recebimento previsto neste período.' : 'Consulte o Financeiro para conferir os próximos vencimentos.'}>
+        {upcoming.slice(0, 4).map((t) => <DueRow key={t.id} title={t} today={today} />)}
+        {!titles?.dueSoon && upcoming.length > 0 ? <Text variant="caption" color={color.textSecondary}>Lista parcial. Consulte os demais vencimentos no Financeiro.</Text> : null}
+      </Block></View> : null}
+
+      {seesOrders ? <View style={[styles.recent, wide && styles.priorityColumn]}>
+        <Block title="Atividade recente" quiet description="Últimos pedidos criados"
+          action={{ label: 'Ver pedidos', href: '/pedidos' as Href }}
+          loading={recent.query.isPending} error={recent.query.isError} onRetry={() => void recent.query.refetch()}
+          count={recent.items.length} empty={canCreateOrder(permissions) ? 'Nenhum pedido ainda. Comece em “Novo pedido”.' : 'Nenhum pedido disponível para consultar.'}>
+          {recent.items.map((o) => <OrderRow key={o.id} order={o} date={o.createdAt} withStatus />)}
+        </Block>
+      </View> : null}
+      </View>
     </Screen>
   );
 }
@@ -352,18 +195,21 @@ function Kpi({
 }) {
   return (
     <RowLink href={href} label={`${label}: ${value ?? 'carregando'}`}>
-      <View style={styles.kpi}>
+      <View style={[styles.kpi, tone === 'danger' && styles.kpiDanger, tone === 'warning' && styles.kpiWarning]}>
         <View style={styles.kpiHead}>
-          <Text variant="small" color={color.textSecondary} style={styles.flex} numberOfLines={1}>
+          <Text variant="smallStrong" color={color.textSecondary} style={styles.flex}>
             {label}
           </Text>
-          <Icon size={16} strokeWidth={1.75} color={color.textSecondary} />
+          <Icon size={16} strokeWidth={1.75} color={tone === 'danger' ? color.danger : tone === 'warning' ? color.warning : color.textSecondary} />
         </View>
         {value === null ? (
           <Skeleton height={28} width="50%" />
         ) : (
           <Text
             variant="figureLarge"
+            style={styles.kpiValue}
+            adjustsFontSizeToFit
+            minimumFontScale={0.65}
             numberOfLines={1}
             color={
               tone === 'danger' ? color.danger : tone === 'warning' ? color.warning : color.text
@@ -372,7 +218,7 @@ function Kpi({
             {value}
           </Text>
         )}
-        <Text variant="caption" color={color.textSecondary} numberOfLines={1}>
+        <Text variant="caption" color={color.textSecondary}>
           {caption}
         </Text>
       </View>
@@ -388,6 +234,10 @@ function Block({
   empty,
   count,
   children,
+  description,
+  tone = 'default',
+  quiet = false,
+  onRetry,
 }: {
   title: string;
   action?: { label: string; href: Href };
@@ -396,13 +246,21 @@ function Block({
   empty: string;
   count: number;
   children: ReactNode;
+  description?: string;
+  tone?: 'default' | 'danger' | 'warning';
+  quiet?: boolean;
+  onRetry?: () => void;
 }) {
   return (
-    <View style={styles.block}>
+    <View style={[styles.block, quiet && styles.quietBlock, tone === 'danger' && styles.blockDanger, tone === 'warning' && styles.blockWarning]}>
       <View style={styles.blockHead}>
-        <Text variant="smallStrong" style={styles.flex}>
+        <View style={styles.flex}>
+        <Text variant={quiet ? 'smallStrong' : 'h3'} accessibilityRole="header"
+          color={tone === 'danger' ? color.danger : color.text}>
           {title}
         </Text>
+        {description ? <Text variant="caption" color={color.textSecondary}>{description}</Text> : null}
+        </View>
         {action ? (
           <Link href={action.href} asChild>
             <Button label={action.label} size="sm" variant="ghost" />
@@ -415,9 +273,12 @@ function Block({
           <Skeleton height={16} width="70%" />
         </View>
       ) : error ? (
+        <View style={styles.errorRow}>
         <Text variant="small" color={color.textSecondary} style={styles.message}>
-          Não foi possível carregar agora. Tente de novo em instantes.
+          Não foi possível atualizar esta seção.
         </Text>
+        {onRetry ? <Button label="Tentar novamente" size="sm" variant="ghost" onPress={onRetry} /> : null}
+        </View>
       ) : count === 0 ? (
         <Text variant="small" color={color.textSecondary} style={styles.message}>
           {empty}
@@ -431,20 +292,21 @@ function Block({
 
 function StockRow({ item: s }: { item: StockAdmin }) {
   const critical = fromApiQuantity(s.available) <= 0;
+  const compact = useLayoutSize() === 'compact';
   return (
     <RowLink href={`/estoque/${s.productId}` as Href}>
-      <View style={styles.row}>
-        <View style={[styles.marker, critical && styles.markerCritical]} />
-        <View style={styles.flex}>
+      <View style={[styles.row, compact && styles.rowCompact]}>
+        {!compact ? <View style={[styles.marker, critical && styles.markerCritical]} /> : null}
+        <View style={compact ? styles.compactText : styles.flex}>
           <Text variant="smallStrong" numberOfLines={1}>
             {s.name}
           </Text>
-          <Text variant="caption" color={color.textSecondary} numberOfLines={1}>
+          <Text variant="caption" color={color.textSecondary}>
             {`Disponível ${qty(s.available, s.unit)} · mínimo ${qty(s.minimumStock, s.unit)}`}
           </Text>
         </View>
         {critical ? (
-          <Badge label="Sem estoque" tone="danger" />
+          <Badge label="Sem disponível" tone="danger" />
         ) : (
           <Text variant="smallStrong" color={color.warning}>
             {`Faltam ${qty(s.suggestedQuantity, s.unit)}`}
@@ -464,20 +326,21 @@ function OrderRow({
   date: string;
   withStatus?: boolean;
 }) {
+  const compact = useLayoutSize() === 'compact';
   return (
     <RowLink href={`/pedidos/${o.id}` as Href}>
-      <View style={styles.row}>
-        <View style={styles.flex}>
+      <View style={[styles.row, compact && styles.rowCompact]}>
+        <View style={compact ? styles.compactText : styles.flex}>
           <Text variant="smallStrong" numberOfLines={1}>
             {o.customerName ?? 'Sem cliente'}
           </Text>
-          <Text variant="caption" color={color.textSecondary} numberOfLines={1}>
+          <Text variant="caption" color={color.textSecondary}>
             {`${shortOrderId(o.commercialId)} · ${formatDateTime(date)}`}
           </Text>
         </View>
-        <View style={styles.right}>
+        <View style={[styles.right, compact && styles.rowFooter]}>
           <Text variant="figure">{formatCents(o.totalCents)}</Text>
-          {withStatus ? <Badge label={statusLabel[o.status]} tone={statusTone[o.status]} /> : null}
+          {withStatus ? <Text variant="caption" color={color.textSecondary}>{statusLabel[o.status]}</Text> : <Text variant="caption" color={color.warning}>Abrir pedido →</Text>}
         </View>
       </View>
     </RowLink>
@@ -485,19 +348,21 @@ function OrderRow({
 }
 
 function DueRow({ title: t, today }: { title: Receivable; today: string | null }) {
+  const compact = useLayoutSize() === 'compact';
+  const overdue = Boolean(today && t.dueDate < today);
   return (
     <RowLink href={`/financeiro/${t.id}` as Href}>
-      <View style={styles.row}>
-        <View style={styles.flex}>
+      <View style={[styles.row, compact && styles.rowCompact]}>
+        <View style={compact ? styles.compactText : styles.flex}>
           <Text variant="smallStrong" numberOfLines={1}>
             {t.customerName}
           </Text>
-          <Text variant="caption" color={color.textSecondary} numberOfLines={1}>
-            {`${orderCode(t.orderId)} · ${installmentLabel(t.installmentNumber)} · ${formatDate(t.dueDate)} · ${dueHint(t, today)}`}
+          <Text variant="caption" color={color.textSecondary}>
+            {`${orderCode(t.orderId)} · ${installmentLabel(t.installmentNumber)} · ${formatDate(t.dueDate)}`}
           </Text>
         </View>
-        <View style={styles.right}>
-          <Text variant="figure">{formatCents(t.outstandingCents)}</Text>
+        <View style={[styles.right, compact && styles.rowFooter]}>
+          <Text variant="figure" color={overdue ? color.danger : color.text}>{formatCents(t.outstandingCents)}</Text>
           <DueBadge title={t} today={today} />
         </View>
       </View>
@@ -523,32 +388,45 @@ const styles = StyleSheet.create({
     marginRight: -1,
     marginBottom: -1,
   },
-  kpi: { gap: 2, paddingHorizontal: space[4], paddingVertical: space[3] },
-  kpiHead: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
+  kpi: { gap: space[2], paddingHorizontal: space[4], paddingVertical: space[4], borderTopWidth: 3, borderTopColor: 'transparent' },
+  kpiValue: { fontSize: 26, lineHeight: 32 },
+  kpiDanger: { borderTopColor: color.danger },
+  kpiWarning: { borderTopColor: color.accent },
+  kpiHead: { flexDirection: 'row', alignItems: 'center', gap: space[2], minHeight: 36 },
   area: { gap: space[3] },
-  areaTitle: { paddingBottom: space[2], borderBottomWidth: 1, borderBottomColor: color.border },
-  headlines: { gap: space[1] },
-  headline: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
   blocks: { gap: space[4] },
-  blocksWide: { flexDirection: 'row', flexWrap: 'wrap', gap: 0, margin: -space[2] },
+  blocksWide: { flexDirection: 'row', alignItems: 'flex-start' },
+  priorityColumn: { flex: 1, minWidth: 0 },
+  stockNotice: { backgroundColor: color.warningSoft, borderRadius: radius.md, paddingHorizontal: space[4], paddingVertical: space[2] },
+  noticeHead: { flexDirection: 'row', alignItems: 'center', gap: space[2], flexWrap: 'wrap' },
+  recent: { borderTopWidth: 1, borderTopColor: color.border, paddingTop: space[3] },
   block: {
-    borderWidth: 1,
-    borderColor: color.border,
+    borderTopWidth: 3,
+    borderTopColor: color.border,
     borderRadius: radius.lg,
     backgroundColor: color.surface,
     paddingHorizontal: space[3],
     paddingBottom: space[2],
   },
+  quietBlock: { backgroundColor: 'transparent', borderTopWidth: 0, paddingHorizontal: 0 },
+  blockDanger: { borderTopColor: color.danger },
+  blockWarning: { borderTopColor: color.accent },
   blockHead: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space[2],
-    minHeight: 44,
+    minHeight: 52,
+    paddingVertical: space[2],
+    flexWrap: 'wrap',
     paddingLeft: space[1],
   },
   loading: { gap: space[2], padding: space[2] },
   message: { paddingHorizontal: space[1], paddingVertical: space[3] },
+  errorRow: { alignItems: 'flex-start', gap: space[1] },
   row: { flexDirection: 'row', alignItems: 'center', gap: space[3], paddingVertical: space[2] },
+  rowCompact: { flexDirection: 'column', alignItems: 'stretch', gap: space[1] },
+  compactText: { minWidth: 0 },
+  rowFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: space[2] },
   right: { alignItems: 'flex-end', gap: 2 },
   marker: { width: 3, alignSelf: 'stretch', borderRadius: 2, backgroundColor: color.accent },
   markerCritical: { backgroundColor: color.danger },

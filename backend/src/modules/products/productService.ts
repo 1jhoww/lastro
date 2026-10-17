@@ -6,6 +6,7 @@ import type { AccessService } from '../auth/accessService.js';
 import { CommercialRepository } from '../../infrastructure/repositories/commercialRepository.js';
 import * as s from '../../shared/schemas/commercial.js';
 import { requireCondition } from '../../shared/errors/appError.js';
+import { holds } from '../users/permissions.js';
 import { digest } from '../../shared/utils/crypto.js';
 import { recordAudit } from '../../shared/audit/audit.js';
 import { stockSchema } from '../../shared/schemas/inventory.js';
@@ -33,7 +34,7 @@ export class ProductService {
     requireCondition(
       product?.tenantId === tenantId &&
         product.id === id &&
-        (ctx.membership.role === 'administrator' || product.status === 'active'),
+        (holds(ctx, 'products:manage') || product.status === 'active'),
       404,
       'RESOURCE_NOT_FOUND',
       'Recurso não encontrado',
@@ -48,7 +49,7 @@ export class ProductService {
       'products',
       s.productSchema,
       input,
-      ctx.membership.role === 'seller',
+      !holds(ctx, 'products:manage'),
     );
   }
   private async category(tenantId: string, id: string | null, tx: Transaction) {

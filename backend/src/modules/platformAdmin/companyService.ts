@@ -24,6 +24,7 @@ import { pendingInvitations, reservedSeats } from '../users/capacity.js';
 import { billingDate } from '../billing/calendar.js';
 import { chargeSchema, nextDueDate, situationOf, type Charge } from '../billing/charges.js';
 import { BillingService } from '../billing/billingService.js';
+import { EmailChangeService } from '../users/emailChangeService.js';
 
 /** Read models of the Super Admin panel stay in memory up to this many documents per query. */
 const MAX_ROWS = 5000;
@@ -43,6 +44,7 @@ export class CompanyService {
     readonly auth: Auth,
     readonly config: Config,
     readonly clock: () => Date = () => new Date(),
+    readonly emailChanges = new EmailChangeService(repo, access, auth, clock),
   ) {
     this.billing = new BillingService(repo, access, config, clock);
   }
@@ -211,6 +213,18 @@ export class CompanyService {
     );
     const memberships = members.docs.map((doc) => membershipSchema.parse(doc.data()));
     const profiles = await this.profiles(memberships.map((member) => member.uid));
+    const identities = memberships.length
+      ? await this.repo.db.getAll(
+          ...memberships.map((member) => this.repo.global('identities', member.uid)),
+        )
+      : [];
+    const identityBlocked = new Set(
+      identities.filter((doc) => doc.get('status') === 'disabled').map((doc) => doc.id),
+    );
+    const changes = await this.emailChanges.forMembers(
+      memberships.map((member) => member.uid),
+      new Map([...profiles].map(([uid, profile]) => [uid, profile.email])),
+    );
     const entitlements = entitlementsFor(subscription);
     const reserved = reservedSeats(pendingInvitations(pending));
     return {
@@ -234,7 +248,11 @@ export class CompanyService {
         role: member.role,
         status: member.status,
         seatExempt: member.seatExempt,
+        version: member.version,
         createdAt: member.createdAt,
+        accountBlocked:
+          identityBlocked.has(member.uid) || profiles.get(member.uid)?.disabled === true,
+        emailChange: changes.get(member.uid) ?? null,
       })),
       invitations: invitations.docs.map((doc) => {
         const invitation = invitationSchema.parse(doc.data());
@@ -247,6 +265,7 @@ export class CompanyService {
           seatExempt: invitation.seatExempt,
           expiresAt: invitation.expiresAt,
           createdAt: invitation.createdAt,
+          replacedBy: invitation.replacedBy,
         };
       }),
       publicCatalogEnabled: catalog?.enabled === true,
@@ -255,7 +274,10 @@ export class CompanyService {
 
   /** Name and e-mail from the identity provider; best effort, never blocks the page. */
   private async profiles(uids: string[]) {
-    const profiles = new Map<string, { name: string | null; email: string | null }>();
+    const profiles = new Map<
+      string,
+      { name: string | null; email: string | null; disabled: boolean }
+    >();
     try {
       for (let i = 0; i < uids.length; i += 100) {
         const result = await this.auth.getUsers(uids.slice(i, i + 100).map((uid) => ({ uid })));
@@ -263,6 +285,7 @@ export class CompanyService {
           profiles.set(user.uid, {
             name: user.displayName?.trim() || null,
             email: user.email?.trim().toLowerCase() || null,
+            disabled: user.disabled,
           });
       }
     } catch {

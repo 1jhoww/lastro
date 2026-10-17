@@ -20,7 +20,7 @@ function world(
 ) {
   const gateway = new FakeGateway({ accounts: [ana], initialUser });
   const server = createFakeApi().on('GET', '/api/v1/me', () =>
-    ok({ uid: 'u1', email: ana.email, platformAdmin: false, memberships }),
+    ok({ uid: 'u1', email: ana.email, name: 'Ana Souza', platformAdmin: false, memberships }),
   );
   return { gateway, server };
 }
@@ -117,6 +117,7 @@ describe('convite', () => {
       overrides,
     });
     await screen.findByRole('button', { name: 'Criar conta' });
+    await fireEvent.changeText(screen.getByLabelText('Seu nome'), 'Ana Souza');
     await fireEvent.changeText(screen.getByLabelText('E-mail convidado'), ana.email);
     await fireEvent.changeText(screen.getByLabelText('Senha'), 'outra-senha-1');
     await fireEvent.changeText(screen.getByLabelText('Repita a senha'), 'outra-senha-1');
@@ -133,6 +134,7 @@ describe('convite', () => {
       overrides,
     });
     await screen.findByRole('button', { name: 'Criar conta' });
+    await fireEvent.changeText(screen.getByLabelText('Seu nome'), 'Ana Souza');
     await fireEvent.changeText(screen.getByLabelText('E-mail convidado'), 'novo@lastro.test');
     await fireEvent.changeText(screen.getByLabelText('Senha'), 'senha-nova-1');
     await fireEvent.changeText(screen.getByLabelText('Repita a senha'), 'senha-nova-1');
@@ -150,6 +152,7 @@ describe('convite', () => {
         ok({
           uid: 'u1',
           email: ana.email,
+          name: 'Ana Souza',
           platformAdmin: false,
           memberships: accepted ? [membership('t9', 'seller')] : [],
         }),
@@ -180,7 +183,7 @@ describe('convite', () => {
     const gateway = new FakeGateway({ accounts: [ana], initialUser: signedIn });
     const server = createFakeApi()
       .on('GET', '/api/v1/me', () =>
-        ok({ uid: 'u1', email: ana.email, platformAdmin: false, memberships: [] }),
+        ok({ uid: 'u1', email: ana.email, name: 'Ana Souza', platformAdmin: false, memberships: [] }),
       )
       .on('POST', '/api/v1/users/invitations/accept', () => fail(status, code));
     await renderApp({
@@ -193,10 +196,37 @@ describe('convite', () => {
     expect(await screen.findByText(title)).toBeTruthy();
   });
 
+  it('conta sem nome informa o nome antes de aceitar e o grava em /me', async () => {
+    let named: string | null = null;
+    const gateway = new FakeGateway({ accounts: [ana], initialUser: signedIn });
+    const server = createFakeApi()
+      .on('GET', '/api/v1/me', () =>
+        ok({ uid: 'u1', email: ana.email, name: named, platformAdmin: false, memberships: [] }),
+      )
+      .on('PATCH', '/api/v1/me', (c) => {
+        named = (c.body as { name: string }).name;
+        return ok({ uid: 'u1', email: ana.email, name: named, platformAdmin: false, memberships: [] });
+      })
+      .on('POST', '/api/v1/users/invitations/accept', () => fail(409, 'CONFLICT'));
+    await renderApp({
+      gateway,
+      fetch: server.fetch,
+      initialUrl: `/convite?token=${token}`,
+      overrides,
+    });
+    await fireEvent.press(await screen.findByRole('button', { name: 'Aceitar convite' }));
+    expect(await screen.findByText('Informe seu nome.')).toBeTruthy();
+    expect(server.calls.some((c) => c.path.endsWith('/accept'))).toBe(false);
+    await fireEvent.changeText(screen.getByLabelText('Seu nome'), '  Ana   Souza ');
+    await fireEvent.press(screen.getByRole('button', { name: 'Aceitar convite' }));
+    expect(await screen.findByText('Você já faz parte desta empresa')).toBeTruthy();
+    expect(named).toBe('Ana Souza');
+  });
+
   it('falha de rede permite tentar de novo', async () => {
     const gateway = new FakeGateway({ accounts: [ana], initialUser: signedIn });
     const server = createFakeApi().on('GET', '/api/v1/me', () =>
-      ok({ uid: 'u1', email: ana.email, platformAdmin: false, memberships: [] }),
+      ok({ uid: 'u1', email: ana.email, name: 'Ana Souza', platformAdmin: false, memberships: [] }),
     );
     await renderApp({
       gateway,

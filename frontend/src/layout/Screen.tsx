@@ -10,6 +10,8 @@ type Props = {
   description?: string;
   /** Ações do cabeçalho; a principal vem por último (à direita no desktop). */
   actions?: ReactNode;
+  /** Mantém a ação na borda do conteúdo mesmo quando o título atinge a largura máxima. */
+  alignActionsEnd?: boolean;
   children: ReactNode;
   /** Barra presa à base, fora da rolagem (ex.: resumo do carrinho no celular). */
   footer?: ReactNode;
@@ -19,7 +21,7 @@ type Props = {
  * Tela padrão: cabeçalho com título da seção e conteúdo com largura máxima. No celular, o
  * wordmark fica no topo e as ações descem para baixo do título, em largura total.
  */
-export function Screen({ title, description, actions, children, footer }: Props) {
+export function Screen({ title, description, actions, children, footer, alignActionsEnd }: Props) {
   const size = useLayoutSize();
   const insets = useSafeAreaInsets();
   const compact = size === 'compact';
@@ -47,7 +49,7 @@ export function Screen({ title, description, actions, children, footer }: Props)
               <Wordmark size={22} />
             </View>
           ) : null}
-          <View style={[styles.header, compact && styles.headerCompact]}>
+          <View style={[styles.header, alignActionsEnd && styles.headerEnd, compact && styles.headerCompact]}>
             <View style={styles.headings}>
               <Text variant="h1" accessibilityRole="header">
                 {title}
@@ -75,6 +77,7 @@ const styles = StyleSheet.create({
   inner: { width: '100%', maxWidth: layout.contentMaxWidth, alignSelf: 'center', gap: space[6] },
   topbar: { paddingBottom: space[2] },
   header: { flexDirection: 'row', alignItems: 'flex-end', gap: space[6], flexWrap: 'wrap' },
+  headerEnd: { justifyContent: 'space-between' },
   headerCompact: {
     flexDirection: 'column',
     alignItems: 'stretch',

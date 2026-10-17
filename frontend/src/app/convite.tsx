@@ -3,12 +3,18 @@ import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { unwrap } from '@/api/client';
 import { authErrorCode, authErrorMessage } from '@/auth/authErrors';
 import { AuthFrame } from '@/features/auth/AuthFrame';
 import { PasswordField } from '@/features/auth/PasswordField';
-import { invitationToken, signUpSchema, type SignUpValues } from '@/features/auth/schemas';
+import {
+  invitationToken,
+  personName,
+  signUpSchema,
+  type SignUpValues,
+} from '@/features/auth/schemas';
+import { useUpdateMyName } from '@/features/session/profile';
 import { inviteFailure } from '@/features/invitations/inviteErrors';
 import { useSession } from '@/session/SessionContext';
 import { color, space } from '@/theme';
@@ -113,7 +119,8 @@ function SignedOutStep() {
 }
 
 function CreateAccountForm({ onExisting }: { onExisting: () => void }) {
-  const { gateway } = useSession();
+  const { gateway, api } = useSession();
+  const queryClient = useQueryClient();
   const [failure, setFailure] = useState<{ message: string; existing: boolean } | null>(null);
   const {
     control,
@@ -121,15 +128,20 @@ function CreateAccountForm({ onExisting }: { onExisting: () => void }) {
     formState: { errors, isSubmitting },
   } = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
-    defaultValues: { email: '', password: '', confirm: '' },
+    defaultValues: { name: '', email: '', password: '', confirm: '' },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
 
-  const onSubmit = handleSubmit(async ({ email, password }) => {
+  const onSubmit = handleSubmit(async ({ name, email, password }) => {
     setFailure(null);
     try {
       await gateway.createAccount(email, password);
+      // O nome fica no cadastro da pessoa (fonte do /me e da lista de usuários). Uma falha aqui
+      // não impede o convite: o nome pode ser informado depois em "Conta".
+      await unwrap(api.PATCH('/api/v1/me', { body: { name } }))
+        .then(() => queryClient.invalidateQueries({ queryKey: ['me'] }))
+        .catch(() => {});
       // O backend só aceita convites de e-mail verificado.
       await gateway.sendEmailVerification().catch(() => {});
     } catch (e) {
@@ -160,6 +172,23 @@ function CreateAccountForm({ onExisting }: { onExisting: () => void }) {
           {failure.message}
         </Alert>
       ) : null}
+      <Controller
+        control={control}
+        name="name"
+        render={({ field }) => (
+          <TextField
+            label="Seu nome"
+            hint="Nome e sobrenome, como você quer ser chamado no Lastro."
+            value={field.value}
+            onChangeText={field.onChange}
+            onBlur={field.onBlur}
+            error={errors.name?.message}
+            autoComplete="name"
+            textContentType="name"
+            autoCapitalize="words"
+          />
+        )}
+      />
       <Controller
         control={control}
         name="email"
@@ -232,6 +261,11 @@ function SignedInStep({
   const [verified, setVerified] = useState(user?.emailVerified ?? false);
   const [verifyNote, setVerifyNote] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
+  // Conta criada antes de o cadastro pedir nome: completa aqui, antes de entrar na empresa.
+  const needsName = session.me !== undefined && !session.me.name;
+  const [name, setName] = useState('');
+  const [nameError, setNameError] = useState<string | null>(null);
+  const saveName = useUpdateMyName();
 
   const accept = useMutation({
     mutationFn: () => unwrap(api.POST('/api/v1/users/invitations/accept', { body: { token } })),
@@ -304,6 +338,18 @@ function SignedInStep({
       <Text variant="body">
         Você vai entrar como <Text variant="bodyStrong">{user?.email}</Text>.
       </Text>
+      {needsName ? (
+        <TextField
+          label="Seu nome"
+          hint="Nome e sobrenome, como você quer ser chamado no Lastro."
+          value={name}
+          onChangeText={setName}
+          error={nameError ?? undefined}
+          autoComplete="name"
+          textContentType="name"
+          autoCapitalize="words"
+        />
+      ) : null}
       {failure ? (
         <Alert
           tone="danger"
@@ -330,8 +376,24 @@ function SignedInStep({
           label="Aceitar convite"
           size="lg"
           fullWidth
-          loading={accept.isPending}
-          onPress={() => accept.mutate()}
+          loading={accept.isPending || saveName.isPending}
+          onPress={async () => {
+            if (needsName) {
+              const parsed = personName.safeParse(name);
+              if (!parsed.success) {
+                setNameError(parsed.error.issues[0]?.message ?? 'Informe seu nome.');
+                return;
+              }
+              setNameError(null);
+              try {
+                await saveName.mutateAsync(parsed.data);
+              } catch {
+                setNameError('Não foi possível salvar o nome. Tente novamente.');
+                return;
+              }
+            }
+            accept.mutate();
+          }}
         />
       )}
       <View style={styles.row}>

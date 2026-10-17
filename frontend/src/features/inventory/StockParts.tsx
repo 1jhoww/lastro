@@ -68,7 +68,7 @@ export function BalanceFigures({ stock }: { stock: StockAdmin }) {
             <Text variant="small" color={color.textSecondary}>
               {i.label}
             </Text>
-            <Text variant={i.label === 'Disponível' ? 'figureLarge' : 'figure'}>
+            <Text variant="figure">
               {formatQuantity(i.value, stock.unit)}
             </Text>
             <Text variant="caption" color={color.textSecondary}>
@@ -93,6 +93,8 @@ export function BalanceFigures({ stock }: { stock: StockAdmin }) {
 /** Situação do saldo em relação ao mínimo, em texto (não só cor). */
 export function StockStatus({ stock }: { stock: StockAdmin }) {
   if (stock.status === 'inactive') return <Badge label="Produto inativo" tone="neutral" />;
+  if (fromApiQuantity(stock.available) === 0)
+    return <Badge label={fromApiQuantity(stock.physical) === 0 ? 'Sem estoque' : 'Tudo reservado'} tone="danger" />;
   if (needsReplenishment(stock)) return <Badge label="Abaixo do mínimo" tone="warning" />;
   return <Badge label="Normal" tone="success" />;
 }
@@ -131,7 +133,7 @@ const styles = StyleSheet.create({
   segment: { height: '100%' },
   figures: { gap: space[4], paddingTop: space[1] },
   row: { flexDirection: 'row', gap: space[5] },
-  rowCompact: { flexDirection: 'column', gap: space[3] },
+  rowCompact: { flexWrap: 'wrap', gap: space[3] },
   figure: { flex: 1, gap: 2, minWidth: 0 },
   minimum: {
     flexDirection: 'row',

@@ -130,7 +130,15 @@ export const movementView = movementSchema
   .strip();
 export const movementPage = pageOf(movementView);
 export const movementResult = z.object({ movement: movementView, stock: stockAdminView });
-export const inventoryQuery = productQuery.omit({ catalogVisible: true });
+export const inventoryQuery = productQuery.omit({ catalogVisible: true }).extend({
+  stockState: z.enum(['all', 'low', 'empty', 'available', 'reserved']).optional(),
+});
+export const inventorySummary = z.object({
+  total: z.number().int().nonnegative(),
+  low: z.number().int().nonnegative(),
+  empty: z.number().int().nonnegative(),
+  reservedProducts: z.number().int().nonnegative(),
+});
 export const replenishmentQuery = z.strictObject({
   ...pageQuery.shape,
   status: z.enum(['active', 'inactive', 'all']).optional(),

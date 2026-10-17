@@ -71,6 +71,12 @@ export class FakeGateway implements AuthGateway {
     return this.user;
   }
 
+  emailChangesRequested: string[] = [];
+
+  async requestEmailChange(newEmail: string) {
+    this.emailChangesRequested.push(newEmail);
+  }
+
   async reauthenticate(password: string) {
     const acc = this.accounts.find((a) => a.uid === this.user?.uid);
     if (!acc || acc.password !== password) throw { code: 'auth/invalid-credential' };

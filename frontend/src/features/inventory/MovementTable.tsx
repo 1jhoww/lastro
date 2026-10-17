@@ -4,8 +4,9 @@ import { shortId } from '@/features/users/api';
 import { formatDateTime } from '@/lib/dates';
 import { formatQuantity, fromApiQuantity } from '@/lib/quantity';
 import { useSession } from '@/session/SessionContext';
-import { color, space } from '@/theme';
-import { Badge, DataTable, Text, type BadgeTone, type Column } from '@/ui';
+import { color, space, useLayoutSize } from '@/theme';
+import { Badge, Button, DataTable, Dialog, Text, type BadgeTone, type Column } from '@/ui';
+import { useState } from 'react';
 import { useProductNames } from './api';
 import { movementEffect, movementTypeLabel, originLabel, reasonText } from './stock';
 
@@ -44,6 +45,8 @@ export function MovementTable({
   stacked?: boolean;
 }) {
   const { user } = useSession();
+  const layoutSize = useLayoutSize();
+  const [selected, setSelected] = useState<Movement | null>(null);
   const names = useProductNames(showProduct ? rows.map((r) => r.productId) : []);
   const who = (uid: string) => (uid === user?.uid ? 'Você' : `Usuário ${shortId(uid)}`);
   const productName = (id: string) => names.get(id) ?? `Produto ${shortId(id)}`;
@@ -52,7 +55,7 @@ export function MovementTable({
     {
       key: 'when',
       label: 'Data',
-      width: 130,
+      width: 110,
       render: (m) => <Text variant="small">{formatDateTime(m.occurredAt)}</Text>,
     },
     ...(showProduct
@@ -72,7 +75,7 @@ export function MovementTable({
     {
       key: 'type',
       label: 'Tipo',
-      width: 150,
+      width: 135,
       render: (m) => (
         <View style={styles.type}>
           <Badge label={movementTypeLabel[m.type]} tone={tone[m.type]} />
@@ -85,14 +88,14 @@ export function MovementTable({
     {
       key: 'quantity',
       label: 'Quantidade',
-      width: 120,
+      width: 100,
       align: 'right',
       render: (m) => <Text variant="figure">{effectText(m)}</Text>,
     },
     {
       key: 'balance',
       label: 'Saldo após',
-      width: 120,
+      width: 100,
       align: 'right',
       render: (m) => (
         <View style={styles.right}>
@@ -121,11 +124,14 @@ export function MovementTable({
   ];
 
   return (
+    <>
     <DataTable
       label="Movimentações de estoque"
       rows={rows}
       keyOf={(m) => m.id}
-      stacked={stacked}
+      stacked={stacked || layoutSize !== 'expanded'}
+      actionsWidth={72}
+      actions={(m) => <Button label="Detalhes" variant="ghost" size="sm" onPress={() => setSelected(m)} />}
       columns={columns}
       renderCompact={(m) => (
         <View style={styles.compact}>
@@ -146,18 +152,37 @@ export function MovementTable({
             {reasonText(m) ?? 'Movimentação automática do pedido'}
           </Text>
           <Text variant="caption" color={color.textSecondary}>
-            {`${who(m.actorUid)} · físico após: ${formatQuantity(fromApiQuantity(m.physical), m.unit)}`}
+            {`${originLabel(m)} · ${who(m.actorUid)}`}
           </Text>
         </View>
       )}
     />
+    <Dialog visible={selected !== null} title="Detalhes da movimentação"
+      onClose={() => setSelected(null)}
+      actions={<Button label="Fechar" variant="ghost" onPress={() => setSelected(null)} />}>
+      {selected ? <View style={styles.detail}>
+        <Text variant="bodyStrong">{showProduct ? productName(selected.productId) : movementTypeLabel[selected.type]}</Text>
+        <Badge label={movementTypeLabel[selected.type]} tone={tone[selected.type]} />
+        <Text variant="small">{formatDateTime(selected.occurredAt)} · {who(selected.actorUid)}</Text>
+        <Text variant="bodyStrong">{effectText(selected)}</Text>
+        <Text variant="small">{`Físico: ${formatQuantity(fromApiQuantity(selected.previousPhysical), selected.unit)} → ${formatQuantity(fromApiQuantity(selected.physical), selected.unit)}`}</Text>
+        <Text variant="small">{`Reservado: ${formatQuantity(fromApiQuantity(selected.previousReserved), selected.unit)} → ${formatQuantity(fromApiQuantity(selected.reserved), selected.unit)}`}</Text>
+        <Text variant="small">{reasonText(selected) ?? 'Movimentação automática do pedido'}</Text>
+        {selected.notes ? <Text variant="small" selectable>{selected.notes}</Text> : null}
+        <Text variant="caption" color={color.textSecondary}>{originLabel(selected)}</Text>
+        {selected.origin === 'order' ? <Text variant="caption" selectable>{`Referência de origem: ${selected.originReference}`}</Text> : null}
+        <Text variant="caption" selectable>{`Responsável: ${selected.actorUid}`}</Text>
+      </View> : null}
+    </Dialog>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
+  detail: { gap: space[3] },
   type: { gap: 2, alignItems: 'flex-start' },
   right: { alignItems: 'flex-end' },
   compact: { gap: space[1] },
-  compactTop: { flexDirection: 'row', alignItems: 'center', gap: space[3] },
+  compactTop: { gap: space[1] },
   flex: { flex: 1, minWidth: 0 },
 });

@@ -37,7 +37,7 @@ npm run seed:local
 npm run dev
 ```
 
-O seed local cria uma identidade fictícia `platform.demo@lastro.invalid` com senha aleatória entregue uma vez no terminal e o plano Lastro Inicial (15.000 centavos de adesão, 20.000 de mensalidade, duas vagas). Os preços são dados configuráveis, não constantes das regras de negócio. Não cria Daiane, Carlos ou condições comerciais reais. Reexecutar preserva credenciais existentes.
+Os dados dos emuladores de desenvolvimento são persistidos em `.local/emulator-data` (restaurados ao iniciar, salvos ao encerrar e a cada 5 minutos). Encerre com `Ctrl+C` uma vez ou `npm run emulators:stop`. O seed cria, somente no emulador, as contas fixas `platform.demo@lastro.invalid` (Super Admin), `admin.demo@lastro.invalid` (administrador) e `vendedor.demo@lastro.invalid` (vendedor), com senhas lidas de `LASTRO_DEMO_*_PASSWORD` no `.env`, e a empresa **Distribuidora Demo Lastro** com clientes, produtos, estoque, pedidos e financeiro. Reexecutar não duplica nem altera dados. Rotina diária, backup, restauração e detalhes: [ambiente local](docs/local-environment.md). `npm run local:check` mostra o que falta.
 
 API: `http://127.0.0.1:3000`; Swagger: `http://127.0.0.1:3000/docs`; contrato: `http://127.0.0.1:3000/openapi.json`. Swagger existe somente em desenvolvimento, usa Bearer e não persiste autorização. Nunca hospede os emuladores publicamente.
 
@@ -48,7 +48,7 @@ Login, logout (`signOut`), verificação de email, recuperação de senha e reau
 Para uma verificação manual local, faça login na conta sintética pelo endpoint do Auth Emulator:
 
 ```powershell
-$loginBody = @{ email = 'platform.demo@lastro.invalid'; password = '<senha gerada pelo seed>'; returnSecureToken = $true } | ConvertTo-Json
+$loginBody = @{ email = 'platform.demo@lastro.invalid'; password = '<LASTRO_DEMO_PLATFORM_PASSWORD do .env>'; returnSecureToken = $true } | ConvertTo-Json
 $login = Invoke-RestMethod -Method Post -Uri 'http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=demo-key' -ContentType 'application/json' -Body $loginBody
 $headers = @{ Authorization = "Bearer $($login.idToken)" }
 Invoke-RestMethod -Uri 'http://127.0.0.1:3000/api/v1/me' -Headers $headers

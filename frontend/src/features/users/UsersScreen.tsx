@@ -32,8 +32,22 @@ import {
   useToast,
   type Column,
 } from '@/ui';
-import { Mail, Pencil, UserPlus, X } from '@/ui/icons';
-import { memberLabel, useUpdateMember } from './api';
+import { Mail, Pencil, RefreshCw, ShieldCheck, UserPlus, X } from '@/ui/icons';
+import { memberLabel, useReissueInvitation, useUpdateMember } from './api';
+import { PermissionsDialog } from './PermissionsDialog';
+
+type StatusFilter = 'all' | 'active' | 'disabled';
+const statusFilters: { value: StatusFilter; label: string }[] = [
+  { value: 'all', label: 'Todos' },
+  { value: 'active', label: 'Ativos' },
+  { value: 'disabled', label: 'Inativos' },
+];
+
+/** Resumo das permissões: administradores têm tudo; vendedores, padrão ou personalizadas. */
+function permissionSummary(m: Member): string {
+  if (m.role === 'administrator') return 'Acesso completo';
+  return m.customOperations ? 'Personalizadas' : 'Padrão do vendedor';
+}
 
 /** O que cada perfil pode fazer, em linguagem de uso (sem nomes internos de permissão). */
 export const roleDescription: Record<Role, string> = {
@@ -64,6 +78,8 @@ export function UsersScreen() {
   const compact = useLayoutSize() === 'compact';
   const [inviting, setInviting] = useState(false);
   const [editing, setEditing] = useState<Member | null>(null);
+  const [granting, setGranting] = useState<Member | null>(null);
+  const [filter, setFilter] = useState<StatusFilter>('all');
   const users = useInfiniteQuery({
     queryKey: queryKeys.users(tenantId),
     initialPageParam: undefined as string | undefined,
@@ -75,7 +91,9 @@ export function UsersScreen() {
       ),
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });
-  const members = users.data?.pages.flatMap((p) => p.items) ?? [];
+  const allMembers = users.data?.pages.flatMap((p) => p.items) ?? [];
+  const members = filter === 'all' ? allMembers : allMembers.filter((m) => m.status === filter);
+  const matrix = users.data?.pages[0]?.permissionMatrix ?? [];
   // Convites pendentes vêm completos na primeira página.
   const pending = users.data?.pages[0]?.pendingInvitations ?? [];
   // Vagas calculadas pelo servidor; o suporte Lastro (seatExempt) não ocupa vaga.
@@ -84,7 +102,7 @@ export function UsersScreen() {
   const sellers = plan?.features.includes('commercial.sellers') ?? false;
   const hasSeat = (capacity?.available ?? 0) > 0;
   // Último administrador da própria empresa: o acesso de suporte não conta (como no servidor).
-  const activeAdmins = members.filter(
+  const activeAdmins = allMembers.filter(
     (m) => m.role === 'administrator' && m.status === 'active' && !m.seatExempt,
   ).length;
 
@@ -112,6 +130,22 @@ export function UsersScreen() {
       render: (m) => <Text variant="small">{roleLabel[m.role]}</Text>,
     },
     {
+      key: 'permissions',
+      label: 'Permissões',
+      flex: 2,
+      render: (m) => (
+        <Text variant="small" numberOfLines={1}>
+          {permissionSummary(m)}
+        </Text>
+      ),
+    },
+    {
+      key: 'since',
+      label: 'Ativação',
+      width: 104,
+      render: (m) => <Text variant="small">{formatDate(m.createdAt)}</Text>,
+    },
+    {
       key: 'status',
       label: 'Situação',
       width: 96,
@@ -128,12 +162,14 @@ export function UsersScreen() {
           : 'Pessoas com acesso à empresa.'
       }
       actions={
-        canInvite && hasSeat ? (
+        canInvite ? (
           <Button
             label="Convidar usuário"
             icon={UserPlus}
             variant="strong"
             fullWidth={compact}
+            // Sem vaga o botão fica indisponível; o aviso abaixo explica. O servidor também recusa.
+            disabled={!hasSeat}
             onPress={() => setInviting(true)}
           />
         ) : undefined
@@ -145,8 +181,8 @@ export function UsersScreen() {
           {`O plano ${plan.name ?? 'contratado'} permite ${plan.userLimit === 1 ? '1 usuário' : `${plan.userLimit} usuários`}. Para convidar mais pessoas, fale com o Lastro sobre o plano Profissional.`}
         </Alert>
       ) : !hasSeat ? (
-        <Alert tone="warning" title="Todas as vagas do plano estão ocupadas">
-          Revogue um convite pendente ou desative um usuário para liberar uma vaga.
+        <Alert tone="warning" title="Todos os acessos estão ocupados">
+          {`Seu plano permite até ${plan.userLimit === 1 ? '1 usuário' : `${plan.userLimit} usuários`}. Revogue um convite pendente ou desative um usuário para liberar uma vaga.`}
         </Alert>
       ) : null}
       {users.isError ? (
@@ -166,7 +202,18 @@ export function UsersScreen() {
         </Alert>
       ) : null}
 
-      <Panel title="Pessoas com acesso" flush>
+      <Panel
+        title="Pessoas com acesso"
+        action={
+          <Segmented<StatusFilter>
+            label="Situação"
+            value={filter}
+            onChange={setFilter}
+            options={statusFilters}
+          />
+        }
+        flush
+      >
         {users.isPending ? (
           <LoadingRows />
         ) : (
@@ -179,11 +226,20 @@ export function UsersScreen() {
               m.id === user?.uid ? (
                 <View style={styles.actionSpacer} />
               ) : (
-                <IconButton
-                  icon={Pencil}
-                  label={`Editar ${memberLabel(m)}`}
-                  onPress={() => setEditing(m)}
-                />
+                <View style={styles.rowActions}>
+                  {m.role === 'seller' && !m.seatExempt ? (
+                    <IconButton
+                      icon={ShieldCheck}
+                      label={`Permissões de ${memberLabel(m)}`}
+                      onPress={() => setGranting(m)}
+                    />
+                  ) : null}
+                  <IconButton
+                    icon={Pencil}
+                    label={`Editar ${memberLabel(m)}`}
+                    onPress={() => setEditing(m)}
+                  />
+                </View>
               )
             }
             renderCompact={(m) => (
@@ -192,6 +248,7 @@ export function UsersScreen() {
                 <Text variant="small" color={color.textSecondary} numberOfLines={1}>
                   {[
                     roleLabel[m.role],
+                    permissionSummary(m),
                     m.status === 'active' ? null : 'Desativado',
                     m.email && m.name ? m.email : null,
                   ]
@@ -228,6 +285,14 @@ export function UsersScreen() {
       </Panel>
 
       <InviteDialog visible={inviting} sellers={sellers} onClose={() => setInviting(false)} />
+      {granting ? (
+        <PermissionsDialog
+          key={`${granting.id}:${granting.version}`}
+          member={granting}
+          matrix={matrix}
+          onClose={() => setGranting(null)}
+        />
+      ) : null}
       {editing ? (
         <EditMemberDialog
           // Remonta a cada pessoa, com os valores atuais dela.
@@ -255,7 +320,7 @@ function SeatsPanel({ plan, capacity }: { plan: MembershipPlan; capacity: UsersP
   return (
     <Panel
       title={`Plano ${plan.name ?? 'contratado'}`}
-      description={`${used} de ${capacity.userLimit} ${capacity.userLimit === 1 ? 'vaga em uso' : 'vagas em uso'}`}
+      description={`Acessos utilizados: ${used} de ${capacity.userLimit}`}
       action={
         <Badge
           label={
@@ -449,8 +514,13 @@ function memberError(code: string): string | undefined {
     return 'O plano não tem vaga para reativar este acesso. Revogue um convite ou desative outra pessoa.';
   if (code === 'CONFLICT')
     return 'Este usuário foi alterado por outra pessoa. A lista foi recarregada; abra de novo para editar.';
-  if (code === 'FORBIDDEN')
-    return 'Não é possível reativar: a conta desta pessoa está indisponível.';
+  if (code === 'IDENTITY_DISABLED')
+    return 'Não é possível reativar: a conta desta pessoa está bloqueada no Lastro. Fale com o suporte do Lastro.';
+  if (code === 'IDENTITY_NOT_FOUND')
+    return 'Não é possível reativar: a conta de acesso desta pessoa não existe mais. Envie um novo convite.';
+  if (code === 'SUPPORT_ACCESS_ENDED')
+    return 'Este acesso de suporte terminou e não pode ser reativado.';
+  if (code === 'FORBIDDEN') return 'Você não tem permissão para alterar este usuário.';
   if (code === 'FEATURE_NOT_IN_PLAN') return 'O perfil Vendedor não faz parte do plano contratado.';
   return undefined;
 }
@@ -606,6 +676,8 @@ function inviteError(e: unknown): string {
     return 'O plano não tem vaga para mais um usuário. Revogue um convite ou desative alguém.';
   if (err.code === 'FEATURE_NOT_IN_PLAN')
     return 'Este convite não faz parte do plano contratado (convites adicionais ou perfil Vendedor).';
+  if (err.code === 'INVITATION_REVOKED')
+    return 'Este convite foi revogado e não pode ser reutilizado. Crie um novo convite.';
   return err.userMessage;
 }
 
@@ -614,6 +686,7 @@ function PendingRow({ invitation, last }: { invitation: PendingInvitation; last:
   const queryClient = useQueryClient();
   const toast = useToast();
   const [confirming, setConfirming] = useState(false);
+  const [reissuing, setReissuing] = useState<'resend' | 'email' | null>(null);
   const revoke = useMutation({
     mutationFn: () =>
       unwrap(
@@ -631,7 +704,13 @@ function PendingRow({ invitation, last }: { invitation: PendingInvitation; last:
           {invitation.email}
         </Text>
         <Text variant="small" color={color.textSecondary}>
-          {roleLabel[invitation.role]} · vence em {formatDate(invitation.expiresAt)}
+          {[
+            roleLabel[invitation.role],
+            invitation.createdAt ? `convidado em ${formatDate(invitation.createdAt)}` : null,
+            `vence em ${formatDate(invitation.expiresAt)}`,
+          ]
+            .filter(Boolean)
+            .join(' · ')}
         </Text>
         {revoke.isError ? (
           <Text variant="small" color={color.danger}>
@@ -640,6 +719,23 @@ function PendingRow({ invitation, last }: { invitation: PendingInvitation; last:
         ) : null}
       </View>
       {invitation.seatExempt ? <Badge label="Suporte Lastro" tone="accent" /> : null}
+      <IconButton
+        icon={RefreshCw}
+        label={`Reenviar convite de ${invitation.email}`}
+        onPress={() => setReissuing('resend')}
+      />
+      <IconButton
+        icon={Pencil}
+        label={`Alterar e-mail do convite de ${invitation.email}`}
+        onPress={() => setReissuing('email')}
+      />
+      {reissuing ? (
+        <ReissueDialog
+          invitation={invitation}
+          mode={reissuing}
+          onClose={() => setReissuing(null)}
+        />
+      ) : null}
       <IconButton
         icon={X}
         label={`Revogar convite de ${invitation.email}`}
@@ -663,6 +759,104 @@ function PendingRow({ invitation, last }: { invitation: PendingInvitation; last:
   );
 }
 
+/**
+ * Reenvio (novo link para o mesmo e-mail) ou correção do e-mail de um convite pendente. O
+ * link anterior deixa de funcionar e a vaga continua a mesma; o novo link aparece uma vez.
+ */
+function ReissueDialog({
+  invitation,
+  mode,
+  onClose,
+}: {
+  invitation: PendingInvitation;
+  mode: 'resend' | 'email';
+  onClose: () => void;
+}) {
+  const reissue = useReissueInvitation();
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [issued, setIssued] = useState<{ email: string; token: string } | null>(null);
+  const submit = () => {
+    let target: string | undefined;
+    if (mode === 'email') {
+      const parsed = z.email().safeParse(email.trim().toLowerCase());
+      if (!parsed.success) return setEmailError('E-mail inválido.');
+      if (parsed.data === invitation.email) return setEmailError('Informe um e-mail diferente.');
+      target = parsed.data;
+    }
+    setEmailError(null);
+    reissue.mutate(
+      { id: invitation.id, ...(target ? { email: target } : {}) },
+      { onSuccess: (r) => setIssued({ email: r.invitation.email, token: r.token }) },
+    );
+  };
+  const close = () => {
+    if (!reissue.isPending) onClose();
+  };
+  return (
+    <Dialog
+      visible
+      title={
+        issued
+          ? 'Novo convite criado'
+          : mode === 'email'
+            ? 'Alterar e-mail do convite'
+            : 'Reenviar convite'
+      }
+      description={
+        issued
+          ? 'Copie o link e envie por um canal seguro. Ele não aparece de novo.'
+          : mode === 'email'
+            ? `O convite para ${invitation.email} deixa de funcionar. A mesma vaga passa para o novo e-mail.`
+            : `Gera um novo link para ${invitation.email}, válido por 7 dias. O link anterior deixa de funcionar.`
+      }
+      onClose={close}
+      actions={
+        issued ? (
+          <Button label="Concluir" variant="strong" onPress={onClose} />
+        ) : (
+          <>
+            <Button label="Cancelar" variant="ghost" onPress={close} disabled={reissue.isPending} />
+            <Button
+              label={mode === 'email' ? 'Alterar e-mail' : 'Gerar novo link'}
+              variant="strong"
+              loading={reissue.isPending}
+              onPress={submit}
+            />
+          </>
+        )
+      }
+    >
+      {issued ? (
+        <IssuedInviteCard email={issued.email} token={issued.token} onDone={onClose} />
+      ) : (
+        <>
+          {reissue.isError ? (
+            <Alert tone="danger" title="Convite não alterado">
+              {inviteError(reissue.error)}
+            </Alert>
+          ) : null}
+          {mode === 'email' ? (
+            <TextField
+              label="E-mail correto"
+              icon={Mail}
+              value={email}
+              onChangeText={setEmail}
+              error={emailError ?? undefined}
+              inputMode="email"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="off"
+              returnKeyType="send"
+              onSubmitEditing={submit}
+            />
+          ) : null}
+        </>
+      )}
+    </Dialog>
+  );
+}
+
 function LoadingRows() {
   return (
     <View style={styles.loading}>
@@ -679,6 +873,7 @@ const styles = StyleSheet.create({
   flexShrink: { flexShrink: 1 },
   compact: { gap: 2 },
   actionSpacer: { width: 1 },
+  rowActions: { flexDirection: 'row', alignItems: 'center' },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

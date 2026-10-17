@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { EmailChangeNotice } from '@/features/session/EmailChangeNotice';
 import { color, useLayoutSize } from '@/theme';
 import { Sidebar } from './Sidebar';
 import { TabBar } from './TabBar';
@@ -13,7 +14,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   if (size === 'compact') {
     return (
       <View style={styles.column}>
-        <View style={styles.main}>{children}</View>
+        <View style={styles.main}>
+          <EmailChangeNotice />
+          {children}
+        </View>
         <TabBar />
       </View>
     );
@@ -21,7 +25,10 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <View style={styles.row}>
       <Sidebar rail={size === 'medium'} />
-      <View style={styles.main}>{children}</View>
+      <View style={styles.main}>
+        <EmailChangeNotice />
+        {children}
+      </View>
     </View>
   );
 }

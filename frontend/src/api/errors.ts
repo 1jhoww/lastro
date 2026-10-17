@@ -131,6 +131,11 @@ const messages: Record<string, string> = {
   USER_LIMIT_REACHED:
     'Todas as vagas do plano estão ocupadas. Revogue um convite ou desative um usuário.',
   LAST_ADMIN_REQUIRED: 'A empresa precisa de pelo menos um administrador ativo.',
+  IDENTITY_DISABLED:
+    'A conta desta pessoa está bloqueada no Lastro. Desbloqueie a conta antes de reativar o acesso.',
+  IDENTITY_NOT_FOUND: 'A conta de acesso desta pessoa não existe mais. Envie um novo convite.',
+  SUPPORT_ACCESS_ENDED: 'Este acesso de suporte terminou: a pessoa não é mais Super Admin.',
+  PLATFORM_ACCOUNT_PROTECTED: 'Contas do Super Admin não são alteradas por este fluxo.',
   FEATURE_NOT_IN_PLAN: 'Este recurso não está incluído no plano contratado pela empresa.',
   CUSTOMER_ADMIN_REQUIRED:
     'O primeiro administrador precisa ser alguém da empresa cliente, não a conta de Super Admin.',

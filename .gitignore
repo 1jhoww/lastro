@@ -8,6 +8,7 @@ backend/.env.*
 backend/*-debug.log
 backend/.firebase/
 backend/.local/
+backend/firebase-export-*/
 backend/reports/*.raw.json
 *.key
 *.pem

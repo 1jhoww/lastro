@@ -28,7 +28,7 @@ export const documentRoutes: Route[] = [
     binaryOutput: true,
     downloadType: 'application/pdf',
     description:
-      'Romaneio A4 sem campos monetários. Separa quantidade solicitada/expedida/fisicamente devolvida. Não autoriza nova expedição. Mesmos limites e autorização do PDF comercial.',
+      'Romaneio de entrega A4: comprovante de recebimento não fiscal com produtos, quantidades expedidas (expedição é sempre integral), valor de cada linha, valor total e campos para assinatura manual. Somente pedidos confirmados ou expedidos (409 DOCUMENT_UNAVAILABLE). Gerar ou assinar não altera o status do pedido. Mesmos limites e autorização do PDF comercial.',
   },
   ...(
     [

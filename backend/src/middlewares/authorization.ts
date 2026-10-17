@@ -28,7 +28,8 @@ export function platformAuthorization(access: AccessService, clock: () => Date):
       clock().getTime() / 1000 - actor.authTime <= 300 &&
         actor.authTime <= clock().getTime() / 1000 + 30,
       403,
-      'FORBIDDEN',
+      // Distinct from FORBIDDEN (not a Super Admin): only this one asks for the password again.
+      'REAUTHENTICATION_REQUIRED',
       'Reautenticação recente necessária',
     );
     next();

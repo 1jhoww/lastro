@@ -115,3 +115,41 @@ export function useUpdateMember() {
     },
   });
 }
+
+/**
+ * Operações de um vendedor na matriz de permissões (PATCH /users/{id}/permissions). O servidor
+ * recusa operações administrativas e dependências faltando; a versão evita sobrescrita.
+ */
+export function useUpdatePermissions() {
+  const { api, tenantId, header } = useTenantApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ member, operations }: { member: Member; operations: string[] }) =>
+      unwrap(
+        api.PATCH('/api/v1/users/{id}/permissions', {
+          params: { header, path: { id: member.id } },
+          body: { operations, expectedVersion: member.version },
+        }),
+      ),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.users(tenantId) }),
+  });
+}
+
+/**
+ * Reenvia um convite pendente com novo link ou corrige o e-mail. O link anterior deixa de
+ * funcionar e a vaga continua reservada pelo novo convite.
+ */
+export function useReissueInvitation() {
+  const { api, tenantId, header } = useTenantApi();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, email }: { id: string; email?: string }) =>
+      unwrap(
+        api.POST('/api/v1/users/invitations/{id}/reissue', {
+          params: { header, path: { id } },
+          body: email ? { email } : {},
+        }),
+      ),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: queryKeys.users(tenantId) }),
+  });
+}

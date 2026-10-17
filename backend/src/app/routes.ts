@@ -41,6 +41,9 @@ import { catalogRoutes } from './catalogRoutes.js';
 import * as catalogSchemas from '../shared/schemas/catalog.js';
 import type { CatalogService } from '../modules/catalog/catalogService.js';
 import { documentRoutes } from './documentRoutes.js';
+import { reportRoutes } from './reportRoutes.js';
+import { ReportService } from '../modules/reports/reportService.js';
+import * as reportSchemas from '../shared/schemas/reports.js';
 import type { DocumentService } from '../modules/documents/documentService.js';
 import type { ExportService } from '../modules/documents/exportService.js';
 import { downloadRateLimit } from '../middlewares/rateLimit.js';
@@ -55,6 +58,7 @@ import { BillingService } from '../modules/billing/billingService.js';
 import { CompanyService } from '../modules/platformAdmin/companyService.js';
 import * as platformSchemas from '../shared/schemas/platform.js';
 import { SubscriptionService } from '../modules/platformAdmin/subscriptionService.js';
+import { EmailChangeService } from '../modules/users/emailChangeService.js';
 
 export interface Route {
   method: 'get' | 'post' | 'patch' | 'delete' | 'put';
@@ -77,6 +81,7 @@ export interface Route {
 export const routeDefinitions: Route[] = [
   ...executionRoutes,
   ...documentRoutes,
+  ...reportRoutes,
   ...catalogRoutes,
   ...financeRoutes,
   ...returnRoutes,
@@ -87,6 +92,34 @@ export const routeDefinitions: Route[] = [
   ...platformRoutes,
   ...billingRoutes,
   { method: 'get', path: '/me', operationId: 'getMe', scope: 'identity', output: s.meView },
+  {
+    method: 'patch',
+    path: '/me',
+    operationId: 'updateMyProfile',
+    scope: 'identity',
+    body: s.profileInput,
+    output: s.meView,
+    description:
+      'Atualiza somente o nome da própria pessoa autenticada (2 a 80 caracteres, sem e-mail).',
+  },
+  {
+    method: 'get',
+    path: '/me/email-change',
+    operationId: 'getMyEmailChange',
+    scope: 'identity',
+    output: s.myEmailChangeView,
+    description:
+      'Alteração de e-mail da própria conta solicitada pelo suporte e ainda pendente, se houver.',
+  },
+  {
+    method: 'post',
+    path: '/me/email-change/complete',
+    operationId: 'completeMyEmailChange',
+    scope: 'identity',
+    output: s.myEmailChangeView,
+    description:
+      'Conclui a alteração depois que o provedor de identidade aplicou o novo e-mail verificado.',
+  },
   {
     method: 'get',
     path: '/tenants/current',
@@ -139,6 +172,31 @@ export const routeDefinitions: Route[] = [
     permission: 'users:manage',
     params: s.idParams,
     output: s.revokedView,
+  },
+  {
+    method: 'post',
+    path: '/users/invitations/:id/reissue',
+    operationId: 'reissueInvitation',
+    scope: 'tenant',
+    permission: 'users:manage',
+    params: s.idParams,
+    body: s.reissueInvitationInput,
+    output: s.issuedInvitationView,
+    status: 201,
+    description:
+      'Reenvia um convite pendente com novo link (o anterior deixa de valer) ou corrige o e-mail, sem ocupar outra vaga.',
+  },
+  {
+    method: 'patch',
+    path: '/users/:id/permissions',
+    operationId: 'updateUserPermissions',
+    scope: 'tenant',
+    permission: 'users:manage',
+    params: s.idParams,
+    body: s.operationsInput,
+    output: s.memberView,
+    description:
+      'Define as operações de um vendedor dentro da matriz de permissões; operações administrativas são sempre recusadas.',
   },
   {
     method: 'patch',
@@ -241,14 +299,24 @@ export function createRoutes(
   const executions = new FinancialExecutions(finance, returns);
   const subscriptions = new SubscriptionService(platform.repo, platform.access, clock);
   const billing = new BillingService(platform.repo, platform.access, platform.config, clock);
+  const emailChanges = new EmailChangeService(platform.repo, platform.access, users.auth, clock);
   const companies = new CompanyService(
     platform.repo,
     platform.access,
     users.auth,
     platform.config,
     clock,
+    emailChanges,
   );
+  const reports = new ReportService(orders, financialReads, inventory, users.auth);
+  const reportFor = (req: Request) => reportSchemas.reportParams.parse(req.params).report;
   const handlers: Record<string, (req: Request) => Promise<unknown>> = {
+    getReport: (req) =>
+      reports.report(actorFor(req), selectedTenant(req), reportFor(req), req.query),
+    exportReportCsv: (req) =>
+      reports.download(actorFor(req), selectedTenant(req), reportFor(req), req.query, 'csv'),
+    exportReportPdf: (req) =>
+      reports.download(actorFor(req), selectedTenant(req), reportFor(req), req.query, 'pdf'),
     startFinancialCancellationExecution: (req) =>
       executions.startCancellation(
         actorFor(req),
@@ -608,6 +676,7 @@ export function createRoutes(
       ),
     getOrderHistory: (req) =>
       orders.history(actorFor(req), selectedTenant(req), idFor(req), s.pageQuery.parse(req.query)),
+    getInventorySummary: (req) => inventory.summary(actorFor(req), selectedTenant(req)),
     listInventory: (req) =>
       inventory.list(
         actorFor(req),
@@ -741,6 +810,7 @@ export function createRoutes(
         status: 'inactive',
       }),
     getMe: (req) => users.me(actorFor(req)),
+    updateMyProfile: (req) => users.updateProfile(actorFor(req), s.profileInput.parse(req.body)),
     getCurrentTenant: (req) => users.current(actorFor(req), selectedTenant(req)),
     updateCurrentTenant: (req) =>
       users.updateTenant(actorFor(req), selectedTenant(req), s.updateTenantInput.parse(req.body)),
@@ -751,6 +821,22 @@ export function createRoutes(
     acceptInvitation: (req) => users.accept(actorFor(req), s.acceptInput.parse(req.body).token),
     revokeInvitation: (req) =>
       users.revokeInvitation(actorFor(req), selectedTenant(req), idFor(req)),
+    reissueInvitation: (req) =>
+      users.reissue(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        s.reissueInvitationInput.parse(req.body),
+      ),
+    updateUserPermissions: (req) =>
+      users.updateOperations(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        s.operationsInput.parse(req.body),
+      ),
+    getMyEmailChange: (req) => emailChanges.mine(actorFor(req)),
+    completeMyEmailChange: (req) => emailChanges.complete(actorFor(req)),
     updateUserRole: (req) =>
       users.updateMember(
         actorFor(req),
@@ -838,6 +924,53 @@ export function createRoutes(
       );
     },
     listOwnerInvitations: (req) => companies.ownerInvitations(actorFor(req)),
+    createCompanyInvitation: (req) =>
+      users.platformInvite(
+        actorFor(req),
+        idFor(req),
+        platformSchemas.companyInviteInput.parse(req.body),
+      ),
+    reissueCompanyInvitation: (req) => {
+      const params = platformSchemas.companyInvitationParams.parse(req.params);
+      return users.platformReissue(
+        actorFor(req),
+        params.id,
+        params.invitationId,
+        platformSchemas.companyReissueInput.parse(req.body),
+      );
+    },
+    updateCompanyMemberStatus: (req) => {
+      const params = platformSchemas.companyMemberParams.parse(req.params);
+      return users.platformMemberStatus(
+        actorFor(req),
+        params.id,
+        params.uid,
+        platformSchemas.companyMemberStatusInput.parse(req.body),
+      );
+    },
+    unblockCompanyMemberAccount: (req) => {
+      const params = platformSchemas.companyMemberParams.parse(req.params);
+      return users.platformUnblockAccount(
+        actorFor(req),
+        params.id,
+        params.uid,
+        platformSchemas.revokeInvitationInput.parse(req.body).reason,
+      );
+    },
+    requestEmailChange: (req) => {
+      const params = platformSchemas.companyMemberParams.parse(req.params);
+      const input = platformSchemas.emailChangeInput.parse(req.body);
+      return emailChanges.start(actorFor(req), params.id, params.uid, input.newEmail, input.reason);
+    },
+    cancelEmailChange: (req) => {
+      const params = platformSchemas.companyMemberParams.parse(req.params);
+      return emailChanges.cancel(
+        actorFor(req),
+        params.id,
+        params.uid,
+        platformSchemas.emailChangeCancelInput.parse(req.body).reason,
+      );
+    },
   };
   for (const definition of routeDefinitions) {
     if (definition.scope === 'public') continue;
@@ -847,7 +980,11 @@ export function createRoutes(
       middleware.push(tenantAuthorization(access, definition.permission));
     } else if (definition.scope === 'platform')
       middleware.push(platformAuthorization(access, clock));
-    if (definition.scope === 'invitation' || definition.operationId === 'inviteUser')
+    if (
+      definition.scope === 'invitation' ||
+      definition.operationId === 'inviteUser' ||
+      definition.operationId === 'reissueInvitation'
+    )
       middleware.push(invitationRateLimit(users.repo));
     if (definition.rawImage)
       middleware.push(

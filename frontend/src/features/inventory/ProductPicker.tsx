@@ -4,7 +4,7 @@ import { toApiError } from '@/api/errors';
 import type { InventoryItem } from '@/api/types';
 import { useDebouncedValue } from '@/lib/useDebouncedValue';
 import { color, layout, space } from '@/theme';
-import { Alert, Button, Dialog, SearchField, Skeleton, Text } from '@/ui';
+import { Alert, Button, Dialog, SearchField, Segmented, Skeleton, Text } from '@/ui';
 import { Touchable } from '@/ui/Touchable';
 import { focusRing, showFocusRing, type InteractionState } from '@/ui/interaction';
 import { useInventoryList } from './api';
@@ -24,27 +24,36 @@ export function ProductPicker({
   onPick: (item: InventoryItem) => void;
 }) {
   const [search, setSearch] = useState('');
+  const [mode, setMode] = useState<'name' | 'sku'>('name');
   const q = useDebouncedValue(search).trim();
-  const { query, items } = useInventoryList({ q, status: 'active', order: 'name' }, visible);
+  const invalid = mode === 'sku' && q.length > 0 && !/^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$/.test(q);
+  const { query, items } = useInventoryList({
+    q: mode === 'name' ? q : '', status: 'active', order: 'name',
+    ...(mode === 'sku' && q && !invalid ? { sku: q } : {}),
+  }, visible && !invalid);
 
   return (
     <Dialog
       visible={visible}
       title="Escolher produto"
-      description="Produtos ativos. A busca considera o início do nome."
+      description="Selecione um produto ativo pelo nome ou código."
       onClose={onClose}
       actions={<Button label="Fechar" variant="ghost" onPress={onClose} />}
     >
       <SearchField
         label="Buscar produto"
         hideLabel
-        placeholder="Buscar pelo início do nome"
+        placeholder={mode === 'name' ? 'Buscar pelo início do nome' : 'SKU exato'}
         value={search}
         onChangeText={setSearch}
         autoFocus
+        error={invalid ? 'Use letras, números, ponto, hífen ou sublinhado.' : undefined}
       />
-      {query.isError ? (
-        <Alert tone="danger" title="Não foi possível carregar os produtos">
+      <Segmented label="Buscar por" value={mode} onChange={setMode}
+        options={[{ value: 'name', label: 'Nome' }, { value: 'sku', label: 'SKU' }]} />
+      {invalid ? null : query.isError ? (
+        <Alert tone="danger" title="Não foi possível carregar os produtos"
+          action={<Button label="Tentar novamente" size="sm" variant="ghost" onPress={() => query.refetch()} />}>
           {toApiError(query.error).userMessage}
         </Alert>
       ) : query.isPending ? (
@@ -54,7 +63,7 @@ export function ProductPicker({
         </View>
       ) : items.length === 0 ? (
         <Text variant="body" color={color.textSecondary}>
-          {q ? 'Nenhum produto começa com esse nome.' : 'Nenhum produto ativo cadastrado.'}
+          {q ? 'Nenhum produto encontrado. Confira o nome ou o SKU exato.' : 'Nenhum produto ativo cadastrado.'}
         </Text>
       ) : (
         <View accessibilityRole="list">

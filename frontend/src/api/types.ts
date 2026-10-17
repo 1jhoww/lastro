@@ -155,3 +155,9 @@ export type JournalReconciliation = DataOf<'/api/v1/orders/{id}/financial-reconc
 
 export type RecordStatus = 'active' | 'inactive';
 export type StatusFilter = 'active' | 'inactive' | 'all';
+
+export type ReportView = DataOf<'/api/v1/reports/{report}', 'get'>;
+export type ReportId = ReportView['report'];
+export type ReportQuery = NonNullable<
+  paths['/api/v1/reports/{report}']['get']['parameters']['query']
+>;

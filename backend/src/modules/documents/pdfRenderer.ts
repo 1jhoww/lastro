@@ -1,48 +1,75 @@
-import PDFDocument from 'pdfkit';
-import { fileURLToPath } from 'node:url';
-import { setImmediate as yieldLoop } from 'node:timers/promises';
-import { readFileSync } from 'node:fs';
-import { create } from 'fontkit';
 import { AppError } from '../../shared/errors/appError.js';
-import { checkReadBudget } from '../../shared/operations/readBudget.js';
 import type { Order } from '../../shared/schemas/orders.js';
-import { decimalCents, brazilianDate, safeDocumentText } from './csv.js';
+import {
+  BrandedPdf,
+  LEFT,
+  RIGHT,
+  WIDTH,
+  brQuantity,
+  brl,
+  calendarDate,
+  localDate,
+  oneLine,
+  orderNumber,
+  type Cell,
+} from './pdfLayout.js';
 
-export const MAX_PDF_BYTES = 8 * 1024 * 1024;
-export const MAX_PDF_PAGES = 100;
-export const MAX_RENDER_MS = 10_000;
+export { MAX_PDF_BYTES, MAX_PDF_PAGES, MAX_RENDER_MS } from './pdfLayout.js';
+
+/** Registration data of the customer. The order itself keeps only the historical name. */
+export interface CustomerContact {
+  tradeName: string | null;
+  document: string | null;
+  email: string | null;
+  phone: string | null;
+  address: {
+    street?: string | undefined;
+    number?: string | undefined;
+    complement?: string | undefined;
+    district?: string | undefined;
+    city?: string | undefined;
+    state?: string | undefined;
+    postalCode?: string | undefined;
+  } | null;
+}
 export interface DocumentSource {
   tenant: { name: string; timezone: string };
   order: Order;
-  returned: { lineId: string; received: string }[];
+  customer: CustomerContact | null;
 }
-const fonts = fileURLToPath(new URL('../../../assets/fonts/', import.meta.url));
-// Compiled files retain the src/module hierarchy under dist.
-// Build copies assets into dist/assets, preserving this module-relative path.
-const fontRoot = fonts;
-const coverage = create(readFileSync(`${fontRoot}/LiberationSans-Regular.ttf`));
-if (!('hasGlyphForCodePoint' in coverage))
-  throw new Error('Fonte PDF precisa ser TrueType individual');
-const safeText = (value: string) => {
-  const text = safeDocumentText(value).replace(/\r\n?/g, '\n').replaceAll('\t', ' ');
-  for (const character of text) {
-    const code = character.codePointAt(0)!;
-    if (![9, 10, 13].includes(code) && !coverage.hasGlyphForCodePoint(code))
-      throw new AppError(
-        422,
-        'DOCUMENT_UNSUPPORTED_TEXT',
-        'Texto contém caractere sem glifo na fonte do documento',
-      );
-  }
-  return text;
-};
-const money = (value: number) => `R$ ${decimalCents(value)}`;
-const statuses = {
-  draft: 'Rascunho',
-  confirmed: 'Confirmado',
-  dispatched: 'Expedido',
-  canceled: 'Cancelado',
-};
+
+export const COMMERCIAL_FOOTER = 'Documento comercial gerado pelo Lastro. Não possui valor fiscal.';
+export const PACKING_FOOTER = 'Gerado pelo Lastro — Documento não fiscal.';
+export const RECEIPT_DECLARATION =
+  'Declaro o recebimento dos produtos e quantidades relacionados acima.';
+
+/** CPF 000.000.000-00 or CNPJ 00.000.000/0000-00 (alphanumeric CNPJ keeps its characters). */
+export function formatDocument(value: string) {
+  const v = value.replace(/[.\-/\s]/g, '').toUpperCase();
+  if (/^\d{11}$/.test(v)) return `${v.slice(0, 3)}.${v.slice(3, 6)}.${v.slice(6, 9)}-${v.slice(9)}`;
+  if (/^[A-Z0-9]{12}\d{2}$/.test(v))
+    return `${v.slice(0, 2)}.${v.slice(2, 5)}.${v.slice(5, 8)}/${v.slice(8, 12)}-${v.slice(12)}`;
+  return value;
+}
+/** (11) 98765-4321 for Brazilian numbers; anything else is shown as registered. */
+export function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, '');
+  const local = digits.length >= 12 && digits.startsWith('55') ? digits.slice(2) : digits;
+  if (local.length === 11) return `(${local.slice(0, 2)}) ${local.slice(2, 7)}-${local.slice(7)}`;
+  if (local.length === 10) return `(${local.slice(0, 2)}) ${local.slice(2, 6)}-${local.slice(6)}`;
+  return value;
+}
+export function addressLines(address: CustomerContact['address']): string[] {
+  if (!address) return [];
+  const street = [address.street, address.number, address.complement].filter(Boolean).join(', ');
+  const city = [address.city, address.state].filter(Boolean).join('/');
+  const place = [address.district, city].filter(Boolean).join(' — ');
+  const postal = address.postalCode
+    ? `CEP ${address.postalCode.replace(/^(\d{5})(\d{3})$/, '$1-$2')}`
+    : '';
+  return [street, [place, postal].filter(Boolean).join(' — ')].filter(Boolean);
+}
+const quantity = (line: Order['lines'][number]) => `${brQuantity(line.quantity)} ${line.unit}`;
 
 export class PdfRenderer {
   async render(
@@ -50,241 +77,242 @@ export class PdfRenderer {
     kind: 'commercial' | 'packing',
     emittedAt: Date,
   ): Promise<Buffer> {
-    const start = performance.now();
-    const doc = new PDFDocument({
-      size: 'A4',
-      margins: { top: 140, bottom: 64, left: 40, right: 40 },
-      autoFirstPage: false,
-      compress: true,
-      info: {
-        Title: kind === 'commercial' ? 'Pedido comercial' : 'Romaneio',
-        CreationDate: emittedAt,
-        ModDate: emittedAt,
+    const { order } = source;
+    if (kind === 'packing' && order.status !== 'confirmed' && order.status !== 'dispatched')
+      throw new AppError(
+        409,
+        'DOCUMENT_UNAVAILABLE',
+        'Romaneio disponível somente para pedido confirmado ou expedido',
+      );
+    const pdf = new BrandedPdf(
+      kind === 'commercial'
+        ? {
+            company: source.tenant.name,
+            title: 'PEDIDO COMERCIAL',
+            subtitle: 'Documento não fiscal',
+            reference: orderNumber(order.commercialId),
+          }
+        : {
+            company: source.tenant.name,
+            title: 'ROMANEIO DE ENTREGA',
+            subtitle: 'Comprovante de recebimento — Documento não fiscal',
+            reference: orderNumber(order.commercialId),
+          },
+      kind === 'commercial' ? COMMERCIAL_FOOTER : PACKING_FOOTER,
+      {
+        title: `${kind === 'commercial' ? 'Pedido comercial' : 'Romaneio de entrega'} ${orderNumber(order.commercialId)}`,
+        createdAt: emittedAt,
       },
-    });
-    const chunks: Buffer[] = [];
-    let bytes = 0;
-    const output = new Promise<Buffer>((resolve, reject) => {
-      doc.on('data', (chunk: Buffer) => {
-        bytes += chunk.length;
-        if (bytes > MAX_PDF_BYTES) {
-          doc.destroy(new AppError(413, 'DOCUMENT_SIZE_LIMIT', 'Documento excede limite técnico'));
-        } else chunks.push(chunk);
-      });
-      doc.on('error', reject);
-      doc.on('end', () => resolve(Buffer.concat(chunks, bytes)));
-    });
-    // Attach rejection handling before asynchronous layout yields.
-    void output.catch(() => undefined);
+    );
     try {
-      doc.registerFont('Body', `${fontRoot}/LiberationSans-Regular.ttf`);
-      doc.registerFont('Heading', `${fontRoot}/LiberationSans-Bold.ttf`);
-      let page = 0,
-        y = 140;
-      const check = () => {
-        checkReadBudget();
-        if (performance.now() - start > MAX_RENDER_MS)
-          throw new AppError(413, 'DOCUMENT_TIME_LIMIT', 'Documento excede tempo técnico');
-        if (doc.destroyed)
-          throw new AppError(413, 'DOCUMENT_SIZE_LIMIT', 'Documento excede limite técnico');
-      };
-      const footer = () => {
-        const bottom = doc.page.margins.bottom;
-        doc.page.margins.bottom = 20;
-        doc.font('Body').fontSize(8).fillColor('#444444');
-        const reference = safeText(`Página ${page} | ${source.order.commercialId}`).replace(
-          /\s+/g,
-          ' ',
-        );
-        if (doc.widthOfString(reference) > 515)
-          throw new AppError(413, 'DOCUMENT_LAYOUT_LIMIT', 'Referência excede largura do rodapé');
-        doc.text(reference, 40, 790, {
-          width: 515,
-          lineBreak: false,
-        });
-        doc.page.margins.bottom = bottom;
-      };
-      const newPage = () => {
-        check();
-        if (page >= MAX_PDF_PAGES)
-          throw new AppError(413, 'DOCUMENT_PAGE_LIMIT', 'Documento excede limite de páginas');
-        if (page) footer();
-        doc.addPage();
-        page++;
-        doc.font('Heading').fontSize(14).fillColor('#202020');
-        const brand = safeText(source.tenant.name).replace(/\s+/g, ' '),
-          brandHeight = doc.heightOfString(brand, { width: 515 }),
-          titleY = Math.max(74, 32 + brandHeight + 8);
-        if (brandHeight > 80)
-          throw new AppError(
-            413,
-            'DOCUMENT_LAYOUT_LIMIT',
-            'Identificação excede limite do cabeçalho',
-          );
-        doc.text(brand, 40, 32, { width: 515 });
-        const title =
-          kind === 'commercial'
-            ? 'Pedido comercial — não é documento fiscal'
-            : 'Romaneio - não é documento fiscal ou comprovante de entrega';
-        doc.fontSize(11);
-        const referenceY = Math.max(105, titleY + doc.heightOfString(title, { width: 515 }) + 8);
-        doc.text(title, 40, titleY, { width: 515 });
-        doc.font('Body').fontSize(9);
-        const reference = safeText(
-            `${source.order.commercialId} | ${statuses[source.order.status]}`,
-          ).replace(/\s+/g, ' '),
-          referenceHeight = doc.heightOfString(reference, { width: 515 });
-        if (referenceHeight > 36)
-          throw new AppError(413, 'DOCUMENT_LAYOUT_LIMIT', 'Referência excede limite do cabeçalho');
-        doc.text(reference, 40, referenceY, { width: 515 });
-        const separatorY = Math.max(130, referenceY + referenceHeight + 12);
-        doc
-          .moveTo(40, separatorY)
-          .lineTo(555, separatorY)
-          .lineWidth(0.5)
-          .strokeColor('#999999')
-          .stroke();
-        y = separatorY + 10;
-      };
-      const ensure = (height: number) => {
-        check();
-        if (height > 630)
-          throw new AppError(413, 'DOCUMENT_LAYOUT_LIMIT', 'Texto excede limite de composição');
-        if (y + height > 770) newPage();
-        if (y + height > 770)
-          throw new AppError(413, 'DOCUMENT_LAYOUT_LIMIT', 'Bloco excede área imprimível');
-      };
-      const text = (value: string, bold = false) => {
-        doc
-          .font(bold ? 'Heading' : 'Body')
-          .fontSize(10)
-          .fillColor('#202020');
-        const content = safeText(value),
-          height = doc.heightOfString(content, { width: 515 }) + 8;
-        ensure(height);
-        doc
-          .font(bold ? 'Heading' : 'Body')
-          .fontSize(10)
-          .text(content, 40, y, { width: 515 });
-        y += height;
-      };
-      const tableRow = (cells: string[], widths: number[], heading = false) => {
-        doc.font(heading ? 'Heading' : 'Body').fontSize(8);
-        const cleaned = cells.map(safeText);
-        const height = Math.max(
-          26,
-          ...cleaned.map((cell, i) => doc.heightOfString(cell, { width: widths[i]! - 8 }) + 12),
-        );
-        ensure(height);
-        if (heading) doc.rect(40, y, 515, height).fill('#eeeeee');
-        let x = 40;
-        cleaned.forEach((cell, i) => {
-          doc
-            .font(heading ? 'Heading' : 'Body')
-            .fontSize(8)
-            .fillColor('#202020')
-            .text(cell, x + 4, y + 6, { width: widths[i]! - 8 });
-          x += widths[i]!;
-        });
-        doc
-          .moveTo(40, y + height)
-          .lineTo(555, y + height)
-          .lineWidth(0.3)
-          .strokeColor('#cccccc')
-          .stroke();
-        y += height;
-      };
-      newPage();
-      const order = source.order;
-      const emission = new Intl.DateTimeFormat('pt-BR', {
-        timeZone: source.tenant.timezone,
-        dateStyle: 'short',
-        timeStyle: 'short',
-      }).format(emittedAt);
-      text(`Emissão: ${emission}`);
-      text(`Data do pedido (UTC): ${brazilianDate(order.createdAt)}`);
-      if (order.customerName) text(`Cliente: ${order.customerName}`, true);
-      if (kind === 'packing')
-        text(
-          order.status === 'dispatched'
-            ? 'Histórico de expedição e devolução física. Não autoriza nova expedição.'
-            : order.status === 'canceled'
-              ? 'Pedido cancelado. Não autoriza separação ou expedição.'
-              : 'Separação do pedido. Expedição ainda não registrada.',
-        );
-      const widths = kind === 'commercial' ? [185, 46, 70, 70, 70, 74] : [275, 60, 60, 60, 60];
-      const headers =
-        kind === 'commercial'
-          ? ['Produto / SKU', 'Qtd / un.', 'Unitário', 'Subtotal', 'Desconto', 'Total']
-          : ['Produto / SKU', 'Solicitada / un.', 'Expedida', 'Devolvida física', 'Conferência'];
-      tableRow(headers, widths, true);
-      const returned = new Map(source.returned.map((r) => [r.lineId, r.received]));
-      for (const [i, line] of order.lines.entries()) {
-        check();
-        // Repeat table headings when a row moves to a new page.
-        doc.font('Body').fontSize(8);
-        const name = `${i + 1}. ${line.name}\nSKU: ${line.sku}`;
-        const estimated = Math.max(
-          46,
-          doc.heightOfString(safeText(name), { width: widths[0]! - 8 }) + 12,
-        );
-        if (y + estimated > 770) {
-          newPage();
-          tableRow(headers, widths, true);
-        }
-        tableRow(
-          kind === 'commercial'
-            ? [
-                name,
-                `${line.quantity.replace('.', ',')} ${line.unit}`,
-                money(line.unitPriceCents),
-                money(line.subtotalCents),
-                money(line.discountCents),
-                money(line.totalCents),
-              ]
-            : [
-                name,
-                `${line.quantity.replace('.', ',')} ${line.unit}`,
-                order.status === 'dispatched' ? line.quantity.replace('.', ',') : '0',
-                (returned.get(line.id) ?? '0').replace('.', ','),
-                '[   ]',
-              ],
-          widths,
-        );
-        if (i % 20 === 19) await yieldLoop();
-      }
-      y += 12;
-      if (kind === 'commercial') {
-        text(`Subtotal: ${money(order.subtotalCents)} | Desconto: ${money(order.discountCents)}`);
-        text(`Total do pedido: ${money(order.totalCents)}`, true);
-        if (order.discount) text(`Motivo do desconto: ${order.discount.reason}`);
-        if (order.paymentTerms) text(`Condição registrada: ${order.paymentTerms.name}`);
-        else if (order.payment)
-          text(`Condição registrada: ${order.payment.type === 'cash' ? 'À vista' : 'Parcelado'}`);
-        if (order.intendedPaymentMethod)
-          text(`Forma prevista: ${order.intendedPaymentMethod.name}`);
-        for (const installment of order.installments)
-          text(
-            `Parcela ${installment.number}: ${brazilianDate(installment.dueDate)} - ${money(installment.amountCents)}`,
-          );
-      }
-      if (kind === 'commercial' && order.notes) text(`Observações do pedido: ${order.notes}`);
-      if (kind === 'packing') {
-        ensure(110);
-        text('Observações da conferência: __________________________________________________');
-        text('___________________________________________________________________________');
-        text('Recebedor / identificação: ____________________________________________________');
-        text('Assinatura: ____________________________________ Data: ______________________');
-      }
-      footer();
-      doc.end();
-      const result = await output;
-      if (performance.now() - start > MAX_RENDER_MS)
-        throw new AppError(413, 'DOCUMENT_TIME_LIMIT', 'Documento excede tempo técnico');
-      return result;
+      pdf.newPage();
+      this.parties(pdf, source, kind);
+      if (kind === 'commercial') await this.commercial(pdf, source);
+      else await this.packing(pdf, source);
+      return await pdf.finish();
     } catch (error) {
-      doc.destroy();
+      pdf.destroy();
       throw error;
     }
+  }
+
+  /** Customer on the left, order reference on the right. Only data that exists is printed. */
+  private parties(pdf: BrandedPdf, source: DocumentSource, kind: 'commercial' | 'packing') {
+    const { order, customer } = source;
+    const leftWidth = 320,
+      rightX = LEFT + 345,
+      rightWidth = RIGHT - rightX;
+    const top = pdf.y;
+    let left = top + pdf.label(kind === 'commercial' ? 'CLIENTE' : 'DESTINATÁRIO', LEFT, top);
+    const name = order.customerName ? oneLine(order.customerName) : 'Cliente não informado';
+    left += pdf.write(name, LEFT, left, leftWidth, { size: 10.5, bold: true }) + 3;
+    const details: string[] = [];
+    if (customer?.tradeName && oneLine(customer.tradeName) !== name)
+      details.push(oneLine(customer.tradeName));
+    if (customer?.document)
+      details.push(
+        `${customer.document.replace(/\D/g, '').length === 11 ? 'CPF' : 'CNPJ'} ${formatDocument(customer.document)}`,
+      );
+    const contact = [
+      customer?.phone ? formatPhone(customer.phone) : null,
+      customer?.email ?? null,
+    ].filter((v): v is string => Boolean(v));
+    if (contact.length) details.push(contact.join(' · '));
+    for (const line of details)
+      left += pdf.write(line, LEFT, left, leftWidth, { size: 8.5, color: '#333333' }) + 1.5;
+    const address = addressLines(customer?.address ?? null);
+    if (address.length) {
+      left += 6;
+      left += pdf.label(kind === 'packing' ? 'ENDEREÇO DE ENTREGA' : 'ENDEREÇO', LEFT, left);
+      for (const line of address)
+        left += pdf.write(line, LEFT, left, leftWidth, { size: 8.5, color: '#333333' }) + 1.5;
+    }
+
+    let right =
+      top + pdf.label(kind === 'commercial' ? 'PEDIDO' : 'PEDIDO DE REFERÊNCIA', rightX, top);
+    const pair = (label: string, value: string, strong = false) => {
+      pdf.write(label, rightX, right + (strong ? 2 : 0), 82, { size: 8.5, color: '#5E5E5E' });
+      right +=
+        Math.max(
+          pdf.write(value, rightX + 84, right, rightWidth - 84, {
+            size: strong ? 11 : 9,
+            bold: strong,
+            align: 'right',
+          }),
+          11,
+        ) + 5;
+    };
+    pair('Número do pedido', orderNumber(order.commercialId), true);
+    pair('Data do pedido', localDate(order.createdAt, source.tenant.timezone));
+    if (kind === 'commercial' && order.status === 'draft') pair('Situação', 'Rascunho');
+    if (kind === 'commercial' && order.status === 'canceled') pair('Situação', 'Cancelado');
+    pdf.y = Math.max(left, right) + 14;
+  }
+
+  private async commercial(pdf: BrandedPdf, source: DocumentSource) {
+    const { order } = source;
+    const discount = order.discountCents > 0;
+    const totals = [
+      ...(discount
+        ? [
+            { label: 'Subtotal dos produtos', value: brl(order.subtotalCents) },
+            { label: 'Desconto', value: `- ${brl(order.discountCents)}` },
+          ]
+        : []),
+      { label: 'TOTAL DO PEDIDO', value: brl(order.totalCents), strong: true },
+    ];
+    const totalsHeight = (discount ? 34 : 0) + 30;
+    if (order.lines.length) {
+      const rows: Cell[][] = order.lines.map((line) => [
+        { text: oneLine(line.name), sub: `SKU ${oneLine(line.sku)}` },
+        { text: quantity(line) },
+        { text: brl(line.unitPriceCents) },
+        { text: brl(line.subtotalCents) },
+      ]);
+      await pdf.table(
+        [
+          { label: 'Produto', width: 255 },
+          { label: 'Quantidade', width: 80, align: 'right' },
+          { label: 'Unitário', width: 90, align: 'right' },
+          { label: 'Subtotal', width: 90, align: 'right' },
+        ],
+        rows,
+        totalsHeight + 8,
+      );
+    } else pdf.paragraph('Pedido sem produtos.', { color: '#5E5E5E' });
+    pdf.y += 8;
+    pdf.ensure(totalsHeight);
+    pdf.totals(totals);
+    if (order.discount) {
+      pdf.y += 2;
+      pdf.paragraph(`Motivo do desconto: ${oneLine(order.discount.reason)}`, {
+        size: 8,
+        color: '#5E5E5E',
+      });
+    }
+    this.payment(pdf, order);
+    if (order.notes.trim()) {
+      pdf.y += 10;
+      pdf.ensure(40);
+      pdf.y += pdf.label('OBSERVAÇÕES');
+      pdf.paragraph(order.notes.trim(), { size: 8.5, color: '#333333' });
+    }
+  }
+
+  /** Commercial conditions recorded in the order (not a payment receipt). */
+  private payment(pdf: BrandedPdf, order: Order) {
+    const condition = order.paymentTerms
+      ? order.paymentTerms.name
+      : order.payment
+        ? order.payment.type === 'cash'
+          ? 'À vista'
+          : 'Parcelado'
+        : null;
+    if (!condition && !order.installments.length) return;
+    pdf.y += 14;
+    pdf.ensure(36 + order.installments.length * 14);
+    pdf.y += pdf.label('CONDIÇÕES DE PAGAMENTO');
+    const summary = [
+      condition ? oneLine(condition) : null,
+      order.intendedPaymentMethod
+        ? `Forma prevista: ${oneLine(order.intendedPaymentMethod.name)}`
+        : null,
+    ].filter(Boolean);
+    if (summary.length) pdf.paragraph(summary.join(' · '), { size: 8.5, color: '#333333', gap: 6 });
+    if (order.installments.length > 1)
+      for (const installment of order.installments) {
+        pdf.ensure(14);
+        pdf.write(`Parcela ${installment.number}`, LEFT, pdf.y, 120, {
+          size: 8.5,
+          color: '#333333',
+        });
+        pdf.write(`Vencimento ${calendarDate(installment.dueDate)}`, LEFT + 120, pdf.y, 160, {
+          size: 8.5,
+          color: '#333333',
+        });
+        pdf.write(brl(installment.amountCents), LEFT + 280, pdf.y, 110, {
+          size: 8.5,
+          align: 'right',
+        });
+        pdf.y += 13;
+      }
+    else if (order.installments[0])
+      pdf.paragraph(
+        `Vencimento ${calendarDate(order.installments[0].dueDate)} · ${brl(order.installments[0].amountCents)}`,
+        { size: 8.5, color: '#333333' },
+      );
+  }
+
+  /**
+   * Delivery receipt. Dispatch is always integral in Lastro (no partial dispatch), so each line's
+   * quantity is exactly what leaves with this delivery; values are the line totals, discount
+   * included, and add up to the order total.
+   */
+  private async packing(pdf: BrandedPdf, source: DocumentSource) {
+    const { order } = source;
+    const receiptHeight = 250;
+    await pdf.table(
+      [
+        { label: 'Produto', width: 315 },
+        { label: 'Quantidade', width: 95, align: 'right' },
+        { label: 'Valor', width: 105, align: 'right' },
+      ],
+      order.lines.map((line) => [
+        { text: oneLine(line.name), sub: `SKU ${oneLine(line.sku)}` },
+        { text: quantity(line) },
+        { text: brl(line.totalCents) },
+      ]),
+      receiptHeight,
+    );
+    pdf.y += 8;
+    pdf.ensure(receiptHeight);
+    pdf.totals([{ label: 'VALOR TOTAL', value: brl(order.totalCents), strong: true }]);
+    if (order.discountCents > 0)
+      pdf.write('Valores com o desconto do pedido aplicado.', LEFT, pdf.y - 18, 260, {
+        size: 7.5,
+        color: '#8A8A8A',
+      });
+    this.receipt(pdf);
+  }
+
+  /** Space for handwritten confirmation; printing or signing never changes the order status. */
+  private receipt(pdf: BrandedPdf) {
+    pdf.y += 22;
+    pdf.rule(pdf.y, '#D9D9D9', 0.6);
+    pdf.y += 14;
+    pdf.y += pdf.label('CONFIRMAÇÃO DE RECEBIMENTO');
+    pdf.y += pdf.write(RECEIPT_DECLARATION, LEFT, pdf.y, WIDTH, { size: 9.5 }) + 24;
+    const field = (label: string, from: number, to: number, y: number) => {
+      pdf.write(label, from, y, to - from, { size: 8.5, color: '#333333' });
+      const width = pdf.doc.font('Body').fontSize(8.5).widthOfString(label);
+      pdf.rule(y + 10, '#111111', 0.6, from + width + 6, to);
+    };
+    field('Nome do recebedor:', LEFT, RIGHT, pdf.y);
+    pdf.y += 34;
+    pdf.write('Data do recebimento:', LEFT, pdf.y, 120, { size: 8.5, color: '#333333' });
+    pdf.write('____/____/________', LEFT + 100, pdf.y - 1, 140, { size: 9.5 });
+    pdf.y += 38;
+    field('Assinatura do recebedor:', LEFT, RIGHT, pdf.y);
+    pdf.y += 30;
   }
 }
