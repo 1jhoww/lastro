@@ -38,10 +38,11 @@ export function useCustomerList(filters: CustomerFilters) {
   );
 }
 
-export function useCustomer(id: string) {
+export function useCustomer(id: string, enabled = true) {
   const { api, tenantId, header } = useTenantApi();
   return useQuery({
     queryKey: queryKeys.customer(tenantId, id),
+    enabled: enabled && Boolean(id),
     queryFn: () => unwrap(api.GET('/api/v1/customers/{id}', { params: { header, path: { id } } })),
   });
 }

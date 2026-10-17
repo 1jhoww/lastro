@@ -55,6 +55,19 @@ export const queryKeys = {
     ['tenant', tenantId, 'orders', 'finance', id] as const,
   paymentOptions: (tenantId: string, kind: 'conditions' | 'methods') =>
     ['tenant', tenantId, 'payment-options', kind] as const,
+  /** Entrega confirmada do pedido (registro separado; não muda o pedido). */
+  orderDelivery: (tenantId: string, id: string) =>
+    ['tenant', tenantId, 'orders', 'delivery', id] as const,
+  /** Visitas, histórico do cliente e recompra: tudo sob o mesmo prefixo para invalidar junto. */
+  visits: (tenantId: string) => ['tenant', tenantId, 'visits'] as const,
+  visitList: (tenantId: string, filters: object) =>
+    ['tenant', tenantId, 'visits', 'list', filters] as const,
+  repurchase: (tenantId: string, filters: object) =>
+    ['tenant', tenantId, 'visits', 'repurchase', filters] as const,
+  customerRepurchase: (tenantId: string, id: string) =>
+    ['tenant', tenantId, 'visits', 'customer-repurchase', id] as const,
+  customerTimeline: (tenantId: string, id: string, limit: number) =>
+    ['tenant', tenantId, 'visits', 'timeline', id, limit] as const,
   platformRoot: ['platform'] as const,
   finance: (tenantId: string) => ['tenant', tenantId, 'finance'] as const,
   receivables: (tenantId: string, filters: object) =>

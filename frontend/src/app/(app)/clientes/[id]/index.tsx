@@ -8,6 +8,10 @@ import { RecordError, RecordLoading } from '@/features/catalog/RecordStates';
 import { useAssignCustomer, useCustomer, useSetCustomerStatus } from '@/features/customers/api';
 import { addressComplete, addressLine as formatAddress } from '@/features/customers/presentation';
 import { memberLabel, useAssigneeLabel, useMembers } from '@/features/users/api';
+import {
+  CustomerPurchasePanel,
+  CustomerTimelinePanel,
+} from '@/features/visits/CustomerRelationship';
 import { Screen } from '@/layout/Screen';
 import { formatDate } from '@/lib/dates';
 import { documentKind, formatDocument, formatPhone } from '@/lib/document';
@@ -37,6 +41,8 @@ export default function CustomerDetail() {
 function CustomerView({ customer: c }: { customer: Customer }) {
   const { permissions } = useSession();
   const admin = permissions.includes('customers:all:manage');
+  // Recurso do plano: só existe quando o servidor emite a permissão.
+  const relationship = permissions.includes('visits:own:manage');
   const compact = useLayoutSize() === 'compact';
   const toast = useToast();
   const setStatus = useSetCustomerStatus(c.id);
@@ -110,10 +116,12 @@ function CustomerView({ customer: c }: { customer: Customer }) {
                 {c.notes || 'Nenhuma observação.'}
               </Text>
             </Panel>
+            {relationship ? <CustomerTimelinePanel customerId={c.id} /> : null}
           </>
         }
         side={
           <>
+            {relationship ? <CustomerPurchasePanel customerId={c.id} /> : null}
             <Panel title="Carteira">
               {admin ? <Assignment customer={c} /> : <Text variant="body">Na sua carteira.</Text>}
             </Panel>
@@ -169,6 +177,7 @@ function Assignment({ customer: c }: { customer: Customer }) {
   const assign = useAssignCustomer(c.id);
   const toast = useToast();
   const [pending, setPending] = useState<string | null | undefined>(undefined);
+  const visits = useSession().permissions.includes('visits:own:manage');
 
   const options = [
     { value: 'none', label: 'Sem responsável' },
@@ -206,7 +215,7 @@ function Assignment({ customer: c }: { customer: Customer }) {
       <ConfirmDialog
         visible={pending !== undefined}
         title="Transferir cliente?"
-        description={`Passa de "${label(c.assignedTo)}" para "${label(pending ?? null)}". O responsável anterior deixa de ver este cliente e os pedidos dele; o novo não recebe pedidos antigos.`}
+        description={`Passa de "${label(c.assignedTo)}" para "${label(pending ?? null)}". O responsável anterior deixa de ver este cliente e os pedidos dele; o novo não recebe pedidos antigos.${visits ? ' Visitas e entregas registradas acompanham o cliente, com a autoria original.' : ''}`}
         confirmLabel="Transferir cliente"
         tone="strong"
         loading={assign.isPending}

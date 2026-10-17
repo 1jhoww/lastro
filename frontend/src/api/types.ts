@@ -161,3 +161,17 @@ export type ReportId = ReportView['report'];
 export type ReportQuery = NonNullable<
   paths['/api/v1/reports/{report}']['get']['parameters']['query']
 >;
+
+export type Visit = DataOf<'/api/v1/visits', 'post'>;
+export type VisitCreate = BodyOf<'/api/v1/visits', 'post'>;
+export type VisitQuery = NonNullable<paths['/api/v1/visits']['get']['parameters']['query']>;
+export type VisitSource = Visit['source'];
+export type VisitKind = Visit['kind'];
+export type RepurchasePage = DataOf<'/api/v1/repurchase', 'get'>;
+export type RepurchaseRow = RepurchasePage['items'][number];
+export type RepurchaseStatus = RepurchaseRow['status'];
+export type CustomerRepurchase = DataOf<'/api/v1/customers/{id}/repurchase', 'get'>;
+export type CustomerTimeline = DataOf<'/api/v1/customers/{id}/timeline', 'get'>;
+export type TimelineEntry = CustomerTimeline['items'][number];
+export type Delivery = DataOf<'/api/v1/orders/{id}/delivery', 'post'>;
+export type DeliveryInput = BodyOf<'/api/v1/orders/{id}/delivery', 'post'>;

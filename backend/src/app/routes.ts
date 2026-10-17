@@ -42,6 +42,10 @@ import * as catalogSchemas from '../shared/schemas/catalog.js';
 import type { CatalogService } from '../modules/catalog/catalogService.js';
 import { documentRoutes } from './documentRoutes.js';
 import { reportRoutes } from './reportRoutes.js';
+import { visitRoutes } from './visitRoutes.js';
+import { VisitService } from '../modules/visits/visitService.js';
+import { DeliveryService } from '../modules/orders/deliveryService.js';
+import * as visitSchemas from '../shared/schemas/visits.js';
 import { ReportService } from '../modules/reports/reportService.js';
 import * as reportSchemas from '../shared/schemas/reports.js';
 import type { DocumentService } from '../modules/documents/documentService.js';
@@ -82,6 +86,7 @@ export const routeDefinitions: Route[] = [
   ...executionRoutes,
   ...documentRoutes,
   ...reportRoutes,
+  ...visitRoutes,
   ...catalogRoutes,
   ...financeRoutes,
   ...returnRoutes,
@@ -309,8 +314,42 @@ export function createRoutes(
     emailChanges,
   );
   const reports = new ReportService(orders, financialReads, inventory, users.auth);
+  const visits = new VisitService(orders, users.auth);
+  const deliveries = new DeliveryService(orders);
   const reportFor = (req: Request) => reportSchemas.reportParams.parse(req.params).report;
   const handlers: Record<string, (req: Request) => Promise<unknown>> = {
+    listVisits: (req) =>
+      visits.list(actorFor(req), selectedTenant(req), visitSchemas.visitQuery.parse(req.query)),
+    createVisit: (req) =>
+      visits.create(
+        actorFor(req),
+        selectedTenant(req),
+        visitSchemas.visitCreate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    listRepurchase: (req) =>
+      visits.repurchase(
+        actorFor(req),
+        selectedTenant(req),
+        visitSchemas.repurchaseQuery.parse(req.query),
+      ),
+    getCustomerRepurchase: (req) =>
+      visits.customerRepurchase(actorFor(req), selectedTenant(req), idFor(req)),
+    getCustomerTimeline: (req) =>
+      visits.timeline(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        visitSchemas.timelineQuery.parse(req.query),
+      ),
+    getOrderDelivery: (req) => deliveries.get(actorFor(req), selectedTenant(req), idFor(req)),
+    confirmOrderDelivery: (req) =>
+      deliveries.confirm(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        visitSchemas.deliveryInput.parse(req.body),
+      ),
     getReport: (req) =>
       reports.report(actorFor(req), selectedTenant(req), reportFor(req), req.query),
     exportReportCsv: (req) =>

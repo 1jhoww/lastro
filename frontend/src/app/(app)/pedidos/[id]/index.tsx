@@ -24,6 +24,7 @@ import { color, space } from '@/theme';
 import { Alert, Badge, Button, DataTable, Disclosure, Panel, Text, type Column } from '@/ui';
 import { canReadFinance } from '@/features/finance/FinanceAccess';
 import { OrderDocuments } from '@/features/files/OrderDocuments';
+import { OrderDelivery } from '@/features/visits/OrderDelivery';
 
 export default function OrderDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -211,6 +212,7 @@ function OrderView({ order: o, onRefresh }: { order: Order; onRefresh: () => voi
                 </Disclosure>
               </View>
             </Panel>
+            <OrderDelivery order={o} />
             <OrderFinancePanel order={o} />
             <Disclosure label="Histórico do pedido">
               <OrderHistoryPanel orderId={o.id} />

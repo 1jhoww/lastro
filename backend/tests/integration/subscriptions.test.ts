@@ -31,7 +31,7 @@ const history = async (fixture: Fixture, id = fixture.tenantA.subscription.id) =
       .get(path(fixture, '/history', id))
       .set(bearer(fixture.platform))
   ).body.data.items as { action: string; changes: Record<string, unknown> }[];
-const allFeatures = ['users.invite', 'catalog.public', 'commercial.sellers'];
+const allFeatures = ['users.invite', 'catalog.public', 'commercial.sellers', 'commercial.visits'];
 
 describe('Criação de empresa com plano oficial', () => {
   it('Essencial recebe limite de 1 usuário, valor de referência e dados de cobrança', async () => {
@@ -107,7 +107,7 @@ describe('Criação de empresa com plano oficial', () => {
       ['essencial', 1, 11900],
       ['profissional', 2, 19900],
     ]);
-    expect(catalog.features).toHaveLength(3);
+    expect(catalog.features).toHaveLength(4);
   });
 });
 

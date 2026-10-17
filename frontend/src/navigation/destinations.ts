@@ -1,6 +1,7 @@
 import type { Href } from 'expo-router';
 import {
   Boxes,
+  CalendarCheck,
   CircleDollarSign,
   ClipboardList,
   House,
@@ -32,6 +33,7 @@ export type Permission =
   | 'orders:own:read'
   | 'orders:own:confirm'
   | 'orders:own:dispatch'
+  | 'orders:own:deliver'
   | 'orders:all:manage'
   | 'orders:dispatch'
   | 'discounts:apply'
@@ -41,7 +43,8 @@ export type Permission =
   | 'refunds:manage'
   | 'payment-settings:manage'
   | 'reports:read'
-  | 'documents:own:read';
+  | 'documents:own:read'
+  | 'visits:own:manage';
 
 export type Destination = {
   key: string;
@@ -80,6 +83,14 @@ export const destinations: Destination[] = [
     icon: Users,
     anyOf: ['customers:all:manage', 'customers:own:manage'],
     primaryOnMobile: true,
+  },
+  {
+    key: 'visitas',
+    label: 'Visitas',
+    href: '/visitas' as Href,
+    icon: CalendarCheck,
+    // Recurso do plano: o servidor só emite a permissão quando a assinatura inclui o módulo.
+    anyOf: ['visits:own:manage'],
   },
   {
     key: 'produtos',

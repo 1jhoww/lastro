@@ -112,6 +112,22 @@ _Avoid_: Baixa física, reserva livre do vendedor.
 Saída física integral de um pedido confirmado, consumindo suas reservas sem apagar o compromisso comercial.
 _Avoid_: Pagamento, cancelamento.
 
+**Confirmação de entrega**:
+Registro de que o cliente recebeu um pedido expedido, separado da expedição; no máximo uma por pedido e sem efeito em estoque ou financeiro.
+_Avoid_: Expedição, romaneio assinado, entrega presumida.
+
+**Visita comercial**:
+Atendimento manual a um cliente (presencial ou remoto), com responsável e data, que não exige pedido.
+_Avoid_: Pedido, entrega, tarefa agendada.
+
+**Registro automático de entrega**:
+Entrada do histórico do cliente criada somente pela confirmação de entrega, atribuída ao vendedor do pedido.
+_Avoid_: Visita presencial, registro de expedição.
+
+**Estimativa de recompra**:
+Data provável de nova compra: última compra confirmada mais a mediana dos intervalos entre compras confirmadas do último ano.
+_Avoid_: Previsão garantida, meta de venda.
+
 **Recebível**:
 Obrigação a receber originada de uma parcela do pedido confirmado, com valor original e saldo em aberto próprios.
 _Avoid_: Dinheiro recebido, cobrança bancária.

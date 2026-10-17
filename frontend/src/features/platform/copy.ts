@@ -16,6 +16,7 @@ export const featureLabel: Record<PlanFeature, string> = {
   'users.invite': 'Convite de usuários adicionais',
   'catalog.public': 'Catálogo / vitrine virtual',
   'commercial.sellers': 'Vendedores e carteiras de clientes',
+  'commercial.visits': 'Visitas e recompra',
 };
 
 /** Situação financeira da cobrança. Vencida e próxima são alertas, nunca bloqueio de acesso. */

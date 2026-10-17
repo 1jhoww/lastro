@@ -64,7 +64,9 @@ export type CommercialCollection =
   | 'returnReceipts'
   | 'orderReturnLines'
   | 'catalogSettings'
-  | 'catalogOperations';
+  | 'catalogOperations'
+  | 'visits'
+  | 'deliveries';
 export class CommercialRepository {
   constructor(
     readonly foundation: FoundationRepository,

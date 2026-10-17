@@ -285,6 +285,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/visits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Visitas manuais e registros automáticos de entrega, mais recentes primeiro. Vendedor vê só clientes da carteira atual, qualquer que seja o autor. Uma página pode vir com menos itens que o limite e ainda ter cursor. */
+        get: operations["listVisits"];
+        put?: never;
+        /** @description Registra visita ou contato manual. Não cria pedido, movimentação de estoque nem recebível. Vendedor registra só para si e para clientes da própria carteira. */
+        post: operations["createVisit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/repurchase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Estimativa de recompra dos clientes ativos do escopo: mediana dos intervalos entre compras confirmadas no último ano (mínimo de 3 dias de compra). Estimativa, não garantia. */
+        get: operations["listRepurchase"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers/{id}/repurchase": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Última compra (pedido confirmado), última entrega confirmada e estimativa de recompra de um cliente. */
+        get: operations["getCustomerRepurchase"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/customers/{id}/timeline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Histórico do cliente: visitas manuais, entregas confirmadas e compras confirmadas, mais recentes primeiro. */
+        get: operations["getCustomerTimeline"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/delivery": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrderDelivery"];
+        put?: never;
+        /** @description Confirma a entrega efetiva de um pedido expedido (uma por pedido; expedição é integral). Gera o registro automático de entrega. Repetir com os mesmos dados devolve a mesma entrega; dados diferentes: 409 DELIVERY_ALREADY_CONFIRMED. Não altera pedido, estoque nem financeiro. */
+        post: operations["confirmOrderDelivery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/catalog-settings": {
         parameters: {
             query?: never;
@@ -6630,6 +6716,1788 @@ export interface operations {
                 };
                 content: {
                     "application/pdf": string;
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    listVisits: {
+        parameters: {
+            query?: {
+                limit?: string;
+                cursor?: string;
+                customerId?: string;
+                responsibleUid?: string;
+                source?: "manual" | "automatic";
+                from?: string;
+                to?: string;
+            };
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            items: {
+                                id: string;
+                                customerId: string;
+                                customerName: string;
+                                /** @enum {string} */
+                                source: "manual" | "automatic";
+                                /** @enum {string} */
+                                kind: "in_person" | "remote" | "delivery";
+                                visitDate: string;
+                                responsibleUid: string;
+                                responsibleName: string | null;
+                                notes: string;
+                                orderId: string | null;
+                                orderCommercialId: string | null;
+                                orderAccessible: boolean;
+                                /** Format: date-time */
+                                createdAt: string;
+                                createdBy: string;
+                            }[];
+                            nextCursor: string | null;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    createVisit: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    customerId: string;
+                    visitDate: string;
+                    /** @enum {string} */
+                    kind: "in_person" | "remote";
+                    responsibleUid?: string;
+                    notes: string;
+                    orderId?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Operação concluída */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            customerId: string;
+                            customerName: string;
+                            /** @enum {string} */
+                            source: "manual" | "automatic";
+                            /** @enum {string} */
+                            kind: "in_person" | "remote" | "delivery";
+                            visitDate: string;
+                            responsibleUid: string;
+                            responsibleName: string | null;
+                            notes: string;
+                            orderId: string | null;
+                            orderCommercialId: string | null;
+                            orderAccessible: boolean;
+                            /** Format: date-time */
+                            createdAt: string;
+                            createdBy: string;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    listRepurchase: {
+        parameters: {
+            query?: {
+                limit?: string;
+                cursor?: string;
+                status?: "insufficient_history" | "on_track" | "overdue";
+                sellerUid?: string | "unassigned";
+                q?: string;
+            };
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            items: {
+                                lastPurchaseOn: string | null;
+                                purchaseCount: number;
+                                frequencyDays: number | null;
+                                nextEstimatedOn: string | null;
+                                /** @enum {string} */
+                                status: "insufficient_history" | "on_track" | "overdue";
+                                daysFromEstimate: number | null;
+                                customerId: string;
+                                customerName: string;
+                                sellerUid: string | null;
+                                sellerName: string | null;
+                            }[];
+                            nextCursor: string | null;
+                            totals: {
+                                insufficient_history: number;
+                                on_track: number;
+                                overdue: number;
+                            };
+                            lookbackDays: number;
+                            minimumPurchases: number;
+                            /** Format: date-time */
+                            generatedAt: string;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getCustomerRepurchase: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            lastPurchaseOn: string | null;
+                            purchaseCount: number;
+                            frequencyDays: number | null;
+                            nextEstimatedOn: string | null;
+                            /** @enum {string} */
+                            status: "insufficient_history" | "on_track" | "overdue";
+                            daysFromEstimate: number | null;
+                            customerId: string;
+                            lastDeliveryOn: string | null;
+                            lookbackDays: number;
+                            minimumPurchases: number;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getCustomerTimeline: {
+        parameters: {
+            query?: {
+                limit?: string;
+            };
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            customerId: string;
+                            items: {
+                                id: string;
+                                /** @enum {string} */
+                                type: "visit" | "delivery" | "purchase";
+                                date: string;
+                                responsibleUid: string | null;
+                                responsibleName: string | null;
+                                kind: ("in_person" | "remote" | "delivery") | null;
+                                notes: string | null;
+                                order: {
+                                    id: string;
+                                    commercialId: string;
+                                    status: ("draft" | "confirmed" | "dispatched" | "canceled") | null;
+                                    accessible: boolean;
+                                } | null;
+                            }[];
+                            hasMore: boolean;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getOrderDelivery: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            delivery: {
+                                orderId: string;
+                                orderCommercialId: string;
+                                customerId: string;
+                                sellerUid: string;
+                                deliveredOn: string;
+                                receivedBy: string | null;
+                                notes: string;
+                                /** Format: date-time */
+                                confirmedAt: string;
+                                confirmedBy: string;
+                                visitId: string;
+                            } | null;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    confirmOrderDelivery: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    deliveredOn: string;
+                    receivedBy?: string | null;
+                    notes?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            orderId: string;
+                            orderCommercialId: string;
+                            customerId: string;
+                            sellerUid: string;
+                            deliveredOn: string;
+                            receivedBy: string | null;
+                            notes: string;
+                            /** Format: date-time */
+                            confirmedAt: string;
+                            confirmedBy: string;
+                            visitId: string;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
                 };
             };
             /** @description Erro seguro com código estável */
@@ -29862,7 +31730,7 @@ export interface operations {
                                 updatedAt: string;
                                 planName: string | null;
                                 nextDueDate: string | null;
-                                features: ("users.invite" | "catalog.public" | "commercial.sellers")[];
+                                features: ("users.invite" | "catalog.public" | "commercial.sellers" | "commercial.visits")[];
                             };
                             capacity: {
                                 userLimit: number;
@@ -32132,14 +34000,14 @@ export interface operations {
                                 userLimit: number;
                                 features: {
                                     /** @enum {string} */
-                                    code: "users.invite" | "catalog.public" | "commercial.sellers";
+                                    code: "users.invite" | "catalog.public" | "commercial.sellers" | "commercial.visits";
                                     label: string;
                                 }[];
                                 offered: boolean;
                             }[];
                             features: {
                                 /** @enum {string} */
-                                code: "users.invite" | "catalog.public" | "commercial.sellers";
+                                code: "users.invite" | "catalog.public" | "commercial.sellers" | "commercial.visits";
                                 label: string;
                             }[];
                         };
@@ -32383,7 +34251,7 @@ export interface operations {
                             activeUsers: number;
                             reservedInvitations: number;
                             excessSeats: number;
-                            lostFeatures: ("users.invite" | "catalog.public" | "commercial.sellers")[];
+                            lostFeatures: ("users.invite" | "catalog.public" | "commercial.sellers" | "commercial.visits")[];
                             publicCatalogEnabled: boolean;
                             monthlyPriceCents: number;
                             referencePriceCents: number;
@@ -32615,7 +34483,7 @@ export interface operations {
                     /** @enum {string} */
                     planCode: "essencial" | "profissional";
                     monthlyPriceCents?: number;
-                    acknowledgedLostFeatures: ("users.invite" | "catalog.public" | "commercial.sellers")[];
+                    acknowledgedLostFeatures: ("users.invite" | "catalog.public" | "commercial.sellers" | "commercial.visits")[];
                     reason: string;
                 };
             };
@@ -35992,7 +37860,7 @@ export interface operations {
                                     code: ("essencial" | "profissional") | null;
                                     name: string | null;
                                     userLimit: number;
-                                    features: ("users.invite" | "catalog.public" | "commercial.sellers")[];
+                                    features: ("users.invite" | "catalog.public" | "commercial.sellers" | "commercial.visits")[];
                                 };
                             }[];
                         };
@@ -36245,7 +38113,7 @@ export interface operations {
                                     code: ("essencial" | "profissional") | null;
                                     name: string | null;
                                     userLimit: number;
-                                    features: ("users.invite" | "catalog.public" | "commercial.sellers")[];
+                                    features: ("users.invite" | "catalog.public" | "commercial.sellers" | "commercial.visits")[];
                                 };
                             }[];
                         };

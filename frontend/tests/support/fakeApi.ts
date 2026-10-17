@@ -84,8 +84,10 @@ const seller = [
   'orders:own:confirm',
   'orders:own:read',
   'orders:own:dispatch',
+  'orders:own:deliver',
   'orders:payment-options:read',
   'documents:own:read',
+  'visits:own:manage',
 ];
 const administrator = [
   ...seller,
@@ -123,8 +125,8 @@ export const membership = (
     code: null,
     name: null,
     userLimit: 2,
-    features: ['users.invite', 'catalog.public', 'commercial.sellers'] as (
-      'users.invite' | 'catalog.public' | 'commercial.sellers'
+    features: ['users.invite', 'catalog.public', 'commercial.sellers', 'commercial.visits'] as (
+      'users.invite' | 'catalog.public' | 'commercial.sellers' | 'commercial.visits'
     )[],
   },
 });

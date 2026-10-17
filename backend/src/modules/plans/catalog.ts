@@ -21,6 +21,8 @@ export const planFeatures = [
   'catalog.public',
   // Seller profile and customer portfolios assigned to sellers.
   'commercial.sellers',
+  // Commercial visits, customer relationship history and repurchase estimates.
+  'commercial.visits',
 ] as const;
 export type PlanFeature = (typeof planFeatures)[number];
 
@@ -54,7 +56,12 @@ export const planCatalog: Readonly<Record<PlanCode, PlanDefinition>> = Object.fr
     version: 1,
     referencePriceCents: 19_900,
     userLimit: 2,
-    features: Object.freeze(['users.invite', 'catalog.public', 'commercial.sellers'] as const),
+    features: Object.freeze([
+      'users.invite',
+      'catalog.public',
+      'commercial.sellers',
+      'commercial.visits',
+    ] as const),
     offered: true,
   }),
 });
@@ -63,12 +70,14 @@ export const featureLabels: Readonly<Record<PlanFeature, string>> = Object.freez
   'users.invite': 'Convite de usuários adicionais',
   'catalog.public': 'Catálogo / vitrine virtual',
   'commercial.sellers': 'Vendedores e carteiras de clientes',
+  'commercial.visits': 'Visitas e recompra',
 });
 
 /** Permissions that only exist while the plan includes the feature. */
 const featurePermissions: Readonly<Partial<Record<PlanFeature, readonly Permission[]>>> =
   Object.freeze({
     'catalog.public': Object.freeze(['catalog:manage'] as const),
+    'commercial.visits': Object.freeze(['visits:own:manage'] as const),
   });
 
 export function isPlanCode(value: unknown): value is PlanCode {

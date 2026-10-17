@@ -10,8 +10,10 @@ const seller = [
   'orders:own:confirm',
   'orders:own:read',
   'orders:own:dispatch',
+  'orders:own:deliver',
   'orders:payment-options:read',
   'documents:own:read',
+  'visits:own:manage',
 ] as const;
 const administrator = [
   ...seller,
@@ -116,6 +118,15 @@ export const permissionMatrix: readonly PermissionOperation[] = Object.freeze([
     ['orders.view'],
   ),
   op(
+    'orders.deliver',
+    'Pedidos',
+    'Confirmar entrega',
+    'Registrar a entrega efetiva dos próprios pedidos expedidos.',
+    ['orders:own:deliver'],
+    'default',
+    ['orders.view'],
+  ),
+  op(
     'orders.documents',
     'Pedidos',
     'Gerar documentos',
@@ -155,6 +166,15 @@ export const permissionMatrix: readonly PermissionOperation[] = Object.freeze([
     'Clientes de toda a empresa, desativação e troca de responsável.',
     ['customers:all:manage'],
     'never',
+  ),
+  op(
+    'visits.manage',
+    'Visitas',
+    'Registrar e consultar',
+    'Visitas, histórico e estimativa de recompra dos clientes da própria carteira.',
+    ['visits:own:manage'],
+    'default',
+    ['customers.manage'],
   ),
   op(
     'products.view',

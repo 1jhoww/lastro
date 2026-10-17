@@ -25,6 +25,15 @@ for (const filters of [
       ],
     });
 }
+// Purchases of one customer by confirmation date (customer history and repurchase estimate).
+config.indexes.push({
+  collectionGroup: 'orders',
+  queryScope: 'COLLECTION',
+  fields: [
+    { fieldPath: 'customerId', order: 'ASCENDING' },
+    { fieldPath: 'confirmedAt', order: 'DESCENDING' },
+  ],
+});
 config.indexes.push({
   collectionGroup: 'orderEvents',
   queryScope: 'COLLECTION',
