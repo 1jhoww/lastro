@@ -21,7 +21,7 @@ Form · Zod · Firebase Authentication (Client SDK) · `openapi-fetch` tipado pe
 
 ## Rodar localmente com o backend e os emuladores
 
-Frontend e backend exigem Node `>=24.22.0 <25`. A referência é Node 24.22.0 LTS, registrada nos arquivos `.node-version`. Firebase 13 exige pelo menos Node 24.12.0. O emulador Firestore exige Java 21. Nenhum projeto Firebase real é usado no desenvolvimento local.
+O backend exige Node `>=24.22.0 <25`; o frontend aceita `>=24.12.0 <25`, mínimo exigido pelo Firebase 13, porque a Vercel escolhe o patch da linha 24.x automaticamente. A referência local é Node 24.22.0 LTS, registrada nos arquivos `.node-version`. O emulador Firestore exige Java 21. Nenhum projeto Firebase real é usado no desenvolvimento local.
 
 Se o Node global for outro, instale Node 24.22.0 ou use um gerenciador de versões. A antiga cópia em `backend/.cache/runtime` pode conter Node 22 e não atende mais ao projeto. Durante o saneamento, o runtime oficial foi extraído somente em `frontend/.local/saneamento/node24/node-v24.22.0-win-x64`.
 Na raiz do repositório, é possível usá-lo no terminal atual sem alterar a instalação global:
