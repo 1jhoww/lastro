@@ -1,12 +1,7 @@
-export const MIN_NODE_VERSION = '22.23.3';
+export const MIN_NODE_VERSION = '24.22.0';
 export function assertRuntime(version = process.versions.node) {
-  const [major, minor, patch] = version.split('.').map(Number);
-  if (
-    major !== 22 ||
-    minor === undefined ||
-    patch === undefined ||
-    minor < 23 ||
-    (minor === 23 && patch < 3)
-  )
-    throw new Error(`Runtime não suportado: Node ${version}; exige >=${MIN_NODE_VERSION} <23`);
+  const parts = /^(\d+)\.(\d+)\.(\d+)$/.exec(version);
+  const [major, minor] = parts ? parts.slice(1).map(Number) : [];
+  if (major !== 24 || minor === undefined || minor < 22)
+    throw new Error(`Runtime não suportado: Node ${version}; exige >=${MIN_NODE_VERSION} <25`);
 }

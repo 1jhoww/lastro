@@ -128,28 +128,27 @@ export class OrderService {
     tenantId: string,
     lines: readonly { id: string; productId: string; quantity: string; unit?: string }[],
   ) {
-    return Promise.all(
-      lines.map(async (line) => {
-        const product = await this.repo.foundation.read(
-          this.repo.ref(tenantId, 'products', line.productId),
-          productSchema,
-          tx,
-        );
-        requireCondition(
-          product?.id === line.productId && product.tenantId === tenantId,
-          404,
-          'RESOURCE_NOT_FOUND',
-          'Recurso não encontrado',
-        );
-        requireCondition(
-          product.status === 'active' && (!line.unit || product.unit === line.unit),
-          409,
-          'PRODUCT_UNAVAILABLE',
-          'Produto inativo ou unidade alterada',
-        );
-        return snapshotLine(line.id, product, line.quantity);
-      }),
+    const products = await this.repo.foundation.readMany(
+      lines.map((line) => this.repo.ref(tenantId, 'products', line.productId)),
+      productSchema,
+      tx,
     );
+    return lines.map((line, index) => {
+      const product = products[index];
+      requireCondition(
+        product?.id === line.productId && product.tenantId === tenantId,
+        404,
+        'RESOURCE_NOT_FOUND',
+        'Recurso não encontrado',
+      );
+      requireCondition(
+        product.status === 'active' && (!line.unit || product.unit === line.unit),
+        409,
+        'PRODUCT_UNAVAILABLE',
+        'Produto inativo ou unidade alterada',
+      );
+      return snapshotLine(line.id, product, line.quantity);
+    });
   }
   private async amounts(
     tx: Transaction,

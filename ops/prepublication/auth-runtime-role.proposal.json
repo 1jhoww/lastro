@@ -1,0 +1,6 @@
+{
+  "title": "Lastro runtime Auth user update",
+  "description": "Proposta aditiva para lastro-api-hml. Preserva viewer existente; concede somente atualização de usuários por operações autorizadas da aplicação.",
+  "stage": "GA",
+  "includedPermissions": ["firebaseauth.users.update"]
+}

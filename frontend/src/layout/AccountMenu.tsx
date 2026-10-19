@@ -1,11 +1,10 @@
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTenant } from '@/features/session/useTenant';
-import { NameEditor } from '@/features/session/NameEditor';
 import { roleLabel, useSession } from '@/session/SessionContext';
 import { color, space } from '@/theme';
 import { Button, IconButton, Skeleton, Text } from '@/ui';
-import { ArrowLeftRight, LogOut, ShieldCheck } from '@/ui/icons';
+import { ArrowLeftRight, LogOut, ShieldCheck, UserRound } from '@/ui/icons';
 
 /**
  * Conta na barra lateral: empresa, perfil e e-mail, com trocar empresa, plataforma e sair.
@@ -19,6 +18,9 @@ export function AccountMenu({ rail = false }: { rail?: boolean }) {
   if (rail) {
     return (
       <View style={styles.rail}>
+        <Link href="/meu-perfil" asChild>
+          <IconButton icon={UserRound} label="Meu Perfil" tone="onStructure" />
+        </Link>
         <IconButton icon={LogOut} label="Sair" tone="onStructure" onPress={session.signOut} />
       </View>
     );
@@ -44,7 +46,9 @@ export function AccountMenu({ rail = false }: { rail?: boolean }) {
         </Text>
       </View>
       <View style={styles.actions}>
-        <NameEditor variant="onStructure" />
+        <Link href="/meu-perfil" asChild>
+          <Button label="Meu Perfil" variant="onStructure" size="sm" icon={UserRound} />
+        </Link>
         {many ? (
           <Link href="/empresas" asChild>
             <Button label="Trocar empresa" variant="onStructure" size="sm" icon={ArrowLeftRight} />

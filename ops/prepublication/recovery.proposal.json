@@ -1,0 +1,60 @@
+{
+  "status": "DEFERRED_NO_NEW_COST_AUTHORIZED",
+  "project": "lastro-hml",
+  "database": "(default)",
+  "current": {
+    "pointInTimeRecoveryEnablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+    "deleteProtectionState": "DELETE_PROTECTION_DISABLED",
+    "versionRetentionPeriod": "3600s",
+    "backupSchedules": []
+  },
+  "futureIndividualChanges": [
+    {
+      "id": "delete-protection",
+      "proposed": "DELETE_PROTECTION_ENABLED",
+      "reason": "Evitar exclusão acidental do banco.",
+      "risk": "Bloqueia exclusão administrativa; não recupera documentos removidos.",
+      "rollback": "Desabilitar apenas com aprovação específica. Não excluir banco."
+    },
+    {
+      "id": "pitr",
+      "proposed": "POINT_IN_TIME_RECOVERY_ENABLED",
+      "retentionDays": 7,
+      "reason": "Recuperar estado em minuto disponível desde earliestVersionTime.",
+      "risk": "Armazenamento faturável, sem franquia gratuita; não retroativo.",
+      "rollback": "Desabilitar somente após aceitar perda da janela. Cobrança mínima de até um dia pode persistir."
+    },
+    {
+      "id": "daily-backup",
+      "proposed": { "recurrence": "daily", "retention": "7d" },
+      "reason": "RPO diário independente do PITR.",
+      "risk": "Snapshots faturáveis; retenção elimina automaticamente cópias expiradas, exigindo aceite explícito.",
+      "rollback": "Suspender agendamento futuro conforme API; preservar cópias existentes até retenção aprovada."
+    },
+    {
+      "id": "weekly-backup",
+      "proposed": {
+        "recurrence": "weekly",
+        "dayOfWeek": "SUNDAY",
+        "retention": "35d"
+      },
+      "reason": "Janela adicional de recuperação.",
+      "risk": "Snapshots faturáveis adicionais e expiração automática.",
+      "rollback": "Suspender agendamento futuro sem apagar manualmente cópias existentes."
+    },
+    {
+      "id": "restore-drill",
+      "proposed": "Restaurar um backup específico em NOVO banco isolado, mesma região, sem clientes comerciais.",
+      "reason": "Medir RTO e validar contagens, isolamento, ledger, índices e acesso antes do aceite.",
+      "risk": "Restore, armazenamento e uso do banco adicional são faturáveis, sem franquia de banco gratuito.",
+      "rollback": "Manter banco ativo original. Nenhuma exclusão de banco de ensaio está autorizada; definir retenção e encerramento em aprovação própria."
+    }
+  ],
+  "targetsNotYetMeasured": {
+    "pitrRpo": "1 minuto elegível",
+    "backupRpo": "24 horas",
+    "restoreRto": "4 horas"
+  },
+  "costModel": "D GiB médios: PITR ~D GiB-mês; até 7 cópias diárias + 5 semanais ~12D GiB retidos; restauração cobra D GiB mais armazenamento/uso do banco isolado. Confirmar SKUs BRL de southamerica-east1 antes de qualquer ativação.",
+  "guard": "Nenhum agendamento, PITR, backup, restauração, export pago ou banco adicional deve ser criado nesta fase. Créditos de teste não tornam esses recursos gratuitos."
+}

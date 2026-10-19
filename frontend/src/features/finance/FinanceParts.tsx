@@ -88,8 +88,7 @@ export function MetricStrip({ children }: { children: ReactNode[] }) {
           style={[
             compact ? styles.cellCompact : styles.cell,
             !compact && i > 0 && styles.cellDivider,
-            compact && i % 2 === 1 && styles.cellDivider,
-            compact && i > 1 && styles.cellTop,
+            compact && i > 0 && styles.cellTop,
           ]}
         >
           {child}
@@ -177,7 +176,7 @@ const styles = StyleSheet.create({
   },
   stripCompact: { flexWrap: 'wrap' },
   cell: { flex: 1, paddingVertical: space[4], paddingHorizontal: space[5], minWidth: 0 },
-  cellCompact: { width: '50%', paddingVertical: space[3], paddingHorizontal: space[4] },
+  cellCompact: { width: '100%', paddingVertical: space[3], paddingHorizontal: space[4] },
   cellDivider: { borderLeftWidth: 1, borderLeftColor: color.border },
   cellTop: { borderTopWidth: 1, borderTopColor: color.border },
   rowLink: { borderRadius: 8, marginHorizontal: -space[2], paddingHorizontal: space[2] },

@@ -28,5 +28,5 @@ describe('F06: artefato isolado de assets de desenvolvimento', () => {
     } finally {
       await rm(root, { recursive: true, force: true });
     }
-  });
+  }, 35_000); // Two child processes each retain their 15-second timeout; allow package copy and parallel test load.
 });

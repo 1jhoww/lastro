@@ -1,0 +1,396 @@
+{
+  "stage": "after",
+  "browser": "155.0.8059.80",
+  "observations": [
+    {
+      "profile": "desktop",
+      "run": 0,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 445.52260000000024,
+      "lcp": 392,
+      "longTasks": [
+        101,
+        55
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 372
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 372
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 72.90000000002328
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 2.599999999976717
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 4.600000000093132
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 9.20000000006985
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 13
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 16.5
+        }
+      ],
+      "heapBytes": 15706113
+    },
+    {
+      "profile": "desktop",
+      "run": 1,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 331.40390000000025,
+      "lcp": 332,
+      "longTasks": [
+        107,
+        55
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 292
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 292
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 9.600000000093132
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 1.8000000000465661
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 1.7000000000698492
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 3.200000000069849
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 3.300000000046566
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 4.099999999976717
+        }
+      ],
+      "heapBytes": 15770738
+    },
+    {
+      "profile": "desktop",
+      "run": 2,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 309.8833999999997,
+      "lcp": 316,
+      "longTasks": [
+        100,
+        54
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 276
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 276
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 8.800000000046566
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 1.2000000000698492
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 1.2999999999301508
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 2.400000000023283
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 2.400000000023283
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 2.900000000023283
+        }
+      ],
+      "heapBytes": 15787017
+    },
+    {
+      "profile": "mobile",
+      "run": 0,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 10889.711100000002,
+      "lcp": 10728,
+      "longTasks": [
+        2445,
+        79,
+        915,
+        58,
+        68,
+        170
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 10540
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 10540
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 3909.6999999999534
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 169.59999999997672
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 2451
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 2513.0999999999767
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 2509.0999999999767
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 2513.9000000000233
+        }
+      ],
+      "heapBytes": 15882697
+    },
+    {
+      "profile": "mobile",
+      "run": 1,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 7956.156900000002,
+      "lcp": 7808,
+      "longTasks": [
+        561,
+        285,
+        152
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 7640
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 7640
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 3892
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 169.40000000002328
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 2434.70000000007
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 2493.4000000000233
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 2508.5
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 2507.29999999993
+        }
+      ],
+      "heapBytes": 15835928
+    },
+    {
+      "profile": "mobile",
+      "run": 2,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 7993.976899999998,
+      "lcp": 7860,
+      "longTasks": [
+        565,
+        305,
+        156
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 7684
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 7684
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 3900.6999999999534
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 169.90000000002328
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 2447.29999999993
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 2507.8000000000466
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 2506.5999999999767
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 2520.29999999993
+        }
+      ],
+      "heapBytes": 15787016
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "completedAt": "2026-10-18T23:32:24.549Z",
+  "node": "v24.22.0",
+  "localOnly": true,
+  "backendUnit": {
+    "files": 25,
+    "passed": 326,
+    "failed": 0
+  },
+  "backendTargeted": {
+    "files": 3,
+    "passed": 27,
+    "failed": 0
+  },
+  "frontendUnit": {
+    "suites": 50,
+    "passed": 616,
+    "failed": 0
+  },
+  "dependencyCompatibility": {
+    "main": 6,
+    "cleanInstall": 6,
+    "failed": 0
+  },
+  "integration": {
+    "files": 51,
+    "passed": 494,
+    "failed": 0
+  },
+  "checks": {
+    "typecheck": "passed-both",
+    "lint": "passed-both",
+    "backendBuild": "passed-windows-assets-pdf-sharp",
+    "webExport": "passed",
+    "androidExport": "passed-not-device",
+    "cleanInstallWebExport": "passed",
+    "openapiAndGeneratedTypes": "matched",
+    "secretSignatures": "no-findings",
+    "historicalPhase9Evidence": "restored-byte-for-byte"
+  },
+  "web": {
+    "finalSha256": "F71D8F24057DB055FD12C1BBFB11BBDD92B2F269B1FF57A63DF70D9CD9B25E75",
+    "cleanInstallSha256": "5240EF97F3ABD027416460A56C35DB43A11EC28C0284F91FC6872EE26EB396AF",
+    "browserSmokeBundleMatchesFinal": true,
+    "binaryIdenticalAcrossCleanInstall": false
+  },
+  "pending": [
+    "Linux container/digest",
+    "native device",
+    "remaining three dependency advisories",
+    "all remote configuration and synthetic tests",
+    "credit balance/expiry/currency confirmation"
+  ],
+  "remoteChanges": [],
+  "paidResourcesCreated": []
+}

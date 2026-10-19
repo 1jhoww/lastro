@@ -1,0 +1,43 @@
+{
+  "annotations": {
+    "run.googleapis.com/client-name": "gcloud",
+    "run.googleapis.com/build-source-location": "{\"lastro-api-hml-1\":\"gs://run-sources-lastro-hml-southamerica-east1/services/lastro-api-hml/1792178731.134905-490c4ca69e6145be8c5442418b89f3cd.zip#1792178728274298\"}",
+    "run.googleapis.com/client-version": "580.0.0",
+    "autoscaling.knative.dev/maxScale": "2"
+  },
+  "createdAt": "2026-10-16T19:27:32.911887Z",
+  "name": "lastro-api-hml-00003-jjc",
+  "conditions": [
+    {
+      "lastTransitionTime": "2026-10-16T19:27:45.81473Z",
+      "message": "Deploying revision succeeded in 12.9s.",
+      "status": "True",
+      "type": "Ready"
+    },
+    {
+      "lastTransitionTime": "2026-10-16T19:27:45.968776Z",
+      "severity": "Info",
+      "status": "True",
+      "type": "Active"
+    },
+    {
+      "lastTransitionTime": "2026-10-16T19:27:45.770768Z",
+      "message": "Containers became healthy in 4.2s.",
+      "status": "True",
+      "type": "ContainerHealthy"
+    },
+    {
+      "lastTransitionTime": "2026-10-16T19:27:39.382958Z",
+      "message": "Container image import completed in 5.87s.",
+      "status": "True",
+      "type": "ContainerReady"
+    },
+    {
+      "lastTransitionTime": "2026-10-16T19:27:41.065763Z",
+      "message": "Provisioning imported containers completed in 1.68s. Checking container health. This will wait for up to 4m for the configured startup probe, including an initial delay of 0s.",
+      "status": "True",
+      "type": "ResourcesAvailable"
+    }
+  ],
+  "imageDigest": "southamerica-east1-docker.pkg.dev/lastro-hml/cloud-run-source-deploy/lastro-api-hml@sha256:a1529f7a0f32f86927ee0a916a3ce618017a67cf14cb2d7bdf8a3db3466a14a7"
+}

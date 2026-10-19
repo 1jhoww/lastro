@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-18T22:37:11.092Z",
+  "target": "production environment in homologation project lastro-hml; preview values not read",
+  "schemaConfigAccepted": true,
+  "computedAuthDomainUrlValid": true,
+  "variables": {
+    "EXPO_PUBLIC_API_URL": {
+      "present": true,
+      "leadingBom": true,
+      "canonicalRawHttps": false,
+      "zodUrlValid": true,
+      "normalizedByZod": true
+    },
+    "EXPO_PUBLIC_FIREBASE_API_KEY": {
+      "present": true,
+      "leadingBom": false,
+      "expectedApiKeyFormat": true
+    },
+    "EXPO_PUBLIC_FIREBASE_PROJECT_ID": {
+      "present": true,
+      "leadingBom": true,
+      "exactProjectId": false
+    },
+    "EXPO_PUBLIC_WEB_BASE_URL": {
+      "present": true,
+      "leadingBom": true,
+      "canonicalRawHttps": false,
+      "zodUrlValid": true,
+      "normalizedByZod": true
+    }
+  }
+}

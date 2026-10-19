@@ -1,0 +1,393 @@
+{
+  "stage": "before",
+  "browser": "155.0.8059.80",
+  "observations": [
+    {
+      "profile": "desktop",
+      "run": 0,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 394.8182000000006,
+      "lcp": 404,
+      "longTasks": [
+        97,
+        51
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 380
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 380
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-683686475051eb4a757307567265e81d.js",
+          "transferSize": 745319,
+          "decodedBodySize": 3094666,
+          "duration": 73.29999999998836
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 2.5
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 11.200000000011642
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 21.899999999965075
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 31.400000000023283
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 41.399999999965075
+        }
+      ],
+      "heapBytes": 15765161
+    },
+    {
+      "profile": "desktop",
+      "run": 1,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 299.0457000000006,
+      "lcp": 304,
+      "longTasks": [
+        100,
+        51
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 268
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 268
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-683686475051eb4a757307567265e81d.js",
+          "transferSize": 745319,
+          "decodedBodySize": 3094666,
+          "duration": 24
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 1.2999999999883585
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 2.3999999999650754
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 3.800000000046566
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 4.899999999965075
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 6
+        }
+      ],
+      "heapBytes": 15743589
+    },
+    {
+      "profile": "desktop",
+      "run": 2,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 286.34360000000015,
+      "lcp": 292,
+      "longTasks": [
+        96,
+        51
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 260
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 260
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-683686475051eb4a757307567265e81d.js",
+          "transferSize": 745319,
+          "decodedBodySize": 3094666,
+          "duration": 8.399999999965075
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 1.400000000023283
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 13.700000000011642
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 2.900000000023283
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 4.399999999965075
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 5.2999999999883585
+        }
+      ],
+      "heapBytes": 15778760
+    },
+    {
+      "profile": "mobile",
+      "run": 0,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 8947.732,
+      "lcp": 8844,
+      "longTasks": [
+        520,
+        270,
+        142
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 8684
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 8684
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-683686475051eb4a757307567265e81d.js",
+          "transferSize": 745319,
+          "decodedBodySize": 3094666,
+          "duration": 3921.4000000000233
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 171.70000000001164
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 3508.100000000035
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 3567.2000000000116
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 3582.4000000000233
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 3581.2999999999884
+        }
+      ],
+      "heapBytes": 16414171
+    },
+    {
+      "profile": "mobile",
+      "run": 1,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 8923.6015,
+      "lcp": 8812,
+      "longTasks": [
+        541,
+        276,
+        147
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 8648
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 8648
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-683686475051eb4a757307567265e81d.js",
+          "transferSize": 745319,
+          "decodedBodySize": 3094666,
+          "duration": 3889.2000000000116
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 171.09999999997672
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 3491.9000000000233
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 3552.399999999965
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 3566.7000000000116
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 3580.7000000000116
+        }
+      ],
+      "heapBytes": 16436991
+    },
+    {
+      "profile": "mobile",
+      "run": 2,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 9075.492100000003,
+      "lcp": 8948,
+      "longTasks": [
+        547,
+        333,
+        145
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 8784
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 8784
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-683686475051eb4a757307567265e81d.js",
+          "transferSize": 745319,
+          "decodedBodySize": 3094666,
+          "duration": 3905.2999999999884
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 169.5
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 3502
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 3562.899999999965
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 3577.7000000000116
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 3591.2999999999884
+        }
+      ],
+      "heapBytes": 15861990
+    }
+  ]
+}

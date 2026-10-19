@@ -1,4 +1,5 @@
 import { Router, raw, type Request, type RequestHandler } from 'express';
+import { tracked } from './lifecycle.js';
 import { z } from 'zod';
 import type { AccessService } from '../modules/auth/accessService.js';
 import type { UserService } from '../modules/users/userService.js';
@@ -1033,51 +1034,55 @@ export function createRoutes(
     if (definition.downloadType) middleware.push(downloadRateLimit(users.repo));
     const handler = handlers[definition.operationId];
     if (!handler) throw new Error('Rota sem implementação');
-    router[definition.method](definition.path, ...middleware, async (req, res) => {
-      (definition.query ?? s.empty).parse(req.query);
-      (definition.params ?? s.empty).parse(req.params);
-      if (definition.body) definition.body.parse(req.body);
-      else if (!definition.rawImage && req.body !== undefined) s.empty.parse(req.body);
-      const result = await handler(req);
-      // Deadline/disconnect does not cancel a financial commit or invalidate its replay record.
-      if (res.writableEnded || res.destroyed) return;
-      if (definition.downloadType) {
-        const download = result as Download;
-        if (
-          !Buffer.isBuffer(download.bytes) ||
-          !/^[a-zA-Z0-9_-]+\.(pdf|csv)$/.test(download.filename)
-        )
-          throw new AppError(500, 'INTERNAL_ERROR', 'Erro interno do servidor');
-        res
-          .type(definition.downloadType)
-          .set('Cache-Control', 'private, no-store')
-          .set('Content-Disposition', `attachment; filename="${download.filename}"`)
-          .set('X-Content-Type-Options', 'nosniff');
-        if (download.nextCursor) res.set('X-Next-Cursor', download.nextCursor);
-        if (download.rowCount !== undefined)
-          res.set('X-Export-Row-Count', String(download.rowCount));
-        res.send(download.bytes);
-        return;
-      }
-      if (definition.binaryOutput) {
-        if (!Buffer.isBuffer(result))
-          throw new AppError(500, 'INTERNAL_ERROR', 'Erro interno do servidor');
-        res
-          .type('image/webp')
-          .set('Cache-Control', 'private, no-store')
-          .set('Content-Disposition', 'inline; filename="product.webp"')
-          .send(result);
-        return;
-      }
-      const data = definition.output.parse(result);
-      const status = definition.executionResponse
-        ? executionSchemas.executionView.parse(data).financialCompleted ||
-          executionSchemas.executionView.parse(data).status === 'ABORTED'
-          ? 200
-          : 202
-        : (definition.status ?? 200);
-      res.status(status).json({ data, requestId: req.requestId });
-    });
+    router[definition.method](
+      definition.path,
+      ...middleware.map(tracked),
+      tracked(async (req, res) => {
+        (definition.query ?? s.empty).parse(req.query);
+        (definition.params ?? s.empty).parse(req.params);
+        if (definition.body) definition.body.parse(req.body);
+        else if (!definition.rawImage && req.body !== undefined) s.empty.parse(req.body);
+        const result = await handler(req);
+        // Deadline/disconnect does not cancel a financial commit or invalidate its replay record.
+        if (res.writableEnded || res.destroyed) return;
+        if (definition.downloadType) {
+          const download = result as Download;
+          if (
+            !Buffer.isBuffer(download.bytes) ||
+            !/^[a-zA-Z0-9_-]+\.(pdf|csv)$/.test(download.filename)
+          )
+            throw new AppError(500, 'INTERNAL_ERROR', 'Erro interno do servidor');
+          res
+            .type(definition.downloadType)
+            .set('Cache-Control', 'private, no-store')
+            .set('Content-Disposition', `attachment; filename="${download.filename}"`)
+            .set('X-Content-Type-Options', 'nosniff');
+          if (download.nextCursor) res.set('X-Next-Cursor', download.nextCursor);
+          if (download.rowCount !== undefined)
+            res.set('X-Export-Row-Count', String(download.rowCount));
+          res.send(download.bytes);
+          return;
+        }
+        if (definition.binaryOutput) {
+          if (!Buffer.isBuffer(result))
+            throw new AppError(500, 'INTERNAL_ERROR', 'Erro interno do servidor');
+          res
+            .type('image/webp')
+            .set('Cache-Control', 'private, no-store')
+            .set('Content-Disposition', 'inline; filename="product.webp"')
+            .send(result);
+          return;
+        }
+        const data = definition.output.parse(result);
+        const status = definition.executionResponse
+          ? executionSchemas.executionView.parse(data).financialCompleted ||
+            executionSchemas.executionView.parse(data).status === 'ABORTED'
+            ? 200
+            : 202
+          : (definition.status ?? 200);
+        res.status(status).json({ data, requestId: req.requestId });
+      }),
+    );
   }
   return router;
 }

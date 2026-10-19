@@ -1,0 +1,3655 @@
+{
+  "project": "lastro-hml",
+  "database": "(default)",
+  "checkedAt": "2026-10-18T22:20:47.303Z",
+  "remoteSnapshotAt": "2026-10-18T22:20:45.686Z",
+  "declared": 150,
+  "remote": 134,
+  "missing": 16,
+  "inventory": [
+    {
+      "position": 1,
+      "collectionGroup": "financialActiveSources",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "orderId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "generationId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "kind",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "titleId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sourceTime",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sourceId",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/financialActiveSources/indexes/CICAgOjXh4EK"
+    },
+    {
+      "position": 2,
+      "collectionGroup": "financialExecutionSourcePlans",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "executionId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "collection",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "linePosition",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionSourcePlans/indexes/CICAgJiUpoMK"
+    },
+    {
+      "position": 3,
+      "collectionGroup": "financialExecutionLotPlans",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "executionId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sourceId",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionLotPlans/indexes/CICAgOi3kJAK"
+    },
+    {
+      "position": 4,
+      "collectionGroup": "financialExecutionStockPlans",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "executionId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "position",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionStockPlans/indexes/CICAgJiUsZIK"
+    },
+    {
+      "position": 5,
+      "collectionGroup": "financialProofEntries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "executionId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "position",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofEntries/indexes/CICAgJim14AK"
+    },
+    {
+      "position": 6,
+      "collectionGroup": "financialProofChunks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "executionId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "position",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofChunks/indexes/CICAgJjF9oIK"
+    },
+    {
+      "position": 7,
+      "collectionGroup": "financialExecutions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "orderId",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutions/indexes/CICAgJiUsZIJ"
+    },
+    {
+      "position": 8,
+      "collectionGroup": "returnEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "returnId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "schemaVersion",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sequence",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/returnEvents/indexes/CICAgJim14AJ"
+    },
+    {
+      "position": 9,
+      "collectionGroup": "invitations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "expiresAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/invitations/indexes/CICAgJj7z4EK"
+    },
+    {
+      "position": 10,
+      "collectionGroup": "memberships",
+      "queryScope": "COLLECTION_GROUP",
+      "fields": [
+        {
+          "fieldPath": "uid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/memberships/indexes/CICAgOjXh4EJ"
+    },
+    {
+      "position": 11,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUpoMJ"
+    },
+    {
+      "position": 12,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgOi3kJAJ"
+    },
+    {
+      "position": 13,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgOjXh4EL"
+    },
+    {
+      "position": 14,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJj7z4EJ"
+    },
+    {
+      "position": 15,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "assignedTo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJjF9oIJ"
+    },
+    {
+      "position": 16,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "assignedTo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUsZIL"
+    },
+    {
+      "position": 17,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "assignedTo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgOi3kJAL"
+    },
+    {
+      "position": 18,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "assignedTo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJjF9oIL"
+    },
+    {
+      "position": 19,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "assignedTo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUsdII"
+    },
+    {
+      "position": 20,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "assignedTo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUpoML"
+    },
+    {
+      "position": 21,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "assignedTo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUpsMI"
+    },
+    {
+      "position": 22,
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "assignedTo",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgOjXh8EI"
+    },
+    {
+      "position": 23,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim14AL"
+    },
+    {
+      "position": 24,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim18AI"
+    },
+    {
+      "position": 25,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh8EK"
+    },
+    {
+      "position": 26,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kNAI"
+    },
+    {
+      "position": 27,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9sII"
+    },
+    {
+      "position": 28,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z4EL"
+    },
+    {
+      "position": 29,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kNAK"
+    },
+    {
+      "position": 30,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsdIK"
+    },
+    {
+      "position": 31,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpsMK"
+    },
+    {
+      "position": 32,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9sIK"
+    },
+    {
+      "position": 33,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsdIJ"
+    },
+    {
+      "position": 34,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpsMJ"
+    },
+    {
+      "position": 35,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh8EJ"
+    },
+    {
+      "position": 36,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh8EL"
+    },
+    {
+      "position": 37,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z8EI"
+    },
+    {
+      "position": 38,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kNAJ"
+    },
+    {
+      "position": 39,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9sIJ"
+    },
+    {
+      "position": 40,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim18AK"
+    },
+    {
+      "position": 41,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kNAL"
+    },
+    {
+      "position": 42,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsdIL"
+    },
+    {
+      "position": 43,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpsML"
+    },
+    {
+      "position": 44,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpqMI"
+    },
+    {
+      "position": 45,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsbII"
+    },
+    {
+      "position": 46,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9sIL"
+    },
+    {
+      "position": 47,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim18AJ"
+    },
+    {
+      "position": 48,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh6EI"
+    },
+    {
+      "position": 49,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh6EK"
+    },
+    {
+      "position": 50,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kLAI"
+    },
+    {
+      "position": 51,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z8EK"
+    },
+    {
+      "position": 52,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim18AL"
+    },
+    {
+      "position": 53,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9qII"
+    },
+    {
+      "position": 54,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsbIK"
+    },
+    {
+      "position": 55,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kLAK"
+    },
+    {
+      "position": 56,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z8EJ"
+    },
+    {
+      "position": 57,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpqMK"
+    },
+    {
+      "position": 58,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpqMJ"
+    },
+    {
+      "position": 59,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsbIJ"
+    },
+    {
+      "position": 60,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh6EJ"
+    },
+    {
+      "position": 61,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh6EL"
+    },
+    {
+      "position": 62,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9qIK"
+    },
+    {
+      "position": 63,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim16AI"
+    },
+    {
+      "position": 64,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kLAJ"
+    },
+    {
+      "position": 65,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpqML"
+    },
+    {
+      "position": 66,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim16AK"
+    },
+    {
+      "position": 67,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kLAL"
+    },
+    {
+      "position": 68,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsbIL"
+    },
+    {
+      "position": 69,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9qIJ"
+    },
+    {
+      "position": 70,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpuMI"
+    },
+    {
+      "position": 71,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z8EL"
+    },
+    {
+      "position": 72,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh-EI"
+    },
+    {
+      "position": 73,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsfII"
+    },
+    {
+      "position": 74,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z6EI"
+    },
+    {
+      "position": 75,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh-EK"
+    },
+    {
+      "position": 76,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kPAI"
+    },
+    {
+      "position": 77,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim16AJ"
+    },
+    {
+      "position": 78,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9qIL"
+    },
+    {
+      "position": 79,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpuMK"
+    },
+    {
+      "position": 80,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim16AL"
+    },
+    {
+      "position": 81,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kPAK"
+    },
+    {
+      "position": 82,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sku",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpuMJ"
+    },
+    {
+      "position": 83,
+      "collectionGroup": "categories",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/categories/indexes/CICAgJjF9uII"
+    },
+    {
+      "position": 84,
+      "collectionGroup": "categories",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/categories/indexes/CICAgJiUsfIK"
+    },
+    {
+      "position": 85,
+      "collectionGroup": "categories",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/categories/indexes/CICAgJj7z6EK"
+    },
+    {
+      "position": 86,
+      "collectionGroup": "categories",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/categories/indexes/CICAgOjXh-EJ"
+    },
+    {
+      "position": 87,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOjXh-EL"
+    },
+    {
+      "position": 88,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOi3kPAJ"
+    },
+    {
+      "position": 89,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "shortfallScaled",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJiUsfIJ"
+    },
+    {
+      "position": 90,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "shortfallScaled",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJj7z6EJ"
+    },
+    {
+      "position": 91,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJim1-AI"
+    },
+    {
+      "position": 92,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJjF9uIK"
+    },
+    {
+      "position": 93,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "shortfallScaled",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJiUpuML"
+    },
+    {
+      "position": 94,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "shortfallScaled",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJim1-AK"
+    },
+    {
+      "position": 95,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOi3kPAL"
+    },
+    {
+      "position": 96,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJiUppMI"
+    },
+    {
+      "position": 97,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "shortfallScaled",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJjF9uIJ"
+    },
+    {
+      "position": 98,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "shortfallScaled",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOjXh5EI"
+    },
+    {
+      "position": 99,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOjXh5EK"
+    },
+    {
+      "position": 100,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJiUsfIL"
+    },
+    {
+      "position": 101,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "shortfallScaled",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJj7z6EL"
+    },
+    {
+      "position": 102,
+      "collectionGroup": "inventory",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belowMinimum",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "shortfallScaled",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJjF9uIL"
+    },
+    {
+      "position": 103,
+      "collectionGroup": "inventoryMovements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "productId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJiUsYoI"
+    },
+    {
+      "position": 104,
+      "collectionGroup": "inventoryMovements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "productId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJj7z-EI"
+    },
+    {
+      "position": 105,
+      "collectionGroup": "inventoryMovements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJim1-AJ"
+    },
+    {
+      "position": 106,
+      "collectionGroup": "inventoryMovements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJiUppMK"
+    },
+    {
+      "position": 107,
+      "collectionGroup": "inventoryMovements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "productId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJiUppMJ"
+    },
+    {
+      "position": 108,
+      "collectionGroup": "inventoryMovements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "productId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgOi3kIgI"
+    },
+    {
+      "position": 109,
+      "collectionGroup": "inventoryMovements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "productId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sequence",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJiUsYoK"
+    },
+    {
+      "position": 110,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sellerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUsYoJ"
+    },
+    {
+      "position": 111,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sellerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUppML"
+    },
+    {
+      "position": 112,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJjF9pII"
+    },
+    {
+      "position": 113,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgOi3kIgK"
+    },
+    {
+      "position": 114,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUptMI"
+    },
+    {
+      "position": 115,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJim1-AL"
+    },
+    {
+      "position": 116,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sellerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJj7z-EK"
+    },
+    {
+      "position": 117,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sellerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgOjXh5EJ"
+    },
+    {
+      "position": 118,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sellerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgOjXh5EL"
+    },
+    {
+      "position": 119,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sellerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJjF9pIK"
+    },
+    {
+      "position": 120,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJim15AI"
+    },
+    {
+      "position": 121,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUptMK"
+    },
+    {
+      "position": 122,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sellerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgOi3kIgJ"
+    },
+    {
+      "position": 123,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "sellerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUsYoL"
+    },
+    {
+      "position": 124,
+      "collectionGroup": "orderEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "orderId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "version",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/orderEvents/indexes/CICAgJiUscoI"
+    },
+    {
+      "position": 125,
+      "collectionGroup": "paymentConditions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/paymentConditions/indexes/CICAgOi3kIgL"
+    },
+    {
+      "position": 126,
+      "collectionGroup": "paymentMethods",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/paymentMethods/indexes/CICAgJjF9pIJ"
+    },
+    {
+      "position": 127,
+      "collectionGroup": "receivables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "orderId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/receivables/indexes/CICAgJj7z-EJ"
+    },
+    {
+      "position": 128,
+      "collectionGroup": "financialEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "orderId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "sequence",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/financialEvents/indexes/CICAgJiUptMJ"
+    },
+    {
+      "position": 129,
+      "collectionGroup": "creditApplications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "orderId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/creditApplications/indexes/CICAgJim15AK"
+    },
+    {
+      "position": 130,
+      "collectionGroup": "payments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "orderId",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/payments/indexes/CICAgOjXh9EI"
+    },
+    {
+      "position": 131,
+      "collectionGroup": "creditApplications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "orderId",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/creditApplications/indexes/CICAgOjXh9EK"
+    },
+    {
+      "position": 132,
+      "collectionGroup": "refundObligations",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "orderId",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/refundObligations/indexes/CICAgJim15AJ"
+    },
+    {
+      "position": 133,
+      "collectionGroup": "creditLots",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "originOrderId",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/creditLots/indexes/CICAgJiUptML"
+    },
+    {
+      "position": 134,
+      "collectionGroup": "products",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "catalogVisible",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "READY",
+      "remoteName": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z-EL"
+    },
+    {
+      "position": 135,
+      "collectionGroup": "auditLogs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "resourceId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 136,
+      "collectionGroup": "billingCharges",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 137,
+      "collectionGroup": "billingCharges",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tenantId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 138,
+      "collectionGroup": "billingCharges",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tenantId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 139,
+      "collectionGroup": "billingCharges",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 140,
+      "collectionGroup": "billingCharges",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tenantId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 141,
+      "collectionGroup": "billingCharges",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "tenantId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "DESCENDING"
+        },
+        {
+          "fieldPath": "__name__",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 142,
+      "collectionGroup": "billingCharges",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "paidAt",
+          "order": "ASCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 143,
+      "collectionGroup": "visits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "visitDate",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 144,
+      "collectionGroup": "visits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "responsibleUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "visitDate",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 145,
+      "collectionGroup": "visits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsibleUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "visitDate",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 146,
+      "collectionGroup": "visits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "source",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "visitDate",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 147,
+      "collectionGroup": "visits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "source",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "visitDate",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 148,
+      "collectionGroup": "visits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "responsibleUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "source",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "visitDate",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 149,
+      "collectionGroup": "visits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "responsibleUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "source",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "visitDate",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    },
+    {
+      "position": 150,
+      "collectionGroup": "orders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "confirmedAt",
+          "order": "DESCENDING"
+        }
+      ],
+      "remoteState": "MISSING",
+      "remoteName": null
+    }
+  ],
+  "fieldInventory": [
+    {
+      "collectionGroup": "financialExecutions",
+      "fieldPath": "baseline",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutions",
+      "fieldPath": "checkpoint",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutions",
+      "fieldPath": "result",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionPlans",
+      "fieldPath": "returnInfo",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionPlans",
+      "fieldPath": "afterTitles",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionPlans",
+      "fieldPath": "afterState",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionPlans",
+      "fieldPath": "generation",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionSourcePlans",
+      "fieldPath": "before",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionSourcePlans",
+      "fieldPath": "after",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionSourcePlans",
+      "fieldPath": "entry",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionSourcePlans",
+      "fieldPath": "lineBefore",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionSourcePlans",
+      "fieldPath": "lineAfter",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionLotPlans",
+      "fieldPath": "entry",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialProofEntries",
+      "fieldPath": "before",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialProofEntries",
+      "fieldPath": "after",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialProofEntries",
+      "fieldPath": "lineBefore",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialProofEntries",
+      "fieldPath": "lineAfter",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialProofChunks",
+      "fieldPath": "entry",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialProofChunks",
+      "fieldPath": "siblings",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialExecutionSteps",
+      "fieldPath": "result",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "invitations",
+      "fieldPath": "tokenHash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "auditLogs",
+      "fieldPath": "changes",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "idempotencyRecords",
+      "fieldPath": "result",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "customers",
+      "fieldPath": "notes",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "customers",
+      "fieldPath": "address",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "customers",
+      "fieldPath": "document",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "customers",
+      "fieldPath": "email",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "customers",
+      "fieldPath": "phone",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "customers",
+      "fieldPath": "tradeName",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "products",
+      "fieldPath": "description",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "products",
+      "fieldPath": "image",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "categories",
+      "fieldPath": "description",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "inventoryMovements",
+      "fieldPath": "reason",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "inventoryMovements",
+      "fieldPath": "notes",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "inventoryMovements",
+      "fieldPath": "hash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "inventoryMovements",
+      "fieldPath": "previousHash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "stockOperations",
+      "fieldPath": "stockAfter",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "stockOperations",
+      "fieldPath": "payloadHash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orders",
+      "fieldPath": "lines",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orders",
+      "fieldPath": "installments",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orders",
+      "fieldPath": "notes",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orders",
+      "fieldPath": "discount",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orders",
+      "fieldPath": "payment",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orders",
+      "fieldPath": "customerName",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orderOperations",
+      "fieldPath": "result",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orderOperations",
+      "fieldPath": "payloadHash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orderEvents",
+      "fieldPath": "reason",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orders",
+      "fieldPath": "paymentTerms",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "orders",
+      "fieldPath": "intendedPaymentMethod",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "paymentConditions",
+      "fieldPath": "schedule",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "paymentConditions",
+      "fieldPath": "description",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "paymentMethods",
+      "fieldPath": "description",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialOperations",
+      "fieldPath": "result",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialOperations",
+      "fieldPath": "payloadHash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialEvents",
+      "fieldPath": "before",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialEvents",
+      "fieldPath": "after",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialEvents",
+      "fieldPath": "references",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialEvents",
+      "fieldPath": "reason",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialEvents",
+      "fieldPath": "hash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "financialEvents",
+      "fieldPath": "previousHash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "payments",
+      "fieldPath": "allocations",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "payments",
+      "fieldPath": "method",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "payments",
+      "fieldPath": "reference",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "creditApplications",
+      "fieldPath": "allocations",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "refundConfirmations",
+      "fieldPath": "method",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "refundConfirmations",
+      "fieldPath": "reference",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "refundConfirmations",
+      "fieldPath": "reason",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returns",
+      "fieldPath": "lines",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returns",
+      "fieldPath": "reason",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returnEvents",
+      "fieldPath": "before",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returnEvents",
+      "fieldPath": "after",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returnEvents",
+      "fieldPath": "guards",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returnEvents",
+      "fieldPath": "reason",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returnEvents",
+      "fieldPath": "hash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returnEvents",
+      "fieldPath": "previousHash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returnReceipts",
+      "fieldPath": "lines",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "returnReceipts",
+      "fieldPath": "reason",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "catalogSettings",
+      "fieldPath": "description",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "catalogSettings",
+      "fieldPath": "whatsappNumber",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "catalogOperations",
+      "fieldPath": "result",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "catalogOperations",
+      "fieldPath": "payloadHash",
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "rateLimits",
+      "fieldPath": "expiresAt",
+      "ttl": true,
+      "indexes": [],
+      "remoteState": "MATCH",
+      "remoteTtl": {
+        "state": "ACTIVE"
+      }
+    },
+    {
+      "collectionGroup": "visits",
+      "fieldPath": "notes",
+      "indexes": [],
+      "remoteState": "MISSING",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "visits",
+      "fieldPath": "customerName",
+      "indexes": [],
+      "remoteState": "MISSING",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "visits",
+      "fieldPath": "payloadHash",
+      "indexes": [],
+      "remoteState": "MISSING",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "deliveries",
+      "fieldPath": "notes",
+      "indexes": [],
+      "remoteState": "MISSING",
+      "remoteTtl": null
+    },
+    {
+      "collectionGroup": "deliveries",
+      "fieldPath": "receivedBy",
+      "indexes": [],
+      "remoteState": "MISSING",
+      "remoteTtl": null
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "status": "DRAFT_NOT_APPLIED_COST_REVIEW_REQUIRED",
+  "project": "lastro-hml",
+  "region": "southamerica-east1",
+  "service": "lastro-api-hml",
+  "current": {
+    "revision": "lastro-api-hml-00003-jjc",
+    "timeoutSeconds": 60,
+    "applicationProcessingSeconds": 120,
+    "cpu": "1",
+    "memory": "1Gi",
+    "containerConcurrency": 40,
+    "serviceMaxInstances": 3,
+    "revisionMaxInstances": 2,
+    "startupProbe": {
+      "tcpSocket": { "port": 8080 },
+      "timeoutSeconds": 240,
+      "periodSeconds": 240,
+      "failureThreshold": 1
+    },
+    "livenessProbe": null,
+    "invitationSecretVersion": "latest"
+  },
+  "proposed": {
+    "timeoutSeconds": 130,
+    "applicationProcessingSeconds": 120,
+    "cpu": "1",
+    "memory": "1Gi",
+    "containerConcurrency": 40,
+    "serviceMaxInstances": 3,
+    "revisionMaxInstances": 2,
+    "minimumInstances": 0,
+    "startupProbe": {
+      "httpGet": { "path": "/health/live", "port": 8080 },
+      "initialDelaySeconds": 0,
+      "timeoutSeconds": 2,
+      "periodSeconds": 5,
+      "failureThreshold": 24
+    },
+    "livenessProbe": {
+      "httpGet": { "path": "/health/live", "port": 8080 },
+      "initialDelaySeconds": 0,
+      "timeoutSeconds": 2,
+      "periodSeconds": 10,
+      "failureThreshold": 3
+    },
+    "readiness": "Verificação manual antes de liberar tráfego em /health/ready; não usar Firestore em liveness.",
+    "invitationSecretVersion": "1",
+    "runtime": "Node 24.22.0, imagem Linux e digest ainda pendentes"
+  },
+  "risk": "Uma nova revisão, probes e requisições mais longas podem consumir créditos. Não garantem custo zero.",
+  "rollback": "Reaplicar snapshot de configuração anterior, ou tráfego na revisão 00003-jjc após comprovar compatibilidade de dados. Não rotacionar segredo nem apagar dados.",
+  "guard": "Não aplicar enquanto usuário exigir ausência de novo consumo faturável. Não habilitar CPU contínua, instâncias mínimas, novas instâncias ou deploy."
+}

@@ -1,0 +1,308 @@
+{
+  "browser": "155.0.8059.80",
+  "conditions": "Chrome desktop, 390 CSS px; no native keyboard or TalkBack",
+  "observations": [
+    {
+      "check": "login-focus-and-required-fields",
+      "focus": [
+        {
+          "tag": "INPUT",
+          "name": "E-mail",
+          "type": "email"
+        },
+        {
+          "tag": "INPUT",
+          "name": "Senha",
+          "type": "password"
+        },
+        {
+          "tag": "BUTTON",
+          "name": "Mostrar senha",
+          "type": "button"
+        },
+        {
+          "tag": "A",
+          "name": "Esqueci minha senha",
+          "type": null
+        },
+        {
+          "tag": "BUTTON",
+          "name": "Entrar",
+          "type": "button"
+        },
+        {
+          "tag": "BODY",
+          "name": "\n    \n    \n      You need to enable JavaScript to run this app.\n    \n    \n    lastroby heptaEntrarUse o e-mail do convite que você recebeu.E-mailSenhaEsqueci minha senhaEntrar\n  \n\n\n",
+          "type": null
+        }
+      ],
+      "invalidFields": 2,
+      "passed": true
+    },
+    {
+      "check": "rendered-form",
+      "route": "/clientes/novo",
+      "fields": [
+        {
+          "type": "text",
+          "label": "Nome ou razão social",
+          "labelledby": "_r_0_-label",
+          "inputmode": null
+        },
+        {
+          "type": "text",
+          "label": "Nome fantasia",
+          "labelledby": "_r_1_-label",
+          "inputmode": null
+        },
+        {
+          "type": "text",
+          "label": "CPF ou CNPJ",
+          "labelledby": "_r_2_-label",
+          "inputmode": null
+        },
+        {
+          "type": "tel",
+          "label": "Telefone ou WhatsApp",
+          "labelledby": "_r_3_-label",
+          "inputmode": "tel"
+        },
+        {
+          "type": "email",
+          "label": "E-mail",
+          "labelledby": "_r_4_-label",
+          "inputmode": "email"
+        },
+        {
+          "type": "text",
+          "label": "CEP",
+          "labelledby": "_r_6_-label",
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Logradouro",
+          "labelledby": "_r_7_-label",
+          "inputmode": null
+        },
+        {
+          "type": "text",
+          "label": "Número",
+          "labelledby": "_r_8_-label",
+          "inputmode": null
+        },
+        {
+          "type": "text",
+          "label": "Complemento",
+          "labelledby": "_r_9_-label",
+          "inputmode": null
+        },
+        {
+          "type": "text",
+          "label": "Bairro",
+          "labelledby": "_r_a_-label",
+          "inputmode": null
+        },
+        {
+          "type": "text",
+          "label": "Cidade",
+          "labelledby": "_r_b_-label",
+          "inputmode": null
+        }
+      ],
+      "buttons": [
+        "UF",
+        "Cancelar",
+        "Salvar cliente"
+      ],
+      "overflow": false
+    },
+    {
+      "check": "rendered-form",
+      "route": "/pedidos/novo",
+      "fields": [
+        {
+          "type": "search",
+          "label": "Cliente",
+          "labelledby": "_r_0_-label",
+          "inputmode": "search"
+        },
+        {
+          "type": "search",
+          "label": "Buscar produtos",
+          "labelledby": null,
+          "inputmode": "search"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Açúcar refinado 1 kg",
+          "labelledby": null,
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Água mineral sem gás 500 ml (caixa com 12)",
+          "labelledby": null,
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Arroz branco tipo 1 5 kg",
+          "labelledby": null,
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Café torrado e moído 500 g",
+          "labelledby": null,
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Desinfetante lavanda 2 L",
+          "labelledby": null,
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Detergente neutro 500 ml (caixa com 24)",
+          "labelledby": null,
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Feijão carioca 1 kg",
+          "labelledby": null,
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Óleo de soja 900 ml",
+          "labelledby": null,
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Queijo muçarela fatiado",
+          "labelledby": null,
+          "inputmode": "decimal"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Refrigerante cola 2 L (fardo com 6)",
+          "labelledby": null,
+          "inputmode": "numeric"
+        },
+        {
+          "type": "text",
+          "label": "Quantidade de Suco de uva integral 1 L",
+          "labelledby": null,
+          "inputmode": "numeric"
+        }
+      ],
+      "buttons": [
+        "Você",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "Definir depois",
+        "Não informar",
+        "Salvar rascunho",
+        "Confirmar pedido",
+        "Ver resumo"
+      ],
+      "overflow": false
+    },
+    {
+      "check": "rendered-form",
+      "route": "/meu-perfil",
+      "fields": [],
+      "buttons": [
+        "Editar nome",
+        "Alterar senha",
+        "Sair"
+      ],
+      "overflow": false
+    },
+    {
+      "check": "name-modal",
+      "invalidName": "true",
+      "modalFocus": [
+        {
+          "name": "Fechar",
+          "hiddenAncestor": false
+        },
+        {
+          "name": "Nome e sobrenome",
+          "hiddenAncestor": false
+        },
+        {
+          "name": "Cancelar",
+          "hiddenAncestor": false
+        },
+        {
+          "name": "Salvar",
+          "hiddenAncestor": false
+        },
+        {
+          "name": "Fechar",
+          "hiddenAncestor": false
+        },
+        {
+          "name": "Nome e sobrenome",
+          "hiddenAncestor": false
+        },
+        {
+          "name": "Cancelar",
+          "hiddenAncestor": false
+        },
+        {
+          "name": "Salvar",
+          "hiddenAncestor": false
+        }
+      ],
+      "escapeCloses": true,
+      "focusReturnsToEdit": true
+    },
+    {
+      "check": "woff2-fonts-loaded",
+      "fonts": [
+        {
+          "family": "Inter_400Regular",
+          "status": "loaded"
+        },
+        {
+          "family": "Inter_500Medium",
+          "status": "loaded"
+        },
+        {
+          "family": "Inter_600SemiBold",
+          "status": "loaded"
+        },
+        {
+          "family": "Inter_700Bold",
+          "status": "loaded"
+        }
+      ]
+    }
+  ]
+}

@@ -54,7 +54,7 @@ type Review = {
 
 /**
  * Formulário de entrada ou ajuste de UM produto (o saldo já carregado). Entradas usam a prévia
- * inline; ajustes exigem revisão antes do envio. Sucesso só aparece com a confirmação do
+ * inline; entradas e ajustes exigem revisão antes do envio. Sucesso só aparece com a confirmação do
  * servidor; resultado incerto trava o formulário até repetir com a mesma chave ou descartar.
  */
 export function MovementForm({ kind, stock }: { kind: MovementKind; stock: StockAdmin }) {
@@ -92,8 +92,7 @@ export function MovementForm({ kind, stock }: { kind: MovementKind; stock: Stock
         ? toEntryBody(stock.productId, v, unit)
         : toAdjustmentBody(stock.productId, v, unit, stock.version);
     record.reset();
-    if (kind === 'entry') send(body);
-    else setReview({ body, delta: d, preview });
+    setReview({ body, delta: d, preview });
   });
 
   const send = (body: StockEntryBody | StockAdjustmentBody) =>
@@ -243,7 +242,7 @@ export function MovementForm({ kind, stock }: { kind: MovementKind; stock: Stock
           <Button label="Cancelar" variant="ghost" disabled={busy} />
         </Link>
         <Button
-          label={kind === 'entry' ? text.confirm : text.review}
+          label={text.review}
           loading={busy}
           variant="strong"
           disabled={locked || Boolean(insufficient)}

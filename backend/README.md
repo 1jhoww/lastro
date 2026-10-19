@@ -4,7 +4,8 @@ Fundação REST com Express, TypeScript strict, Firebase Admin, Zod, OpenAPI 3.1
 
 ## Requisitos e instalação
 
-- Node.js LTS `>=22.23.3 <23`, com npm; Java 21 para Firestore Emulator. A versão de referência está em `.node-version`. Build e servidor recusam runtimes antigos ou de outra linha.
+- Node.js LTS `>=24.22.0 <25`, com npm; Java 21 para Firestore Emulator. A versão de referência está em `.node-version`. Build e servidor recusam runtimes antigos ou de outra linha.
+- O wrapper `scripts/npm.ps1` prioriza uma versão compatível no PATH e ignora a antiga cópia Node 22 em `.cache/runtime`. Pode usar o runtime oficial local da sessão de saneamento, sem alterar a instalação global.
 - Portas locais livres: 3000 (API), 8080 (Firestore), 9099 (Auth), 9199 (Storage), 4400/4500 e 9150 (processos auxiliares do Emulator Suite).
 - Execute tudo na pasta `backend`. Downloads de dependências são públicos; emulação não exige login no Firebase, ADC ou criação de projeto.
 
@@ -20,7 +21,7 @@ Configure `JAVA_HOME` para um JDK 21 instalado. O launcher preserva o PATH, mant
 
 ## Executar localmente
 
-`npm run build` empacota fontes/licença em `dist/assets`, verifica hashes e gera PDFs a partir dos módulos compilados. Execute o build antes da suíte unitária: um teste copia `dist` e valida os assets sem depender das fontes de desenvolvimento. `npm run check:artifact` repete o smoke test; `npm run check:openapi` confere contrato e tipos. O Dockerfile fixa Node 22.23.3, mas a imagem Linux ainda exige build e testes no ambiente autorizado.
+`npm run build` empacota fontes/licença em `dist/assets`, verifica hashes e gera PDFs a partir dos módulos compilados. Execute o build antes da suíte unitária: um teste copia `dist` e valida os assets sem depender das fontes de desenvolvimento. `npm run check:artifact` repete o smoke test; `npm run check:openapi` confere contrato e tipos. O Dockerfile fixa Node 24.22.0, mas a imagem Linux ainda exige build e testes no ambiente autorizado.
 
 Limites, retenção, migração local e pendências de infraestrutura de F03–F07 estão em [operação técnica](docs/operations-f03-f07.md). Essas configurações não foram implantadas. O launcher aceita `test --without-capacity` para dispensar explicitamente os dois ensaios de 20.000 fontes, preservando os arquivos e a execução padrão integral.
 

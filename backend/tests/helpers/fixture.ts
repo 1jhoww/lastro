@@ -131,7 +131,9 @@ async function clearLocalFixture(url: string) {
     await delay(1000);
   }
 }
-export function registerFixture(options: { rateLimitMax?: number } = {}): Fixture {
+export function registerFixture(
+  options: { rateLimitMax?: number; preserveExisting?: boolean } = {},
+): Fixture {
   const f = {} as Fixture;
   beforeAll(() => {
     if (
@@ -152,12 +154,15 @@ export function registerFixture(options: { rateLimitMax?: number } = {}): Fixtur
   });
   beforeEach(async () => {
     f.offset = 0;
-    await f.firebase.bucket.deleteFiles({ prefix: 'tenants/', force: true });
-    for (const url of [
-      `http://127.0.0.1:8080/emulator/v1/projects/demo-lastro-tests/databases/(default)/documents`,
-      `http://127.0.0.1:9099/emulator/v1/projects/demo-lastro-tests/accounts`,
-    ]) {
-      await clearLocalFixture(url);
+    // Measurements may create fresh tenants without erasing another local capacity run.
+    if (!options.preserveExisting) {
+      await f.firebase.bucket.deleteFiles({ prefix: 'tenants/', force: true });
+      for (const url of [
+        `http://127.0.0.1:8080/emulator/v1/projects/demo-lastro-tests/databases/(default)/documents`,
+        `http://127.0.0.1:9099/emulator/v1/projects/demo-lastro-tests/accounts`,
+      ]) {
+        await clearLocalFixture(url);
+      }
     }
     f.platform = await newUser(f, 'platform');
     f.ownerA = await newUser(f, 'owner-a');

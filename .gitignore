@@ -22,3 +22,5 @@ backend/reports/
 !.env.example
 **/.claude/settings.local.json
 .vercel
+# Generated repository graphs stay local. Existing tracked files are preserved.
+/graphify-out/

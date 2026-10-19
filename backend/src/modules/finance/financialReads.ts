@@ -46,21 +46,19 @@ export class FinancialReads {
     );
   }
   private async header(tx: Transaction, tenantId: string, orderId: string) {
-    const order = await this.repo.foundation.read(
-      this.repo.ref(tenantId, 'orders', orderId),
-      orderSchema,
-      tx,
-    );
-    const guard = await this.repo.foundation.read(
-      this.repo.ref(tenantId, 'orderFinancialGuards', orderId),
-      financialGuardSchema,
-      tx,
-    );
-    const state = await this.repo.foundation.read(
-      this.repo.ref(tenantId, 'financialOrderStates', orderId),
-      s.financialStateSchema,
-      tx,
-    );
+    const [order, guard, state] = await Promise.all([
+      this.repo.foundation.read(this.repo.ref(tenantId, 'orders', orderId), orderSchema, tx),
+      this.repo.foundation.read(
+        this.repo.ref(tenantId, 'orderFinancialGuards', orderId),
+        financialGuardSchema,
+        tx,
+      ),
+      this.repo.foundation.read(
+        this.repo.ref(tenantId, 'financialOrderStates', orderId),
+        s.financialStateSchema,
+        tx,
+      ),
+    ]);
     const head = state?.headEventId
       ? await this.repo.foundation.read(
           this.repo.ref(tenantId, 'financialEvents', state.headEventId),

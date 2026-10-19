@@ -52,11 +52,12 @@ describe('início', () => {
     // Uma página cheia com continuação: não inventa total, mostra "pelo menos 50".
     expect(await screen.findByLabelText('Pedidos em aberto: 50+')).toBeTruthy();
     expect(await screen.findByLabelText('Aguardando saída: 1')).toBeTruthy();
-    expect(await screen.findByText('Você tem 1 pedido aguardando saída.')).toBeTruthy();
+    expect(await screen.findByText('Pedidos aguardando saída')).toBeTruthy();
+    expect(screen.getByText('1 para preparar · mais antigos primeiro')).toBeTruthy();
     // Financeiro lido por completo: soma só o que está em aberto.
     expect(await screen.findByLabelText('A receber: R$ 20,00')).toBeTruthy();
-    expect(await screen.findByText('1 recebimento vencido: R$ 20,00.')).toBeTruthy();
-    expect(screen.getByText('Estoque baixo')).toBeTruthy();
+    expect(await screen.findByText('1 parcela vencida')).toBeTruthy();
+    expect(screen.queryByText('Estoque baixo')).toBeNull();
     expect(called(server, '/api/v1/inventory/replenishment')).toBe(true);
   });
 

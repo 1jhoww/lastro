@@ -50,6 +50,7 @@ export type RouteRoot =
   | 'acesso-bloqueado'
   | 'sem-empresa'
   | 'plataforma'
+  | 'meu-perfil'
   | 'sistema';
 
 export function allowedRoots(gate: Gate, dev = false): RouteRoot[] {
@@ -61,13 +62,13 @@ export function allowedRoots(gate: Gate, dev = false): RouteRoot[] {
     case 'signedOut':
       return ['(auth)', ...always];
     case 'chooseTenant':
-      return ['empresas', ...platform(gate), ...always];
+      return ['empresas', 'meu-perfil', ...platform(gate), ...always];
     case 'tenant':
-      return ['(app)', 'empresas', ...platform(gate), ...always];
+      return ['(app)', 'empresas', 'meu-perfil', ...platform(gate), ...always];
     case 'tenantBlocked':
-      return ['acesso-bloqueado', 'empresas', ...platform(gate), ...always];
+      return ['acesso-bloqueado', 'empresas', 'meu-perfil', ...platform(gate), ...always];
     case 'noTenant':
-      return [gate.platformAdmin ? 'plataforma' : 'sem-empresa', ...always];
+      return [gate.platformAdmin ? 'plataforma' : 'sem-empresa', 'meu-perfil', ...always];
   }
 }
 

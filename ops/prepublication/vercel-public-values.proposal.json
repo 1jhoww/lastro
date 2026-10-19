@@ -1,0 +1,26 @@
+{
+  "status": "DRAFT_NOT_APPLIED",
+  "project": "lastro-hml",
+  "target": "production",
+  "targetMeaning": "Frontend principal de homologação; produção comercial não identificada.",
+  "changes": [
+    {
+      "key": "EXPO_PUBLIC_API_URL",
+      "current": "\ufeffhttps://lastro-api-hml-859974935461.southamerica-east1.run.app",
+      "proposed": "https://lastro-api-hml-859974935461.southamerica-east1.run.app"
+    },
+    {
+      "key": "EXPO_PUBLIC_FIREBASE_PROJECT_ID",
+      "current": "\ufefflastro-hml",
+      "proposed": "lastro-hml"
+    },
+    {
+      "key": "EXPO_PUBLIC_WEB_BASE_URL",
+      "current": "\ufeffhttps://lastro-hml.vercel.app",
+      "proposed": "https://lastro-hml.vercel.app"
+    }
+  ],
+  "preview": "Não inspecionado em lote. Validar nomes/escopo sem baixar segredos.",
+  "rollback": "Restaurar somente os três valores/escopos do snapshot anterior. Não baixar nem sobrescrever outras variáveis.",
+  "releaseGate": "Alterar valores exige nova build aprovada separadamente. Não disparar deploy agora."
+}

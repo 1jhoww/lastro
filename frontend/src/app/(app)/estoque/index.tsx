@@ -103,6 +103,7 @@ function Inventory() {
           figureColumn('available', 'Disponível', true),
           figureColumn('reserved', 'Reservado'),
           figureColumn('physical', 'Físico'),
+          figureColumn('minimumStock', 'Mínimo'),
         ]
       : [
           {

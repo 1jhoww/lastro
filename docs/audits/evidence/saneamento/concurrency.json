@@ -1,0 +1,357 @@
+{
+  "measuredAt": "2026-10-18T23:17:15.121Z",
+  "environment": "demo-lastro-tests, local emulator, independent synthetic companies",
+  "records": [
+    {
+      "name": "stock-entries-2",
+      "concurrency": 2,
+      "ms": 44.94699999999966,
+      "responses": [
+        {
+          "status": 201,
+          "code": null,
+          "ms": 43.802900000000136
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 44.778099999999995
+        }
+      ],
+      "memory": {
+        "rss": 218173440,
+        "heapTotal": 213856256,
+        "heapUsed": 96140680,
+        "external": 7231836,
+        "arrayBuffers": 2855033
+      }
+    },
+    {
+      "name": "stock-entries-4",
+      "concurrency": 4,
+      "ms": 3453.1407,
+      "responses": [
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3453.1325999999995
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 46.80639999999994
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3443.9806000000003
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3345.0827000000004
+        }
+      ],
+      "memory": {
+        "rss": 233119744,
+        "heapTotal": 216883200,
+        "heapUsed": 122933512,
+        "external": 7706846,
+        "arrayBuffers": 3325286
+      }
+    },
+    {
+      "name": "stock-entries-8",
+      "concurrency": 8,
+      "ms": 3321.9548999999997,
+      "responses": [
+        {
+          "status": 201,
+          "code": null,
+          "ms": 2762.7654999999995
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 2698.8973000000005
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 2763.619600000001
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3147.5878000000002
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 2950.2626
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3321.6872000000003
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3261.2289
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 2949.216299999999
+        }
+      ],
+      "memory": {
+        "rss": 244707328,
+        "heapTotal": 219504640,
+        "heapUsed": 105913128,
+        "external": 7363662,
+        "arrayBuffers": 2983980
+      }
+    },
+    {
+      "name": "stock-entries-16",
+      "concurrency": 16,
+      "ms": 7642.357900000001,
+      "responses": [
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3432.0774
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3242.676300000001
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3302.7731999999996
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 7050.338500000002
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3245.4056
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 2774.3599999999988
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3227.1378999999997
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 7642.1168
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 7313.596299999999
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3149.7101999999995
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3275.0948999999982
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 6412.6109
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 2759.7696000000014
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3238.392
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3430.717999999999
+        },
+        {
+          "status": 201,
+          "code": null,
+          "ms": 3164.3626000000004
+        }
+      ],
+      "memory": {
+        "rss": 166047744,
+        "heapTotal": 89481216,
+        "heapUsed": 81236672,
+        "external": 7245318,
+        "arrayBuffers": 2869655
+      }
+    },
+    {
+      "name": "receipt-conflict-0",
+      "concurrency": 2,
+      "ms": 13722.608099999998,
+      "responses": [
+        {
+          "status": 409,
+          "code": "CONFLICT",
+          "ms": 13722.5962
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 6543.411499999998
+        }
+      ],
+      "memory": {
+        "rss": 178626560,
+        "heapTotal": 121266176,
+        "heapUsed": 80156224,
+        "external": 7226037,
+        "arrayBuffers": 2857720
+      }
+    },
+    {
+      "name": "receipt-replay-0",
+      "concurrency": 2,
+      "ms": 2777.042800000003,
+      "responses": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 2777.0305000000008
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 2138.303199999995
+        }
+      ],
+      "memory": {
+        "rss": 187072512,
+        "heapTotal": 121528320,
+        "heapUsed": 85529360,
+        "external": 7378301,
+        "arrayBuffers": 3006954
+      }
+    },
+    {
+      "name": "receipt-conflict-1",
+      "concurrency": 2,
+      "ms": 8002.7167000000045,
+      "responses": [
+        {
+          "status": 409,
+          "code": "CONFLICT",
+          "ms": 8002.705800000003
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 5682.331100000003
+        }
+      ],
+      "memory": {
+        "rss": 192561152,
+        "heapTotal": 154861568,
+        "heapUsed": 83118352,
+        "external": 7119644,
+        "arrayBuffers": 2750646
+      }
+    },
+    {
+      "name": "receipt-replay-1",
+      "concurrency": 2,
+      "ms": 10929.885799999996,
+      "responses": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 3111.0462999999945
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 10929.798600000002
+        }
+      ],
+      "memory": {
+        "rss": 202108928,
+        "heapTotal": 155123712,
+        "heapUsed": 100935928,
+        "external": 7428161,
+        "arrayBuffers": 3055468
+      }
+    },
+    {
+      "name": "receipt-conflict-2",
+      "concurrency": 2,
+      "ms": 3751.2010999999984,
+      "responses": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 2167.2816999999995
+        },
+        {
+          "status": 409,
+          "code": "CONFLICT",
+          "ms": 3751.1043999999965
+        }
+      ],
+      "memory": {
+        "rss": 220385280,
+        "heapTotal": 155385856,
+        "heapUsed": 90797440,
+        "external": 7862533,
+        "arrayBuffers": 3483707
+      }
+    },
+    {
+      "name": "receipt-replay-2",
+      "concurrency": 2,
+      "ms": 3651.686799999996,
+      "responses": [
+        {
+          "status": 200,
+          "code": null,
+          "ms": 3651.6740000000063
+        },
+        {
+          "status": 200,
+          "code": null,
+          "ms": 2940.331499999993
+        }
+      ],
+      "memory": {
+        "rss": 218292224,
+        "heapTotal": 155385856,
+        "heapUsed": 81100064,
+        "external": 7104890,
+        "arrayBuffers": 2737920
+      }
+    }
+  ],
+  "node": "v24.22.0"
+}

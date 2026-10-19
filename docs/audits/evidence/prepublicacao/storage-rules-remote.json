@@ -1,0 +1,17 @@
+{
+  "name": "projects/lastro-hml/rulesets/584f5f77-d414-4d1d-bb84-c816f66360b6",
+  "source": {
+    "files": [
+      {
+        "content": "rules_version = '2';\nservice firebase.storage {\n  match /b/{bucket}/o {\n    match /{allPaths=**} {\n      allow read, write: if false;\n    }\n  }\n}\n",
+        "name": "storage.rules"
+      }
+    ]
+  },
+  "createTime": "2026-10-15T22:03:03.816187Z",
+  "metadata": {
+    "services": [
+      "firebase.storage"
+    ]
+  }
+}

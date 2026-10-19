@@ -1,0 +1,444 @@
+{
+  "status": "DRAFT_NOT_APPLIED",
+  "observedAt": "2026-10-18T22:33:42.809Z",
+  "project": "lastro-hml",
+  "database": "(default)",
+  "indexes": [
+    {
+      "id": "index-135",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "auditLogs",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "resourceId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "occurredAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-136",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "billingCharges",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "dueDate",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "__name__",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-137",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "billingCharges",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "tenantId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "dueDate",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "__name__",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-138",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "billingCharges",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "tenantId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "dueDate",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "__name__",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-139",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "billingCharges",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "dueDate",
+            "order": "DESCENDING"
+          },
+          {
+            "fieldPath": "__name__",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-140",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "billingCharges",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "tenantId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "dueDate",
+            "order": "DESCENDING"
+          },
+          {
+            "fieldPath": "__name__",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-141",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "billingCharges",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "tenantId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "dueDate",
+            "order": "DESCENDING"
+          },
+          {
+            "fieldPath": "__name__",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-142",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "billingCharges",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "status",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "paidAt",
+            "order": "ASCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-143",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "visits",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "customerId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "visitDate",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-144",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "visits",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "responsibleUid",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "visitDate",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-145",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "visits",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "customerId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "responsibleUid",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "visitDate",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-146",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "visits",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "source",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "visitDate",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-147",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "visits",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "customerId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "source",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "visitDate",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-148",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "visits",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "responsibleUid",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "source",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "visitDate",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-149",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "visits",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "customerId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "responsibleUid",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "source",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "visitDate",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    },
+    {
+      "id": "index-150",
+      "current": "MISSING",
+      "proposed": {
+        "collectionGroup": "orders",
+        "queryScope": "COLLECTION",
+        "fields": [
+          {
+            "fieldPath": "customerId",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "confirmedAt",
+            "order": "DESCENDING"
+          }
+        ]
+      },
+      "risk": "Construção assíncrona, quota, armazenamento e escrita adicionais. Custo zero não comprovado.",
+      "rollback": "Conservar índice durante rollback do código; remover somente com autorização específica e análise das consultas."
+    }
+  ],
+  "fieldExemptions": [
+    {
+      "id": "visits.notes",
+      "current": "Sem isenção específica. Capturar configuração herdada no preflight antes de alterar.",
+      "proposed": {
+        "collectionGroup": "visits",
+        "fieldPath": "notes",
+        "indexes": []
+      },
+      "reason": "Texto/snapshot não consultado pelos consumidores auditados",
+      "risk": "Pode afetar consumidor externo não identificado",
+      "rollback": "Restaurar indexConfig anterior após snapshot, com reindexação e custo avaliados; preservar TTL."
+    },
+    {
+      "id": "visits.customerName",
+      "current": "Sem isenção específica. Capturar configuração herdada no preflight antes de alterar.",
+      "proposed": {
+        "collectionGroup": "visits",
+        "fieldPath": "customerName",
+        "indexes": []
+      },
+      "reason": "Texto/snapshot não consultado pelos consumidores auditados",
+      "risk": "Pode afetar consumidor externo não identificado",
+      "rollback": "Restaurar indexConfig anterior após snapshot, com reindexação e custo avaliados; preservar TTL."
+    },
+    {
+      "id": "visits.payloadHash",
+      "current": "Sem isenção específica. Capturar configuração herdada no preflight antes de alterar.",
+      "proposed": {
+        "collectionGroup": "visits",
+        "fieldPath": "payloadHash",
+        "indexes": []
+      },
+      "reason": "Texto/snapshot não consultado pelos consumidores auditados",
+      "risk": "Pode afetar consumidor externo não identificado",
+      "rollback": "Restaurar indexConfig anterior após snapshot, com reindexação e custo avaliados; preservar TTL."
+    },
+    {
+      "id": "deliveries.notes",
+      "current": "Sem isenção específica. Capturar configuração herdada no preflight antes de alterar.",
+      "proposed": {
+        "collectionGroup": "deliveries",
+        "fieldPath": "notes",
+        "indexes": []
+      },
+      "reason": "Texto/snapshot não consultado pelos consumidores auditados",
+      "risk": "Pode afetar consumidor externo não identificado",
+      "rollback": "Restaurar indexConfig anterior após snapshot, com reindexação e custo avaliados; preservar TTL."
+    },
+    {
+      "id": "deliveries.receivedBy",
+      "current": "Sem isenção específica. Capturar configuração herdada no preflight antes de alterar.",
+      "proposed": {
+        "collectionGroup": "deliveries",
+        "fieldPath": "receivedBy",
+        "indexes": []
+      },
+      "reason": "Texto/snapshot não consultado pelos consumidores auditados",
+      "risk": "Pode afetar consumidor externo não identificado",
+      "rollback": "Restaurar indexConfig anterior após snapshot, com reindexação e custo avaliados; preservar TTL."
+    }
+  ],
+  "reason": "Alinhar somente as ausências auditadas, sem excluir índices existentes",
+  "costGuard": "Índices adiados até comprovar cobertura de créditos e aprovar eventual consumo. Não executar deploy integral do arquivo."
+}

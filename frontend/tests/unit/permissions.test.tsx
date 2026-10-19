@@ -63,7 +63,9 @@ describe('permissões vindas do /me', () => {
       initialUrl: '/estoque',
       overrides: { '(app)/_layout': AppLayout, '(app)/estoque/index': Inventory },
     });
-    expect(await screen.findByText('Como ler os saldos')).toBeTruthy();
+    expect(await screen.findByRole('button', { name: 'Entender os saldos' })).toBeTruthy();
+    await fireEvent.press(screen.getByRole('button', { name: 'Entender os saldos' }));
+    expect(screen.getByText('Como ler os saldos')).toBeTruthy();
     expect(screen.queryByText('Você não tem acesso a esta área')).toBeNull();
     expect(screen.getByRole('link', { name: 'Registrar entrada' })).toBeTruthy();
   });

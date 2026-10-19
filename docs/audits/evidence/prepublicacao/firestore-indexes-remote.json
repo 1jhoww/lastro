@@ -1,0 +1,3110 @@
+[
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "productId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "type",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "occurredAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgOi3kIgI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "productId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "occurredAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJiUsYoI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJim15AI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "shortfallScaled",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOjXh5EI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJjF9pII",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJiUppMI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim16AI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh6EI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z6EI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9qII",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpqMI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kLAI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsbII",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim18AI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "assignedTo",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgOjXh8EI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z8EI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9sII",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "assignedTo",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUpsMI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "orderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "version",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orderEvents/indexes/CICAgJiUscoI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kNAI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "orderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/payments/indexes/CICAgOjXh9EI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "assignedTo",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUsdII",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUptMI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJim1-AI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh-EI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "productId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "occurredAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJj7z-EI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/categories/indexes/CICAgJjF9uII",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpuMI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kPAI",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsfII",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "returnId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "schemaVersion",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sequence",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returnEvents/indexes/CICAgJim14AJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "uid",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/memberships/indexes/CICAgOjXh4EJ",
+    "queryScope": "COLLECTION_GROUP",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJj7z4EJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "assignedTo",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJjF9oIJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUpoMJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sellerUid",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgOi3kIgJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sellerUid",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUsYoJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgOi3kJAJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "orderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/refundObligations/indexes/CICAgJim15AJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sellerUid",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgOjXh5EJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "orderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutions/indexes/CICAgJiUsZIJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/paymentMethods/indexes/CICAgJjF9pIJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "productId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "type",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "occurredAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJiUppMJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim16AJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh6EJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "shortfallScaled",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJj7z6EJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9qIJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpqMJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kLAJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsbIJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim18AJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh8EJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z8EJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9sIJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpsMJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kNAJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsdIJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "orderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sequence",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialEvents/indexes/CICAgJiUptMJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "type",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "occurredAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJim1-AJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/categories/indexes/CICAgOjXh-EJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "orderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "dueDate",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/receivables/indexes/CICAgJj7z-EJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "shortfallScaled",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJjF9uIJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpuMJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOi3kPAJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "shortfallScaled",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJiUsfIJ",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "executionId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "position",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofEntries/indexes/CICAgJim14AK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "orderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "generationId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "kind",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "titleId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sourceTime",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sourceId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialActiveSources/indexes/CICAgOjXh4EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "expiresAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/invitations/indexes/CICAgJj7z4EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "executionId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "position",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofChunks/indexes/CICAgJjF9oIK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "executionId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "collection",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "linePosition",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionSourcePlans/indexes/CICAgJiUpoMK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgOi3kIgK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "productId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sequence",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJiUsYoK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "executionId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sourceId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionLotPlans/indexes/CICAgOi3kJAK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "orderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/creditApplications/indexes/CICAgJim15AK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOjXh5EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "executionId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "position",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionStockPlans/indexes/CICAgJiUsZIK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sellerUid",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJjF9pIK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "type",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "occurredAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/indexes/CICAgJiUppMK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim16AK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh6EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/categories/indexes/CICAgJj7z6EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9qIK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpqMK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kLAK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsbIK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim18AK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh8EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z8EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9sIK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpsMK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kNAK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "orderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/creditApplications/indexes/CICAgOjXh9EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsdIK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUptMK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "shortfallScaled",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJim1-AK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh-EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sellerUid",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJj7z-EK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJjF9uIK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpuMK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kPAK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/categories/indexes/CICAgJiUsfIK",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim14AL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgOjXh4EL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z4EL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "assignedTo",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJjF9oIL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "assignedTo",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUpoML",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/paymentConditions/indexes/CICAgOi3kIgL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sellerUid",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUsYoL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "assignedTo",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgOi3kJAL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sellerUid",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgOjXh5EL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "assignedTo",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/indexes/CICAgJiUsZIL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sellerUid",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJiUppML",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim16AL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh6EL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "shortfallScaled",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJj7z6EL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9qIL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpqML",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kLAL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsbIL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJim18AL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOjXh8EL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z8EL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJjF9sIL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUpsML",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgOi3kNAL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "sku",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJiUsdIL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "originOrderId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/creditLots/indexes/CICAgJiUptML",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "customerId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "createdAt",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/indexes/CICAgJim1-AL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOjXh-EL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "catalogVisible",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/indexes/CICAgJj7z-EL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "shortfallScaled",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJjF9uIL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "shortfallScaled",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJiUpuML",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "ASCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgOi3kPAL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  },
+  {
+    "density": "SPARSE_ALL",
+    "fields": [
+      {
+        "fieldPath": "belowMinimum",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "status",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "categoryId",
+        "order": "ASCENDING"
+      },
+      {
+        "fieldPath": "nameKey",
+        "order": "DESCENDING"
+      },
+      {
+        "fieldPath": "__name__",
+        "order": "DESCENDING"
+      }
+    ],
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventory/indexes/CICAgJiUsfIL",
+    "queryScope": "COLLECTION",
+    "state": "READY"
+  }
+]

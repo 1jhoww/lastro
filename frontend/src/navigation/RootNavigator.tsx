@@ -64,6 +64,9 @@ export function RootNavigator() {
         <Stack.Protected guard={can('plataforma')}>
           <Stack.Screen name="plataforma" />
         </Stack.Protected>
+        <Stack.Protected guard={can('meu-perfil')}>
+          <Stack.Screen name="meu-perfil" />
+        </Stack.Protected>
         <Stack.Protected guard={can('sistema')}>
           <Stack.Screen name="sistema" />
         </Stack.Protected>

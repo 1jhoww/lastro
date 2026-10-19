@@ -58,6 +58,7 @@ export async function renderApp(opts: {
       return <Slot />;
     },
     'plataforma/index': marker('plataforma'),
+    'meu-perfil': marker('meu-perfil'),
     sistema: marker('sistema'),
     convite: marker('convite'),
     'catalogo/_layout': () => {

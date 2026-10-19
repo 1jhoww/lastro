@@ -1,0 +1,20 @@
+{
+  "scope": "local-anonymous-export-only",
+  "runtime": "v24.22.0",
+  "results": [
+    {
+      "name": "unicode",
+      "queryBytes": 40,
+      "elapsedMs": 377,
+      "loginRendered": true,
+      "pageErrors": []
+    },
+    {
+      "name": "malformed",
+      "queryBytes": 12290,
+      "elapsedMs": 347,
+      "loginRendered": true,
+      "pageErrors": []
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "f02Capacity": "cancellation",
+    "sources": 20000,
+    "receiptHttpCalls": 0,
+    "seed": {
+      "sources": 20000,
+      "receiptHttpCalls": 0,
+      "seededEvents": 20000,
+      "seededOperations": 20000,
+      "seededAudits": 20000,
+      "activeRows": 20000,
+      "seedCommits": 1001,
+      "maxBatchWrites": 100,
+      "maxBatchEstimatedBytes": 86781,
+      "maxDocumentEstimatedBytes": 1507,
+      "maxSampledHeapBytes": 264826840,
+      "maxSampledRssBytes": 423264256,
+      "elapsedMs": 15315
+    },
+    "execution": {
+      "commits": 6276,
+      "reads": 561169,
+      "writes": 191395,
+      "estimatedBytes": 780867798,
+      "maxReads": 150,
+      "maxWrites": 80,
+      "maxEstimatedBytes": 457996,
+      "maxDocumentBytes": 4394,
+      "maxSampledHeapDeltaBytes": 15593480,
+      "maxSampledRssBytes": 425091072
+    },
+    "elapsedMs": 3379508,
+    "proofs": {
+      "examined": 20000,
+      "eligible": 20000,
+      "planned": 20000,
+      "sealed": 20000,
+      "validated": 20000,
+      "applied": 20000,
+      "releasedReservations": 1,
+      "total": 20000
+    },
+    "publicationCount": 1,
+    "completedAt": "2026-10-18T16:35:48.824Z",
+    "environment": "demo-lastro-tests emulator",
+    "independentlyCheckedProofs": 20000,
+    "independentlyCheckedPayments": 20000
+  },
+  {
+    "f02Capacity": "return",
+    "sources": 20000,
+    "receiptHttpCalls": 0,
+    "seed": {
+      "sources": 20000,
+      "receiptHttpCalls": 0,
+      "seededEvents": 20000,
+      "seededOperations": 20000,
+      "seededAudits": 20000,
+      "activeRows": 20000,
+      "seedCommits": 1001,
+      "maxBatchWrites": 100,
+      "maxBatchEstimatedBytes": 86781,
+      "maxDocumentEstimatedBytes": 1507,
+      "maxSampledHeapBytes": 234463128,
+      "maxSampledRssBytes": 431689728,
+      "elapsedMs": 14073
+    },
+    "execution": {
+      "commits": 5470,
+      "reads": 490537,
+      "writes": 187367,
+      "estimatedBytes": 777406672,
+      "maxReads": 150,
+      "maxWrites": 80,
+      "maxEstimatedBytes": 462268,
+      "maxDocumentBytes": 4659,
+      "maxSampledHeapDeltaBytes": 15666808,
+      "maxSampledRssBytes": 444997632
+    },
+    "elapsedMs": 3202836,
+    "proofs": {
+      "examined": 20000,
+      "eligible": 20000,
+      "planned": 20001,
+      "sealed": 20001,
+      "validated": 20001,
+      "applied": 20001,
+      "releasedReservations": 0,
+      "total": 20001
+    },
+    "publicationCount": 1,
+    "completedAt": "2026-10-18T17:29:16.801Z",
+    "environment": "demo-lastro-tests emulator",
+    "independentlyCheckedProofs": 20001,
+    "independentlyCheckedPayments": 20000
+  }
+]

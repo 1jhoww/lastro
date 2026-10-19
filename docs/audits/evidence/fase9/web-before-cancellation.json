@@ -1,0 +1,945 @@
+{
+  "stage": "after",
+  "browser": "155.0.8059.80",
+  "observations": [
+    {
+      "profile": "desktop",
+      "run": 0,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 405.80269999999996,
+      "lcp": 396,
+      "longTasks": [
+        97,
+        56
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 380
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 380
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 69.89999999990687
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 0,
+          "decodedBodySize": 0,
+          "duration": 0.7999999998137355
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 12.899999999906868
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 18
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 21.600000000093132
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 25.199999999720603
+        }
+      ],
+      "heapBytes": 15762354,
+      "loginShellMs": 140.06489999999985,
+      "loginDashboardMs": 1299.4343000000001,
+      "dashboardRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tenants/current",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 429
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 429
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 429
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/payments?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/receivables?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        }
+      ],
+      "customerPageMs": 245.9598000000001,
+      "customerRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tenants/current",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/customers?limit=50&sort=name&direction=asc&status=active",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/users?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        }
+      ],
+      "customerFilterMs": 357.2664999999997
+    },
+    {
+      "profile": "desktop",
+      "run": 1,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 341.3665000000001,
+      "lcp": 320,
+      "longTasks": [
+        99,
+        51
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 284
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 284
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 13.100000000093132
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 0,
+          "decodedBodySize": 0,
+          "duration": 0.7000000001862645
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 11.100000000093132
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 11.199999999720603
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 11
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 11.600000000093132
+        }
+      ],
+      "heapBytes": 15722073,
+      "loginShellMs": 126.48929999999928,
+      "loginDashboardMs": 1260.5598999999993,
+      "dashboardRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tenants/current",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 429
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 429
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 429
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/payments?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/receivables?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        }
+      ],
+      "customerPageMs": 236.35590000000047,
+      "customerRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tenants/current",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/customers?limit=50&sort=name&direction=asc&status=active",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/users?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        }
+      ],
+      "customerFilterMs": 380.567500000001
+    },
+    {
+      "profile": "desktop",
+      "run": 2,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 363.14799999999923,
+      "lcp": 340,
+      "longTasks": [
+        98,
+        63
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 300
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 300
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 13.200000000186265
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 0,
+          "decodedBodySize": 0,
+          "duration": 1.3000000002793968
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 9.5
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 9.800000000279397
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 11
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 11.5
+        }
+      ],
+      "heapBytes": 15732799,
+      "loginShellMs": 128.6748000000007,
+      "loginDashboardMs": 1289.6348000000016,
+      "dashboardRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tenants/current",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 429
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 429
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 429
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/payments?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/receivables?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        }
+      ],
+      "customerPageMs": 288.60030000000006,
+      "customerRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tenants/current",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/users?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/customers?limit=50&sort=name&direction=asc&status=active",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        }
+      ],
+      "customerFilterMs": 366.71830000000045
+    },
+    {
+      "profile": "mobile",
+      "run": 0,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 7992.296200000001,
+      "lcp": 7880,
+      "longTasks": [
+        571,
+        300,
+        157
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 7704
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 7704
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 3894
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 0,
+          "decodedBodySize": 0,
+          "duration": 0.7000000001862645
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 2468.1999999997206
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 2528
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 2526.899999999907
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 2540.7000000001863
+        }
+      ],
+      "heapBytes": 15813821,
+      "loginShellMs": 966.2921999999999,
+      "loginDashboardMs": 1507.7970999999998,
+      "dashboardRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tenants/current",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/receivables?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/payments?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        }
+      ],
+      "customerPageMs": 7511.8014,
+      "customerRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/customers?limit=50&sort=name&direction=asc&status=active",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/users?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        }
+      ],
+      "customerFilterMs": 629.2285000000047
+    },
+    {
+      "profile": "mobile",
+      "run": 1,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 7924.535799999998,
+      "lcp": 7800,
+      "longTasks": [
+        536,
+        279,
+        145
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 7640
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 7640
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 3913.600000000093
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 0,
+          "decodedBodySize": 0,
+          "duration": 0.8000000002793968
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 2469.100000000093
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 2513.100000000093
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 2527.1999999997206
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 2525.7999999998137
+        }
+      ],
+      "heapBytes": 15845445,
+      "loginShellMs": 913.2947000000058,
+      "loginDashboardMs": 1471.4105000000054,
+      "dashboardRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tenants/current",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/receivables?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/payments?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        }
+      ],
+      "customerPageMs": 7508.9761,
+      "customerRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/users?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/customers?limit=50&sort=name&direction=asc&status=active",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        }
+      ],
+      "customerFilterMs": 663.3614999999991
+    },
+    {
+      "profile": "mobile",
+      "run": 2,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 7945.7837,
+      "lcp": 7836,
+      "longTasks": [
+        539,
+        335,
+        153
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 7664
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 7664
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/entry-a2f29ddc0622f79796011d0e7bb1e517.js",
+          "transferSize": 743684,
+          "decodedBodySize": 3087158,
+          "duration": 3882
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 0,
+          "decodedBodySize": 0,
+          "duration": 0.6000000000931323
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_400Regular.27952679da7d55aaf291939404098c82.woff2",
+          "transferSize": 114350,
+          "decodedBodySize": 114336,
+          "duration": 2466.9000000003725
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_500Medium.f6e6240f92e65667e0615e5fa9a180fe.woff2",
+          "transferSize": 117319,
+          "decodedBodySize": 117340,
+          "duration": 2511.2000000001863
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_600SemiBold.d156622564424070f7ab189c7582966e.woff2",
+          "transferSize": 117781,
+          "decodedBodySize": 117792,
+          "duration": 2526.100000000093
+        },
+        {
+          "name": "/assets/assets/fonts/Inter_700Bold.39340736d7178ad6679ae65042aceab7.woff2",
+          "transferSize": 117966,
+          "decodedBodySize": 117936,
+          "duration": 2524.899999999907
+        }
+      ],
+      "heapBytes": 15829968,
+      "loginShellMs": 955.0878999999986,
+      "loginDashboardMs": 1494.2188000000024,
+      "dashboardRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/tenants/current",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=asc&status=confirmed",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=50&direction=desc&status=draft",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/orders?limit=6&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/inventory/replenishment?limit=50&status=active&sort=shortfall&direction=desc",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/receivables?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/payments?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        }
+      ],
+      "customerPageMs": 7477.932700000005,
+      "customerRequests": [
+        {
+          "path": "/api/v1/me",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/me/email-change",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/customers?limit=50&sort=name&direction=asc&status=active",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/users?limit=100",
+          "status": 200
+        },
+        {
+          "path": "/api/v1/financial-executions?pending=true&limit=25",
+          "status": 200
+        }
+      ],
+      "customerFilterMs": 633.8352000000014
+    }
+  ]
+}

@@ -1,0 +1,82 @@
+[
+  {
+    "role": "admin",
+    "name": "financeiro",
+    "width": 320,
+    "path": "admin-financeiro-320.png",
+    "url": "http://localhost:8081/financeiro",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Financeiro",
+      "Próximos vencimentos",
+      "Recebimentos recentes",
+      "Precisa de atenção"
+    ],
+    "text": "lastro\nFinanceiro\nQuanto seus clientes devem, o que vence nos próximos dias e o que já entrou.\nFinanceiro\nVisão geral\nSeções\nTotal a receber\nR$ 4.280,72\n8 títulos em aberto\nVencido\nR$ 1.743,38\n3 títulos vencidos\nVence em 7 dias\nR$ 335,94\n1 título\nRecebido em outubro\nR$ 509,06\n2 p",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro",
+    "width": 390,
+    "path": "admin-financeiro-390.png",
+    "url": "http://localhost:8081/financeiro",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Financeiro",
+      "Próximos vencimentos",
+      "Recebimentos recentes",
+      "Precisa de atenção"
+    ],
+    "text": "lastro\nFinanceiro\nQuanto seus clientes devem, o que vence nos próximos dias e o que já entrou.\nFinanceiro\nVisão geral\nSeções\nTotal a receber\nR$ 4.280,72\n8 títulos em aberto\nVencido\nR$ 1.743,38\n3 títulos vencidos\nVence em 7 dias\nR$ 335,94\n1 título\nRecebido em outubro\nR$ 509,06\n2 p",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro",
+    "width": 768,
+    "path": "admin-financeiro-768.png",
+    "url": "http://localhost:8081/financeiro",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Financeiro",
+      "Próximos vencimentos",
+      "Recebimentos recentes",
+      "Precisa de atenção"
+    ],
+    "text": "Financeiro\nQuanto seus clientes devem, o que vence nos próximos dias e o que já entrou.\nVisão geral\nContas a receber\nCondições e formas\nCréditos\nReembolsos\nHistórico e operações\nTotal a receber\nR$ 4.280,72\n8 títulos em aberto\nVencido\nR$ 1.743,38\n3 títulos vencidos\nVence em 7 dias",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro",
+    "width": 1280,
+    "path": "admin-financeiro-1280.png",
+    "url": "http://localhost:8081/financeiro",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Financeiro",
+      "Próximos vencimentos",
+      "Recebimentos recentes",
+      "Precisa de atenção"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nFinanceiro\nQuanto seus clientes devem, o que vence nos p",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  }
+]

@@ -1,0 +1,70 @@
+{
+  "acl": [
+    {
+      "entity": "project-editors-859974935461",
+      "projectTeam": {
+        "projectNumber": "859974935461",
+        "team": "editors"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-owners-859974935461",
+      "projectTeam": {
+        "projectNumber": "859974935461",
+        "team": "owners"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-viewers-859974935461",
+      "projectTeam": {
+        "projectNumber": "859974935461",
+        "team": "viewers"
+      },
+      "role": "READER"
+    }
+  ],
+  "creation_time": "2026-10-15T19:00:31-03:00",
+  "default_acl": [
+    {
+      "entity": "project-owners-859974935461",
+      "projectTeam": {
+        "projectNumber": "859974935461",
+        "team": "owners"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-editors-859974935461",
+      "projectTeam": {
+        "projectNumber": "859974935461",
+        "team": "editors"
+      },
+      "role": "OWNER"
+    },
+    {
+      "entity": "project-viewers-859974935461",
+      "projectTeam": {
+        "projectNumber": "859974935461",
+        "team": "viewers"
+      },
+      "role": "READER"
+    }
+  ],
+  "default_storage_class": "STANDARD",
+  "generation": 1792101630779510150,
+  "location": "SOUTHAMERICA-EAST1",
+  "location_type": "region",
+  "metageneration": 2,
+  "name": "lastro-hml.firebasestorage.app",
+  "public_access_prevention": "inherited",
+  "satisfies_pzs": true,
+  "soft_delete_policy": {
+    "effectiveTime": "2026-10-15T19:00:31.339-03:00",
+    "retentionDurationSeconds": "604800"
+  },
+  "storage_url": "gs://lastro-hml.firebasestorage.app/",
+  "uniform_bucket_level_access": false,
+  "update_time": "2026-10-15T19:04:01-03:00"
+}

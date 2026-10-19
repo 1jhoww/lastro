@@ -1,0 +1,1979 @@
+[
+  {
+    "role": "public",
+    "name": "entrar",
+    "width": 320,
+    "path": "public-entrar-320.png",
+    "url": "http://localhost:8081/entrar",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Entrar"
+    ],
+    "text": "lastro\nby hepta\nEntrar\nUse o e-mail do convite que você recebeu.\nE-mail\nSenha\nEsqueci minha senha\nEntrar",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "public",
+    "name": "entrar",
+    "width": 390,
+    "path": "public-entrar-390.png",
+    "url": "http://localhost:8081/entrar",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Entrar"
+    ],
+    "text": "lastro\nby hepta\nEntrar\nUse o e-mail do convite que você recebeu.\nE-mail\nSenha\nEsqueci minha senha\nEntrar",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "public",
+    "name": "entrar",
+    "width": 768,
+    "path": "public-entrar-768.png",
+    "url": "http://localhost:8081/entrar",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Entrar"
+    ],
+    "text": "lastro\nUma base sólida para o seu negócio.\nby hepta\nEntrar\nUse o e-mail do convite que você recebeu.\nE-mail\nSenha\nEsqueci minha senha\nEntrar",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "public",
+    "name": "entrar",
+    "width": 1280,
+    "path": "public-entrar-1280.png",
+    "url": "http://localhost:8081/entrar",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Entrar"
+    ],
+    "text": "lastro\nUma base sólida para o seu negócio.\nby hepta\nEntrar\nUse o e-mail do convite que você recebeu.\nE-mail\nSenha\nEsqueci minha senha\nEntrar",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "public",
+    "name": "recuperar-senha",
+    "width": 320,
+    "path": "public-recuperar-senha-320.png",
+    "url": "http://localhost:8081/recuperar-senha",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Recuperar senha"
+    ],
+    "text": "lastro\nby hepta\nVoltar para entrar\nRecuperar senha\nEnviaremos um link para criar uma nova senha.\nE-mail\nEnviar link",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "public",
+    "name": "recuperar-senha",
+    "width": 390,
+    "path": "public-recuperar-senha-390.png",
+    "url": "http://localhost:8081/recuperar-senha",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Recuperar senha"
+    ],
+    "text": "lastro\nby hepta\nVoltar para entrar\nRecuperar senha\nEnviaremos um link para criar uma nova senha.\nE-mail\nEnviar link",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "public",
+    "name": "recuperar-senha",
+    "width": 768,
+    "path": "public-recuperar-senha-768.png",
+    "url": "http://localhost:8081/recuperar-senha",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Recuperar senha"
+    ],
+    "text": "lastro\nUma base sólida para o seu negócio.\nby hepta\nVoltar para entrar\nRecuperar senha\nEnviaremos um link para criar uma nova senha.\nE-mail\nEnviar link",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "public",
+    "name": "recuperar-senha",
+    "width": 1280,
+    "path": "public-recuperar-senha-1280.png",
+    "url": "http://localhost:8081/recuperar-senha",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Recuperar senha"
+    ],
+    "text": "lastro\nUma base sólida para o seu negócio.\nby hepta\nVoltar para entrar\nRecuperar senha\nEnviaremos um link para criar uma nova senha.\nE-mail\nEnviar link",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "dashboard",
+    "width": 320,
+    "path": "admin-dashboard-320.png",
+    "url": "http://localhost:8081/",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Olá, Ana!",
+      "O que precisa de atenção",
+      "Recebimentos vencidos",
+      "Pedidos aguardando saída",
+      "Próximos 7 dias",
+      "Atividade recente"
+    ],
+    "text": "lastro\nOlá, Ana!\nBons resultados começam com boas decisões.\nNovo pedido\nPedidos em aberto\n2\nRascunhos a confirmar\nAguardando saída\n2\nConfirmados, com estoque reservado\nA receber\nR$ 4.280,72\n8 parcelas em aberto\nVencidas\nR$ 1.743,38\n3 parcelas vencidas\nO que precisa de atenção\nRec",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "dashboard",
+    "width": 390,
+    "path": "admin-dashboard-390.png",
+    "url": "http://localhost:8081/",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Olá, Ana!",
+      "O que precisa de atenção",
+      "Recebimentos vencidos",
+      "Pedidos aguardando saída",
+      "Próximos 7 dias",
+      "Atividade recente"
+    ],
+    "text": "lastro\nOlá, Ana!\nBons resultados começam com boas decisões.\nNovo pedido\nPedidos em aberto\n2\nRascunhos a confirmar\nAguardando saída\n2\nConfirmados, com estoque reservado\nA receber\nR$ 4.280,72\n8 parcelas em aberto\nVencidas\nR$ 1.743,38\n3 parcelas vencidas\nO que precisa de atenção\nRec",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "dashboard",
+    "width": 768,
+    "path": "admin-dashboard-768.png",
+    "url": "http://localhost:8081/",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Olá, Ana!",
+      "O que precisa de atenção",
+      "Recebimentos vencidos",
+      "Pedidos aguardando saída",
+      "Próximos 7 dias",
+      "Atividade recente"
+    ],
+    "text": "Olá, Ana!\nBons resultados começam com boas decisões.\nNovo pedido\nPedidos em aberto\n2\nRascunhos a confirmar\nAguardando saída\n2\nConfirmados, com estoque reservado\nA receber\nR$ 4.280,72\n8 parcelas em aberto\nVencidas\nR$ 1.743,38\n3 parcelas vencidas\nO que precisa de atenção\nRecebiment",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "dashboard",
+    "width": 1280,
+    "path": "admin-dashboard-1280.png",
+    "url": "http://localhost:8081/",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Olá, Ana!",
+      "O que precisa de atenção",
+      "Recebimentos vencidos",
+      "Pedidos aguardando saída",
+      "Próximos 7 dias",
+      "Atividade recente"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nOlá, Ana!\nBons resultados começam com boas decisões.\nNov",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "clientes",
+    "width": 320,
+    "path": "admin-clientes-320.png",
+    "url": "http://localhost:8081/clientes",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Clientes"
+    ],
+    "text": "lastro\nClientes\n9 clientes\nNovo cliente\nAtivos\nInativos\nTodos\nTodos os responsáveis\nCantina Bella Itália Ltda\n(11) 3289-4471 · São Paulo/SP\nBruno Vendedor\nEmpório Vila Nova Comércio de Alimentos Ltda\n(11) 2408-3355 · Guarulhos/SP\nSem responsável\nHotel Recanto Verde Ltda\n(19) 3254",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "clientes",
+    "width": 390,
+    "path": "admin-clientes-390.png",
+    "url": "http://localhost:8081/clientes",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Clientes"
+    ],
+    "text": "lastro\nClientes\n9 clientes\nNovo cliente\nAtivos\nInativos\nTodos\nTodos os responsáveis\nCantina Bella Itália Ltda\n(11) 3289-4471 · São Paulo/SP\nBruno Vendedor\nEmpório Vila Nova Comércio de Alimentos Ltda\n(11) 2408-3355 · Guarulhos/SP\nSem responsável\nHotel Recanto Verde Ltda\n(19) 3254",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "clientes",
+    "width": 768,
+    "path": "admin-clientes-768.png",
+    "url": "http://localhost:8081/clientes",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Clientes"
+    ],
+    "text": "Clientes\n9 clientes\nNovo cliente\nAtivos\nInativos\nTodos\nTodos os responsáveis\nCliente\nCPF/CNPJ\nTelefone\nCidade/UF\nResponsável\nSituação\nAções\nCantina Bella Itália Ltda\nBella Itália\n77.888.999/0001-81\n(11) 3289-4471\nSão Paulo/SP\nBruno Vendedor\nAtivo\nEmpório Vila Nova Comércio de Ali",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "clientes",
+    "width": 1280,
+    "path": "admin-clientes-1280.png",
+    "url": "http://localhost:8081/clientes",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Clientes"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nClientes\n9 clientes\nNovo cliente\nAtivos\nInativos\nTodos\nT",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "cliente-novo",
+    "width": 320,
+    "path": "admin-cliente-novo-320.png",
+    "url": "http://localhost:8081/clientes/novo",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo cliente",
+      "Identificação",
+      "Contato",
+      "Endereço"
+    ],
+    "text": "lastro\nNovo cliente\nComeça sem responsável; o vendedor é definido depois, na ficha.\nIdentificação\nNome ou razão social\nNome fantasia\nopcional\nCPF ou CNPJ\nopcional\nSó os dígitos são validados.\nContato\nTelefone ou WhatsApp\nopcional\nE-mail\nopcional\nObservações\nopcional\nEndereço\nObri",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "cliente-novo",
+    "width": 390,
+    "path": "admin-cliente-novo-390.png",
+    "url": "http://localhost:8081/clientes/novo",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo cliente",
+      "Identificação",
+      "Contato",
+      "Endereço"
+    ],
+    "text": "lastro\nNovo cliente\nComeça sem responsável; o vendedor é definido depois, na ficha.\nIdentificação\nNome ou razão social\nNome fantasia\nopcional\nCPF ou CNPJ\nopcional\nSó os dígitos são validados.\nContato\nTelefone ou WhatsApp\nopcional\nE-mail\nopcional\nObservações\nopcional\nEndereço\nObri",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "cliente-novo",
+    "width": 768,
+    "path": "admin-cliente-novo-768.png",
+    "url": "http://localhost:8081/clientes/novo",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo cliente",
+      "Identificação",
+      "Contato",
+      "Endereço"
+    ],
+    "text": "Novo cliente\nComeça sem responsável; o vendedor é definido depois, na ficha.\nIdentificação\nNome ou razão social\nNome fantasia\nopcional\nCPF ou CNPJ\nopcional\nSó os dígitos são validados.\nContato\nTelefone ou WhatsApp\nopcional\nE-mail\nopcional\nObservações\nopcional\nEndereço\nObrigatório",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "cliente-novo",
+    "width": 1280,
+    "path": "admin-cliente-novo-1280.png",
+    "url": "http://localhost:8081/clientes/novo",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo cliente",
+      "Identificação",
+      "Contato",
+      "Endereço"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nNovo cliente\nComeça sem responsável; o vendedor é defini",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "produtos",
+    "width": 320,
+    "path": "admin-produtos-320.png",
+    "url": "http://localhost:8081/produtos",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Produtos"
+    ],
+    "text": "lastro\nProdutos\n11 produtos\nCategorias\nNovo produto\nTodas as categorias\nAtivos\nInativos\nTodos\nCatálogo: todos\nAçúcar refinado 1 kg\nMER-003 · Mercearia\nR$ 5,29\npor pct\nÁgua mineral sem gás 500 ml (caixa com 12)\nBEB-001 · Bebidas\nR$ 23,90\npor cx\nArroz branco tipo 1 5 kg\nMER-001 · M",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "produtos",
+    "width": 390,
+    "path": "admin-produtos-390.png",
+    "url": "http://localhost:8081/produtos",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Produtos"
+    ],
+    "text": "lastro\nProdutos\n11 produtos\nCategorias\nNovo produto\nTodas as categorias\nAtivos\nInativos\nTodos\nCatálogo: todos\nAçúcar refinado 1 kg\nMER-003 · Mercearia\nR$ 5,29\npor pct\nÁgua mineral sem gás 500 ml (caixa com 12)\nBEB-001 · Bebidas\nR$ 23,90\npor cx\nArroz branco tipo 1 5 kg\nMER-001 · M",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "produtos",
+    "width": 768,
+    "path": "admin-produtos-768.png",
+    "url": "http://localhost:8081/produtos",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Produtos"
+    ],
+    "text": "Produtos\n11 produtos\nCategorias\nNovo produto\nTodas as categorias\nAtivos\nInativos\nTodos\nCatálogo: todos\nProduto\nCategoria\nUnidade\nPreço\nCatálogo\nSituação\nAções\nAçúcar refinado 1 kg\nMER-003\nMercearia\nPCT\nR$ 5,29\nVisível\nAtivo\nÁgua mineral sem gás 500 ml (caixa com 12)\nBEB-001\nBebid",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "produtos",
+    "width": 1280,
+    "path": "admin-produtos-1280.png",
+    "url": "http://localhost:8081/produtos",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Produtos"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nProdutos\n11 produtos\nCategorias\nNovo produto\nTodas as ca",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "produto-novo",
+    "width": 320,
+    "path": "admin-produto-novo-320.png",
+    "url": "http://localhost:8081/produtos/novo",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo produto",
+      "Informações",
+      "Comercial",
+      "Imagem"
+    ],
+    "text": "lastro\nNovo produto\nO estoque começa zerado. Entradas são registradas no Estoque.\nInformações\nNome do produto\nSKU\nCódigo único. Salvo em maiúsculas.\nCategoria\nopcional\nSem categoria\nDescrição\nopcional\nComercial\nUnidade de venda\nUnidade (UN)\nKG e L aceitam até 3 casas; as demais, ",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "produto-novo",
+    "width": 390,
+    "path": "admin-produto-novo-390.png",
+    "url": "http://localhost:8081/produtos/novo",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo produto",
+      "Informações",
+      "Comercial",
+      "Imagem"
+    ],
+    "text": "lastro\nNovo produto\nO estoque começa zerado. Entradas são registradas no Estoque.\nInformações\nNome do produto\nSKU\nCódigo único. Salvo em maiúsculas.\nCategoria\nopcional\nSem categoria\nDescrição\nopcional\nComercial\nUnidade de venda\nUnidade (UN)\nKG e L aceitam até 3 casas; as demais, ",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "produto-novo",
+    "width": 768,
+    "path": "admin-produto-novo-768.png",
+    "url": "http://localhost:8081/produtos/novo",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo produto",
+      "Informações",
+      "Comercial",
+      "Imagem"
+    ],
+    "text": "Novo produto\nO estoque começa zerado. Entradas são registradas no Estoque.\nInformações\nNome do produto\nSKU\nCódigo único. Salvo em maiúsculas.\nCategoria\nopcional\nSem categoria\nDescrição\nopcional\nComercial\nUnidade de venda\nUnidade (UN)\nKG e L aceitam até 3 casas; as demais, só inte",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "produto-novo",
+    "width": 1280,
+    "path": "admin-produto-novo-1280.png",
+    "url": "http://localhost:8081/produtos/novo",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo produto",
+      "Informações",
+      "Comercial",
+      "Imagem"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nNovo produto\nO estoque começa zerado. Entradas são regis",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "categorias",
+    "width": 320,
+    "path": "admin-categorias-320.png",
+    "url": "http://localhost:8081/produtos/categorias",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Categorias"
+    ],
+    "text": "lastro\nCategorias\nAgrupam produtos nas listas e no catálogo.\nNova categoria\nAtivas\nInativas\nTodas\nBebidas\nÁguas, refrigerantes, sucos e café.\nEditar\nDesativar\nLimpeza\nProdutos de limpeza para comércio e cozinha industrial.\nEditar\nDesativar\nMercearia\nGrãos, óleos, açúcar e frios.\n",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "categorias",
+    "width": 390,
+    "path": "admin-categorias-390.png",
+    "url": "http://localhost:8081/produtos/categorias",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Categorias"
+    ],
+    "text": "lastro\nCategorias\nAgrupam produtos nas listas e no catálogo.\nNova categoria\nAtivas\nInativas\nTodas\nBebidas\nÁguas, refrigerantes, sucos e café.\nEditar\nDesativar\nLimpeza\nProdutos de limpeza para comércio e cozinha industrial.\nEditar\nDesativar\nMercearia\nGrãos, óleos, açúcar e frios.\n",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "categorias",
+    "width": 768,
+    "path": "admin-categorias-768.png",
+    "url": "http://localhost:8081/produtos/categorias",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Categorias"
+    ],
+    "text": "Categorias\nAgrupam produtos nas listas e no catálogo.\nNova categoria\nAtivas\nInativas\nTodas\nBebidas\nÁguas, refrigerantes, sucos e café.\nEditar\nDesativar\nLimpeza\nProdutos de limpeza para comércio e cozinha industrial.\nEditar\nDesativar\nMercearia\nGrãos, óleos, açúcar e frios.\nEditar\n",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "categorias",
+    "width": 1280,
+    "path": "admin-categorias-1280.png",
+    "url": "http://localhost:8081/produtos/categorias",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Categorias"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nCategorias\nAgrupam produtos nas listas e no catálogo.\nNo",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "catalogo",
+    "width": 320,
+    "path": "admin-catalogo-320.png",
+    "url": "http://localhost:8081/configuracoes/catalogo",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Catálogo público",
+      "Informações do catálogo",
+      "Publicação e link",
+      "Produtos no catálogo"
+    ],
+    "text": "lastro\nCatálogo público\nSua vitrine para clientes pedirem orçamento pelo WhatsApp. Não cria pedidos nem reserva estoque.\nInformações do catálogo\nNome da distribuidora\nWhatsApp para orçamentos\nCom DDD. Números de fora do Brasil: inclua o código do país.\nDescrição do catálogo\nopcio",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "catalogo",
+    "width": 390,
+    "path": "admin-catalogo-390.png",
+    "url": "http://localhost:8081/configuracoes/catalogo",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Catálogo público",
+      "Informações do catálogo",
+      "Publicação e link",
+      "Produtos no catálogo"
+    ],
+    "text": "lastro\nCatálogo público\nSua vitrine para clientes pedirem orçamento pelo WhatsApp. Não cria pedidos nem reserva estoque.\nInformações do catálogo\nNome da distribuidora\nWhatsApp para orçamentos\nCom DDD. Números de fora do Brasil: inclua o código do país.\nDescrição do catálogo\nopcio",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "catalogo",
+    "width": 768,
+    "path": "admin-catalogo-768.png",
+    "url": "http://localhost:8081/configuracoes/catalogo",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Catálogo público",
+      "Informações do catálogo",
+      "Publicação e link",
+      "Produtos no catálogo"
+    ],
+    "text": "Catálogo público\nSua vitrine para clientes pedirem orçamento pelo WhatsApp. Não cria pedidos nem reserva estoque.\nInformações do catálogo\nNome da distribuidora\nWhatsApp para orçamentos\nCom DDD. Números de fora do Brasil: inclua o código do país.\nDescrição do catálogo\nopcional\nEnd",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "catalogo",
+    "width": 1280,
+    "path": "admin-catalogo-1280.png",
+    "url": "http://localhost:8081/configuracoes/catalogo",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Catálogo público",
+      "Informações do catálogo",
+      "Publicação e link",
+      "Produtos no catálogo"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nCatálogo público\nSua vitrine para clientes pedirem orçam",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "pedidos",
+    "width": 320,
+    "path": "admin-pedidos-320.png",
+    "url": "http://localhost:8081/pedidos",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Pedidos"
+    ],
+    "text": "lastro\nPedidos\nTodos os pedidos da empresa.\nSituação do pedido\nTodos\nRascunhos\nConfirmados\nExpedidos\nCancelados\nFiltrar por cliente\nMais recentes\nMais antigos\nNúmero nos pedidos carregados\nBusca por número nos 12 pedidos carregados. Carregue mais para ampliar; o filtro por client",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "pedidos",
+    "width": 390,
+    "path": "admin-pedidos-390.png",
+    "url": "http://localhost:8081/pedidos",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Pedidos"
+    ],
+    "text": "lastro\nPedidos\nTodos os pedidos da empresa.\nSituação do pedido\nTodos\nRascunhos\nConfirmados\nExpedidos\nCancelados\nFiltrar por cliente\nMais recentes\nMais antigos\nNúmero nos pedidos carregados\nBusca por número nos 12 pedidos carregados. Carregue mais para ampliar; o filtro por client",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "pedidos",
+    "width": 768,
+    "path": "admin-pedidos-768.png",
+    "url": "http://localhost:8081/pedidos",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Pedidos"
+    ],
+    "text": "Pedidos\nTodos os pedidos da empresa.\nNovo pedido\nSituação do pedido\nTodos\nRascunhos\nConfirmados\nExpedidos\nCancelados\nFiltrar por cliente\nMais recentes\nMais antigos\nNúmero nos pedidos carregados\nBusca por número nos 12 pedidos carregados. Carregue mais para ampliar; o filtro por c",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "pedidos",
+    "width": 1280,
+    "path": "admin-pedidos-1280.png",
+    "url": "http://localhost:8081/pedidos",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Pedidos"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nPedidos\nTodos os pedidos da empresa.\nNovo pedido\nSituaçã",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "pedido-novo",
+    "width": 320,
+    "path": "admin-pedido-novo-320.png",
+    "url": "http://localhost:8081/pedidos/novo",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo pedido",
+      "Dados do pedido",
+      "Produtos",
+      "Pagamento",
+      "Finalização"
+    ],
+    "text": "lastro\nNovo pedido\nCliente, produtos e pagamento em uma página. O pedido fica como rascunho até ser confirmado.\nDados do pedido\nCliente\nResponsável\nVocê\nProdutos\nAçúcar refinado 1 kg\nMER-003 · pct · 240 pct disponível\nR$ 5,29\npct\nÁgua mineral sem gás 500 ml (caixa com 12)\nBEB-001",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "pedido-novo",
+    "width": 390,
+    "path": "admin-pedido-novo-390.png",
+    "url": "http://localhost:8081/pedidos/novo",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo pedido",
+      "Dados do pedido",
+      "Produtos",
+      "Pagamento",
+      "Finalização"
+    ],
+    "text": "lastro\nNovo pedido\nCliente, produtos e pagamento em uma página. O pedido fica como rascunho até ser confirmado.\nDados do pedido\nCliente\nResponsável\nVocê\nProdutos\nAçúcar refinado 1 kg\nMER-003 · pct · 240 pct disponível\nR$ 5,29\npct\nÁgua mineral sem gás 500 ml (caixa com 12)\nBEB-001",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "pedido-novo",
+    "width": 768,
+    "path": "admin-pedido-novo-768.png",
+    "url": "http://localhost:8081/pedidos/novo",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo pedido",
+      "Dados do pedido",
+      "Produtos",
+      "Pagamento",
+      "Finalização"
+    ],
+    "text": "Novo pedido\nCliente, produtos e pagamento em uma página. O pedido fica como rascunho até ser confirmado.\nDados do pedido\nCliente\nResponsável\nVocê\nProdutos\nAçúcar refinado 1 kg\nMER-003 · pct · 240 pct disponível\nR$ 5,29\npct\nÁgua mineral sem gás 500 ml (caixa com 12)\nBEB-001 · cx ·",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "pedido-novo",
+    "width": 1280,
+    "path": "admin-pedido-novo-1280.png",
+    "url": "http://localhost:8081/pedidos/novo",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Novo pedido",
+      "Dados do pedido",
+      "Produtos",
+      "Pagamento",
+      "Finalização",
+      "Carrinho"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nNovo pedido\nCliente, produtos e pagamento em uma página.",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque",
+    "width": 320,
+    "path": "admin-estoque-320.png",
+    "url": "http://localhost:8081/estoque",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Estoque"
+    ],
+    "text": "lastro\nEstoque\nSaldos por produto: físico, reservado para pedidos e disponível para vender.\nAjustar saldo\nRegistrar entrada\nSaldos\nReposição\nMovimentações\nProdutos ativos\n11\nEstoque baixo\n2\nSem disponível\n0\nCom reservas\n5\nProdutos ativos da empresa. Estoque baixo: disponível maio",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque",
+    "width": 390,
+    "path": "admin-estoque-390.png",
+    "url": "http://localhost:8081/estoque",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Estoque"
+    ],
+    "text": "lastro\nEstoque\nSaldos por produto: físico, reservado para pedidos e disponível para vender.\nAjustar saldo\nRegistrar entrada\nSaldos\nReposição\nMovimentações\nProdutos ativos\n11\nEstoque baixo\n2\nSem disponível\n0\nCom reservas\n5\nProdutos ativos da empresa. Estoque baixo: disponível maio",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque",
+    "width": 768,
+    "path": "admin-estoque-768.png",
+    "url": "http://localhost:8081/estoque",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Estoque"
+    ],
+    "text": "Estoque\nSaldos por produto: físico, reservado para pedidos e disponível para vender.\nAjustar saldo\nRegistrar entrada\nSaldos\nReposição\nMovimentações\nProdutos ativos\n11\nEstoque baixo\n2\nSem disponível\n0\nCom reservas\n5\nProdutos ativos da empresa. Estoque baixo: disponível maior que z",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque",
+    "width": 1280,
+    "path": "admin-estoque-1280.png",
+    "url": "http://localhost:8081/estoque",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Estoque"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nEstoque\nSaldos por produto: físico, reservado para pedid",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-entrada",
+    "width": 320,
+    "path": "admin-estoque-entrada-320.png",
+    "url": "http://localhost:8081/estoque/entrada",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Registrar entrada",
+      "Produto"
+    ],
+    "text": "lastro\nRegistrar entrada\nMercadoria que chegou: soma ao saldo físico do produto.\nProduto\nEscolha o produto\nA unidade do produto define se a quantidade aceita casas decimais.\nEscolher produto\nVoltar para o estoque\nInício\nPedidos\nClientes\nMais",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-entrada",
+    "width": 390,
+    "path": "admin-estoque-entrada-390.png",
+    "url": "http://localhost:8081/estoque/entrada",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Registrar entrada",
+      "Produto"
+    ],
+    "text": "lastro\nRegistrar entrada\nMercadoria que chegou: soma ao saldo físico do produto.\nProduto\nEscolha o produto\nA unidade do produto define se a quantidade aceita casas decimais.\nEscolher produto\nVoltar para o estoque\nInício\nPedidos\nClientes\nMais",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-entrada",
+    "width": 768,
+    "path": "admin-estoque-entrada-768.png",
+    "url": "http://localhost:8081/estoque/entrada",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Registrar entrada",
+      "Produto"
+    ],
+    "text": "Registrar entrada\nMercadoria que chegou: soma ao saldo físico do produto.\nProduto\nEscolha o produto\nA unidade do produto define se a quantidade aceita casas decimais.\nEscolher produto\nVoltar para o estoque",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-entrada",
+    "width": 1280,
+    "path": "admin-estoque-entrada-1280.png",
+    "url": "http://localhost:8081/estoque/entrada",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Registrar entrada",
+      "Produto"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nRegistrar entrada\nMercadoria que chegou: soma ao saldo f",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-ajuste",
+    "width": 320,
+    "path": "admin-estoque-ajuste-320.png",
+    "url": "http://localhost:8081/estoque/ajuste",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Ajustar saldo",
+      "Produto"
+    ],
+    "text": "lastro\nAjustar saldo\nCorreção autorizada do saldo físico, com motivo registrado no histórico.\nProduto\nEscolha o produto\nA unidade do produto define se a quantidade aceita casas decimais.\nEscolher produto\nVoltar para o estoque\nInício\nPedidos\nClientes\nMais",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-ajuste",
+    "width": 390,
+    "path": "admin-estoque-ajuste-390.png",
+    "url": "http://localhost:8081/estoque/ajuste",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Ajustar saldo",
+      "Produto"
+    ],
+    "text": "lastro\nAjustar saldo\nCorreção autorizada do saldo físico, com motivo registrado no histórico.\nProduto\nEscolha o produto\nA unidade do produto define se a quantidade aceita casas decimais.\nEscolher produto\nVoltar para o estoque\nInício\nPedidos\nClientes\nMais",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-ajuste",
+    "width": 768,
+    "path": "admin-estoque-ajuste-768.png",
+    "url": "http://localhost:8081/estoque/ajuste",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Ajustar saldo",
+      "Produto"
+    ],
+    "text": "Ajustar saldo\nCorreção autorizada do saldo físico, com motivo registrado no histórico.\nProduto\nEscolha o produto\nA unidade do produto define se a quantidade aceita casas decimais.\nEscolher produto\nVoltar para o estoque",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-ajuste",
+    "width": 1280,
+    "path": "admin-estoque-ajuste-1280.png",
+    "url": "http://localhost:8081/estoque/ajuste",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Ajustar saldo",
+      "Produto"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nAjustar saldo\nCorreção autorizada do saldo físico, com m",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-movimentacoes",
+    "width": 320,
+    "path": "admin-estoque-movimentacoes-320.png",
+    "url": "http://localhost:8081/estoque/movimentacoes",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Movimentações"
+    ],
+    "text": "lastro\nMovimentações\nEntradas, ajustes e movimentações de pedidos, com origem e responsável.\nSaldos\nReposição\nMovimentações\nFiltrar por produto\nTodos os tipos\nTodo o período\nMais recentes\nMais antigas\nAtualizar histórico\nÁgua mineral sem gás 500 ml (caixa com 12)\nReserva de pedid",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-movimentacoes",
+    "width": 390,
+    "path": "admin-estoque-movimentacoes-390.png",
+    "url": "http://localhost:8081/estoque/movimentacoes",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Movimentações"
+    ],
+    "text": "lastro\nMovimentações\nEntradas, ajustes e movimentações de pedidos, com origem e responsável.\nSaldos\nReposição\nMovimentações\nFiltrar por produto\nTodos os tipos\nTodo o período\nMais recentes\nMais antigas\nAtualizar histórico\nÁgua mineral sem gás 500 ml (caixa com 12)\nReserva de pedid",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-movimentacoes",
+    "width": 768,
+    "path": "admin-estoque-movimentacoes-768.png",
+    "url": "http://localhost:8081/estoque/movimentacoes",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Movimentações"
+    ],
+    "text": "Movimentações\nEntradas, ajustes e movimentações de pedidos, com origem e responsável.\nSaldos\nReposição\nMovimentações\nFiltrar por produto\nTodos os tipos\nTodo o período\nMais recentes\nMais antigas\nAtualizar histórico\nÁgua mineral sem gás 500 ml (caixa com 12)\nReserva de pedido · 13/",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-movimentacoes",
+    "width": 1280,
+    "path": "admin-estoque-movimentacoes-1280.png",
+    "url": "http://localhost:8081/estoque/movimentacoes",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Movimentações"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nMovimentações\nEntradas, ajustes e movimentações de pedid",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-reposicao",
+    "width": 320,
+    "path": "admin-estoque-reposicao-320.png",
+    "url": "http://localhost:8081/estoque/reposicao",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Reposição"
+    ],
+    "text": "lastro\nReposição\nProdutos com disponível abaixo do estoque mínimo. Toque em um produto para registrar a entrada.\nSaldos\nReposição\nMovimentações\nTodas as categorias\nAtivos\nInativos\nTodos\nOrdem: maior falta primeiro\nDesinfetante lavanda 2 L\nDisponível 8 un · mínimo 12 un\n4 un\nfalta",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-reposicao",
+    "width": 390,
+    "path": "admin-estoque-reposicao-390.png",
+    "url": "http://localhost:8081/estoque/reposicao",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Reposição"
+    ],
+    "text": "lastro\nReposição\nProdutos com disponível abaixo do estoque mínimo. Toque em um produto para registrar a entrada.\nSaldos\nReposição\nMovimentações\nTodas as categorias\nAtivos\nInativos\nTodos\nOrdem: maior falta primeiro\nDesinfetante lavanda 2 L\nDisponível 8 un · mínimo 12 un\n4 un\nfalta",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-reposicao",
+    "width": 768,
+    "path": "admin-estoque-reposicao-768.png",
+    "url": "http://localhost:8081/estoque/reposicao",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Reposição"
+    ],
+    "text": "Reposição\nProdutos com disponível abaixo do estoque mínimo. Toque em um produto para registrar a entrada.\nSaldos\nReposição\nMovimentações\nTodas as categorias\nAtivos\nInativos\nTodos\nOrdem: maior falta primeiro\nProduto\nDisponível\nMínimo\nFalta para o mínimo\nDesinfetante lavanda 2 L\nLI",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "estoque-reposicao",
+    "width": 1280,
+    "path": "admin-estoque-reposicao-1280.png",
+    "url": "http://localhost:8081/estoque/reposicao",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Reposição"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nReposição\nProdutos com disponível abaixo do estoque míni",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro",
+    "width": 320,
+    "path": "admin-financeiro-320.png",
+    "url": "http://localhost:8081/financeiro",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Financeiro",
+      "Próximos vencimentos",
+      "Recebimentos recentes",
+      "Precisa de atenção"
+    ],
+    "text": "lastro\nFinanceiro\nQuanto seus clientes devem, o que vence nos próximos dias e o que já entrou.\nFinanceiro\nVisão geral\nSeções\nTotal a receber\nR$ 4.280,72\n8 títulos em aberto\nVencido\nR$ 1.743,38\n3 títulos vencidos\nVence em 7 dias\nR$ 335,94\n1 título\nRecebido em outubro\nR$ 509,06\n2 p",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro",
+    "width": 390,
+    "path": "admin-financeiro-390.png",
+    "url": "http://localhost:8081/financeiro",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Financeiro",
+      "Próximos vencimentos",
+      "Recebimentos recentes",
+      "Precisa de atenção"
+    ],
+    "text": "lastro\nFinanceiro\nQuanto seus clientes devem, o que vence nos próximos dias e o que já entrou.\nFinanceiro\nVisão geral\nSeções\nTotal a receber\nR$ 4.280,72\n8 títulos em aberto\nVencido\nR$ 1.743,38\n3 títulos vencidos\nVence em 7 dias\nR$ 335,94\n1 título\nRecebido em outubro\nR$ 509,06\n2 p",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro",
+    "width": 768,
+    "path": "admin-financeiro-768.png",
+    "url": "http://localhost:8081/financeiro",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Financeiro",
+      "Próximos vencimentos",
+      "Recebimentos recentes",
+      "Precisa de atenção"
+    ],
+    "text": "Financeiro\nQuanto seus clientes devem, o que vence nos próximos dias e o que já entrou.\nVisão geral\nContas a receber\nCondições e formas\nCréditos\nReembolsos\nHistórico e operações\nTotal a receber\nR$ 4.280,72\n8 títulos em aberto\nVencido\nR$ 1.743,38\n3 títulos vencidos\nVence em 7 dias",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro",
+    "width": 1280,
+    "path": "admin-financeiro-1280.png",
+    "url": "http://localhost:8081/financeiro",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Financeiro",
+      "Próximos vencimentos",
+      "Recebimentos recentes",
+      "Precisa de atenção"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nFinanceiro\nQuanto seus clientes devem, o que vence nos p",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro-receber",
+    "width": 320,
+    "path": "admin-financeiro-receber-320.png",
+    "url": "http://localhost:8081/financeiro/receber",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Contas a receber"
+    ],
+    "text": "lastro\nContas a receber\nParcelas dos pedidos confirmados. Abra uma parcela para registrar o pagamento.\nFinanceiro\nContas a receber\nSeções\nA receber\nVencidos\nQuitados\nTodos\nCliente\nPeríodo\nMinimercado Família Souza Ltda\n1ª parcela · PED-151E02DF\n04/09/2026 · Venceu há 44 dias\nVenc",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro-receber",
+    "width": 390,
+    "path": "admin-financeiro-receber-390.png",
+    "url": "http://localhost:8081/financeiro/receber",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Contas a receber"
+    ],
+    "text": "lastro\nContas a receber\nParcelas dos pedidos confirmados. Abra uma parcela para registrar o pagamento.\nFinanceiro\nContas a receber\nSeções\nA receber\nVencidos\nQuitados\nTodos\nCliente\nPeríodo\nMinimercado Família Souza Ltda\n1ª parcela · PED-151E02DF\n04/09/2026 · Venceu há 44 dias\nVenc",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro-receber",
+    "width": 768,
+    "path": "admin-financeiro-receber-768.png",
+    "url": "http://localhost:8081/financeiro/receber",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Contas a receber"
+    ],
+    "text": "Contas a receber\nParcelas dos pedidos confirmados. Abra uma parcela para registrar o pagamento.\nVisão geral\nContas a receber\nCondições e formas\nCréditos\nReembolsos\nHistórico e operações\nA receber\nVencidos\nQuitados\nTodos\nCliente\nPeríodo\nCliente\nParcela\nVencimento\nSituação\nSaldo\nMi",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro-receber",
+    "width": 1280,
+    "path": "admin-financeiro-receber-1280.png",
+    "url": "http://localhost:8081/financeiro/receber",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Contas a receber"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nContas a receber\nParcelas dos pedidos confirmados. Abra ",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro-devolucoes",
+    "width": 320,
+    "path": "admin-financeiro-devolucoes-320.png",
+    "url": "http://localhost:8081/financeiro/devolucoes",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Devoluções de mercadoria"
+    ],
+    "text": "lastro\nDevoluções de mercadoria\nAcerto financeiro das devoluções já recebidas fisicamente.\nFinanceiro\nHistórico e operações\nSeções\nA devolução é registrada e recebida pelo fluxo de pedidos. Aqui você faz o acerto financeiro do que já chegou: o valor vira crédito do cliente ou ree",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro-devolucoes",
+    "width": 390,
+    "path": "admin-financeiro-devolucoes-390.png",
+    "url": "http://localhost:8081/financeiro/devolucoes",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Devoluções de mercadoria"
+    ],
+    "text": "lastro\nDevoluções de mercadoria\nAcerto financeiro das devoluções já recebidas fisicamente.\nFinanceiro\nHistórico e operações\nSeções\nA devolução é registrada e recebida pelo fluxo de pedidos. Aqui você faz o acerto financeiro do que já chegou: o valor vira crédito do cliente ou ree",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro-devolucoes",
+    "width": 768,
+    "path": "admin-financeiro-devolucoes-768.png",
+    "url": "http://localhost:8081/financeiro/devolucoes",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Devoluções de mercadoria"
+    ],
+    "text": "Devoluções de mercadoria\nAcerto financeiro das devoluções já recebidas fisicamente.\nVisão geral\nContas a receber\nCondições e formas\nCréditos\nReembolsos\nHistórico e operações\nA devolução é registrada e recebida pelo fluxo de pedidos. Aqui você faz o acerto financeiro do que já che",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "financeiro-devolucoes",
+    "width": 1280,
+    "path": "admin-financeiro-devolucoes-1280.png",
+    "url": "http://localhost:8081/financeiro/devolucoes",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Devoluções de mercadoria"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nDevoluções de mercadoria\nAcerto financeiro das devoluçõe",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios",
+    "width": 320,
+    "path": "admin-relatorios-320.png",
+    "url": "http://localhost:8081/relatorios",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Relatórios",
+      "Vendas por período"
+    ],
+    "text": "lastro\nRelatórios\nAnálise detalhada de vendas, financeiro e estoque, com filtros e exportação.\nComercial\nFinanceiro\nEstoque\nVendas por período\nPedidos por status\nPor cliente\nPor produto\nPor vendedor\nVendas por período\nPedidos confirmados ou expedidos, pela data de confirmação. · ",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios",
+    "width": 390,
+    "path": "admin-relatorios-390.png",
+    "url": "http://localhost:8081/relatorios",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Relatórios",
+      "Vendas por período"
+    ],
+    "text": "lastro\nRelatórios\nAnálise detalhada de vendas, financeiro e estoque, com filtros e exportação.\nComercial\nFinanceiro\nEstoque\nVendas por período\nPedidos por status\nPor cliente\nPor produto\nPor vendedor\nVendas por período\nPedidos confirmados ou expedidos, pela data de confirmação. · ",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios",
+    "width": 768,
+    "path": "admin-relatorios-768.png",
+    "url": "http://localhost:8081/relatorios",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Relatórios",
+      "Vendas por período"
+    ],
+    "text": "Relatórios\nAnálise detalhada de vendas, financeiro e estoque, com filtros e exportação.\nComercial\nFinanceiro\nEstoque\nVendas por período\nPedidos por status\nPor cliente\nPor produto\nPor vendedor\nVendas por período\nPedidos confirmados ou expedidos, pela data de confirmação. · 01/10/2",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios",
+    "width": 1280,
+    "path": "admin-relatorios-1280.png",
+    "url": "http://localhost:8081/relatorios",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Relatórios",
+      "Vendas por período"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nRelatórios\nAnálise detalhada de vendas, financeiro e est",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios-pedidos",
+    "width": 320,
+    "path": "admin-relatorios-pedidos-320.png",
+    "url": "http://localhost:8081/relatorios/pedidos",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Relatório de pedidos",
+      "Filtros disponíveis"
+    ],
+    "text": "lastro\nRelatório de pedidos\nValores comerciais por pedido. Abra o pedido para documentos e histórico.\nFiltros disponíveis\nSituação\nTodas\nID do cliente (opcional)\nAplicar cliente\nOrdem de criação\nMais recentes\nSem total global\n10 registros carregados. Esta lista não representa fat",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios-pedidos",
+    "width": 390,
+    "path": "admin-relatorios-pedidos-390.png",
+    "url": "http://localhost:8081/relatorios/pedidos",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Relatório de pedidos",
+      "Filtros disponíveis"
+    ],
+    "text": "lastro\nRelatório de pedidos\nValores comerciais por pedido. Abra o pedido para documentos e histórico.\nFiltros disponíveis\nSituação\nTodas\nID do cliente (opcional)\nAplicar cliente\nOrdem de criação\nMais recentes\nSem total global\n10 registros carregados. Esta lista não representa fat",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios-pedidos",
+    "width": 768,
+    "path": "admin-relatorios-pedidos-768.png",
+    "url": "http://localhost:8081/relatorios/pedidos",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Relatório de pedidos",
+      "Filtros disponíveis"
+    ],
+    "text": "Relatório de pedidos\nValores comerciais por pedido. Abra o pedido para documentos e histórico.\nFiltros disponíveis\nSituação\nTodas\nID do cliente (opcional)\nAplicar cliente\nOrdem de criação\nMais recentes\nSem total global\n10 registros carregados. Esta lista não representa faturament",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios-pedidos",
+    "width": 1280,
+    "path": "admin-relatorios-pedidos-1280.png",
+    "url": "http://localhost:8081/relatorios/pedidos",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Relatório de pedidos",
+      "Filtros disponíveis"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nRelatório de pedidos\nValores comerciais por pedido. Abra",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios-exportacoes",
+    "width": 320,
+    "path": "admin-relatorios-exportacoes-320.png",
+    "url": "http://localhost:8081/relatorios/exportacoes",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Exportar CSV",
+      "Filtros",
+      "Página CSV 1"
+    ],
+    "text": "lastro\nExportar CSV\nUm arquivo por página, emitido pelo backend. Sem total global ou snapshot entre páginas.\nFiltros\nDados\nClientes\nSituação\nPadrão da API\nPrefixo do nome\nOrdenar por\nNome\nResponsável: UID ou unassigned (opcional)\nDireção\nCrescente\nRegistros por arquivo (1 a 100)\n",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios-exportacoes",
+    "width": 390,
+    "path": "admin-relatorios-exportacoes-390.png",
+    "url": "http://localhost:8081/relatorios/exportacoes",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Exportar CSV",
+      "Filtros",
+      "Página CSV 1"
+    ],
+    "text": "lastro\nExportar CSV\nUm arquivo por página, emitido pelo backend. Sem total global ou snapshot entre páginas.\nFiltros\nDados\nClientes\nSituação\nPadrão da API\nPrefixo do nome\nOrdenar por\nNome\nResponsável: UID ou unassigned (opcional)\nDireção\nCrescente\nRegistros por arquivo (1 a 100)\n",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios-exportacoes",
+    "width": 768,
+    "path": "admin-relatorios-exportacoes-768.png",
+    "url": "http://localhost:8081/relatorios/exportacoes",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Exportar CSV",
+      "Filtros",
+      "Página CSV 1"
+    ],
+    "text": "Exportar CSV\nUm arquivo por página, emitido pelo backend. Sem total global ou snapshot entre páginas.\nFiltros\nDados\nClientes\nSituação\nPadrão da API\nPrefixo do nome\nOrdenar por\nNome\nResponsável: UID ou unassigned (opcional)\nDireção\nCrescente\nRegistros por arquivo (1 a 100)\nPágina ",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "relatorios-exportacoes",
+    "width": 1280,
+    "path": "admin-relatorios-exportacoes-1280.png",
+    "url": "http://localhost:8081/relatorios/exportacoes",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Exportar CSV",
+      "Filtros",
+      "Página CSV 1"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nExportar CSV\nUm arquivo por página, emitido pelo backend",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "usuarios",
+    "width": 320,
+    "path": "admin-usuarios-320.png",
+    "url": "http://localhost:8081/configuracoes/usuarios",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Usuários",
+      "Plano Profissional",
+      "Pessoas com acesso",
+      "Convites pendentes"
+    ],
+    "text": "lastro\nUsuários\n2 ativos · 0 convites pendentes. Cada um ocupa uma vaga do plano.\nConvidar usuário\nPlano Profissional\nAcessos utilizados: 2 de 2\nSem vagas livres\nRecursos do plano: Convite de usuários adicionais, Catálogo / vitrine virtual, Vendedores e carteiras de clientes, Vis",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "usuarios",
+    "width": 390,
+    "path": "admin-usuarios-390.png",
+    "url": "http://localhost:8081/configuracoes/usuarios",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Usuários",
+      "Plano Profissional",
+      "Pessoas com acesso",
+      "Convites pendentes"
+    ],
+    "text": "lastro\nUsuários\n2 ativos · 0 convites pendentes. Cada um ocupa uma vaga do plano.\nConvidar usuário\nPlano Profissional\nAcessos utilizados: 2 de 2\nSem vagas livres\nRecursos do plano: Convite de usuários adicionais, Catálogo / vitrine virtual, Vendedores e carteiras de clientes, Vis",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "usuarios",
+    "width": 768,
+    "path": "admin-usuarios-768.png",
+    "url": "http://localhost:8081/configuracoes/usuarios",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Usuários",
+      "Plano Profissional",
+      "Pessoas com acesso",
+      "Convites pendentes"
+    ],
+    "text": "Usuários\n2 ativos · 0 convites pendentes. Cada um ocupa uma vaga do plano.\nConvidar usuário\nPlano Profissional\nAcessos utilizados: 2 de 2\nSem vagas livres\nRecursos do plano: Convite de usuários adicionais, Catálogo / vitrine virtual, Vendedores e carteiras de clientes, Visitas e ",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "usuarios",
+    "width": 1280,
+    "path": "admin-usuarios-1280.png",
+    "url": "http://localhost:8081/configuracoes/usuarios",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Usuários",
+      "Plano Profissional",
+      "Pessoas com acesso",
+      "Convites pendentes"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nUsuários\n2 ativos · 0 convites pendentes. Cada um ocupa ",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "visitas",
+    "width": 320,
+    "path": "admin-visitas-320.png",
+    "url": "http://localhost:8081/visitas",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Visitas"
+    ],
+    "text": "lastro\nVisitas\n0 registros\nRegistrar visita\nVisitas\nRecompra\nTodas\nManuais\nEntregas\nTodos os responsáveis\nDe\nopcional\nAté\nopcional\nNenhuma visita registrada\nRegistre visitas e contatos com clientes. Entregas confirmadas nos pedidos aparecem aqui automaticamente.\nRegistrar visita\n",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "visitas",
+    "width": 390,
+    "path": "admin-visitas-390.png",
+    "url": "http://localhost:8081/visitas",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Visitas"
+    ],
+    "text": "lastro\nVisitas\n0 registros\nRegistrar visita\nVisitas\nRecompra\nTodas\nManuais\nEntregas\nTodos os responsáveis\nDe\nopcional\nAté\nopcional\nNenhuma visita registrada\nRegistre visitas e contatos com clientes. Entregas confirmadas nos pedidos aparecem aqui automaticamente.\nRegistrar visita\n",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "visitas",
+    "width": 768,
+    "path": "admin-visitas-768.png",
+    "url": "http://localhost:8081/visitas",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Visitas"
+    ],
+    "text": "Visitas\n0 registros\nRegistrar visita\nVisitas\nRecompra\nTodas\nManuais\nEntregas\nTodos os responsáveis\nDe\nopcional\nAté\nopcional\nNenhuma visita registrada\nRegistre visitas e contatos com clientes. Entregas confirmadas nos pedidos aparecem aqui automaticamente.\nRegistrar visita",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "visitas",
+    "width": 1280,
+    "path": "admin-visitas-1280.png",
+    "url": "http://localhost:8081/visitas",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Visitas"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nVisitas\n0 registros\nRegistrar visita\nVisitas\nRecompra\nTo",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "visita-nova",
+    "width": 320,
+    "path": "admin-visita-nova-320.png",
+    "url": "http://localhost:8081/visitas/nova",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Registrar visita",
+      "Atendimento",
+      "Pedido relacionado"
+    ],
+    "text": "lastro\nRegistrar visita\nRegistro do atendimento ao cliente. Não cria pedido, estoque nem financeiro.\nAtendimento\nCliente\nData da visita\nTipo de atendimento\nVisita presencial\nContato remoto\nResponsável\nAna Administradora (você)\nQuem realizou o atendimento.\nObservações do atendimen",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "visita-nova",
+    "width": 390,
+    "path": "admin-visita-nova-390.png",
+    "url": "http://localhost:8081/visitas/nova",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Registrar visita",
+      "Atendimento",
+      "Pedido relacionado"
+    ],
+    "text": "lastro\nRegistrar visita\nRegistro do atendimento ao cliente. Não cria pedido, estoque nem financeiro.\nAtendimento\nCliente\nData da visita\nTipo de atendimento\nVisita presencial\nContato remoto\nResponsável\nAna Administradora (você)\nQuem realizou o atendimento.\nObservações do atendimen",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "visita-nova",
+    "width": 768,
+    "path": "admin-visita-nova-768.png",
+    "url": "http://localhost:8081/visitas/nova",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Registrar visita",
+      "Atendimento",
+      "Pedido relacionado"
+    ],
+    "text": "Registrar visita\nRegistro do atendimento ao cliente. Não cria pedido, estoque nem financeiro.\nAtendimento\nCliente\nData da visita\nTipo de atendimento\nVisita presencial\nContato remoto\nResponsável\nAna Administradora (você)\nQuem realizou o atendimento.\nObservações do atendimento\nPedi",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "visita-nova",
+    "width": 1280,
+    "path": "admin-visita-nova-1280.png",
+    "url": "http://localhost:8081/visitas/nova",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Registrar visita",
+      "Atendimento",
+      "Pedido relacionado"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nRegistrar visita\nRegistro do atendimento ao cliente. Não",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "recompra",
+    "width": 320,
+    "path": "admin-recompra-320.png",
+    "url": "http://localhost:8081/visitas/recompra",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Recompra"
+    ],
+    "text": "lastro\nRecompra\n9 clientes\nVisitas\nRecompra\nEstimativa de recompra: mediana dos intervalos entre compras confirmadas nos últimos 12 meses, com pelo menos 3 compras. É uma referência, não uma data garantida.\nTodos os vendedores\nTodos\nEstimativa vencida (0)\nDentro do intervalo (0)\n",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "recompra",
+    "width": 390,
+    "path": "admin-recompra-390.png",
+    "url": "http://localhost:8081/visitas/recompra",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Recompra"
+    ],
+    "text": "lastro\nRecompra\n9 clientes\nVisitas\nRecompra\nEstimativa de recompra: mediana dos intervalos entre compras confirmadas nos últimos 12 meses, com pelo menos 3 compras. É uma referência, não uma data garantida.\nTodos os vendedores\nTodos\nEstimativa vencida (0)\nDentro do intervalo (0)\n",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "recompra",
+    "width": 768,
+    "path": "admin-recompra-768.png",
+    "url": "http://localhost:8081/visitas/recompra",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Recompra"
+    ],
+    "text": "Recompra\n9 clientes\nVisitas\nRecompra\nEstimativa de recompra: mediana dos intervalos entre compras confirmadas nos últimos 12 meses, com pelo menos 3 compras. É uma referência, não uma data garantida.\nTodos os vendedores\nTodos\nEstimativa vencida (0)\nDentro do intervalo (0)\nSem his",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "recompra",
+    "width": 1280,
+    "path": "admin-recompra-1280.png",
+    "url": "http://localhost:8081/visitas/recompra",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Recompra"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nRecompra\n9 clientes\nVisitas\nRecompra\nEstimativa de recom",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "meu-perfil",
+    "width": 320,
+    "path": "admin-meu-perfil-320.png",
+    "url": "http://localhost:8081/meu-perfil",
+    "innerWidth": 320,
+    "scrollWidth": 320,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Meu Perfil",
+      "Identidade",
+      "Acesso atual",
+      "Segurança"
+    ],
+    "text": "lastro\nMeu Perfil\nDados da sua identidade e acesso.\nVoltar\nIdentidade\nNome\nAna Administradora\nE-mail de acesso\nadmin.demo@lastro.invalid\nEditar nome\nAcesso atual\nEmpresa\nDistribuidora Demo Lastro\nFunção\nAdministrador\nSegurança\nSua senha e seu e-mail são gerenciados pelo Firebase.",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "meu-perfil",
+    "width": 390,
+    "path": "admin-meu-perfil-390.png",
+    "url": "http://localhost:8081/meu-perfil",
+    "innerWidth": 390,
+    "scrollWidth": 390,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Meu Perfil",
+      "Identidade",
+      "Acesso atual",
+      "Segurança"
+    ],
+    "text": "lastro\nMeu Perfil\nDados da sua identidade e acesso.\nVoltar\nIdentidade\nNome\nAna Administradora\nE-mail de acesso\nadmin.demo@lastro.invalid\nEditar nome\nAcesso atual\nEmpresa\nDistribuidora Demo Lastro\nFunção\nAdministrador\nSegurança\nSua senha e seu e-mail são gerenciados pelo Firebase.",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "meu-perfil",
+    "width": 768,
+    "path": "admin-meu-perfil-768.png",
+    "url": "http://localhost:8081/meu-perfil",
+    "innerWidth": 768,
+    "scrollWidth": 768,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Meu Perfil",
+      "Identidade",
+      "Acesso atual",
+      "Segurança"
+    ],
+    "text": "Meu Perfil\nDados da sua identidade e acesso.\nVoltar\nIdentidade\nNome\nAna Administradora\nE-mail de acesso\nadmin.demo@lastro.invalid\nEditar nome\nAcesso atual\nEmpresa\nDistribuidora Demo Lastro\nFunção\nAdministrador\nSegurança\nSua senha e seu e-mail são gerenciados pelo Firebase.\nEnviar",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  },
+  {
+    "role": "admin",
+    "name": "meu-perfil",
+    "width": 1280,
+    "path": "admin-meu-perfil-1280.png",
+    "url": "http://localhost:8081/meu-perfil",
+    "innerWidth": 1280,
+    "scrollWidth": 1280,
+    "scrollHeight": 800,
+    "title": "Lastro",
+    "headings": [
+      "Meu Perfil",
+      "Identidade",
+      "Acesso atual",
+      "Segurança"
+    ],
+    "text": "Meu Perfil\nDados da sua identidade e acesso.\nVoltar\nIdentidade\nNome\nAna Administradora\nE-mail de acesso\nadmin.demo@lastro.invalid\nEditar nome\nAcesso atual\nEmpresa\nDistribuidora Demo Lastro\nFunção\nAdministrador\nSegurança\nSua senha e seu e-mail são gerenciados pelo Firebase.\nEnviar",
+    "unnamedButtons": 0,
+    "unnamedInputs": 0
+  }
+]

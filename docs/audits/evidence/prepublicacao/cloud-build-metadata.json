@@ -1,0 +1,56 @@
+{
+  "createTime": "2026-10-16T19:25:28.960560208Z",
+  "finishTime": "2026-10-16T19:27:26.347880Z",
+  "id": "89883c00-c854-4b0d-b724-4d57508961f0",
+  "results": {
+    "images": [
+      {
+        "artifactRegistryPackage": "projects/lastro-hml/locations/southamerica-east1/repositories/cloud-run-source-deploy/packages/lastro-api-hml/versions/sha256:a1529f7a0f32f86927ee0a916a3ce618017a67cf14cb2d7bdf8a3db3466a14a7",
+        "digest": "sha256:a1529f7a0f32f86927ee0a916a3ce618017a67cf14cb2d7bdf8a3db3466a14a7",
+        "name": "southamerica-east1-docker.pkg.dev/lastro-hml/cloud-run-source-deploy/lastro-api-hml",
+        "pushTiming": {
+          "endTime": "2026-10-16T19:27:25.719133771Z",
+          "startTime": "2026-10-16T19:27:11.557842101Z"
+        }
+      },
+      {
+        "artifactRegistryPackage": "projects/lastro-hml/locations/southamerica-east1/repositories/cloud-run-source-deploy/packages/lastro-api-hml/versions/sha256:a1529f7a0f32f86927ee0a916a3ce618017a67cf14cb2d7bdf8a3db3466a14a7",
+        "digest": "sha256:a1529f7a0f32f86927ee0a916a3ce618017a67cf14cb2d7bdf8a3db3466a14a7",
+        "name": "southamerica-east1-docker.pkg.dev/lastro-hml/cloud-run-source-deploy/lastro-api-hml:latest",
+        "pushTiming": {
+          "endTime": "2026-10-16T19:27:25.719133771Z",
+          "startTime": "2026-10-16T19:27:11.557842101Z"
+        }
+      }
+    ]
+  },
+  "source": {
+    "storageSource": {
+      "bucket": "run-sources-lastro-hml-southamerica-east1",
+      "generation": "1792178728274298",
+      "object": "services/lastro-api-hml/1792178731.134905-490c4ca69e6145be8c5442418b89f3cd.zip"
+    }
+  },
+  "sourceProvenance": {
+    "fileHashes": {
+      "gs://run-sources-lastro-hml-southamerica-east1/services/lastro-api-hml/1792178731.134905-490c4ca69e6145be8c5442418b89f3cd.zip#1792178728274298": {
+        "fileHash": [
+          {
+            "type": "MD5",
+            "value": "WkJU8ukwFg_79VQYSEAhKQ=="
+          },
+          {
+            "type": "SHA256",
+            "value": "h4W4LcRA1m_BU0CDdHolEEpc7bVBkrldU6hyKJ-ooQ8="
+          }
+        ]
+      }
+    },
+    "resolvedStorageSource": {
+      "bucket": "run-sources-lastro-hml-southamerica-east1",
+      "generation": "1792178728274298",
+      "object": "services/lastro-api-hml/1792178731.134905-490c4ca69e6145be8c5442418b89f3cd.zip"
+    }
+  },
+  "status": "SUCCESS"
+}

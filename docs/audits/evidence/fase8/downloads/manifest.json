@@ -1,0 +1,49 @@
+{
+  "project": "demo-lastro-phase-a",
+  "orderId": "fe23d64a-203d-46dc-8828-8fe5c0356712",
+  "tenantId": "fa3d9030-2cad-4ce9-aa98-f05fc5d29eba",
+  "period": {
+    "from": "2026-07-10",
+    "to": "2026-10-18"
+  },
+  "sellerExportStatus": 403,
+  "sellerReportStatus": 403,
+  "invalidTokenStatus": 401,
+  "files": [
+    {
+      "file": "pedido-comercial.pdf",
+      "bytes": 35031,
+      "sha256": "92ecae4f678b541bdaa4a585af40166a19f0a1677f19a824299e4943c0cd087d",
+      "disposition": "attachment; filename=\"pedido-fe23d64a-203d-46dc-8828-8fe5c0356712.pdf\"",
+      "contentType": "application/pdf"
+    },
+    {
+      "file": "romaneio.pdf",
+      "bytes": 35024,
+      "sha256": "7d71ca4ca05fdaff535e4ee66f71fbeee2f92da34b30d0b5b3c5f69b11d5ef02",
+      "disposition": "attachment; filename=\"romaneio-fe23d64a-203d-46dc-8828-8fe5c0356712.pdf\"",
+      "contentType": "application/pdf"
+    },
+    {
+      "file": "relatorio-pedidos.pdf",
+      "bytes": 35445,
+      "sha256": "62babc32d9cb98818904c9db6035a77b58b42bc930a6c48cd1a410de3064ab15",
+      "disposition": "attachment; filename=\"pedidos-por-status_distribuidora-demo-lastro_2026-07-10_a_2026-10-18.pdf\"",
+      "contentType": "application/pdf"
+    },
+    {
+      "file": "relatorio-pedidos.csv",
+      "bytes": 1448,
+      "sha256": "781c734d1ecef5acb3147a1dec40e2318400aaeae84e6e7d0e55a22458426950",
+      "disposition": "attachment; filename=\"pedidos-por-status_distribuidora-demo-lastro_2026-07-10_a_2026-10-18.csv\"",
+      "contentType": "text/csv; charset=utf-8"
+    },
+    {
+      "file": "produtos.csv",
+      "bytes": 895,
+      "sha256": "38dd9d6f3788163e35422db63fd261bdc7344f76cd86e03babda588458eedaf3",
+      "disposition": "attachment; filename=\"produtos.csv\"",
+      "contentType": "text/csv; charset=utf-8"
+    }
+  ]
+}

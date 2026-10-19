@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-18T22:38:49.674Z",
+  "scope": "Local web export source-map inventory only. Presence proves inclusion, not an exploitable call path. Native reachability remains untested.",
+  "sourceCount": 1364,
+  "packages": [
+    {
+      "package": "decode-uri-component",
+      "sources": [
+        "/node_modules/decode-uri-component/index.js"
+      ]
+    },
+    {
+      "package": "@grpc/grpc-js",
+      "sources": []
+    },
+    {
+      "package": "node-forge",
+      "sources": []
+    },
+    {
+      "package": "braces",
+      "sources": []
+    },
+    {
+      "package": "sprintf-js",
+      "sources": []
+    },
+    {
+      "package": "uuid",
+      "sources": []
+    }
+  ]
+}

@@ -88,6 +88,23 @@ export class FoundationRepository {
     const snapshot = tx ? await tx.get(ref) : await ref.get();
     return this.readSnapshot(snapshot, schema, tx);
   }
+  /** Bounded point reads in the same transaction, with the usual validation and read budget. */
+  async readMany<T>(
+    refs: readonly DocumentReference[],
+    schema: z.ZodType<T>,
+    tx: Transaction,
+  ): Promise<(T | null)[]> {
+    const unique = [...new Map(refs.map((ref) => [ref.path, ref])).values()];
+    const values = new Map<string, T | null>();
+    for (let offset = 0; offset < unique.length; offset += 100) {
+      checkReadBudget();
+      const snapshots = await tx.getAll(...unique.slice(offset, offset + 100));
+      for (const snapshot of snapshots) {
+        values.set(snapshot.ref.path, await this.readSnapshot(snapshot, schema, tx));
+      }
+    }
+    return refs.map((ref) => values.get(ref.path) ?? null);
+  }
   async readSnapshot<T>(
     snapshot: DocumentSnapshot,
     schema: z.ZodType<T>,

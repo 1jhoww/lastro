@@ -1,0 +1,267 @@
+{
+  "scope": "demo-lastro-tests, local emulators only",
+  "node": "v24.22.0",
+  "command": "node scripts/emulators.mjs test --without-capacity",
+  "tests": 494,
+  "passed": 494,
+  "failed": 0,
+  "startTime": "2026-10-18T23:00:58.003Z",
+  "files": [
+    {
+      "file": "tests/concurrency/admission.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "tests/concurrency/commercial.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "file": "tests/concurrency/inventory.test.ts",
+      "status": "passed",
+      "tests": 7
+    },
+    {
+      "file": "tests/concurrency/orderCapacity.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "tests/concurrency/orders.test.ts",
+      "status": "passed",
+      "tests": 8
+    },
+    {
+      "file": "tests/concurrency/planCapacity.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "tests/integration/accessAdjustments.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "file": "tests/integration/accessManagement.test.ts",
+      "status": "passed",
+      "tests": 20
+    },
+    {
+      "file": "tests/integration/adminExpiryMigration.test.ts",
+      "status": "passed",
+      "tests": 1
+    },
+    {
+      "file": "tests/integration/batchedProducts.test.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "tests/integration/billing.test.ts",
+      "status": "passed",
+      "tests": 8
+    },
+    {
+      "file": "tests/integration/catalog.test.ts",
+      "status": "passed",
+      "tests": 30
+    },
+    {
+      "file": "tests/integration/catalogSettings.test.ts",
+      "status": "passed",
+      "tests": 8
+    },
+    {
+      "file": "tests/integration/commercial.test.ts",
+      "status": "passed",
+      "tests": 18
+    },
+    {
+      "file": "tests/integration/concurrentPerformance.test.ts",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "file": "tests/integration/documents.test.ts",
+      "status": "passed",
+      "tests": 21
+    },
+    {
+      "file": "tests/integration/exports.test.ts",
+      "status": "passed",
+      "tests": 18
+    },
+    {
+      "file": "tests/integration/financeReceipts.test.ts",
+      "status": "passed",
+      "tests": 11
+    },
+    {
+      "file": "tests/integration/financeSettlement.test.ts",
+      "status": "passed",
+      "tests": 11
+    },
+    {
+      "file": "tests/integration/financialEconomicView.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "tests/integration/financialExecution.test.ts",
+      "status": "passed",
+      "tests": 1
+    },
+    {
+      "file": "tests/integration/financialExecutionLocks.test.ts",
+      "status": "passed",
+      "tests": 8
+    },
+    {
+      "file": "tests/integration/financialExecutionRecovery.test.ts",
+      "status": "passed",
+      "tests": 7
+    },
+    {
+      "file": "tests/integration/financialExecutionReturns.test.ts",
+      "status": "passed",
+      "tests": 4
+    },
+    {
+      "file": "tests/integration/financialExecutionStock.test.ts",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "file": "tests/integration/financialReceiptVolumes.test.ts",
+      "status": "passed",
+      "tests": 3
+    },
+    {
+      "file": "tests/integration/financialReconciliation.test.ts",
+      "status": "passed",
+      "tests": 21
+    },
+    {
+      "file": "tests/integration/financialReturnCompatibility.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "tests/integration/financialSourceBackfill.test.ts",
+      "status": "passed",
+      "tests": 8
+    },
+    {
+      "file": "tests/integration/financialSourceIndex.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "tests/integration/financialSourceSeed.test.ts",
+      "status": "passed",
+      "tests": 1
+    },
+    {
+      "file": "tests/integration/foundation.test.ts",
+      "status": "passed",
+      "tests": 19
+    },
+    {
+      "file": "tests/integration/inventory.test.ts",
+      "status": "passed",
+      "tests": 13
+    },
+    {
+      "file": "tests/integration/orderCapacity.test.ts",
+      "status": "passed",
+      "tests": 15
+    },
+    {
+      "file": "tests/integration/orders.test.ts",
+      "status": "passed",
+      "tests": 24
+    },
+    {
+      "file": "tests/integration/paymentSettings.test.ts",
+      "status": "passed",
+      "tests": 10
+    },
+    {
+      "file": "tests/integration/performance.test.ts",
+      "status": "passed",
+      "tests": 6
+    },
+    {
+      "file": "tests/integration/planLimits.test.ts",
+      "status": "passed",
+      "tests": 11
+    },
+    {
+      "file": "tests/integration/planMigration.test.ts",
+      "status": "passed",
+      "tests": 2
+    },
+    {
+      "file": "tests/integration/platformPanel.test.ts",
+      "status": "passed",
+      "tests": 7
+    },
+    {
+      "file": "tests/integration/readMemory.test.ts",
+      "status": "passed",
+      "tests": 1
+    },
+    {
+      "file": "tests/integration/remediation.test.ts",
+      "status": "passed",
+      "tests": 9
+    },
+    {
+      "file": "tests/integration/reports.test.ts",
+      "status": "passed",
+      "tests": 5
+    },
+    {
+      "file": "tests/integration/returns.test.ts",
+      "status": "passed",
+      "tests": 34
+    },
+    {
+      "file": "tests/integration/subscriptions.test.ts",
+      "status": "passed",
+      "tests": 11
+    },
+    {
+      "file": "tests/integration/visits.test.ts",
+      "status": "passed",
+      "tests": 19
+    },
+    {
+      "file": "tests/security/access.test.ts",
+      "status": "passed",
+      "tests": 12
+    },
+    {
+      "file": "tests/security/commercial.test.ts",
+      "status": "passed",
+      "tests": 12
+    },
+    {
+      "file": "tests/security/finance.test.ts",
+      "status": "passed",
+      "tests": 7
+    },
+    {
+      "file": "tests/security/inventory.test.ts",
+      "status": "passed",
+      "tests": 8
+    },
+    {
+      "file": "tests/security/orders.test.ts",
+      "status": "passed",
+      "tests": 14
+    }
+  ],
+  "excluded": "Only original financial 20,000-source capacity scenarios; not rerun in this remediation."
+}

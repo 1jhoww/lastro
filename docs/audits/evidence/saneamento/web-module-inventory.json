@@ -1,0 +1,14 @@
+{
+  "runtime": "v24.22.0",
+  "mapSha256": "7ff7abe27896e1e9913b5422d0dfef389ae4a4ef757f305553baa3ff72f62d12",
+  "modules": {
+    "decode-uri-component": ["/node_modules/decode-uri-component/index.js"],
+    "@grpc/grpc-js": [],
+    "uuid": [],
+    "braces": [],
+    "node-forge": [],
+    "sprintf-js": []
+  },
+  "decoderSourceMatchesInstalled": true,
+  "decoderVersion": "0.5.0"
+}

@@ -1,0 +1,106 @@
+{
+  "target": "production environment of lastro-hml project, not a separate production project",
+  "checkedAt": "2026-10-18T22:31:54.709Z",
+  "values": {
+    "EXPO_PUBLIC_API_URL": {
+      "display": "\\uFEFFhttps://lastro-api-hml-859974935461.southamerica-east1.run.app",
+      "leadingBom": true
+    },
+    "EXPO_PUBLIC_FIREBASE_API_KEY": {
+      "present": true,
+      "public": true
+    },
+    "EXPO_PUBLIC_FIREBASE_PROJECT_ID": {
+      "display": "\\uFEFFlastro-hml",
+      "leadingBom": true
+    },
+    "EXPO_PUBLIC_WEB_BASE_URL": {
+      "display": "\\uFEFFhttps://lastro-hml.vercel.app",
+      "leadingBom": true
+    },
+    "NX_DAEMON": {
+      "present": true,
+      "public": false
+    },
+    "TURBO_CACHE": {
+      "present": true,
+      "public": false
+    },
+    "TURBO_DOWNLOAD_LOCAL_ENABLED": {
+      "present": true,
+      "public": false
+    },
+    "TURBO_REMOTE_ONLY": {
+      "present": true,
+      "public": false
+    },
+    "TURBO_RUN_SUMMARY": {
+      "present": true,
+      "public": false
+    },
+    "VERCEL": {
+      "present": true,
+      "public": false
+    },
+    "VERCEL_ENV": {
+      "present": true,
+      "public": false
+    },
+    "VERCEL_GIT_COMMIT_AUTHOR_LOGIN": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_COMMIT_AUTHOR_NAME": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_COMMIT_MESSAGE": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_COMMIT_REF": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_COMMIT_SHA": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_PREVIOUS_SHA": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_PROVIDER": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_PULL_REQUEST_ID": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_REPO_ID": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_REPO_OWNER": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_GIT_REPO_SLUG": {
+      "present": false,
+      "public": false
+    },
+    "VERCEL_OIDC_TOKEN": {
+      "present": true,
+      "public": false
+    },
+    "VERCEL_TARGET_ENV": {
+      "present": true,
+      "public": false
+    },
+    "VERCEL_URL": {
+      "present": false,
+      "public": false
+    }
+  }
+}

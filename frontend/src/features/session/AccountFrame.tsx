@@ -1,11 +1,12 @@
 import type { ReactNode } from 'react';
+import { Link, usePathname } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Wordmark } from '@/brand';
 import { useSession } from '@/session/SessionContext';
 import { color, space, useLayoutSize } from '@/theme';
 import { Button, Text } from '@/ui';
-import { LogOut } from '@/ui/icons';
+import { LogOut, UserRound } from '@/ui/icons';
 
 /**
  * Moldura das telas da conta fora de uma empresa (escolher empresa, acesso bloqueado, sem
@@ -21,6 +22,7 @@ export function AccountFrame({
   children: ReactNode;
 }) {
   const { user, signOut } = useSession();
+  const pathname = usePathname();
   const insets = useSafeAreaInsets();
   const compact = useLayoutSize() === 'compact';
 
@@ -42,6 +44,11 @@ export function AccountFrame({
                 {user?.email}
               </Text>
             )}
+            {pathname !== '/meu-perfil' ? (
+              <Link href="/meu-perfil" asChild>
+                <Button label="Meu Perfil" variant="ghost" size="sm" icon={UserRound} />
+              </Link>
+            ) : null}
             <Button label="Sair" variant="ghost" size="sm" icon={LogOut} onPress={signOut} />
           </View>
         </View>
@@ -71,8 +78,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: space[4],
+    flexWrap: 'wrap',
     marginBottom: space[4],
   },
-  who: { flexDirection: 'row', alignItems: 'center', gap: space[2], flexShrink: 1 },
+  who: { flexDirection: 'row', alignItems: 'center', gap: space[2], flexShrink: 1, flexWrap: 'wrap' },
   headings: { gap: space[2] },
 });

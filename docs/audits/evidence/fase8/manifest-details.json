@@ -1,0 +1,482 @@
+[
+  {
+    "role": "admin",
+    "name": "pedido-detalhe",
+    "width": 320,
+    "file": "admin-pedido-detalhe-320.png",
+    "route": "http://localhost:8081/pedidos/e48f56ee-555d-49b1-b516-fe45bc676a36",
+    "scrollWidth": 320,
+    "headings": [
+      "PED-E48F56EE",
+      "Itens (1)",
+      "Pagamento",
+      "Observações",
+      "Registro",
+      "Documentos"
+    ],
+    "text": "lastro\nPED-E48F56EE\nCantina Bella Itália Ltda\nRascunho\nR$ 154,80\nEditar rascunho\nCancelar rascunho\nConfirmar pedido\nAbrir financeiro do pedido\nItens (1)\nQuantidades e valores do pedido.\nSuco de uva integral 1 L\n12 un × R$ 12,90\nR$ 154,80\nSubtotal\nR$ "
+  },
+  {
+    "role": "admin",
+    "name": "pedido-detalhe",
+    "width": 390,
+    "file": "admin-pedido-detalhe-390.png",
+    "route": "http://localhost:8081/pedidos/e48f56ee-555d-49b1-b516-fe45bc676a36",
+    "scrollWidth": 390,
+    "headings": [
+      "PED-E48F56EE",
+      "Itens (1)",
+      "Pagamento",
+      "Observações",
+      "Registro",
+      "Documentos"
+    ],
+    "text": "lastro\nPED-E48F56EE\nCantina Bella Itália Ltda\nRascunho\nR$ 154,80\nEditar rascunho\nCancelar rascunho\nConfirmar pedido\nAbrir financeiro do pedido\nItens (1)\nQuantidades e valores do pedido.\nSuco de uva integral 1 L\n12 un × R$ 12,90\nR$ 154,80\nSubtotal\nR$ "
+  },
+  {
+    "role": "admin",
+    "name": "pedido-detalhe",
+    "width": 768,
+    "file": "admin-pedido-detalhe-768.png",
+    "route": "http://localhost:8081/pedidos/e48f56ee-555d-49b1-b516-fe45bc676a36",
+    "scrollWidth": 768,
+    "headings": [
+      "PED-E48F56EE",
+      "Itens (1)",
+      "Pagamento",
+      "Observações",
+      "Registro",
+      "Documentos"
+    ],
+    "text": "PED-E48F56EE\nCantina Bella Itália Ltda\nRascunho\nR$ 154,80\nEditar rascunho\nCancelar rascunho\nConfirmar pedido\nAbrir financeiro do pedido\nItens (1)\nQuantidades e valores do pedido.\nProduto\nQuantidade\nPreço registrado\nTotal\nSuco de uva integral 1 L\nBEB-"
+  },
+  {
+    "role": "admin",
+    "name": "pedido-detalhe",
+    "width": 1280,
+    "file": "admin-pedido-detalhe-1280.png",
+    "route": "http://localhost:8081/pedidos/e48f56ee-555d-49b1-b516-fe45bc676a36",
+    "scrollWidth": 1280,
+    "headings": [
+      "PED-E48F56EE",
+      "Itens (1)",
+      "Pagamento",
+      "Observações",
+      "Registro",
+      "Documentos"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nPED-E48F56EE\nCantina Bella"
+  },
+  {
+    "role": "admin",
+    "name": "cliente-detalhe",
+    "width": 320,
+    "file": "admin-cliente-detalhe-320.png",
+    "route": "http://localhost:8081/clientes/6d802f7d-b3a8-4c7c-9f3c-789b8c87cc7b",
+    "scrollWidth": 320,
+    "headings": [
+      "Cantina Bella Itália Ltda",
+      "Dados",
+      "Observações",
+      "Histórico de relacionamento",
+      "Compras e recompra",
+      "Carteira",
+      "Registro"
+    ],
+    "text": "lastro\nCantina Bella Itália Ltda\nBella Itália\nEditar\nDesativar\nDados\nCNPJ\n77.888.999/0001-81\nTelefone\n(11) 3289-4471\nE-mail\nNão informado\nEndereço\nRua Treze de Maio, 742, Bela Vista, São Paulo/SP, 01327-000\nObservações\nNenhuma observação.\nHistórico d"
+  },
+  {
+    "role": "admin",
+    "name": "cliente-detalhe",
+    "width": 390,
+    "file": "admin-cliente-detalhe-390.png",
+    "route": "http://localhost:8081/clientes/6d802f7d-b3a8-4c7c-9f3c-789b8c87cc7b",
+    "scrollWidth": 390,
+    "headings": [
+      "Cantina Bella Itália Ltda",
+      "Dados",
+      "Observações",
+      "Histórico de relacionamento",
+      "Compras e recompra",
+      "Carteira",
+      "Registro"
+    ],
+    "text": "lastro\nCantina Bella Itália Ltda\nBella Itália\nEditar\nDesativar\nDados\nCNPJ\n77.888.999/0001-81\nTelefone\n(11) 3289-4471\nE-mail\nNão informado\nEndereço\nRua Treze de Maio, 742, Bela Vista, São Paulo/SP, 01327-000\nObservações\nNenhuma observação.\nHistórico d"
+  },
+  {
+    "role": "admin",
+    "name": "cliente-detalhe",
+    "width": 768,
+    "file": "admin-cliente-detalhe-768.png",
+    "route": "http://localhost:8081/clientes/6d802f7d-b3a8-4c7c-9f3c-789b8c87cc7b",
+    "scrollWidth": 768,
+    "headings": [
+      "Cantina Bella Itália Ltda",
+      "Dados",
+      "Observações",
+      "Histórico de relacionamento",
+      "Compras e recompra",
+      "Carteira",
+      "Registro"
+    ],
+    "text": "Cantina Bella Itália Ltda\nBella Itália\nEditar\nDesativar\nDados\nCNPJ\n77.888.999/0001-81\nTelefone\n(11) 3289-4471\nE-mail\nNão informado\nEndereço\nRua Treze de Maio, 742, Bela Vista, São Paulo/SP, 01327-000\nObservações\nNenhuma observação.\nHistórico de relac"
+  },
+  {
+    "role": "admin",
+    "name": "cliente-detalhe",
+    "width": 1280,
+    "file": "admin-cliente-detalhe-1280.png",
+    "route": "http://localhost:8081/clientes/6d802f7d-b3a8-4c7c-9f3c-789b8c87cc7b",
+    "scrollWidth": 1280,
+    "headings": [
+      "Cantina Bella Itália Ltda",
+      "Dados",
+      "Observações",
+      "Histórico de relacionamento",
+      "Compras e recompra",
+      "Carteira",
+      "Registro"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nCantina Bella Itália Ltda\n"
+  },
+  {
+    "role": "admin",
+    "name": "produto-detalhe",
+    "width": 320,
+    "file": "admin-produto-detalhe-320.png",
+    "route": "http://localhost:8081/produtos/30c24a2f-2306-4219-9d79-5f5c75e797c7",
+    "scrollWidth": 320,
+    "headings": [
+      "Açúcar refinado 1 kg",
+      "Venda",
+      "Descrição",
+      "Imagem",
+      "Estoque",
+      "Registro"
+    ],
+    "text": "lastro\nAçúcar refinado 1 kg\nMER-003\nEditar\nDesativar\nVenda\nPreço de tabela\nR$ 5,29 por pct\nUnidade\nPacote (PCT)\nCategoria\nMercearia\nQuantidades\nSomente inteiras\nDescrição\nSem descrição.\nImagem\nSem imagem\nAdicionar imagem\nJPEG, PNG ou WebP, até 5 MB.\n"
+  },
+  {
+    "role": "admin",
+    "name": "produto-detalhe",
+    "width": 390,
+    "file": "admin-produto-detalhe-390.png",
+    "route": "http://localhost:8081/produtos/30c24a2f-2306-4219-9d79-5f5c75e797c7",
+    "scrollWidth": 390,
+    "headings": [
+      "Açúcar refinado 1 kg",
+      "Venda",
+      "Descrição",
+      "Imagem",
+      "Estoque",
+      "Registro"
+    ],
+    "text": "lastro\nAçúcar refinado 1 kg\nMER-003\nEditar\nDesativar\nVenda\nPreço de tabela\nR$ 5,29 por pct\nUnidade\nPacote (PCT)\nCategoria\nMercearia\nQuantidades\nSomente inteiras\nDescrição\nSem descrição.\nImagem\nSem imagem\nAdicionar imagem\nJPEG, PNG ou WebP, até 5 MB.\n"
+  },
+  {
+    "role": "admin",
+    "name": "produto-detalhe",
+    "width": 768,
+    "file": "admin-produto-detalhe-768.png",
+    "route": "http://localhost:8081/produtos/30c24a2f-2306-4219-9d79-5f5c75e797c7",
+    "scrollWidth": 768,
+    "headings": [
+      "Açúcar refinado 1 kg",
+      "Venda",
+      "Descrição",
+      "Imagem",
+      "Estoque",
+      "Registro"
+    ],
+    "text": "Açúcar refinado 1 kg\nMER-003\nEditar\nDesativar\nVenda\nPreço de tabela\nR$ 5,29 por pct\nUnidade\nPacote (PCT)\nCategoria\nMercearia\nQuantidades\nSomente inteiras\nDescrição\nSem descrição.\nImagem\nSem imagem\nAdicionar imagem\nJPEG, PNG ou WebP, até 5 MB.\nEstoque"
+  },
+  {
+    "role": "admin",
+    "name": "produto-detalhe",
+    "width": 1280,
+    "file": "admin-produto-detalhe-1280.png",
+    "route": "http://localhost:8081/produtos/30c24a2f-2306-4219-9d79-5f5c75e797c7",
+    "scrollWidth": 1280,
+    "headings": [
+      "Açúcar refinado 1 kg",
+      "Venda",
+      "Descrição",
+      "Imagem",
+      "Estoque",
+      "Registro"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nAçúcar refinado 1 kg\nMER-0"
+  },
+  {
+    "role": "admin",
+    "name": "estoque-detalhe",
+    "width": 320,
+    "file": "admin-estoque-detalhe-320.png",
+    "route": "http://localhost:8081/estoque/30c24a2f-2306-4219-9d79-5f5c75e797c7",
+    "scrollWidth": 320,
+    "headings": [
+      "Açúcar refinado 1 kg",
+      "Saldos",
+      "Últimas movimentações",
+      "Registro do estoque"
+    ],
+    "text": "lastro\nAçúcar refinado 1 kg\nMER-003 · estoque\nAjustar saldo\nRegistrar entrada\nSaldos\nDisponível\n240 pct\nFísico menos reservado\nReservado\n0 pct\nComprometido com pedidos\nFísico\n240 pct\nExistente no estoque\nEstoque mínimo cadastrado: 40 pct\nÚltimas movi"
+  },
+  {
+    "role": "admin",
+    "name": "estoque-detalhe",
+    "width": 390,
+    "file": "admin-estoque-detalhe-390.png",
+    "route": "http://localhost:8081/estoque/30c24a2f-2306-4219-9d79-5f5c75e797c7",
+    "scrollWidth": 390,
+    "headings": [
+      "Açúcar refinado 1 kg",
+      "Saldos",
+      "Últimas movimentações",
+      "Registro do estoque"
+    ],
+    "text": "lastro\nAçúcar refinado 1 kg\nMER-003 · estoque\nAjustar saldo\nRegistrar entrada\nSaldos\nDisponível\n240 pct\nFísico menos reservado\nReservado\n0 pct\nComprometido com pedidos\nFísico\n240 pct\nExistente no estoque\nEstoque mínimo cadastrado: 40 pct\nÚltimas movi"
+  },
+  {
+    "role": "admin",
+    "name": "estoque-detalhe",
+    "width": 768,
+    "file": "admin-estoque-detalhe-768.png",
+    "route": "http://localhost:8081/estoque/30c24a2f-2306-4219-9d79-5f5c75e797c7",
+    "scrollWidth": 768,
+    "headings": [
+      "Açúcar refinado 1 kg",
+      "Saldos",
+      "Últimas movimentações",
+      "Registro do estoque"
+    ],
+    "text": "Açúcar refinado 1 kg\nMER-003 · estoque\nAjustar saldo\nRegistrar entrada\nSaldos\nDisponível\n240 pct\nFísico menos reservado\nReservado\n0 pct\nComprometido com pedidos\nFísico\n240 pct\nExistente no estoque\nEstoque mínimo cadastrado: 40 pct\nÚltimas movimentaçõ"
+  },
+  {
+    "role": "admin",
+    "name": "estoque-detalhe",
+    "width": 1280,
+    "file": "admin-estoque-detalhe-1280.png",
+    "route": "http://localhost:8081/estoque/30c24a2f-2306-4219-9d79-5f5c75e797c7",
+    "scrollWidth": 1280,
+    "headings": [
+      "Açúcar refinado 1 kg",
+      "Saldos",
+      "Últimas movimentações",
+      "Registro do estoque"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nFinanceiro\nRelatórios\nCatálogo público\nConfigurações\nDistribuidora Demo Lastro\nAna Administradora · Administrador\nadmin.demo@lastro.invalid\nMeu Perfil\nSair\nAçúcar refinado 1 kg\nMER-0"
+  },
+  {
+    "role": "seller",
+    "name": "pedido-detalhe",
+    "width": 320,
+    "file": "seller-pedido-detalhe-320.png",
+    "route": "http://localhost:8081/pedidos/e48f56ee-555d-49b1-b516-fe45bc676a36",
+    "scrollWidth": 320,
+    "headings": [
+      "PED-E48F56EE",
+      "Itens (1)",
+      "Pagamento",
+      "Observações",
+      "Registro",
+      "Documentos"
+    ],
+    "text": "lastro\nPED-E48F56EE\nCantina Bella Itália Ltda\nRascunho\nR$ 154,80\nEditar rascunho\nConfirmar pedido\nItens (1)\nQuantidades e valores do pedido.\nSuco de uva integral 1 L\n12 un × R$ 12,90\nR$ 154,80\nSubtotal\nR$ 154,80\nTotal\nR$ 154,80\nPagamento\nCondição\n30 "
+  },
+  {
+    "role": "seller",
+    "name": "pedido-detalhe",
+    "width": 390,
+    "file": "seller-pedido-detalhe-390.png",
+    "route": "http://localhost:8081/pedidos/e48f56ee-555d-49b1-b516-fe45bc676a36",
+    "scrollWidth": 390,
+    "headings": [
+      "PED-E48F56EE",
+      "Itens (1)",
+      "Pagamento",
+      "Observações",
+      "Registro",
+      "Documentos"
+    ],
+    "text": "lastro\nPED-E48F56EE\nCantina Bella Itália Ltda\nRascunho\nR$ 154,80\nEditar rascunho\nConfirmar pedido\nItens (1)\nQuantidades e valores do pedido.\nSuco de uva integral 1 L\n12 un × R$ 12,90\nR$ 154,80\nSubtotal\nR$ 154,80\nTotal\nR$ 154,80\nPagamento\nCondição\n30 "
+  },
+  {
+    "role": "seller",
+    "name": "pedido-detalhe",
+    "width": 768,
+    "file": "seller-pedido-detalhe-768.png",
+    "route": "http://localhost:8081/pedidos/e48f56ee-555d-49b1-b516-fe45bc676a36",
+    "scrollWidth": 768,
+    "headings": [
+      "PED-E48F56EE",
+      "Itens (1)",
+      "Pagamento",
+      "Observações",
+      "Registro",
+      "Documentos"
+    ],
+    "text": "PED-E48F56EE\nCantina Bella Itália Ltda\nRascunho\nR$ 154,80\nEditar rascunho\nConfirmar pedido\nItens (1)\nQuantidades e valores do pedido.\nProduto\nQuantidade\nPreço registrado\nTotal\nSuco de uva integral 1 L\nBEB-003\n12 un\nR$ 12,90\nR$ 154,80\nSubtotal\nR$ 154,"
+  },
+  {
+    "role": "seller",
+    "name": "pedido-detalhe",
+    "width": 1280,
+    "file": "seller-pedido-detalhe-1280.png",
+    "route": "http://localhost:8081/pedidos/e48f56ee-555d-49b1-b516-fe45bc676a36",
+    "scrollWidth": 1280,
+    "headings": [
+      "PED-E48F56EE",
+      "Itens (1)",
+      "Pagamento",
+      "Observações",
+      "Registro",
+      "Documentos"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nConfigurações\nDistribuidora Demo Lastro\nBruno Vendedor · Vendedor\nvendedor.demo@lastro.invalid\nMeu Perfil\nSair\nPED-E48F56EE\nCantina Bella Itália Ltda\nRascunho\nR$ 154,80\nEditar rascun"
+  },
+  {
+    "role": "seller",
+    "name": "cliente-detalhe",
+    "width": 320,
+    "file": "seller-cliente-detalhe-320.png",
+    "route": "http://localhost:8081/clientes/6d802f7d-b3a8-4c7c-9f3c-789b8c87cc7b",
+    "scrollWidth": 320,
+    "headings": [
+      "Cantina Bella Itália Ltda",
+      "Dados",
+      "Observações",
+      "Histórico de relacionamento",
+      "Compras e recompra",
+      "Carteira",
+      "Registro"
+    ],
+    "text": "lastro\nCantina Bella Itália Ltda\nBella Itália\nEditar\nDados\nCNPJ\n77.888.999/0001-81\nTelefone\n(11) 3289-4471\nE-mail\nNão informado\nEndereço\nRua Treze de Maio, 742, Bela Vista, São Paulo/SP, 01327-000\nObservações\nNenhuma observação.\nHistórico de relacion"
+  },
+  {
+    "role": "seller",
+    "name": "cliente-detalhe",
+    "width": 390,
+    "file": "seller-cliente-detalhe-390.png",
+    "route": "http://localhost:8081/clientes/6d802f7d-b3a8-4c7c-9f3c-789b8c87cc7b",
+    "scrollWidth": 390,
+    "headings": [
+      "Cantina Bella Itália Ltda",
+      "Dados",
+      "Observações",
+      "Histórico de relacionamento",
+      "Compras e recompra",
+      "Carteira",
+      "Registro"
+    ],
+    "text": "lastro\nCantina Bella Itália Ltda\nBella Itália\nEditar\nDados\nCNPJ\n77.888.999/0001-81\nTelefone\n(11) 3289-4471\nE-mail\nNão informado\nEndereço\nRua Treze de Maio, 742, Bela Vista, São Paulo/SP, 01327-000\nObservações\nNenhuma observação.\nHistórico de relacion"
+  },
+  {
+    "role": "seller",
+    "name": "cliente-detalhe",
+    "width": 768,
+    "file": "seller-cliente-detalhe-768.png",
+    "route": "http://localhost:8081/clientes/6d802f7d-b3a8-4c7c-9f3c-789b8c87cc7b",
+    "scrollWidth": 768,
+    "headings": [
+      "Cantina Bella Itália Ltda",
+      "Dados",
+      "Observações",
+      "Histórico de relacionamento",
+      "Compras e recompra",
+      "Carteira",
+      "Registro"
+    ],
+    "text": "Cantina Bella Itália Ltda\nBella Itália\nEditar\nDados\nCNPJ\n77.888.999/0001-81\nTelefone\n(11) 3289-4471\nE-mail\nNão informado\nEndereço\nRua Treze de Maio, 742, Bela Vista, São Paulo/SP, 01327-000\nObservações\nNenhuma observação.\nHistórico de relacionamento\n"
+  },
+  {
+    "role": "seller",
+    "name": "cliente-detalhe",
+    "width": 1280,
+    "file": "seller-cliente-detalhe-1280.png",
+    "route": "http://localhost:8081/clientes/6d802f7d-b3a8-4c7c-9f3c-789b8c87cc7b",
+    "scrollWidth": 1280,
+    "headings": [
+      "Cantina Bella Itália Ltda",
+      "Dados",
+      "Observações",
+      "Histórico de relacionamento",
+      "Compras e recompra",
+      "Carteira",
+      "Registro"
+    ],
+    "text": "lastro\nNovo pedido\nInício\nPedidos\nClientes\nVisitas\nProdutos\nEstoque\nConfigurações\nDistribuidora Demo Lastro\nBruno Vendedor · Vendedor\nvendedor.demo@lastro.invalid\nMeu Perfil\nSair\nCantina Bella Itália Ltda\nBella Itália\nEditar\nDados\nCNPJ\n77.888.999/000"
+  },
+  {
+    "role": "platform",
+    "name": "empresa-detalhe",
+    "width": 320,
+    "file": "platform-empresa-detalhe-320.png",
+    "route": "http://localhost:8081/plataforma/empresas/fa3d9030-2cad-4ce9-aa98-f05fc5d29eba",
+    "scrollWidth": 320,
+    "headings": [
+      "Distribuidora Demo Lastro",
+      "Assinatura",
+      "Vagas e recursos",
+      "Usuários",
+      "Convites",
+      "Cobranças",
+      "Histórico da assinatura"
+    ],
+    "text": "lastro\nSuper Admin\nMeu Perfil\nSair\nVisão geral\nEmpresas\nAssinaturas\nCobranças\nConvites\nEmpresas\nDistribuidora Demo Lastro\nIdentificador fa3d9030-2cad-4ce9-aa98-f05fc5d29eba · no Lastro desde 18/07/2026\nAtiva\nProfissional\nAssinatura\nTrocar plano\nAjust"
+  },
+  {
+    "role": "platform",
+    "name": "empresa-detalhe",
+    "width": 390,
+    "file": "platform-empresa-detalhe-390.png",
+    "route": "http://localhost:8081/plataforma/empresas/fa3d9030-2cad-4ce9-aa98-f05fc5d29eba",
+    "scrollWidth": 390,
+    "headings": [
+      "Distribuidora Demo Lastro",
+      "Assinatura",
+      "Vagas e recursos",
+      "Usuários",
+      "Convites",
+      "Cobranças",
+      "Histórico da assinatura"
+    ],
+    "text": "lastro\nSuper Admin\nMeu Perfil\nSair\nVisão geral\nEmpresas\nAssinaturas\nCobranças\nConvites\nEmpresas\nDistribuidora Demo Lastro\nIdentificador fa3d9030-2cad-4ce9-aa98-f05fc5d29eba · no Lastro desde 18/07/2026\nAtiva\nProfissional\nAssinatura\nTrocar plano\nAjust"
+  },
+  {
+    "role": "platform",
+    "name": "empresa-detalhe",
+    "width": 768,
+    "file": "platform-empresa-detalhe-768.png",
+    "route": "http://localhost:8081/plataforma/empresas/fa3d9030-2cad-4ce9-aa98-f05fc5d29eba",
+    "scrollWidth": 768,
+    "headings": [
+      "Distribuidora Demo Lastro",
+      "Assinatura",
+      "Vagas e recursos",
+      "Usuários",
+      "Convites",
+      "Cobranças",
+      "Histórico da assinatura"
+    ],
+    "text": "lastro\nSuper Admin\nVisão geral\nEmpresas\nAssinaturas\nCobranças\nConvites\nplatform.demo@lastro.invalid\nMeu Perfil\nSair\nEmpresas\nDistribuidora Demo Lastro\nIdentificador fa3d9030-2cad-4ce9-aa98-f05fc5d29eba · no Lastro desde 18/07/2026\nAtiva\nProfissional\n"
+  },
+  {
+    "role": "platform",
+    "name": "empresa-detalhe",
+    "width": 1280,
+    "file": "platform-empresa-detalhe-1280.png",
+    "route": "http://localhost:8081/plataforma/empresas/fa3d9030-2cad-4ce9-aa98-f05fc5d29eba",
+    "scrollWidth": 1280,
+    "headings": [
+      "Distribuidora Demo Lastro",
+      "Assinatura",
+      "Vagas e recursos",
+      "Usuários",
+      "Convites",
+      "Cobranças",
+      "Histórico da assinatura"
+    ],
+    "text": "lastro\nSuper Admin\nVisão geral\nEmpresas\nAssinaturas\nCobranças\nConvites\nplatform.demo@lastro.invalid\nMeu Perfil\nSair\nEmpresas\nDistribuidora Demo Lastro\nIdentificador fa3d9030-2cad-4ce9-aa98-f05fc5d29eba · no Lastro desde 18/07/2026\nAtiva\nProfissional\n"
+  }
+]

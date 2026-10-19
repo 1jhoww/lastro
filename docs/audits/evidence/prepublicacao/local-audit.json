@@ -1,0 +1,65 @@
+{
+  "checkedAt": "2026-10-18T22:29:20.181Z",
+  "head": "4051f03e78f57f42b5ccc6f7b376c8814e3daa5c",
+  "branch": "main",
+  "commitsAfterBase": 0,
+  "trackedChanges": 34,
+  "untrackedFiles": 301,
+  "graphifyTracked": 97,
+  "trackedSensitivePaths": [],
+  "secretScan": {
+    "scanned": 858,
+    "findings": [],
+    "scope": "Current tracked and non-ignored untracked text. No Git history, ignored env or binary scan. Values never printed."
+  },
+  "environment": {
+    "backend/.env": {
+      "NODE_ENV": "development",
+      "PORT": "3000",
+      "FIREBASE_MODE": "emulator",
+      "FIREBASE_PROJECT_ID": "demo-lastro-phase-a",
+      "FIREBASE_AUTH_EMULATOR_HOST": {
+        "present": true,
+        "placeholder": false
+      },
+      "FIRESTORE_EMULATOR_HOST": {
+        "present": true,
+        "placeholder": false
+      },
+      "FIREBASE_STORAGE_EMULATOR_HOST": {
+        "present": true,
+        "placeholder": false
+      },
+      "CORS_ORIGINS": "http://localhost:8081,http://localhost:19006",
+      "TRUST_PROXY_HOPS": "0",
+      "RATE_LIMIT_MAX": "180",
+      "LASTRO_DEMO_PLATFORM_PASSWORD": {
+        "present": true,
+        "placeholder": false
+      },
+      "LASTRO_DEMO_ADMIN_PASSWORD": {
+        "present": true,
+        "placeholder": false
+      },
+      "LASTRO_DEMO_SELLER_PASSWORD": {
+        "present": true,
+        "placeholder": false
+      }
+    },
+    "frontend/.env": {
+      "EXPO_PUBLIC_API_URL": "http://127.0.0.1:3000",
+      "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "demo-lastro-phase-a",
+      "EXPO_PUBLIC_FIREBASE_API_KEY": {
+        "present": true,
+        "placeholder": true
+      },
+      "EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_URL": "http://127.0.0.1:9099"
+    },
+    "frontend/.env.local": {
+      "VERCEL_OIDC_TOKEN": {
+        "present": true,
+        "placeholder": false
+      }
+    }
+  }
+}

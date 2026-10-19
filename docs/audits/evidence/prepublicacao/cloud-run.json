@@ -1,0 +1,125 @@
+{
+  "createdAt": "2026-10-15T22:14:31.747782Z",
+  "serviceAnnotations": {
+    "run.googleapis.com/client-version": "580.0.0",
+    "run.googleapis.com/build-image-uri": "southamerica-east1-docker.pkg.dev/lastro-hml/cloud-run-source-deploy/lastro-api-hml",
+    "run.googleapis.com/build-id": "89883c00-c854-4b0d-b724-4d57508961f0",
+    "run.googleapis.com/build-name": "projects/859974935461/locations/southamerica-east1/builds/89883c00-c854-4b0d-b724-4d57508961f0",
+    "run.googleapis.com/build-source-location": "gs://run-sources-lastro-hml-southamerica-east1/services/lastro-api-hml/1792178731.134905-490c4ca69e6145be8c5442418b89f3cd.zip#1792178728274298",
+    "run.googleapis.com/maxScale": "3",
+    "run.googleapis.com/client-name": "gcloud",
+    "run.googleapis.com/ingress": "all"
+  },
+  "checkedAt": "2026-10-18T22:30:25.0447791+00:00",
+  "name": "lastro-api-hml",
+  "status": {
+    "address": {
+      "url": "https://lastro-api-hml-njkivn2g3q-rj.a.run.app"
+    },
+    "conditions": [
+      {
+        "lastTransitionTime": "2026-10-16T19:27:47.2269Z",
+        "status": "True",
+        "type": "Ready"
+      },
+      {
+        "lastTransitionTime": "2026-10-16T19:27:39.481578Z",
+        "status": "True",
+        "type": "ConfigurationsReady"
+      },
+      {
+        "lastTransitionTime": "2026-10-16T19:27:47.188987Z",
+        "status": "True",
+        "type": "RoutesReady"
+      }
+    ],
+    "latestCreatedRevisionName": "lastro-api-hml-00003-jjc",
+    "latestReadyRevisionName": "lastro-api-hml-00003-jjc",
+    "observedGeneration": 3,
+    "traffic": [
+      {
+        "latestRevision": true,
+        "percent": 100,
+        "revisionName": "lastro-api-hml-00003-jjc"
+      }
+    ],
+    "url": "https://lastro-api-hml-njkivn2g3q-rj.a.run.app"
+  },
+  "templateAnnotations": {
+    "run.googleapis.com/client-name": "gcloud",
+    "run.googleapis.com/client-version": "580.0.0",
+    "autoscaling.knative.dev/maxScale": "2"
+  },
+  "serviceAccount": "lastro-api-hml@lastro-hml.iam.gserviceaccount.com",
+  "concurrency": 40,
+  "container": {
+    "livenessProbe": null,
+    "resources": {
+      "limits": {
+        "cpu": "1",
+        "memory": "1Gi"
+      }
+    },
+    "image": "southamerica-east1-docker.pkg.dev/lastro-hml/cloud-run-source-deploy/lastro-api-hml@sha256:a1529f7a0f32f86927ee0a916a3ce618017a67cf14cb2d7bdf8a3db3466a14a7",
+    "ports": [
+      {
+        "containerPort": 8080,
+        "name": "http1"
+      }
+    ],
+    "startupProbe": {
+      "failureThreshold": 1,
+      "periodSeconds": 240,
+      "tcpSocket": {
+        "port": 8080
+      },
+      "timeoutSeconds": 240
+    },
+    "env": [
+      {
+        "name": "NODE_ENV",
+        "value": "production"
+      },
+      {
+        "name": "FIREBASE_MODE",
+        "value": "production"
+      },
+      {
+        "name": "FIREBASE_PROJECT_ID",
+        "value": "lastro-hml"
+      },
+      {
+        "name": "STORAGE_BUCKET",
+        "value": "lastro-hml.firebasestorage.app"
+      },
+      {
+        "name": "CORS_ORIGINS",
+        "value": "https://lastro-hml.vercel.app"
+      },
+      {
+        "name": "PUBLIC_ORIGIN",
+        "value": "https://lastro-api-hml-859974935461.southamerica-east1.run.app"
+      },
+      {
+        "name": "RATE_LIMIT_MAX",
+        "value": "180"
+      },
+      {
+        "name": "TRUST_PROXY_HOPS",
+        "value": "0"
+      },
+      {
+        "name": "INVITATION_SECRET",
+        "secretRef": {
+          "key": "latest",
+          "name": "lastro-invitation-secret"
+        }
+      },
+      {
+        "name": "TRUST_PROXY_ADDRESSES",
+        "value": "169.254.169.126/32"
+      }
+    ]
+  },
+  "timeoutSeconds": 60
+}

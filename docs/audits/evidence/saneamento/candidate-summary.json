@@ -1,0 +1,9 @@
+{
+  "mode": "local-inventory-only",
+  "includedFiles": 667,
+  "excludedFiles": 480,
+  "sourceBytes": 18755732.0,
+  "findings": [],
+  "privateManifest": "backend/.local/saneamento/candidate-files.json",
+  "historicalEvidenceRestored": true
+}

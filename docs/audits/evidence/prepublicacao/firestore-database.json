@@ -1,0 +1,19 @@
+{
+  "appEngineIntegrationMode": "DISABLED",
+  "concurrencyMode": "PESSIMISTIC",
+  "createTime": "2026-10-15T22:00:10.702744Z",
+  "databaseEdition": "STANDARD",
+  "deleteProtectionState": "DELETE_PROTECTION_DISABLED",
+  "earliestVersionTime": "2026-10-18T21:30:31.738354Z",
+  "etag": "IN/j5I/PxJcDMOat47ODvZcD",
+  "freeTier": true,
+  "keyPrefix": "i",
+  "locationId": "southamerica-east1",
+  "name": "projects/lastro-hml/databases/(default)",
+  "pointInTimeRecoveryEnablement": "POINT_IN_TIME_RECOVERY_DISABLED",
+  "realtimeUpdatesMode": "REALTIME_UPDATES_MODE_ENABLED",
+  "type": "FIRESTORE_NATIVE",
+  "uid": "8218804c-02a4-45ae-a4d5-acde5159b542",
+  "updateTime": "2026-10-15T22:00:10.702744Z",
+  "versionRetentionPeriod": "3600s"
+}

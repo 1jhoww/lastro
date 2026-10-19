@@ -1,0 +1,16 @@
+{
+  "releases": [
+    {
+      "name": "projects/lastro-hml/releases/cloud.firestore",
+      "rulesetName": "projects/lastro-hml/rulesets/e1f9da52-e683-4740-b31a-85698c2ab4f2",
+      "createTime": "2026-10-15T22:03:23.927824Z",
+      "updateTime": "2026-10-15T22:03:23.927824Z"
+    },
+    {
+      "name": "projects/lastro-hml/releases/firebase.storage/lastro-hml.firebasestorage.app",
+      "rulesetName": "projects/lastro-hml/rulesets/584f5f77-d414-4d1d-bb84-c816f66360b6",
+      "createTime": "2026-10-15T22:03:22.547683Z",
+      "updateTime": "2026-10-15T22:03:22.547683Z"
+    }
+  ]
+}

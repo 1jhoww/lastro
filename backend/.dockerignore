@@ -3,6 +3,17 @@ dist
 .cache
 .local
 .env
+.env.*
+!.env.example
 reports
 coverage
 *-debug.log
+.git
+**/*.key
+**/*.pem
+**/*.p8
+**/*.p12
+**/*.pfx
+**/*.jks
+**/*.keystore
+**/*service-account*.json

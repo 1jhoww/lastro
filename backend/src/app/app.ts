@@ -39,11 +39,13 @@ import { ingressLimit } from '../middlewares/ingressLimit.js';
 import { readiness } from './readiness.js';
 import { processingDeadline, HTTP_PROCESSING_MS } from '../middlewares/processingDeadline.js';
 import { ReadGate } from '../shared/operations/readBudget.js';
+import { ApplicationLifecycle, tracked } from './lifecycle.js';
 export function createApp(
   config: Config,
   firebase: Firebase,
   clock: () => Date = () => new Date(),
   processingMs = HTTP_PROCESSING_MS,
+  lifecycle = new ApplicationLifecycle(),
 ) {
   const app = express();
   app.disable('x-powered-by');
@@ -129,6 +131,7 @@ export function createApp(
     if (req.path === '/api/v1/public' || req.path.startsWith('/api/v1/public/')) next();
     else privateCors(req, res, next);
   });
+  app.use(lifecycle.middleware);
   app.use('/api/v1/public', publicCatalogMemoryLimit(config));
   const privateIngress = ingressLimit(config.rateLimitMax);
   app.use('/api/v1', (req, res, next) => {
@@ -139,7 +142,7 @@ export function createApp(
   app.get(
     '/health/ready',
     ingressLimit(120),
-    readiness(() => firebase.db.doc('_health/readiness').get()),
+    readiness(() => lifecycle.run(() => firebase.db.doc('_health/readiness').get())),
   );
   app.use(express.json({ limit: '64kb', strict: true }));
   if (config.nodeEnv === 'development') {
@@ -157,8 +160,8 @@ export function createApp(
       res.set('Cache-Control', 'private, no-store');
       next();
     },
-    apiRateLimit(config, repo),
-    authentication(firebase.auth, repo),
+    tracked(apiRateLimit(config, repo)),
+    tracked(authentication(firebase.auth, repo)),
     createRoutes(
       access,
       users,

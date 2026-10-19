@@ -1,0 +1,335 @@
+ M backend/src/infrastructure/repositories/foundationRepository.ts
+ M backend/src/modules/finance/financialReads.ts
+ M backend/src/modules/orders/orderService.ts
+ M backend/tests/concurrency/planCapacity.test.ts
+ M backend/tests/helpers/fixture.ts
+ M backend/tests/unit/artifact.test.ts
+ M frontend/metro.config.js
+ M frontend/scripts/e2eSupport.ts
+ M frontend/src/app/(app)/estoque/index.tsx
+ M frontend/src/app/(app)/mais.tsx
+ M frontend/src/app/_layout.tsx
+ M frontend/src/features/finance/FinanceParts.tsx
+ M frontend/src/features/home/Dashboard.tsx
+ M frontend/src/features/inventory/MovementForm.tsx
+ M frontend/src/features/inventory/api.ts
+ M frontend/src/features/orders/api.ts
+ M frontend/src/features/platform/PlatformShell.tsx
+ M frontend/src/features/session/AccountFrame.tsx
+ M frontend/src/features/session/NameEditor.tsx
+ M frontend/src/layout/AccountMenu.tsx
+ M frontend/src/navigation/RootNavigator.tsx
+ M frontend/src/session/gate.ts
+ M frontend/src/ui/Panel.tsx
+ M frontend/tests/support/renderApp.tsx
+ M frontend/tests/unit/dashboard.test.tsx
+ M frontend/tests/unit/inventoryScreens.test.tsx
+ M frontend/tests/unit/permissions.test.tsx
+ M graphify-out/.graphify_labels.json
+ M graphify-out/.graphify_root
+ M graphify-out/GRAPH_REPORT.md
+ M graphify-out/cache/stat-index.json
+ M graphify-out/graph.html
+ M graphify-out/graph.json
+ M graphify-out/manifest.json
+?? backend/scripts/audit-firestore-indexes.mjs
+?? backend/scripts/measure-local-api.mjs
+?? backend/scripts/summarize-phase9.mjs
+?? backend/tests/integration/batchedProducts.test.ts
+?? backend/tests/integration/concurrentPerformance.test.ts
+?? backend/tests/integration/performance.test.ts
+?? docs/audits/evidence/fase8/account-flow.json
+?? docs/audits/evidence/fase8/admin-catalogo-1280.png
+?? docs/audits/evidence/fase8/admin-catalogo-320.png
+?? docs/audits/evidence/fase8/admin-catalogo-390.png
+?? docs/audits/evidence/fase8/admin-catalogo-768.png
+?? docs/audits/evidence/fase8/admin-categorias-1280.png
+?? docs/audits/evidence/fase8/admin-categorias-320.png
+?? docs/audits/evidence/fase8/admin-categorias-390.png
+?? docs/audits/evidence/fase8/admin-categorias-768.png
+?? docs/audits/evidence/fase8/admin-cliente-detalhe-1280.png
+?? docs/audits/evidence/fase8/admin-cliente-detalhe-320.png
+?? docs/audits/evidence/fase8/admin-cliente-detalhe-390.png
+?? docs/audits/evidence/fase8/admin-cliente-detalhe-768.png
+?? docs/audits/evidence/fase8/admin-cliente-novo-1280.png
+?? docs/audits/evidence/fase8/admin-cliente-novo-320.png
+?? docs/audits/evidence/fase8/admin-cliente-novo-390.png
+?? docs/audits/evidence/fase8/admin-cliente-novo-768.png
+?? docs/audits/evidence/fase8/admin-clientes-1280.png
+?? docs/audits/evidence/fase8/admin-clientes-320.png
+?? docs/audits/evidence/fase8/admin-clientes-390.png
+?? docs/audits/evidence/fase8/admin-clientes-768.png
+?? docs/audits/evidence/fase8/admin-dashboard-1280.png
+?? docs/audits/evidence/fase8/admin-dashboard-320.png
+?? docs/audits/evidence/fase8/admin-dashboard-390.png
+?? docs/audits/evidence/fase8/admin-dashboard-768.png
+?? docs/audits/evidence/fase8/admin-estoque-1280.png
+?? docs/audits/evidence/fase8/admin-estoque-320.png
+?? docs/audits/evidence/fase8/admin-estoque-390.png
+?? docs/audits/evidence/fase8/admin-estoque-768.png
+?? docs/audits/evidence/fase8/admin-estoque-ajuste-1280.png
+?? docs/audits/evidence/fase8/admin-estoque-ajuste-320.png
+?? docs/audits/evidence/fase8/admin-estoque-ajuste-390.png
+?? docs/audits/evidence/fase8/admin-estoque-ajuste-768.png
+?? docs/audits/evidence/fase8/admin-estoque-detalhe-1280.png
+?? docs/audits/evidence/fase8/admin-estoque-detalhe-320.png
+?? docs/audits/evidence/fase8/admin-estoque-detalhe-390.png
+?? docs/audits/evidence/fase8/admin-estoque-detalhe-768.png
+?? docs/audits/evidence/fase8/admin-estoque-entrada-1280.png
+?? docs/audits/evidence/fase8/admin-estoque-entrada-320.png
+?? docs/audits/evidence/fase8/admin-estoque-entrada-390.png
+?? docs/audits/evidence/fase8/admin-estoque-entrada-768.png
+?? docs/audits/evidence/fase8/admin-estoque-movimentacoes-1280.png
+?? docs/audits/evidence/fase8/admin-estoque-movimentacoes-320.png
+?? docs/audits/evidence/fase8/admin-estoque-movimentacoes-390.png
+?? docs/audits/evidence/fase8/admin-estoque-movimentacoes-768.png
+?? docs/audits/evidence/fase8/admin-estoque-reposicao-1280.png
+?? docs/audits/evidence/fase8/admin-estoque-reposicao-320.png
+?? docs/audits/evidence/fase8/admin-estoque-reposicao-390.png
+?? docs/audits/evidence/fase8/admin-estoque-reposicao-768.png
+?? docs/audits/evidence/fase8/admin-financeiro-1280.png
+?? docs/audits/evidence/fase8/admin-financeiro-320.png
+?? docs/audits/evidence/fase8/admin-financeiro-390.png
+?? docs/audits/evidence/fase8/admin-financeiro-768.png
+?? docs/audits/evidence/fase8/admin-financeiro-devolucoes-1280.png
+?? docs/audits/evidence/fase8/admin-financeiro-devolucoes-320.png
+?? docs/audits/evidence/fase8/admin-financeiro-devolucoes-390.png
+?? docs/audits/evidence/fase8/admin-financeiro-devolucoes-768.png
+?? docs/audits/evidence/fase8/admin-financeiro-receber-1280.png
+?? docs/audits/evidence/fase8/admin-financeiro-receber-320.png
+?? docs/audits/evidence/fase8/admin-financeiro-receber-390.png
+?? docs/audits/evidence/fase8/admin-financeiro-receber-768.png
+?? docs/audits/evidence/fase8/admin-meu-perfil-1280.png
+?? docs/audits/evidence/fase8/admin-meu-perfil-320.png
+?? docs/audits/evidence/fase8/admin-meu-perfil-390.png
+?? docs/audits/evidence/fase8/admin-meu-perfil-768.png
+?? docs/audits/evidence/fase8/admin-pedido-detalhe-1280.png
+?? docs/audits/evidence/fase8/admin-pedido-detalhe-320.png
+?? docs/audits/evidence/fase8/admin-pedido-detalhe-390.png
+?? docs/audits/evidence/fase8/admin-pedido-detalhe-768.png
+?? docs/audits/evidence/fase8/admin-pedido-novo-1280.png
+?? docs/audits/evidence/fase8/admin-pedido-novo-320.png
+?? docs/audits/evidence/fase8/admin-pedido-novo-390.png
+?? docs/audits/evidence/fase8/admin-pedido-novo-768.png
+?? docs/audits/evidence/fase8/admin-pedidos-1280.png
+?? docs/audits/evidence/fase8/admin-pedidos-320.png
+?? docs/audits/evidence/fase8/admin-pedidos-390.png
+?? docs/audits/evidence/fase8/admin-pedidos-768.png
+?? docs/audits/evidence/fase8/admin-produto-detalhe-1280.png
+?? docs/audits/evidence/fase8/admin-produto-detalhe-320.png
+?? docs/audits/evidence/fase8/admin-produto-detalhe-390.png
+?? docs/audits/evidence/fase8/admin-produto-detalhe-768.png
+?? docs/audits/evidence/fase8/admin-produto-novo-1280.png
+?? docs/audits/evidence/fase8/admin-produto-novo-320.png
+?? docs/audits/evidence/fase8/admin-produto-novo-390.png
+?? docs/audits/evidence/fase8/admin-produto-novo-768.png
+?? docs/audits/evidence/fase8/admin-produtos-1280.png
+?? docs/audits/evidence/fase8/admin-produtos-320.png
+?? docs/audits/evidence/fase8/admin-produtos-390.png
+?? docs/audits/evidence/fase8/admin-produtos-768.png
+?? docs/audits/evidence/fase8/admin-recompra-1280.png
+?? docs/audits/evidence/fase8/admin-recompra-320.png
+?? docs/audits/evidence/fase8/admin-recompra-390.png
+?? docs/audits/evidence/fase8/admin-recompra-768.png
+?? docs/audits/evidence/fase8/admin-relatorios-1280.png
+?? docs/audits/evidence/fase8/admin-relatorios-320.png
+?? docs/audits/evidence/fase8/admin-relatorios-390.png
+?? docs/audits/evidence/fase8/admin-relatorios-768.png
+?? docs/audits/evidence/fase8/admin-relatorios-exportacoes-1280.png
+?? docs/audits/evidence/fase8/admin-relatorios-exportacoes-320.png
+?? docs/audits/evidence/fase8/admin-relatorios-exportacoes-390.png
+?? docs/audits/evidence/fase8/admin-relatorios-exportacoes-768.png
+?? docs/audits/evidence/fase8/admin-relatorios-pedidos-1280.png
+?? docs/audits/evidence/fase8/admin-relatorios-pedidos-320.png
+?? docs/audits/evidence/fase8/admin-relatorios-pedidos-390.png
+?? docs/audits/evidence/fase8/admin-relatorios-pedidos-768.png
+?? docs/audits/evidence/fase8/admin-usuarios-1280.png
+?? docs/audits/evidence/fase8/admin-usuarios-320.png
+?? docs/audits/evidence/fase8/admin-usuarios-390.png
+?? docs/audits/evidence/fase8/admin-usuarios-768.png
+?? docs/audits/evidence/fase8/admin-visita-nova-1280.png
+?? docs/audits/evidence/fase8/admin-visita-nova-320.png
+?? docs/audits/evidence/fase8/admin-visita-nova-390.png
+?? docs/audits/evidence/fase8/admin-visita-nova-768.png
+?? docs/audits/evidence/fase8/admin-visitas-1280.png
+?? docs/audits/evidence/fase8/admin-visitas-320.png
+?? docs/audits/evidence/fase8/admin-visitas-390.png
+?? docs/audits/evidence/fase8/admin-visitas-768.png
+?? docs/audits/evidence/fase8/android-login.png
+?? docs/audits/evidence/fase8/dashboard-scroll-320.png
+?? docs/audits/evidence/fase8/downloads/manifest.json
+?? docs/audits/evidence/fase8/downloads/pedido-comercial.pdf
+?? docs/audits/evidence/fase8/downloads/produtos.csv
+?? docs/audits/evidence/fase8/downloads/relatorio-pedidos.csv
+?? docs/audits/evidence/fase8/downloads/relatorio-pedidos.pdf
+?? docs/audits/evidence/fase8/downloads/romaneio.pdf
+?? docs/audits/evidence/fase8/financeiro-scroll-320.png
+?? docs/audits/evidence/fase8/manifest-details.json
+?? docs/audits/evidence/fase8/manifest-financeiro.json
+?? docs/audits/evidence/fase8/manifest.json
+?? docs/audits/evidence/fase8/pdf/commercial-200-p1.png
+?? docs/audits/evidence/fase8/pdf/commercial-200-p11.png
+?? docs/audits/evidence/fase8/pdf/commercial-200-p21.png
+?? docs/audits/evidence/fase8/pdf/commercial-accents-p1.png
+?? docs/audits/evidence/fase8/pdf/commercial-long-brand-p1.png
+?? docs/audits/evidence/fase8/pdf/demo-pedido-comercial-p1.png
+?? docs/audits/evidence/fase8/pdf/demo-receivables-p1.png
+?? docs/audits/evidence/fase8/pdf/demo-relatorio-pedidos-p1.png
+?? docs/audits/evidence/fase8/pdf/demo-romaneio-p1.png
+?? docs/audits/evidence/fase8/pdf/demo-stock-p1.png
+?? docs/audits/evidence/fase8/pdf/packing-200-p1.png
+?? docs/audits/evidence/fase8/pdf/packing-200-p11.png
+?? docs/audits/evidence/fase8/pdf/packing-200-p21.png
+?? docs/audits/evidence/fase8/pdf/packing-accents-p1.png
+?? docs/audits/evidence/fase8/pedido-novo-scroll-320.png
+?? docs/audits/evidence/fase8/perfil-editado-320.png
+?? docs/audits/evidence/fase8/perfil-modal-320.png
+?? docs/audits/evidence/fase8/platform-convites-1280.png
+?? docs/audits/evidence/fase8/platform-convites-320.png
+?? docs/audits/evidence/fase8/platform-convites-390.png
+?? docs/audits/evidence/fase8/platform-convites-768.png
+?? docs/audits/evidence/fase8/platform-empresa-detalhe-1280.png
+?? docs/audits/evidence/fase8/platform-empresa-detalhe-320.png
+?? docs/audits/evidence/fase8/platform-empresa-detalhe-390.png
+?? docs/audits/evidence/fase8/platform-empresa-detalhe-768.png
+?? docs/audits/evidence/fase8/platform-empresas-1280.png
+?? docs/audits/evidence/fase8/platform-empresas-320.png
+?? docs/audits/evidence/fase8/platform-empresas-390.png
+?? docs/audits/evidence/fase8/platform-empresas-768.png
+?? docs/audits/evidence/fase8/platform-meu-perfil-1280.png
+?? docs/audits/evidence/fase8/platform-meu-perfil-320.png
+?? docs/audits/evidence/fase8/platform-meu-perfil-390.png
+?? docs/audits/evidence/fase8/platform-meu-perfil-768.png
+?? docs/audits/evidence/fase8/platform-nova-empresa-1280.png
+?? docs/audits/evidence/fase8/platform-nova-empresa-320.png
+?? docs/audits/evidence/fase8/platform-nova-empresa-390.png
+?? docs/audits/evidence/fase8/platform-nova-empresa-768.png
+?? docs/audits/evidence/fase8/platform-plataforma-1280.png
+?? docs/audits/evidence/fase8/platform-plataforma-320.png
+?? docs/audits/evidence/fase8/platform-plataforma-390.png
+?? docs/audits/evidence/fase8/platform-plataforma-768.png
+?? docs/audits/evidence/fase8/public-entrar-1280.png
+?? docs/audits/evidence/fase8/public-entrar-320.png
+?? docs/audits/evidence/fase8/public-entrar-390.png
+?? docs/audits/evidence/fase8/public-entrar-768.png
+?? docs/audits/evidence/fase8/public-recuperar-senha-1280.png
+?? docs/audits/evidence/fase8/public-recuperar-senha-320.png
+?? docs/audits/evidence/fase8/public-recuperar-senha-390.png
+?? docs/audits/evidence/fase8/public-recuperar-senha-768.png
+?? docs/audits/evidence/fase8/recuperacao-enviada-320.png
+?? docs/audits/evidence/fase8/seller-cliente-detalhe-1280.png
+?? docs/audits/evidence/fase8/seller-cliente-detalhe-320.png
+?? docs/audits/evidence/fase8/seller-cliente-detalhe-390.png
+?? docs/audits/evidence/fase8/seller-cliente-detalhe-768.png
+?? docs/audits/evidence/fase8/seller-clientes-1280.png
+?? docs/audits/evidence/fase8/seller-clientes-320.png
+?? docs/audits/evidence/fase8/seller-clientes-390.png
+?? docs/audits/evidence/fase8/seller-clientes-768.png
+?? docs/audits/evidence/fase8/seller-dashboard-1280.png
+?? docs/audits/evidence/fase8/seller-dashboard-320.png
+?? docs/audits/evidence/fase8/seller-dashboard-390.png
+?? docs/audits/evidence/fase8/seller-dashboard-768.png
+?? docs/audits/evidence/fase8/seller-estoque-1280.png
+?? docs/audits/evidence/fase8/seller-estoque-320.png
+?? docs/audits/evidence/fase8/seller-estoque-390.png
+?? docs/audits/evidence/fase8/seller-estoque-768.png
+?? docs/audits/evidence/fase8/seller-financeiro-negado-1280.png
+?? docs/audits/evidence/fase8/seller-financeiro-negado-320.png
+?? docs/audits/evidence/fase8/seller-financeiro-negado-390.png
+?? docs/audits/evidence/fase8/seller-financeiro-negado-768.png
+?? docs/audits/evidence/fase8/seller-pedido-detalhe-1280.png
+?? docs/audits/evidence/fase8/seller-pedido-detalhe-320.png
+?? docs/audits/evidence/fase8/seller-pedido-detalhe-390.png
+?? docs/audits/evidence/fase8/seller-pedido-detalhe-768.png
+?? docs/audits/evidence/fase8/seller-pedidos-1280.png
+?? docs/audits/evidence/fase8/seller-pedidos-320.png
+?? docs/audits/evidence/fase8/seller-pedidos-390.png
+?? docs/audits/evidence/fase8/seller-pedidos-768.png
+?? docs/audits/evidence/fase8/seller-usuarios-negado-1280.png
+?? docs/audits/evidence/fase8/seller-usuarios-negado-320.png
+?? docs/audits/evidence/fase8/seller-usuarios-negado-390.png
+?? docs/audits/evidence/fase8/seller-usuarios-negado-768.png
+?? docs/audits/evidence/fase8/seller-visitas-1280.png
+?? docs/audits/evidence/fase8/seller-visitas-320.png
+?? docs/audits/evidence/fase8/seller-visitas-390.png
+?? docs/audits/evidence/fase8/seller-visitas-768.png
+?? docs/audits/evidence/fase8/usuarios-scroll-320.png
+?? docs/audits/evidence/fase9/accessibility-web.json
+?? docs/audits/evidence/fase9/api-after.json
+?? docs/audits/evidence/fase9/api-before.json
+?? docs/audits/evidence/fase9/api-current.json
+?? docs/audits/evidence/fase9/backend-after.json
+?? docs/audits/evidence/fase9/backend-before.json
+?? docs/audits/evidence/fase9/backend-regression.json
+?? docs/audits/evidence/fase9/capacity-progress.ndjson
+?? docs/audits/evidence/fase9/capacity-suite.json
+?? docs/audits/evidence/fase9/concurrency.json
+?? docs/audits/evidence/fase9/final-integration.json
+?? docs/audits/evidence/fase9/financial-cancellation.json
+?? docs/audits/evidence/fase9/financial-capacity.json
+?? docs/audits/evidence/fase9/firestore-indexes.json
+?? docs/audits/evidence/fase9/measurement-summary.json
+?? docs/audits/evidence/fase9/measurement-summary.md
+?? docs/audits/evidence/fase9/name-dialog-390.png
+?? docs/audits/evidence/fase9/order-capacity.json
+?? docs/audits/evidence/fase9/pending-index-commands.txt
+?? docs/audits/evidence/fase9/web-after-authenticated.json
+?? docs/audits/evidence/fase9/web-after.json
+?? docs/audits/evidence/fase9/web-before-authenticated.json
+?? docs/audits/evidence/fase9/web-before-cancellation.json
+?? docs/audits/evidence/fase9/web-before.json
+?? docs/audits/evidence/fase9/web-discarded-async.json
+?? docs/audits/fase7-acabamento-2026-10-17.md
+?? docs/audits/fase8-homologacao-2026-10-17.md
+?? docs/audits/fase8-homologacao-final-2026-10-18.md
+?? docs/audits/fase9-acessibilidade-2026-10-18.md
+?? docs/audits/fase9-indices-2026-10-18.md
+?? docs/audits/fase9-performance-2026-10-18.md
+?? frontend/assets/fonts/Inter_400Regular.woff2
+?? frontend/assets/fonts/Inter_500Medium.woff2
+?? frontend/assets/fonts/Inter_600SemiBold.woff2
+?? frontend/assets/fonts/Inter_700Bold.woff2
+?? frontend/assets/fonts/LICENSE-Expo.txt
+?? frontend/assets/fonts/LICENSE-Inter.txt
+?? frontend/assets/fonts/provenance.json
+?? frontend/public/font-licenses/Expo-MIT.txt
+?? frontend/public/font-licenses/Inter-OFL.txt
+?? frontend/scripts/audit-phase9-accessibility.cjs
+?? frontend/scripts/compress-web-fonts.py
+?? frontend/scripts/performance-serve.cjs
+?? frontend/scripts/performance-web.cjs
+?? frontend/src/app/meu-perfil.tsx
+?? frontend/src/theme/fonts.ts
+?? frontend/src/theme/fonts.web.ts
+?? frontend/tests/unit/listCancellation.test.tsx
+?? frontend/tests/unit/myProfile.test.tsx
+?? graphify-out/.graphify_labels.json.sig
+?? graphify-out/.graphify_labels.pending.json
+?? graphify-out/2026-10-16/.graphify_labels.json
+?? graphify-out/2026-10-16/GRAPH_REPORT.md
+?? graphify-out/2026-10-16/cost.json
+?? graphify-out/2026-10-16/graph.json
+?? graphify-out/2026-10-16/manifest.json
+?? graphify-out/2026-10-17/.graphify_labels.json
+?? graphify-out/2026-10-17/GRAPH_REPORT.md
+?? graphify-out/2026-10-17/cost.json
+?? graphify-out/2026-10-17/graph.json
+?? graphify-out/2026-10-17/manifest.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/080c45506dcd48755fed63ce5eb1f738e0fe78182e611d5e2de2e08e5f42abea.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/1822ae55d3dc32ab34d17acec3a27a280e06c569a3d0324b1c600e41e7fe3733.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/19dd52bd907df561b0389fe5a73b071d54ad4e39186085047caacda7485be82a.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/2e5f988f29a12c2fdb4184c3243737aa92ae5433c19e77d7ab8d72e3358a489e.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/41c6746b81795c465877c7c28cc662e6fb8327a5c12a129642ad145a41841f8c.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/4466384ae030766023b256bd912735744fdda6f9cf269d4fbc1e1a6f2d48e5fd.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/5559dba80f9e7b59ea95250b4193209be5d0c5634b864e5e0bec4e0599e941e8.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/62c9079247bd7f39addd940db566a2d80f5f3edea40d8f3500a3cc17a5308423.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/6a9624f5173f4bc3041c99090a6e00691f4245a3c4ccb389e6d430c7c5484517.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/6b81fd1c4d5e43538ab28a779e95b440db9628d4f6a55c3948f6183fee43c092.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/7af0bcc7d71f5ce376db79a22ca10ecb74df29eed889c1799686ccfd7ec20e78.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/878764e7f68295d3e8060ef2cf3d6efff5a304eb5bd13eb2afea1a773a547285.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/8c70be5e93d043eca2f99065c27dff1b3d02da6ce0c162b1eacf05ebbaad5628.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/91ce1a0243a8c6f83151d100b29c41e47f6e8a521edb88610972b99f3f091a1b.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/d9a6b504d87c8f0956bdc51a623ab7a5ea79f185d9b07457eb686184a511a39a.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/dd80bd37629055424e656fb289890d0c13f25c57698051ee970a9fb70011c493.json
+?? graphify-out/cache/ast/v0.9.91-s16-g0fcafffe3c00/e7c106e8528994b15fc6afa6746986130f37bdb4fa2ac6f61235394a1a6423c9.json
+?? graphify-out/cache/last_query_stamp

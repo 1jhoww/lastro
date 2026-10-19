@@ -120,10 +120,11 @@ describe('estoque: saldos', () => {
     server.on('GET', '/api/v1/inventory', () => ok(page([stockAdmin('p1')])));
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/estoque', overrides });
     expect(await screen.findByText('Produto p1')).toBeTruthy();
-    for (const label of ['Disponível', 'Reservado', 'Físico', 'Mínimo', 'Situação'])
+    for (const label of ['Disponível', 'Reservado', 'Físico', 'Mínimo'])
       expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     expect(screen.getByLabelText('Disponível: 6 un')).toBeTruthy();
     expect(screen.getByLabelText('Reservado: 4 un')).toBeTruthy();
+    expect(screen.getByLabelText('Mínimo: 0 un')).toBeTruthy();
     expect(screen.queryByText('Físico 10 un · Reservado 4 un')).toBeNull();
   });
 
@@ -201,7 +202,7 @@ describe('estoque: saldos', () => {
 /* ---------------- Detalhe e ficha do produto ---------------- */
 
 describe('estoque: produto', () => {
-  it('administrador vê saldos, mínimo, versão do estoque e últimas movimentações', async () => {
+  it('administrador vê saldos, mínimo e últimas movimentações', async () => {
     const { gateway, server } = world();
     server
       .on('GET', '/api/v1/inventory/p1', () =>
@@ -215,7 +216,6 @@ describe('estoque: produto', () => {
     expect(screen.getByLabelText('Físico: 10 un')).toBeTruthy();
     expect(screen.getByText('Estoque mínimo cadastrado: 8 un')).toBeTruthy();
     expect(screen.getByText('Repor 2 un')).toBeTruthy();
-    expect(screen.getByText('9')).toBeTruthy();
     expect(await screen.findByText('Nota fiscal 1')).toBeTruthy();
     const q = calls(server, 'GET', '/api/v1/inventory/movements')[0]!.query;
     expect(q).toMatchObject({ productId: 'p1', direction: 'desc', limit: '10' });
@@ -772,7 +772,7 @@ describe('estoque: reposição', () => {
     expect(await screen.findByText('Feijão 1 kg')).toBeTruthy();
     expect(screen.getByText('Faltam 4 un')).toBeTruthy();
     // Frase de atenção e atalho para a reposição completa.
-    expect(screen.getByText('1 produto precisa de atenção no estoque.')).toBeTruthy();
+    expect(screen.getByText('1 produto abaixo do mínimo')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Ver estoque' })).toBeTruthy();
     // Uma página de até 50 itens, maior falta primeiro (contagem mostra 50+ quando há mais).
     expect(calls(server, 'GET', '/api/v1/inventory/replenishment')[0]!.query).toMatchObject({
@@ -801,7 +801,7 @@ describe('estoque: reposição', () => {
       initialUrl: '/',
       overrides: { '(app)/index': Home },
     });
-    expect(await screen.findByText('Pedidos recentes')).toBeTruthy();
+    expect(await screen.findByText('Atividade recente')).toBeTruthy();
     expect(screen.queryByText('Abaixo do mínimo')).toBeNull();
     expect(calls(server, 'GET', '/api/v1/inventory/replenishment')).toHaveLength(0);
   });

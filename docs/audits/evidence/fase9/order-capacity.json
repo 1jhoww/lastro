@@ -1,0 +1,50 @@
+[
+  {
+    "lines": 20,
+    "installments": 12,
+    "confirmMs": 402,
+    "replayMs": 160,
+    "dispatchMs": 239,
+    "cancelMs": 347,
+    "orderStorageBytes": 53918,
+    "operationStorageBytes": 54227,
+    "confirmWrites": 77,
+    "confirmLogicalReads": 104
+  },
+  {
+    "lines": 50,
+    "installments": 12,
+    "confirmMs": 473,
+    "replayMs": 175,
+    "dispatchMs": 293,
+    "cancelMs": 420,
+    "orderStorageBytes": 127358,
+    "operationStorageBytes": 127667,
+    "confirmWrites": 167,
+    "confirmLogicalReads": 224
+  },
+  {
+    "lines": 100,
+    "installments": 12,
+    "confirmMs": 550,
+    "replayMs": 182,
+    "dispatchMs": 357,
+    "cancelMs": 478,
+    "orderStorageBytes": 249758,
+    "operationStorageBytes": 250067,
+    "confirmWrites": 317,
+    "confirmLogicalReads": 424
+  },
+  {
+    "lines": 200,
+    "installments": 12,
+    "confirmMs": 751,
+    "replayMs": 183,
+    "dispatchMs": 539,
+    "cancelMs": 673,
+    "orderStorageBytes": 494558,
+    "operationStorageBytes": 494867,
+    "confirmWrites": 617,
+    "confirmLogicalReads": 824
+  }
+]

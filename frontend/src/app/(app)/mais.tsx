@@ -1,13 +1,12 @@
 import type { Href } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTenant } from '@/features/session/useTenant';
-import { NameEditor } from '@/features/session/NameEditor';
 import { Screen } from '@/layout/Screen';
 import { visibleDestinations } from '@/navigation/destinations';
 import { roleLabel, useSession } from '@/session/SessionContext';
 import { color, space } from '@/theme';
 import { Button, ListRow, Panel, Skeleton, Text } from '@/ui';
-import { ArrowLeftRight, LogOut, Palette, ShieldCheck } from '@/ui/icons';
+import { ArrowLeftRight, LogOut, Palette, ShieldCheck, UserRound } from '@/ui/icons';
 
 /** Celular: seções que não cabem na barra inferior e a conta. */
 export default function More() {
@@ -67,10 +66,10 @@ export default function More() {
           <Text variant="small" color={color.textSecondary}>
             {session.user?.email}
           </Text>
-          <View style={styles.nameAction}>
-            <NameEditor />
-          </View>
         </View>
+      </Panel>
+      <Panel flush>
+        <ListRow icon={UserRound} title="Meu Perfil" description="Nome, e-mail e senha" href="/meu-perfil" last />
       </Panel>
       {extras.length ? (
         <Panel flush>
@@ -92,5 +91,4 @@ export default function More() {
 
 const styles = StyleSheet.create({
   account: { gap: space[1] },
-  nameAction: { alignItems: 'flex-start', marginLeft: -space[3] },
 });

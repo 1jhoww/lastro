@@ -1,0 +1,678 @@
+{
+  "stage": "after",
+  "browser": "155.0.8059.80",
+  "observations": [
+    {
+      "profile": "desktop",
+      "run": 0,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 1066.9189999999999,
+      "lcp": 916,
+      "longTasks": [
+        73
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 608
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 608
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/__expo-metro-runtime-e61693ae33497368646febbbae1b21fe.js",
+          "transferSize": 4225,
+          "decodedBodySize": 10157,
+          "duration": 2
+        },
+        {
+          "name": "/_expo/static/js/web/__common-733d3348b52441776583d91f10a9ac69.js",
+          "transferSize": 274025,
+          "decodedBodySize": 1217176,
+          "duration": 27.199999999953434
+        },
+        {
+          "name": "/_expo/static/js/web/entry-c809149808473aa50d57fc23948036af.js",
+          "transferSize": 290928,
+          "decodedBodySize": 1096643,
+          "duration": 54.90000000002328
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d4fb214db73d9c86dfe706ea09791e69.js",
+          "transferSize": 3149,
+          "decodedBodySize": 9466,
+          "duration": 1.599999999976717
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d2bc10242eee40c089737ad3f5b5ec9d.js",
+          "transferSize": 557,
+          "decodedBodySize": 336,
+          "duration": 1.400000000023283
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-6075896f0a57e02ff8bbed825f771d05.js",
+          "transferSize": 65955,
+          "decodedBodySize": 323460,
+          "duration": 7.599999999976717
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-4762dc22e84c356be2e5378ce275a5be.js",
+          "transferSize": 519,
+          "decodedBodySize": 276,
+          "duration": 8
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-5ba0c9a2cee9e2b43ac3b6c0ef785e89.js",
+          "transferSize": 2246,
+          "decodedBodySize": 5545,
+          "duration": 9.70000000006985
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 2.900000000023283
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 12
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 22
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 31.20000000006985
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 41
+        },
+        {
+          "name": "/_expo/static/js/web/entrar-a03d9f44b87d05cc4d74971531407258.js",
+          "transferSize": 1632,
+          "decodedBodySize": 2665,
+          "duration": 1.2999999999301508
+        }
+      ],
+      "heapBytes": 15629309
+    },
+    {
+      "profile": "desktop",
+      "run": 1,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 1001.4856,
+      "lcp": 848,
+      "longTasks": [
+        72
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 516
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 516
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/__expo-metro-runtime-e61693ae33497368646febbbae1b21fe.js",
+          "transferSize": 4225,
+          "decodedBodySize": 10157,
+          "duration": 1.599999999976717
+        },
+        {
+          "name": "/_expo/static/js/web/__common-733d3348b52441776583d91f10a9ac69.js",
+          "transferSize": 274025,
+          "decodedBodySize": 1217176,
+          "duration": 4.900000000023283
+        },
+        {
+          "name": "/_expo/static/js/web/entry-c809149808473aa50d57fc23948036af.js",
+          "transferSize": 290928,
+          "decodedBodySize": 1096643,
+          "duration": 8.199999999953434
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d4fb214db73d9c86dfe706ea09791e69.js",
+          "transferSize": 3149,
+          "decodedBodySize": 9466,
+          "duration": 1.099999999976717
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d2bc10242eee40c089737ad3f5b5ec9d.js",
+          "transferSize": 557,
+          "decodedBodySize": 336,
+          "duration": 2.099999999976717
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-6075896f0a57e02ff8bbed825f771d05.js",
+          "transferSize": 65955,
+          "decodedBodySize": 323460,
+          "duration": 2.5
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-4762dc22e84c356be2e5378ce275a5be.js",
+          "transferSize": 519,
+          "decodedBodySize": 276,
+          "duration": 2.5
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-5ba0c9a2cee9e2b43ac3b6c0ef785e89.js",
+          "transferSize": 2246,
+          "decodedBodySize": 5545,
+          "duration": 3.099999999976717
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 1.099999999976717
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 2
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 2.800000000046566
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 3.699999999953434
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 5.199999999953434
+        },
+        {
+          "name": "/_expo/static/js/web/entrar-a03d9f44b87d05cc4d74971531407258.js",
+          "transferSize": 1632,
+          "decodedBodySize": 2665,
+          "duration": 0.8999999999068677
+        }
+      ],
+      "heapBytes": 15554101
+    },
+    {
+      "profile": "desktop",
+      "run": 2,
+      "cache": "cold",
+      "cpuRate": 1,
+      "latencyMs": 0,
+      "downloadBytesPerSecond": null,
+      "readyMs": 1039.3098,
+      "lcp": 868,
+      "longTasks": [
+        81
+      ],
+      "cls": 0.00625,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 544
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 544
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/__expo-metro-runtime-e61693ae33497368646febbbae1b21fe.js",
+          "transferSize": 4225,
+          "decodedBodySize": 10157,
+          "duration": 1.6999999999534339
+        },
+        {
+          "name": "/_expo/static/js/web/__common-733d3348b52441776583d91f10a9ac69.js",
+          "transferSize": 274025,
+          "decodedBodySize": 1217176,
+          "duration": 5.300000000046566
+        },
+        {
+          "name": "/_expo/static/js/web/entry-c809149808473aa50d57fc23948036af.js",
+          "transferSize": 290928,
+          "decodedBodySize": 1096643,
+          "duration": 8.599999999976717
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d4fb214db73d9c86dfe706ea09791e69.js",
+          "transferSize": 3149,
+          "decodedBodySize": 9466,
+          "duration": 1.5
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d2bc10242eee40c089737ad3f5b5ec9d.js",
+          "transferSize": 557,
+          "decodedBodySize": 336,
+          "duration": 1.1999999999534339
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-6075896f0a57e02ff8bbed825f771d05.js",
+          "transferSize": 65955,
+          "decodedBodySize": 323460,
+          "duration": 2.199999999953434
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-4762dc22e84c356be2e5378ce275a5be.js",
+          "transferSize": 519,
+          "decodedBodySize": 276,
+          "duration": 1.7000000000698492
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-5ba0c9a2cee9e2b43ac3b6c0ef785e89.js",
+          "transferSize": 2246,
+          "decodedBodySize": 5545,
+          "duration": 2.400000000023283
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 1.1999999999534339
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 2.599999999976717
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 3.299999999930151
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 4.700000000069849
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 5.5
+        },
+        {
+          "name": "/_expo/static/js/web/entrar-a03d9f44b87d05cc4d74971531407258.js",
+          "transferSize": 1632,
+          "decodedBodySize": 2665,
+          "duration": 1.099999999976717
+        }
+      ],
+      "heapBytes": 15657466
+    },
+    {
+      "profile": "mobile",
+      "run": 0,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 9001.2087,
+      "lcp": 8488,
+      "longTasks": [
+        426,
+        195,
+        57
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 8028
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 8028
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/__expo-metro-runtime-e61693ae33497368646febbbae1b21fe.js",
+          "transferSize": 4225,
+          "decodedBodySize": 10157,
+          "duration": 225.10000000009313
+        },
+        {
+          "name": "/_expo/static/js/web/__common-733d3348b52441776583d91f10a9ac69.js",
+          "transferSize": 274025,
+          "decodedBodySize": 1217176,
+          "duration": 2949.5
+        },
+        {
+          "name": "/_expo/static/js/web/entry-c809149808473aa50d57fc23948036af.js",
+          "transferSize": 290928,
+          "decodedBodySize": 1096643,
+          "duration": 3042.70000000007
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d4fb214db73d9c86dfe706ea09791e69.js",
+          "transferSize": 3149,
+          "decodedBodySize": 9466,
+          "duration": 231.5
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d2bc10242eee40c089737ad3f5b5ec9d.js",
+          "transferSize": 557,
+          "decodedBodySize": 336,
+          "duration": 164.90000000002328
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-6075896f0a57e02ff8bbed825f771d05.js",
+          "transferSize": 65955,
+          "decodedBodySize": 323460,
+          "duration": 553.5999999999767
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-4762dc22e84c356be2e5378ce275a5be.js",
+          "transferSize": 519,
+          "decodedBodySize": 276,
+          "duration": 177.90000000002328
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-5ba0c9a2cee9e2b43ac3b6c0ef785e89.js",
+          "transferSize": 2246,
+          "decodedBodySize": 5545,
+          "duration": 224
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 214.30000000004657
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 3492
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 3551.399999999907
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 3565.5
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 3580.100000000093
+        },
+        {
+          "name": "/_expo/static/js/web/entrar-a03d9f44b87d05cc4d74971531407258.js",
+          "transferSize": 1632,
+          "decodedBodySize": 2665,
+          "duration": 174.70000000006985
+        }
+      ],
+      "heapBytes": 15526153
+    },
+    {
+      "profile": "mobile",
+      "run": 1,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 8929.27,
+      "lcp": 8416,
+      "longTasks": [
+        432,
+        173,
+        50
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 8000
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 8000
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/__expo-metro-runtime-e61693ae33497368646febbbae1b21fe.js",
+          "transferSize": 4225,
+          "decodedBodySize": 10157,
+          "duration": 219
+        },
+        {
+          "name": "/_expo/static/js/web/__common-733d3348b52441776583d91f10a9ac69.js",
+          "transferSize": 274025,
+          "decodedBodySize": 1217176,
+          "duration": 2928.399999999907
+        },
+        {
+          "name": "/_expo/static/js/web/entry-c809149808473aa50d57fc23948036af.js",
+          "transferSize": 290928,
+          "decodedBodySize": 1096643,
+          "duration": 3021.4000000000233
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d4fb214db73d9c86dfe706ea09791e69.js",
+          "transferSize": 3149,
+          "decodedBodySize": 9466,
+          "duration": 227.19999999995343
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d2bc10242eee40c089737ad3f5b5ec9d.js",
+          "transferSize": 557,
+          "decodedBodySize": 336,
+          "duration": 177.39999999990687
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-6075896f0a57e02ff8bbed825f771d05.js",
+          "transferSize": 65955,
+          "decodedBodySize": 323460,
+          "duration": 553.9000000000233
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-4762dc22e84c356be2e5378ce275a5be.js",
+          "transferSize": 519,
+          "decodedBodySize": 276,
+          "duration": 189.40000000002328
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-5ba0c9a2cee9e2b43ac3b6c0ef785e89.js",
+          "transferSize": 2246,
+          "decodedBodySize": 5545,
+          "duration": 219.19999999995343
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 196.20000000006985
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 3491
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 3551.3000000000466
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 3565.5999999999767
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 3579.8000000000466
+        },
+        {
+          "name": "/_expo/static/js/web/entrar-a03d9f44b87d05cc4d74971531407258.js",
+          "transferSize": 1632,
+          "decodedBodySize": 2665,
+          "duration": 169.20000000006985
+        }
+      ],
+      "heapBytes": 15565944
+    },
+    {
+      "profile": "mobile",
+      "run": 2,
+      "cache": "cold",
+      "cpuRate": 4,
+      "latencyMs": 150,
+      "downloadBytesPerSecond": 200000,
+      "readyMs": 8972.021099999998,
+      "lcp": 8456,
+      "longTasks": [
+        445,
+        182,
+        53
+      ],
+      "cls": 0.009478672985781991,
+      "paints": [
+        {
+          "name": "first-paint",
+          "ms": 8020
+        },
+        {
+          "name": "first-contentful-paint",
+          "ms": 8020
+        }
+      ],
+      "resources": [
+        {
+          "name": "/_expo/static/js/web/__expo-metro-runtime-e61693ae33497368646febbbae1b21fe.js",
+          "transferSize": 4225,
+          "decodedBodySize": 10157,
+          "duration": 223.59999999997672
+        },
+        {
+          "name": "/_expo/static/js/web/__common-733d3348b52441776583d91f10a9ac69.js",
+          "transferSize": 274025,
+          "decodedBodySize": 1217176,
+          "duration": 2921.79999999993
+        },
+        {
+          "name": "/_expo/static/js/web/entry-c809149808473aa50d57fc23948036af.js",
+          "transferSize": 290928,
+          "decodedBodySize": 1096643,
+          "duration": 3013.9000000000233
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d4fb214db73d9c86dfe706ea09791e69.js",
+          "transferSize": 3149,
+          "decodedBodySize": 9466,
+          "duration": 231.5
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-d2bc10242eee40c089737ad3f5b5ec9d.js",
+          "transferSize": 557,
+          "decodedBodySize": 336,
+          "duration": 166.30000000004657
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-6075896f0a57e02ff8bbed825f771d05.js",
+          "transferSize": 65955,
+          "decodedBodySize": 323460,
+          "duration": 553.0999999999767
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-4762dc22e84c356be2e5378ce275a5be.js",
+          "transferSize": 519,
+          "decodedBodySize": 276,
+          "duration": 179.10000000009313
+        },
+        {
+          "name": "/_expo/static/js/web/_layout-5ba0c9a2cee9e2b43ac3b6c0ef785e89.js",
+          "transferSize": 2246,
+          "decodedBodySize": 5545,
+          "duration": 223.69999999995343
+        },
+        {
+          "name": "/favicon.ico",
+          "transferSize": 2116,
+          "decodedBodySize": 14510,
+          "duration": 212.29999999993015
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/400Regular/Inter_400Regular.51b6ad87261f18b6433ec52871ddfabc.ttf",
+          "transferSize": 166731,
+          "decodedBodySize": 342408,
+          "duration": 3510.5
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/500Medium/Inter_500Medium.137ab18bace28dd0bd83eb3b8ed2bc54.ttf",
+          "transferSize": 170587,
+          "decodedBodySize": 342892,
+          "duration": 3554
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/600SemiBold/Inter_600SemiBold.a5f35888d2da465de352e0dcfaf33324.ttf",
+          "transferSize": 171336,
+          "decodedBodySize": 343632,
+          "duration": 3583.8000000000466
+        },
+        {
+          "name": "/assets/node_modules/@expo-google-fonts/inter/700Bold/Inter_700Bold.6e237de4f1f413afa2fcc45c77ac343a.ttf",
+          "transferSize": 171865,
+          "decodedBodySize": 344072,
+          "duration": 3582.399999999907
+        },
+        {
+          "name": "/_expo/static/js/web/entrar-a03d9f44b87d05cc4d74971531407258.js",
+          "transferSize": 1632,
+          "decodedBodySize": 2665,
+          "duration": 175.60000000009313
+        }
+      ],
+      "heapBytes": 15562941
+    }
+  ]
+}

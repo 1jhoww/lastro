@@ -1,0 +1,119 @@
+{
+  "status": "PREPARATION_ONLY_AWAITING_REMOTE_CONFIRMATION",
+  "project": "lastro-hml",
+  "database": "(default)",
+  "G2": {
+    "approvedForPreparationOnly": true,
+    "changes": [
+      {
+        "name": "projects/lastro-hml/databases/(default)/collectionGroups/visits/fields/notes",
+        "method": "PATCH",
+        "updateMask": "indexConfig",
+        "body": {
+          "indexConfig": {
+            "indexes": []
+          }
+        }
+      },
+      {
+        "name": "projects/lastro-hml/databases/(default)/collectionGroups/visits/fields/customerName",
+        "method": "PATCH",
+        "updateMask": "indexConfig",
+        "body": {
+          "indexConfig": {
+            "indexes": []
+          }
+        }
+      },
+      {
+        "name": "projects/lastro-hml/databases/(default)/collectionGroups/visits/fields/payloadHash",
+        "method": "PATCH",
+        "updateMask": "indexConfig",
+        "body": {
+          "indexConfig": {
+            "indexes": []
+          }
+        }
+      },
+      {
+        "name": "projects/lastro-hml/databases/(default)/collectionGroups/deliveries/fields/notes",
+        "method": "PATCH",
+        "updateMask": "indexConfig",
+        "body": {
+          "indexConfig": {
+            "indexes": []
+          }
+        }
+      },
+      {
+        "name": "projects/lastro-hml/databases/(default)/collectionGroups/deliveries/fields/receivedBy",
+        "method": "PATCH",
+        "updateMask": "indexConfig",
+        "body": {
+          "indexConfig": {
+            "indexes": []
+          }
+        }
+      }
+    ],
+    "preserve": ["all ttlConfig", "all composite indexes", "all other fields", "all documents"]
+  },
+  "G3": {
+    "approvedForPreparationOnly": true,
+    "projectId": "prj_jrOM9upMAw6v5uecuCrgpPUGwAM4",
+    "changes": [
+      {
+        "key": "EXPO_PUBLIC_WEB_BASE_URL",
+        "path": "/v9/projects/prj_jrOM9upMAw6v5uecuCrgpPUGwAM4/env/vBUKsj1YC5E2jLN4?teamId=team_H7PBg30K6E951T7pyrGlbBvD",
+        "method": "PATCH",
+        "body": {
+          "value": "https://lastro-hml.vercel.app"
+        },
+        "preserveType": "encrypted",
+        "preserveTarget": ["production"]
+      },
+      {
+        "key": "EXPO_PUBLIC_FIREBASE_PROJECT_ID",
+        "path": "/v9/projects/prj_jrOM9upMAw6v5uecuCrgpPUGwAM4/env/ICHZZs3KnYCUBIAO?teamId=team_H7PBg30K6E951T7pyrGlbBvD",
+        "method": "PATCH",
+        "body": {
+          "value": "lastro-hml"
+        },
+        "preserveType": "encrypted",
+        "preserveTarget": ["production"]
+      },
+      {
+        "key": "EXPO_PUBLIC_API_URL",
+        "path": "/v9/projects/prj_jrOM9upMAw6v5uecuCrgpPUGwAM4/env/K23CkRz1I3YFvOPi?teamId=team_H7PBg30K6E951T7pyrGlbBvD",
+        "method": "PATCH",
+        "body": {
+          "value": "https://lastro-api-hml-859974935461.southamerica-east1.run.app"
+        },
+        "preserveType": "encrypted",
+        "preserveTarget": ["production"]
+      }
+    ],
+    "deploy": false
+  },
+  "G5": {
+    "approvedForPreparationOnly": true,
+    "name": "projects/lastro-hml/databases/(default)",
+    "method": "PATCH",
+    "updateMask": "deleteProtectionState",
+    "body": {
+      "deleteProtectionState": "DELETE_PROTECTION_ENABLED"
+    },
+    "preservePitr": "POINT_IN_TIME_RECOVERY_DISABLED",
+    "createBackups": false,
+    "createResources": false
+  },
+  "G4": {
+    "status": "AWAITING_SEPARATE_AUTHORIZATION",
+    "soleAdditionalAuthPermission": "firebaseauth.users.update",
+    "preserveExistingRoles": true,
+    "sufficientWithExistingUsersGetAndDatastore": true,
+    "realFunctionalTestPending": true
+  },
+  "expectedIncrementalConfigCost": "R$0; excludes existing service usage, future builds/deploys, data tests and rollback reindexing",
+  "automaticPublication": false
+}

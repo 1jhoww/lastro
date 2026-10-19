@@ -1,0 +1,74 @@
+[
+  {
+    "gitBranch": null,
+    "target": [
+      "preview"
+    ],
+    "key": "EXPO_PUBLIC_FIREBASE_API_KEY",
+    "type": "encrypted",
+    "valueState": "encrypted-not-inspected"
+  },
+  {
+    "gitBranch": null,
+    "target": [
+      "production"
+    ],
+    "key": "EXPO_PUBLIC_FIREBASE_API_KEY",
+    "type": "encrypted",
+    "valueState": "encrypted-not-inspected"
+  },
+  {
+    "target": [
+      "preview"
+    ],
+    "key": "EXPO_PUBLIC_WEB_BASE_URL",
+    "gitBranch": null,
+    "type": "encrypted",
+    "valueState": "encrypted-not-inspected"
+  },
+  {
+    "target": [
+      "production"
+    ],
+    "key": "EXPO_PUBLIC_WEB_BASE_URL",
+    "gitBranch": null,
+    "type": "encrypted",
+    "valueState": "encrypted-not-inspected"
+  },
+  {
+    "target": [
+      "preview"
+    ],
+    "key": "EXPO_PUBLIC_FIREBASE_PROJECT_ID",
+    "gitBranch": null,
+    "type": "encrypted",
+    "valueState": "encrypted-not-inspected"
+  },
+  {
+    "target": [
+      "production"
+    ],
+    "key": "EXPO_PUBLIC_FIREBASE_PROJECT_ID",
+    "gitBranch": null,
+    "type": "encrypted",
+    "valueState": "encrypted-not-inspected"
+  },
+  {
+    "target": [
+      "preview"
+    ],
+    "key": "EXPO_PUBLIC_API_URL",
+    "gitBranch": null,
+    "type": "encrypted",
+    "valueState": "encrypted-not-inspected"
+  },
+  {
+    "target": [
+      "production"
+    ],
+    "key": "EXPO_PUBLIC_API_URL",
+    "gitBranch": null,
+    "type": "encrypted",
+    "valueState": "encrypted-not-inspected"
+  }
+]

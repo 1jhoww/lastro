@@ -7,7 +7,7 @@ import { NavMarker } from '@/layout/NavMarker';
 import { useSession } from '@/session/SessionContext';
 import { color, fontFamily, layout, radius, space, useLayoutSize } from '@/theme';
 import { Button, Text } from '@/ui';
-import { ArrowLeft, Banknote, Building, CreditCard, House, LogOut, Mail } from '@/ui/icons';
+import { ArrowLeft, Banknote, Building, CreditCard, House, LogOut, Mail, UserRound } from '@/ui/icons';
 import { Touchable } from '@/ui/Touchable';
 import { focusRing, showFocusRing, type InteractionState } from '@/ui/interaction';
 import { ReauthGate } from './ReauthGate';
@@ -66,6 +66,9 @@ export function PlatformShell({ children }: { children: ReactNode }) {
                 Super Admin
               </Text>
             </View>
+            <Link href="/meu-perfil" asChild>
+              <Button label="Meu Perfil" size="sm" variant="onStructure" icon={UserRound} />
+            </Link>
             <Button
               label="Sair"
               size="sm"
@@ -120,6 +123,9 @@ export function PlatformShell({ children }: { children: ReactNode }) {
             {session.user?.email}
           </Text>
           <View style={styles.footerActions}>
+            <Link href="/meu-perfil" asChild>
+              <Button label="Meu Perfil" size="sm" variant="onStructure" icon={UserRound} />
+            </Link>
             {inTenant ? (
               <Link href="/" asChild>
                 <Button label="Voltar à empresa" size="sm" variant="onStructure" icon={ArrowLeft} />
@@ -211,7 +217,7 @@ const styles = StyleSheet.create({
     paddingBottom: space[3],
     gap: space[3],
   },
-  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: space[2] },
   tabs: { gap: space[2] },
   tab: { paddingHorizontal: space[3], paddingVertical: space[2], borderRadius: radius.sm },
   tabSelected: { backgroundColor: color.accent },

@@ -1,0 +1,534 @@
+[
+  {
+    "indexConfig": {
+      "indexes": [
+        {
+          "fields": [
+            {
+              "fieldPath": "*",
+              "order": "ASCENDING"
+            }
+          ],
+          "queryScope": "COLLECTION",
+          "state": "READY"
+        },
+        {
+          "fields": [
+            {
+              "fieldPath": "*",
+              "order": "DESCENDING"
+            }
+          ],
+          "queryScope": "COLLECTION",
+          "state": "READY"
+        },
+        {
+          "fields": [
+            {
+              "arrayConfig": "CONTAINS",
+              "fieldPath": "*"
+            }
+          ],
+          "queryScope": "COLLECTION",
+          "state": "READY"
+        }
+      ]
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/auditLogs/fields/changes"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/catalogOperations/fields/payloadHash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/catalogOperations/fields/result"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/catalogSettings/fields/description"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/catalogSettings/fields/whatsappNumber"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/categories/fields/description"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/creditApplications/fields/allocations"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/fields/address"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/fields/document"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/fields/email"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/fields/notes"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/fields/phone"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/customers/fields/tradeName"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialEvents/fields/after"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialEvents/fields/before"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialEvents/fields/hash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialEvents/fields/previousHash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialEvents/fields/reason"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialEvents/fields/references"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionLotPlans/fields/entry"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionPlans/fields/afterState"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionPlans/fields/afterTitles"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionPlans/fields/generation"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionPlans/fields/returnInfo"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionSourcePlans/fields/after"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionSourcePlans/fields/before"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionSourcePlans/fields/entry"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionSourcePlans/fields/lineAfter"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionSourcePlans/fields/lineBefore"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutionSteps/fields/result"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutions/fields/baseline"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutions/fields/checkpoint"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialExecutions/fields/result"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialOperations/fields/payloadHash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialOperations/fields/result"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofChunks/fields/entry"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofChunks/fields/siblings"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofEntries/fields/after"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofEntries/fields/before"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofEntries/fields/lineAfter"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/financialProofEntries/fields/lineBefore"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/idempotencyRecords/fields/result"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/fields/hash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/fields/notes"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/fields/previousHash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/inventoryMovements/fields/reason"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/invitations/fields/tokenHash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orderEvents/fields/reason"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orderOperations/fields/payloadHash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orderOperations/fields/result"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/fields/customerName"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/fields/discount"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/fields/installments"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/fields/intendedPaymentMethod"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/fields/lines"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/fields/notes"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/fields/payment"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/orders/fields/paymentTerms"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/paymentConditions/fields/description"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/paymentConditions/fields/schedule"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/paymentMethods/fields/description"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/payments/fields/allocations"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/payments/fields/method"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/payments/fields/reference"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/fields/description"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/products/fields/image"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/rateLimits/fields/expiresAt",
+    "ttlConfig": {
+      "state": "ACTIVE"
+    }
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/refundConfirmations/fields/method"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/refundConfirmations/fields/reason"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/refundConfirmations/fields/reference"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returnEvents/fields/after"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returnEvents/fields/before"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returnEvents/fields/guards"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returnEvents/fields/hash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returnEvents/fields/previousHash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returnEvents/fields/reason"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returnReceipts/fields/lines"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returnReceipts/fields/reason"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returns/fields/lines"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/returns/fields/reason"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/stockOperations/fields/payloadHash"
+  },
+  {
+    "indexConfig": {
+      "ancestorField": "projects/lastro-hml/databases/(default)/collectionGroups/__default__/fields/*"
+    },
+    "name": "projects/lastro-hml/databases/(default)/collectionGroups/stockOperations/fields/stockAfter"
+  }
+]

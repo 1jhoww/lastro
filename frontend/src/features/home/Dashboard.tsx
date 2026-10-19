@@ -128,7 +128,7 @@ export function Dashboard() {
       ) : null}>
       {kpis.length ? <View style={styles.kpis}>
         {kpis.map((k, i) => <View key={i} style={[styles.kpiCell,
-          { width: wide ? (100 / kpis.length + '%') as `${number}%` : '50%' }]}>{k}</View>)}
+          { width: wide ? (100 / kpis.length + '%') as `${number}%` : size === 'compact' ? '100%' : '50%' }]}>{k}</View>)}
       </View> : null}
 
       {hasAttention ? <View style={styles.area}>

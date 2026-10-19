@@ -5,6 +5,7 @@ import { empty } from '../shared/schemas/http.js';
 import type { CatalogService } from '../modules/catalog/catalogService.js';
 import type { Config } from '../config/env.js';
 import { publicCatalogRateLimit } from '../middlewares/rateLimit.js';
+import { tracked } from './lifecycle.js';
 
 export const catalogRoutes: Route[] = [
   {
@@ -115,11 +116,12 @@ export function publicCatalogRoutes(catalog: CatalogService, config: Config) {
         else if (req.body !== undefined) empty.parse(req.body);
         next();
       },
-      limiter,
-      async (req, res) => {
+      tracked(limiter),
+      tracked(async (req, res) => {
         const { slug } = s.catalogParams.parse({ slug: req.params.slug }),
           id = typeof req.params.id === 'string' ? req.params.id : '';
         const result = await handlers[route.operationId]!(slug, id, req.body, req.query);
+        if (res.writableEnded || res.destroyed) return;
         if (route.binaryOutput) {
           res
             .type('image/webp')
@@ -128,7 +130,7 @@ export function publicCatalogRoutes(catalog: CatalogService, config: Config) {
           return;
         }
         res.json({ data: route.output.parse(result), requestId: req.requestId });
-      },
+      }),
     );
   }
   router.use((_req, res) =>

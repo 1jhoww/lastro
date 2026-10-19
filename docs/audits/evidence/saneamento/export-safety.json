@@ -1,0 +1,6 @@
+{
+  "checkedFiles": 4,
+  "privateValuesCompared": 5,
+  "findings": [],
+  "note": "Signature and known-value scan; no claim of exhaustive secret detection."
+}

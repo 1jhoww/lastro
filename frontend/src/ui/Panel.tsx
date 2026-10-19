@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: space[4],
@@ -55,6 +56,6 @@ const styles = StyleSheet.create({
     paddingTop: space[4],
     paddingBottom: space[3],
   },
-  headings: { flex: 1, gap: 2 },
+  headings: { flex: 1, minWidth: 160, gap: 2 },
   body: { paddingHorizontal: space[5], paddingBottom: space[5] },
 });

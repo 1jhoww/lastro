@@ -36,7 +36,7 @@ export function useOrderList(filters: OrderFilters, limit = 25, enabled = true) 
   const { api, tenantId, header } = useTenantApi();
   return useCursorList(
     queryKeys.orderList(tenantId, { ...filters, limit }),
-    (cursor) =>
+    (cursor, signal) =>
       unwrap(
         api.GET('/api/v1/orders', {
           params: {
@@ -49,6 +49,7 @@ export function useOrderList(filters: OrderFilters, limit = 25, enabled = true) 
               ...(cursor ? { cursor } : {}),
             },
           },
+          signal,
         }),
       ),
     enabled,

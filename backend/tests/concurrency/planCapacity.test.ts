@@ -28,7 +28,12 @@ describe('Limites do plano sob concorrência', () => {
         .send({
           expectedVersion: 1,
           planCode: 'essencial',
-          acknowledgedLostFeatures: ['users.invite', 'catalog.public', 'commercial.sellers'],
+          acknowledgedLostFeatures: [
+            'users.invite',
+            'catalog.public',
+            'commercial.sellers',
+            'commercial.visits',
+          ],
           reason: 'Corrida de teste',
         }),
       issue(f, invitee),

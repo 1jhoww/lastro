@@ -1,0 +1,39 @@
+{
+  "source": "@expo-google-fonts/inter@0.4.2",
+  "converter": "fonttools[woff]==4.60.1; brotli==1.2.0",
+  "subset": false,
+  "fonts": [
+    {
+      "style": "400Regular",
+      "sourceBytes": 342408,
+      "woff2Bytes": 114336,
+      "glyphs": 2926,
+      "sourceSha256": "a414b48aa577ef2c62ebb135341ddeef33ee26a4f5dc9f787f93c1aab08ebb50",
+      "woff2Sha256": "eefaee7c4ebf2f45847c081ceafb99fadc5f984a6e60ede98026e901896cabe4"
+    },
+    {
+      "style": "500Medium",
+      "sourceBytes": 342892,
+      "woff2Bytes": 117340,
+      "glyphs": 2926,
+      "sourceSha256": "f1738576525e86db1d5cf63a6c1b56e0a7e2a2898b499ac93db95f2e7a9f9cd5",
+      "woff2Sha256": "6d40e8cfa82e166ff3da5b315026a75e150e6be235dd8a3583be13f694867b60"
+    },
+    {
+      "style": "600SemiBold",
+      "sourceBytes": 343632,
+      "woff2Bytes": 117792,
+      "glyphs": 2926,
+      "sourceSha256": "f30e9d2574c3bec5144347ff965f9841c8f06857f0b7383000f8c9489a161841",
+      "woff2Sha256": "486fc8f752fa11747ab4dbc026efb331ab046f18e4af63ec291929e9328bed59"
+    },
+    {
+      "style": "700Bold",
+      "sourceBytes": 344072,
+      "woff2Bytes": 117936,
+      "glyphs": 2926,
+      "sourceSha256": "fbe825cbfc749317f57a1433d3905aa9d3f388732fd29b8e8a36f34845e3bc3e",
+      "woff2Sha256": "7b927dcbeb09f5cd57dbc9d1e8de34625d42a19a1b719b6565e8cc6187ca08fe"
+    }
+  ]
+}

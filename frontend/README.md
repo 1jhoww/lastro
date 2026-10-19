@@ -21,13 +21,14 @@ Form · Zod · Firebase Authentication (Client SDK) · `openapi-fetch` tipado pe
 
 ## Rodar localmente com o backend e os emuladores
 
-O frontend roda com Node 22 ou 24. O backend exige Node `>=22.23.3 <23` (veja `backend/.node-version`) e Java 21 para o emulador do Firestore. Nenhum projeto Firebase real é usado.
+Frontend e backend exigem Node `>=24.22.0 <25`. A referência é Node 24.22.0 LTS, registrada nos arquivos `.node-version`. Firebase 13 exige pelo menos Node 24.12.0. O emulador Firestore exige Java 21. Nenhum projeto Firebase real é usado no desenvolvimento local.
 
-Se o Node global for outro, o backend já traz um runtime compatível em `backend/.cache/runtime`.
-Coloque essa pasta na frente do `PATH` só nos terminais do backend, sem mudar o Node global:
+Se o Node global for outro, instale Node 24.22.0 ou use um gerenciador de versões. A antiga cópia em `backend/.cache/runtime` pode conter Node 22 e não atende mais ao projeto. Durante o saneamento, o runtime oficial foi extraído somente em `frontend/.local/saneamento/node24/node-v24.22.0-win-x64`.
+Na raiz do repositório, é possível usá-lo no terminal atual sem alterar a instalação global:
 
 ```powershell
-$env:Path = "$PWD\.cache\runtime;$env:Path"
+$runtime = (Resolve-Path 'frontend/.local/saneamento/node24/node-v24.22.0-win-x64').Path
+$env:Path = "$runtime;$env:Path"
 ```
 
 1. Backend (pasta `backend`, terminal 1): emuladores.

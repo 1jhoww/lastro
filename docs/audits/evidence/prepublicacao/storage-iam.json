@@ -1,0 +1,24 @@
+{
+  "bindings": [
+    {
+      "members": [
+        "projectEditor:lastro-hml",
+        "projectOwner:lastro-hml"
+      ],
+      "role": "roles/storage.legacyBucketOwner"
+    },
+    {
+      "members": [
+        "projectViewer:lastro-hml"
+      ],
+      "role": "roles/storage.legacyBucketReader"
+    },
+    {
+      "members": [
+        "serviceAccount:lastro-api-hml@lastro-hml.iam.gserviceaccount.com"
+      ],
+      "role": "roles/storage.objectUser"
+    }
+  ],
+  "etag": "CAI="
+}

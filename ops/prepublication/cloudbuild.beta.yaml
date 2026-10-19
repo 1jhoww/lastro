@@ -1,0 +1,15 @@
+# Proposal only. Requires explicit build/upload approval before submission.
+# Uses the existing Artifact Registry repository and existing source/log bucket.
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - --tag
+      - southamerica-east1-docker.pkg.dev/lastro-hml/cloud-run-source-deploy/lastro-api-hml:${_BETA_TAG}
+      - .
+images:
+  - southamerica-east1-docker.pkg.dev/lastro-hml/cloud-run-source-deploy/lastro-api-hml:${_BETA_TAG}
+timeout: 900s
+options:
+  machineType: E2_MEDIUM
+  logging: GCS_ONLY

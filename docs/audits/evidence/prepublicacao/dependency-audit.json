@@ -1,0 +1,1369 @@
+{
+  "checkedAt": "2026-10-18T22:35:39.845Z",
+  "command": "npm audit --omit=dev --json",
+  "backend": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "dependencies": {
+      "prod": 239,
+      "dev": 680,
+      "optional": 131,
+      "peer": 35,
+      "peerOptional": 0,
+      "total": 969
+    }
+  },
+  "frontend": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 17,
+      "high": 50,
+      "critical": 0,
+      "total": 67
+    },
+    "dependencies": {
+      "prod": 854,
+      "dev": 325,
+      "optional": 40,
+      "peer": 13,
+      "peerOptional": 0,
+      "total": 1203
+    }
+  },
+  "uniqueFrontendAdvisories": [
+    {
+      "source": 1240623,
+      "name": "@grpc/grpc-js",
+      "dependency": "@grpc/grpc-js",
+      "title": "@grpc/grpc-js: In certain configurations, getAuthContext can return unauthorized certificates as though they were authorized",
+      "url": "https://github.com/advisories/GHSA-m9gg-hp2v-232j",
+      "severity": "high",
+      "cwe": [
+        "CWE-295"
+      ],
+      "cvss": {
+        "score": 7.4,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N"
+      },
+      "range": "<1.13.6"
+    },
+    {
+      "source": 1240625,
+      "name": "@grpc/grpc-js",
+      "dependency": "@grpc/grpc-js",
+      "title": "@grpc/grpc-js: The server transmits some error messages thrown by method handlers to the client in status messages",
+      "url": "https://github.com/advisories/GHSA-f596-whhp-79r4",
+      "severity": "low",
+      "cwe": [
+        "CWE-550"
+      ],
+      "cvss": {
+        "score": 3.7,
+        "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N"
+      },
+      "range": "<1.13.6"
+    },
+    {
+      "source": 1240992,
+      "name": "braces",
+      "dependency": "braces",
+      "title": "braces vulnerable to stack-exhaustion denial of service through deeply nested patterns",
+      "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+      "severity": "high",
+      "cwe": [
+        "CWE-674"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"
+      },
+      "range": "<=3.0.3"
+    },
+    {
+      "source": 1147955,
+      "name": "decode-uri-component",
+      "dependency": "decode-uri-component",
+      "title": "decode-uri-component: Denial of service via exponential decoding of malformed percent-encoded input",
+      "url": "https://github.com/advisories/GHSA-vcc3-ghjq-m6fr",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-400",
+        "CWE-405",
+        "CWE-407",
+        "CWE-1176"
+      ],
+      "cvss": {
+        "score": 0,
+        "vectorString": null
+      },
+      "range": "<=0.4.2"
+    },
+    {
+      "source": 1240912,
+      "name": "node-forge",
+      "dependency": "node-forge",
+      "title": "node-forge RSA PKCS#1 v1.5 signature verification accepts extra nested DigestAlgorithm elements",
+      "url": "https://github.com/advisories/GHSA-86w9-cpqp-85rv",
+      "severity": "high",
+      "cwe": [
+        "CWE-347"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+      },
+      "range": "<=1.4.0"
+    },
+    {
+      "source": 1241202,
+      "name": "sprintf-js",
+      "dependency": "sprintf-js",
+      "title": "sprintf-js vulnerable to denial of service through unbounded precision specifiers",
+      "url": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-1284"
+      ],
+      "cvss": {
+        "score": 5.3,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:L"
+      },
+      "range": "<=1.1.3"
+    },
+    {
+      "source": 1119441,
+      "name": "uuid",
+      "dependency": "uuid",
+      "title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+      "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+      "severity": "moderate",
+      "cwe": [
+        "CWE-787",
+        "CWE-1285"
+      ],
+      "cvss": {
+        "score": 7.5,
+        "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:H/A:N"
+      },
+      "range": "<11.1.1"
+    }
+  ],
+  "affectedFrontendPackages": [
+    {
+      "name": "@expo/cli",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=0.0.0-canary-20231123-1b19f96-4 || >=0.0.1-canary-20231125-d600e44",
+      "fixAvailable": {
+        "name": "expo",
+        "version": "44.0.6",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/expo/node_modules/@expo/cli"
+      ],
+      "via": [
+        "@expo/code-signing-certificates",
+        "@expo/config",
+        "@expo/config-plugins",
+        "@expo/inline-modules",
+        "@expo/metro",
+        "@expo/metro-config",
+        "@expo/prebuild-config",
+        "node-forge"
+      ]
+    },
+    {
+      "name": "@expo/code-signing-certificates",
+      "severity": "high",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": true,
+      "nodes": [
+        "node_modules/@expo/code-signing-certificates"
+      ],
+      "via": [
+        "node-forge"
+      ]
+    },
+    {
+      "name": "@expo/config",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "<=0.0.1-canary-20240418-8d74597 || >=3.3.23-alpha.0",
+      "fixAvailable": {
+        "name": "expo",
+        "version": "44.0.6",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@expo/config"
+      ],
+      "via": [
+        "@expo/config-plugins"
+      ]
+    },
+    {
+      "name": "@expo/config-plugins",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "expo-splash-screen",
+        "version": "55.0.25",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@expo/config-plugins"
+      ],
+      "via": [
+        "xcode"
+      ]
+    },
+    {
+      "name": "@expo/inline-modules",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": ">=0.0.2-canary-20260409-6fc2991",
+      "fixAvailable": {
+        "name": "expo",
+        "version": "44.0.6",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@expo/inline-modules"
+      ],
+      "via": [
+        "@expo/config-plugins"
+      ]
+    },
+    {
+      "name": "@expo/local-build-cache-provider",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "expo",
+        "version": "44.0.6",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@expo/local-build-cache-provider"
+      ],
+      "via": [
+        "@expo/config"
+      ]
+    },
+    {
+      "name": "@expo/metro",
+      "severity": "high",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "expo",
+        "version": "44.0.6",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@expo/metro"
+      ],
+      "via": [
+        "metro",
+        "metro-config",
+        "metro-file-map",
+        "metro-transform-worker"
+      ]
+    },
+    {
+      "name": "@expo/metro-config",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=0.0.1-canary-20240418-8d74597 || >=0.1.49-alpha.0",
+      "fixAvailable": {
+        "name": "expo",
+        "version": "44.0.6",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@expo/metro-config"
+      ],
+      "via": [
+        "@expo/config",
+        "@expo/metro"
+      ]
+    },
+    {
+      "name": "@expo/prebuild-config",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": true,
+      "nodes": [
+        "node_modules/@expo/prebuild-config"
+      ],
+      "via": [
+        "@expo/config",
+        "@expo/config-plugins"
+      ]
+    },
+    {
+      "name": "@firebase/firestore",
+      "severity": "high",
+      "isDirect": false,
+      "range": "1.3.1-0 - 1.3.1-canary.df1b588 || 1.3.2-0 - 1.3.3-canary.bc4a844 || 1.13.1-0 - 1.13.1-canary.ce3addba || 1.14.0-0 - 1.15.1 || 3.7.3-20221108184443 - 3.7.3-canary.fde5adf63 || >=3.8.0-20221206221533",
+      "fixAvailable": {
+        "name": "firebase",
+        "version": "9.14.0",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@firebase/firestore"
+      ],
+      "via": [
+        "@grpc/grpc-js"
+      ]
+    },
+    {
+      "name": "@firebase/firestore-compat",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=0.0.900-exp.520ca39d0 || 0.2.3-20221108184443 - 0.2.3-canary.fde5adf63 || >=0.3.0-20221206221533",
+      "fixAvailable": {
+        "name": "firebase",
+        "version": "9.14.0",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@firebase/firestore-compat"
+      ],
+      "via": [
+        "@firebase/firestore"
+      ]
+    },
+    {
+      "name": "@grpc/grpc-js",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=1.13.5",
+      "fixAvailable": {
+        "name": "firebase",
+        "version": "9.14.0",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@grpc/grpc-js"
+      ],
+      "via": [
+        1240623,
+        1240625
+      ]
+    },
+    {
+      "name": "@istanbuljs/load-nyc-config",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@istanbuljs/load-nyc-config"
+      ],
+      "via": [
+        "js-yaml"
+      ]
+    },
+    {
+      "name": "@jest/console",
+      "severity": "high",
+      "isDirect": false,
+      "range": "25.4.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/console"
+      ],
+      "via": [
+        "jest-message-util"
+      ]
+    },
+    {
+      "name": "@jest/core",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/core"
+      ],
+      "via": [
+        "@jest/console",
+        "@jest/reporters",
+        "@jest/test-result",
+        "@jest/transform",
+        "jest-config",
+        "jest-haste-map",
+        "jest-message-util",
+        "jest-resolve",
+        "jest-resolve-dependencies",
+        "jest-runner",
+        "jest-runtime",
+        "jest-snapshot",
+        "jest-watcher",
+        "micromatch"
+      ]
+    },
+    {
+      "name": "@jest/environment",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/environment"
+      ],
+      "via": [
+        "@jest/fake-timers"
+      ]
+    },
+    {
+      "name": "@jest/expect",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/expect"
+      ],
+      "via": [
+        "expect",
+        "jest-snapshot"
+      ]
+    },
+    {
+      "name": "@jest/fake-timers",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/fake-timers"
+      ],
+      "via": [
+        "jest-message-util"
+      ]
+    },
+    {
+      "name": "@jest/globals",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/globals"
+      ],
+      "via": [
+        "@jest/environment",
+        "@jest/expect"
+      ]
+    },
+    {
+      "name": "@jest/reporters",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/reporters"
+      ],
+      "via": [
+        "@jest/console",
+        "@jest/test-result",
+        "@jest/transform",
+        "jest-message-util"
+      ]
+    },
+    {
+      "name": "@jest/test-result",
+      "severity": "high",
+      "isDirect": false,
+      "range": "25.4.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/test-result"
+      ],
+      "via": [
+        "@jest/console"
+      ]
+    },
+    {
+      "name": "@jest/test-sequencer",
+      "severity": "high",
+      "isDirect": false,
+      "range": "<=30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/test-sequencer"
+      ],
+      "via": [
+        "@jest/test-result",
+        "jest-haste-map"
+      ]
+    },
+    {
+      "name": "@jest/transform",
+      "severity": "high",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@jest/transform"
+      ],
+      "via": [
+        "babel-plugin-istanbul",
+        "jest-haste-map",
+        "micromatch"
+      ]
+    },
+    {
+      "name": "@react-native/community-cli-plugin",
+      "severity": "high",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.72.17",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@react-native/community-cli-plugin"
+      ],
+      "via": [
+        "@react-native/metro-config",
+        "metro",
+        "metro-config"
+      ]
+    },
+    {
+      "name": "@react-native/jest-preset",
+      "severity": "high",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.72.17",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@react-native/jest-preset"
+      ],
+      "via": [
+        "babel-jest",
+        "jest-environment-node"
+      ]
+    },
+    {
+      "name": "@react-native/metro-config",
+      "severity": "high",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.72.17",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@react-native/metro-config"
+      ],
+      "via": [
+        "metro-config"
+      ]
+    },
+    {
+      "name": "@react-native/virtualized-lists",
+      "severity": "high",
+      "isDirect": false,
+      "range": ">=0.85.0-nightly-20260108-1236b6be4",
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.72.17",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@react-native/virtualized-lists"
+      ],
+      "via": [
+        "react-native"
+      ]
+    },
+    {
+      "name": "@testing-library/react-native",
+      "severity": "high",
+      "isDirect": true,
+      "range": ">=14.0.0-alpha.0",
+      "fixAvailable": {
+        "name": "@testing-library/react-native",
+        "version": "13.3.3",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@testing-library/react-native"
+      ],
+      "via": [
+        "react-native"
+      ]
+    },
+    {
+      "name": "argparse",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "1.0.0 - 1.0.10",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@istanbuljs/load-nyc-config/node_modules/argparse"
+      ],
+      "via": [
+        "sprintf-js"
+      ]
+    },
+    {
+      "name": "babel-jest",
+      "severity": "high",
+      "isDirect": false,
+      "range": ">=24.2.0-alpha.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/babel-jest"
+      ],
+      "via": [
+        "@jest/transform",
+        "babel-plugin-istanbul"
+      ]
+    },
+    {
+      "name": "babel-plugin-istanbul",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": ">=6.0.0-beta.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/babel-plugin-istanbul"
+      ],
+      "via": [
+        "@istanbuljs/load-nyc-config"
+      ]
+    },
+    {
+      "name": "braces",
+      "severity": "high",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/braces"
+      ],
+      "via": [
+        1240992
+      ]
+    },
+    {
+      "name": "create-jest",
+      "severity": "high",
+      "isDirect": false,
+      "range": "29.7.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/create-jest"
+      ],
+      "via": [
+        "jest-config"
+      ]
+    },
+    {
+      "name": "decode-uri-component",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "<=0.4.2",
+      "fixAvailable": {
+        "name": "expo-router",
+        "version": "58.0.23",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/decode-uri-component"
+      ],
+      "via": [
+        1147955
+      ]
+    },
+    {
+      "name": "expect",
+      "severity": "high",
+      "isDirect": false,
+      "range": "21.0.0-beta.1 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/expect"
+      ],
+      "via": [
+        "jest-message-util"
+      ]
+    },
+    {
+      "name": "expo",
+      "severity": "high",
+      "isDirect": true,
+      "range": ">=45.0.0-beta.1",
+      "fixAvailable": {
+        "name": "expo",
+        "version": "44.0.6",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/expo"
+      ],
+      "via": [
+        "@expo/cli",
+        "@expo/config",
+        "@expo/config-plugins",
+        "@expo/local-build-cache-provider",
+        "@expo/metro",
+        "@expo/metro-config"
+      ]
+    },
+    {
+      "name": "expo-router",
+      "severity": "moderate",
+      "isDirect": true,
+      "range": "1.2.2 - 3.1.2 || 5.2.0-canary-20250611-f0afe80 - 58.0.12",
+      "fixAvailable": {
+        "name": "expo-router",
+        "version": "58.0.23",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/expo-router"
+      ],
+      "via": [
+        "query-string"
+      ]
+    },
+    {
+      "name": "expo-sharing",
+      "severity": "moderate",
+      "isDirect": true,
+      "range": ">=14.0.9-canary-20251205-756eb7a",
+      "fixAvailable": {
+        "name": "expo-sharing",
+        "version": "14.0.8",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/expo-sharing"
+      ],
+      "via": [
+        "@expo/config-plugins"
+      ]
+    },
+    {
+      "name": "expo-splash-screen",
+      "severity": "moderate",
+      "isDirect": true,
+      "range": "55.0.10-canary-20260424-7bedc9d - 55.0.10-canary-20260429-a5e59cf || >=56.0.0-canary-20260212-4f61309",
+      "fixAvailable": {
+        "name": "expo-splash-screen",
+        "version": "55.0.25",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/expo-splash-screen"
+      ],
+      "via": [
+        "@expo/config-plugins"
+      ]
+    },
+    {
+      "name": "firebase",
+      "severity": "high",
+      "isDirect": true,
+      "range": "0.900.22 || 6.0.2-0 - 6.0.2-canary.42eae23 || 6.0.3-0 - 6.0.4-canary.bc4a844 || 7.9.1-0 - 7.9.1-canary.0396117e || 7.13.2-0 - 7.13.2-canary.ce3addba || 7.14.0-0 - 7.15.1 || 8.10.0-20217172214 - 8.10.0-canary.f40c0db53 || 9.0.0-20217250818 - 9.0.0-canary.d0d3acb10 || 9.0.1-2021727231341 - 9.0.1-canary.e039e1472 || 9.0.2-2021891633 - 9.0.2-canary.ff9baf70c || 9.0.3-202181503543 - 9.1.0-canary.f7d8324a1 || 9.1.1-2021830195733 - 9.1.1-canary.e70de6201 || 9.1.2-20219523556 - 9.1.2-canary.fc1d36497 || 9.13.1-20221108184443 - 9.14.0-canary.fde5adf63 || >=9.15.0-20221206221533",
+      "fixAvailable": {
+        "name": "firebase",
+        "version": "9.14.0",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/firebase"
+      ],
+      "via": [
+        "@firebase/firestore",
+        "@firebase/firestore-compat"
+      ]
+    },
+    {
+      "name": "jest",
+      "severity": "high",
+      "isDirect": true,
+      "range": "23.5.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest"
+      ],
+      "via": [
+        "@jest/core",
+        "jest-cli"
+      ]
+    },
+    {
+      "name": "jest-circus",
+      "severity": "high",
+      "isDirect": false,
+      "range": "20.1.0-alpha.1 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-circus"
+      ],
+      "via": [
+        "@jest/environment",
+        "@jest/expect",
+        "@jest/test-result",
+        "jest-message-util",
+        "jest-runtime",
+        "jest-snapshot"
+      ]
+    },
+    {
+      "name": "jest-cli",
+      "severity": "high",
+      "isDirect": false,
+      "range": "23.5.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-cli"
+      ],
+      "via": [
+        "@jest/core",
+        "@jest/test-result",
+        "create-jest",
+        "jest-config"
+      ]
+    },
+    {
+      "name": "jest-config",
+      "severity": "high",
+      "isDirect": false,
+      "range": "18.1.0 - 18.5.0-alpha.7da3df39 || 23.5.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-config"
+      ],
+      "via": [
+        "@jest/test-sequencer",
+        "babel-jest",
+        "jest-circus",
+        "jest-environment-node",
+        "jest-resolve",
+        "jest-runner",
+        "micromatch"
+      ]
+    },
+    {
+      "name": "jest-environment-node",
+      "severity": "high",
+      "isDirect": false,
+      "range": "24.2.0-alpha.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-environment-node"
+      ],
+      "via": [
+        "@jest/environment",
+        "@jest/fake-timers"
+      ]
+    },
+    {
+      "name": "jest-haste-map",
+      "severity": "high",
+      "isDirect": false,
+      "range": "18.1.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-haste-map"
+      ],
+      "via": [
+        "micromatch"
+      ]
+    },
+    {
+      "name": "jest-message-util",
+      "severity": "high",
+      "isDirect": false,
+      "range": "18.5.0-alpha.7da3df39 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-message-util"
+      ],
+      "via": [
+        "micromatch"
+      ]
+    },
+    {
+      "name": "jest-resolve",
+      "severity": "high",
+      "isDirect": false,
+      "range": "18.1.0 - 19.0.2 || 24.2.0-alpha.0 - 24.5.0 || 27.1.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-resolve"
+      ],
+      "via": [
+        "jest-haste-map"
+      ]
+    },
+    {
+      "name": "jest-resolve-dependencies",
+      "severity": "high",
+      "isDirect": false,
+      "range": "23.3.0 - 30.2.0",
+      "fixAvailable": true,
+      "nodes": [
+        "node_modules/jest-resolve-dependencies"
+      ],
+      "via": [
+        "jest-snapshot"
+      ]
+    },
+    {
+      "name": "jest-runner",
+      "severity": "high",
+      "isDirect": false,
+      "range": "21.0.0-alpha.1 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-runner"
+      ],
+      "via": [
+        "@jest/console",
+        "@jest/environment",
+        "@jest/test-result",
+        "@jest/transform",
+        "jest-environment-node",
+        "jest-haste-map",
+        "jest-message-util",
+        "jest-resolve",
+        "jest-runtime",
+        "jest-watcher"
+      ]
+    },
+    {
+      "name": "jest-runtime",
+      "severity": "high",
+      "isDirect": false,
+      "range": "18.1.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-runtime"
+      ],
+      "via": [
+        "@jest/environment",
+        "@jest/fake-timers",
+        "@jest/globals",
+        "@jest/test-result",
+        "@jest/transform",
+        "jest-haste-map",
+        "jest-message-util",
+        "jest-resolve",
+        "jest-snapshot"
+      ]
+    },
+    {
+      "name": "jest-snapshot",
+      "severity": "high",
+      "isDirect": false,
+      "range": "23.3.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-snapshot"
+      ],
+      "via": [
+        "@jest/transform",
+        "expect",
+        "jest-message-util"
+      ]
+    },
+    {
+      "name": "jest-watcher",
+      "severity": "high",
+      "isDirect": false,
+      "range": "25.4.0 - 30.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/jest-watcher"
+      ],
+      "via": [
+        "@jest/test-result"
+      ]
+    },
+    {
+      "name": "js-yaml",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "3.2.7 - 3.15.2",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/@istanbuljs/load-nyc-config/node_modules/js-yaml"
+      ],
+      "via": [
+        "argparse"
+      ]
+    },
+    {
+      "name": "metro",
+      "severity": "high",
+      "isDirect": false,
+      "range": ">=0.71.0",
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.72.17",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/metro"
+      ],
+      "via": [
+        "metro-config",
+        "metro-file-map",
+        "metro-transform-worker"
+      ]
+    },
+    {
+      "name": "metro-config",
+      "severity": "high",
+      "isDirect": false,
+      "range": ">=0.71.0",
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.72.17",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/metro-config"
+      ],
+      "via": [
+        "metro"
+      ]
+    },
+    {
+      "name": "metro-file-map",
+      "severity": "high",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "expo",
+        "version": "44.0.6",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/metro-file-map"
+      ],
+      "via": [
+        "micromatch"
+      ]
+    },
+    {
+      "name": "metro-transform-worker",
+      "severity": "high",
+      "isDirect": false,
+      "range": ">=0.71.0",
+      "fixAvailable": true,
+      "nodes": [
+        "node_modules/metro-transform-worker"
+      ],
+      "via": [
+        "metro"
+      ]
+    },
+    {
+      "name": "micromatch",
+      "severity": "high",
+      "isDirect": false,
+      "range": ">=0.2.0",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/micromatch"
+      ],
+      "via": [
+        "braces"
+      ]
+    },
+    {
+      "name": "node-forge",
+      "severity": "high",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "expo",
+        "version": "44.0.6",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/node-forge"
+      ],
+      "via": [
+        1240912
+      ]
+    },
+    {
+      "name": "query-string",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "5.0.0 - 9.4.1",
+      "fixAvailable": {
+        "name": "expo-router",
+        "version": "58.0.23",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/query-string"
+      ],
+      "via": [
+        "decode-uri-component"
+      ]
+    },
+    {
+      "name": "react-native",
+      "severity": "high",
+      "isDirect": true,
+      "range": ">=0.73.0-nightly-20230506-1af868c52",
+      "fixAvailable": {
+        "name": "react-native",
+        "version": "0.72.17",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/react-native"
+      ],
+      "via": [
+        "@react-native/community-cli-plugin",
+        "@react-native/jest-preset",
+        "@react-native/virtualized-lists"
+      ]
+    },
+    {
+      "name": "react-native-reanimated",
+      "severity": "high",
+      "isDirect": true,
+      "range": "3.20.0-nightly-20250722-b6c8b9a3c - 4.0.0-nightly-20250309-9ce9085cb || 4.1.7 - 4.2.0-nightly-20251017-235c127fd || >=4.2.3",
+      "fixAvailable": {
+        "name": "react-native-reanimated",
+        "version": "4.2.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/react-native-reanimated"
+      ],
+      "via": [
+        "react-native",
+        "react-native-worklets"
+      ]
+    },
+    {
+      "name": "react-native-worklets",
+      "severity": "high",
+      "isDirect": true,
+      "range": ">=0.8.0-bundle-mode-preview-1",
+      "fixAvailable": {
+        "name": "react-native-worklets",
+        "version": "0.7.4",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/react-native-worklets"
+      ],
+      "via": [
+        "@react-native/metro-config",
+        "react-native"
+      ]
+    },
+    {
+      "name": "sprintf-js",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "*",
+      "fixAvailable": {
+        "name": "jest",
+        "version": "30.5.2",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/sprintf-js"
+      ],
+      "via": [
+        1241202
+      ]
+    },
+    {
+      "name": "uuid",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": "<11.1.1",
+      "fixAvailable": {
+        "name": "expo-splash-screen",
+        "version": "55.0.25",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/uuid"
+      ],
+      "via": [
+        1119441
+      ]
+    },
+    {
+      "name": "xcode",
+      "severity": "moderate",
+      "isDirect": false,
+      "range": ">=0.9.2",
+      "fixAvailable": {
+        "name": "expo-splash-screen",
+        "version": "55.0.25",
+        "isSemVerMajor": true
+      },
+      "nodes": [
+        "node_modules/xcode"
+      ],
+      "via": [
+        "uuid"
+      ]
+    }
+  ],
+  "warning": "Affected-package counts include transitive chains and build/test tools in the dependency graph. This does not prove browser/native reachability. No automatic fix or downgrade was run."
+}

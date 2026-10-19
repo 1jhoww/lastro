@@ -1,0 +1,160 @@
+{
+  "checkedAt": "2026-10-18T22:35:42.413Z",
+  "scope": "Eight sequential read-only HTTP requests and at most one static JS asset. An earlier identical round could not persist its evidence because of a local output path error. Total at most 18 HTTP requests. No authentication, private API GET, email or business write. Single samples; no p95 or cold-start claim.",
+  "records": [
+    {
+      "name": "api-live",
+      "method": "GET",
+      "url": "https://lastro-api-hml-njkivn2g3q-rj.a.run.app/health/live",
+      "status": 200,
+      "ms": 146.8938,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "strict-transport-security": "max-age=31536000; includeSubDomains",
+        "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "x-request-id": "bb425ff5-4251-4f3f-8b5e-5fe6660986ea",
+        "server": "Google Frontend"
+      },
+      "body": "{\"status\":\"ok\"}"
+    },
+    {
+      "name": "api-alias-live",
+      "method": "GET",
+      "url": "https://lastro-api-hml-859974935461.southamerica-east1.run.app/health/live",
+      "status": 200,
+      "ms": 83.85799999999998,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "strict-transport-security": "max-age=31536000; includeSubDomains",
+        "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "x-request-id": "1d47da6f-dd4d-46aa-ae30-49322c66e2c2",
+        "server": "Google Frontend"
+      },
+      "body": "{\"status\":\"ok\"}"
+    },
+    {
+      "name": "api-ready",
+      "method": "GET",
+      "url": "https://lastro-api-hml-njkivn2g3q-rj.a.run.app/health/ready",
+      "status": 200,
+      "ms": 84.70150000000001,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "strict-transport-security": "max-age=31536000; includeSubDomains",
+        "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "x-request-id": "761d379e-a7fd-4883-9ac5-71e4b46e8b5d",
+        "server": "Google Frontend"
+      },
+      "body": "{\"status\":\"ok\"}"
+    },
+    {
+      "name": "frontend",
+      "method": "GET",
+      "url": "https://lastro-hml.vercel.app/",
+      "status": 200,
+      "ms": 39.34220000000005,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "access-control-allow-origin": "*",
+        "server": "Vercel"
+      },
+      "jsAssets": [
+        "/_expo/static/js/web/entry-4e5b24032e7f9320418ae0f1ce36f1ba.js"
+      ]
+    },
+    {
+      "name": "frontend-deep-link",
+      "method": "GET",
+      "url": "https://lastro-hml.vercel.app/meu-perfil",
+      "status": 200,
+      "ms": 18.9092,
+      "headers": {
+        "content-type": "text/html; charset=utf-8",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "strict-transport-security": "max-age=63072000; includeSubDomains; preload",
+        "access-control-allow-origin": "*",
+        "server": "Vercel"
+      }
+    },
+    {
+      "name": "private-preflight-allowed",
+      "method": "OPTIONS",
+      "url": "https://lastro-api-hml-njkivn2g3q-rj.a.run.app/api/v1/me",
+      "origin": "https://lastro-hml.vercel.app",
+      "status": 204,
+      "ms": 14.103499999999997,
+      "headers": {
+        "content-type": "text/html",
+        "cache-control": "no-store",
+        "strict-transport-security": "max-age=31536000; includeSubDomains",
+        "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "access-control-allow-origin": "https://lastro-hml.vercel.app",
+        "access-control-allow-headers": "Authorization,Content-Type,X-Tenant-Id,Idempotency-Key",
+        "access-control-allow-methods": "GET,POST,PATCH,PUT,DELETE,OPTIONS",
+        "x-request-id": "6f20ba16-c786-422b-a2e8-895a5e233af2",
+        "server": "Google Frontend"
+      }
+    },
+    {
+      "name": "private-preflight-denied",
+      "method": "OPTIONS",
+      "url": "https://lastro-api-hml-njkivn2g3q-rj.a.run.app/api/v1/me",
+      "origin": "https://example.invalid",
+      "status": 403,
+      "ms": 74.92240000000004,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "strict-transport-security": "max-age=31536000; includeSubDomains",
+        "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "x-request-id": "45b01854-f053-4741-9f85-988ed7909dc1",
+        "server": "Google Frontend"
+      }
+    },
+    {
+      "name": "private-preflight-preview",
+      "method": "OPTIONS",
+      "url": "https://lastro-api-hml-njkivn2g3q-rj.a.run.app/api/v1/me",
+      "origin": "https://lastro-hml-git-main-jhow-s-projects3.vercel.app",
+      "status": 403,
+      "ms": 14.236199999999997,
+      "headers": {
+        "content-type": "application/json; charset=utf-8",
+        "cache-control": "no-store",
+        "strict-transport-security": "max-age=31536000; includeSubDomains",
+        "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+        "x-content-type-options": "nosniff",
+        "x-frame-options": "SAMEORIGIN",
+        "x-request-id": "b841f360-7b40-4f84-b439-57f2018aaac7",
+        "server": "Google Frontend"
+      }
+    },
+    {
+      "name": "published-js-public-config",
+      "status": 200,
+      "bytes": 2988840,
+      "publicUrls": [
+        "https://lastro-api-hml-859974935461.southamerica-east1.run.app",
+        "https://lastro-hml.vercel.app"
+      ],
+      "hasEscapedBom": true,
+      "hasLiteralBom": false,
+      "containsLocalEmulatorAddress": false
+    }
+  ]
+}

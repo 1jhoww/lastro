@@ -1,0 +1,84 @@
+{
+  "status": "DRAFT_NOT_CREATED_COST_REVIEW_REQUIRED",
+  "project": "lastro-hml",
+  "service": "lastro-api-hml",
+  "region": "southamerica-east1",
+  "notificationChannel": {
+    "create": false,
+    "type": "email",
+    "addressSource": "backend/.local/saneamento/operational-preferences.private.json"
+  },
+  "budget": {
+    "create": false,
+    "displayName": "Lastro homologação - referência R$100",
+    "budgetFilter": {
+      "projects": ["projects/859974935461"],
+      "calendarPeriod": "MONTH",
+      "creditTypesTreatment": "EXCLUDE_ALL_CREDITS"
+    },
+    "amount": { "specifiedAmount": { "currencyCode": "BRL", "units": "100" } },
+    "thresholdRules": [
+      { "thresholdPercent": 0.5, "spendBasis": "CURRENT_SPEND" },
+      { "thresholdPercent": 0.9, "spendBasis": "CURRENT_SPEND" },
+      { "thresholdPercent": 1, "spendBasis": "CURRENT_SPEND" }
+    ],
+    "allUpdatesRule": {
+      "disableDefaultIamRecipients": true,
+      "monitoringNotificationChannels": []
+    },
+    "gate": "Resolver canal de e-mail somente após aprovação. Confirmar moeda da conta de faturamento: BRL é referência solicitada, não moeda verificada. Não converter valor nem ativar Pub/Sub, funções ou desligamento automático. Referência de consumo bruto antes dos créditos, sem autorizar gasto de R$100."
+  },
+  "metricPolicyDrafts": [
+    {
+      "id": "run-5xx",
+      "enabled": false,
+      "metric": "run.googleapis.com/request_count",
+      "responseCodeClass": "5xx",
+      "alignmentPeriodSeconds": 300,
+      "perSeriesAligner": "ALIGN_SUM",
+      "crossSeriesReducer": "REDUCE_SUM",
+      "comparison": "COMPARISON_GT",
+      "thresholdValue": 2,
+      "durationSeconds": 0
+    },
+    {
+      "id": "run-latency-p95",
+      "enabled": false,
+      "metric": "run.googleapis.com/request_latencies",
+      "alignmentPeriodSeconds": 60,
+      "perSeriesAligner": "ALIGN_PERCENTILE_95",
+      "crossSeriesReducer": "REDUCE_MAX",
+      "comparison": "COMPARISON_GT",
+      "thresholdValue": 3000,
+      "metricUnit": "ms",
+      "durationSeconds": 300
+    },
+    {
+      "id": "run-memory",
+      "enabled": false,
+      "metric": "run.googleapis.com/container/memory/utilizations",
+      "alignmentPeriodSeconds": 60,
+      "perSeriesAligner": "ALIGN_PERCENTILE_95",
+      "crossSeriesReducer": "REDUCE_MAX",
+      "comparison": "COMPARISON_GT",
+      "thresholdValue": 0.85,
+      "durationSeconds": 300
+    }
+  ],
+  "metricScope": "resource.type=cloud_run_revision; project_id=lastro-hml; service_name=lastro-api-hml; location=southamerica-east1. Agregar todas as revisões para 5xx; máximo entre p95 por revisão para latência/memória.",
+  "uptimeCheck": {
+    "create": false,
+    "hostname": "lastro-api-hml-njkivn2g3q-rj.a.run.app",
+    "path": "/health/ready",
+    "useSsl": true,
+    "validateSsl": true,
+    "port": 443,
+    "periodSeconds": 60,
+    "timeoutSeconds": 5,
+    "selectedRegions": ["SOUTH_AMERICA", "USA_IOWA", "EUROPE"],
+    "expectedStatus": 200,
+    "failurePolicy": "Falhas por 120s em ao menos duas localizações. Vincular CHECK_ID real somente após criação aprovada.",
+    "costGate": "Adiado: até 129600 checks e leituras Firestore por 30 dias, sem considerar cache compartilhado. Pode manter Cloud Run ativo e consumir créditos."
+  },
+  "rollback": "Desabilitar políticas/checks aprovados e suspender notificações. Não apagar evidências, buckets ou dados. Orçamento não é teto de gastos nem confirma saldo/validade de créditos."
+}

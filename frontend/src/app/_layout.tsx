@@ -3,13 +3,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import {
-  Inter_400Regular,
-  Inter_500Medium,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  useFonts,
-} from '@expo-google-fonts/inter';
+import { useFonts } from 'expo-font';
+import { appFonts } from '@/theme/fonts';
 import { createQueryClient } from '@/api/queryClient';
 import { createFirebaseGateway } from '@/auth/firebaseGateway';
 import { env, envProblem } from '@/config/env';
@@ -21,12 +16,7 @@ import { ToastProvider } from '@/ui';
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
-  const [fontsLoaded, fontError] = useFonts({
-    Inter_400Regular,
-    Inter_500Medium,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
+  const [fontsLoaded, fontError] = useFonts(appFonts);
   const [queryClient] = useState(() => createQueryClient());
   const [deps] = useState<SessionDeps | null>(() =>
     env ? { gateway: createFirebaseGateway(env), apiBaseUrl: env.apiUrl } : null,

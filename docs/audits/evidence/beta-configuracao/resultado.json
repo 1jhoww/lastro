@@ -1,0 +1,86 @@
+{
+  "recordedAt": "2026-10-19T00:12:03.143Z",
+  "project": "lastro-hml",
+  "database": "(default)",
+  "authorization": "G2, G3, G5 and G4 only",
+  "groups": {
+    "G2": {
+      "group": "G2",
+      "verified": true,
+      "G2": {
+        "exemptFields": 5,
+        "unchangedComposites": 134,
+        "otherFieldsUnchanged": true,
+        "ttlUnchanged": true
+      }
+    },
+    "G3": {
+      "group": "G3",
+      "verified": true,
+      "G3": {
+        "variables": 3,
+        "onlyLeadingBomRemoved": true,
+        "metadataUnchanged": true,
+        "deploymentAndTargetsUnchanged": true
+      }
+    },
+    "G5": {
+      "group": "G5",
+      "verified": true,
+      "G5": {
+        "deleteProtection": "DELETE_PROTECTION_ENABLED",
+        "pitrUnchanged": "POINT_IN_TIME_RECOVERY_DISABLED",
+        "retentionUnchanged": "3600s",
+        "backupSchedulesUnchanged": true
+      }
+    },
+    "G4": {
+      "group": "G4",
+      "verified": true,
+      "G4": {
+        "soleAddedPermission": "firebaseauth.users.update",
+        "bindingMember": "serviceAccount:lastro-api-hml@lastro-hml.iam.gserviceaccount.com",
+        "allPreviousBindingsPreserved": true,
+        "actualAuthFlowTestPending": true
+      }
+    }
+  },
+  "fieldOperations": [
+    {
+      "field": "visits.notes",
+      "done": true,
+      "state": "SUCCESSFUL"
+    },
+    {
+      "field": "visits.customerName",
+      "done": true,
+      "state": "SUCCESSFUL"
+    },
+    {
+      "field": "visits.payloadHash",
+      "done": true,
+      "state": "SUCCESSFUL"
+    },
+    {
+      "field": "deliveries.notes",
+      "done": true,
+      "state": "SUCCESSFUL"
+    },
+    {
+      "field": "deliveries.receivedBy",
+      "done": true,
+      "state": "SUCCESSFUL"
+    }
+  ],
+  "pendingFieldOperations": 0,
+  "cloudRunRevision": "lastro-api-hml-00003-jjc",
+  "vercelDeploymentId": "dpl_6ax4B9GsLyg1rZWr2L27WhotJzDr",
+  "noBuildCommitPushDeployExecuted": true,
+  "compositeIndexesCreated": 0,
+  "dataDocumentsReadOrWritten": 0,
+  "newPaidResourcesCreated": 0,
+  "expectedAdditionalConfigCostBRL": 0,
+  "unexpectedCostObserved": false,
+  "costCaveat": "Control-plane configuration only; billing invoice not measured in real time; existing service use remains billable.",
+  "actualAuthBusinessSmokePending": true
+}

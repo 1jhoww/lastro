@@ -65,10 +65,13 @@ describe('F05: orçamento de leituras e backpressure', () => {
   });
 });
 describe('F06: runtime suportado', () => {
-  it.each(['22.16.0', '22.23.2', '23.11.0', '24.21.0', '20.20.0'])('recusa Node %s', (version) => {
-    expect(() => assertRuntime(version)).toThrow('Runtime não suportado');
-  });
-  it.each(['22.23.3', '22.24.0'])('aceita Node %s', (version) => {
+  it.each(['22.23.3', '23.11.0', '24.21.0', '25.0.0', '20.20.0', '24.22.bad'])(
+    'recusa Node %s',
+    (version) => {
+      expect(() => assertRuntime(version)).toThrow('Runtime não suportado');
+    },
+  );
+  it.each(['24.22.0', '24.23.0'])('aceita Node %s', (version) => {
     expect(() => assertRuntime(version)).not.toThrow();
   });
 });

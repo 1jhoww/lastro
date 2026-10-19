@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { View } from 'react-native';
+import { toApiError } from '@/api/errors';
 import { personName } from '@/features/auth/schemas';
 import { useSession } from '@/session/SessionContext';
 import { space } from '@/theme';
-import { Button, Dialog, TextField, type ButtonVariant } from '@/ui';
+import { Button, Dialog, TextField, useToast, type ButtonVariant } from '@/ui';
 import { useUpdateMyName } from './profile';
 
 /**
@@ -12,6 +13,7 @@ import { useUpdateMyName } from './profile';
  */
 export function NameEditor({ variant = 'ghost' }: { variant?: ButtonVariant }) {
   const session = useSession();
+  const toast = useToast();
   const current = session.me?.name ?? '';
   const save = useUpdateMyName();
   const [open, setOpen] = useState(false);
@@ -32,8 +34,9 @@ export function NameEditor({ variant = 'ghost' }: { variant?: ButtonVariant }) {
     try {
       await save.mutateAsync(parsed.data);
       close();
-    } catch {
-      setError('Não foi possível salvar o nome. Tente novamente.');
+      toast.show('Nome atualizado');
+    } catch (e) {
+      setError(toApiError(e).userMessage);
     }
   };
   if (!session.me) return null;

@@ -13,8 +13,8 @@ permissions:
   contents: read
 
 env:
-  # backend/.npmrc sets engine-strict; backend/package.json requires >=22.23.3 <23.
-  NODE_VERSION: '22.23.3'
+  # Both packages enforce Node 24 LTS; Firebase 13 requires Node >=24.12.0.
+  NODE_VERSION: '24.22.0'
 
 jobs:
   backend:
@@ -36,6 +36,7 @@ jobs:
       - run: npm run build
       - run: npm test
       - run: npm run audit:secrets
+      - run: node ../scripts/prepare-release-candidate.mjs
 
   frontend:
     runs-on: ubuntu-latest
@@ -55,6 +56,8 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test -- --ci
+      - run: npm run test:dependencies
+      - run: npm run build
 
   # The API contract exists in four committed files. Each must match its source:
   # backend code -> backend/docs/api/openapi.json -> frontend/contract/openapi.json,

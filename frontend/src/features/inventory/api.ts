@@ -163,7 +163,7 @@ export function useReplenishment(filters: ReplenishmentFilters, limit = 50, enab
       : { sort: 'shortfall' as const, direction: 'desc' as const };
   return useCursorList(
     queryKeys.replenishment(tenantId, { ...filters, limit }),
-    (cursor) =>
+    (cursor, signal) =>
       unwrap(
         api.GET('/api/v1/inventory/replenishment', {
           params: {
@@ -177,6 +177,7 @@ export function useReplenishment(filters: ReplenishmentFilters, limit = 50, enab
               ...(cursor ? { cursor } : {}),
             },
           },
+          signal,
         }),
       ),
     enabled,

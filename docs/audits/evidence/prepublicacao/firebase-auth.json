@@ -1,0 +1,52 @@
+{
+  "signIn": {
+    "email": {
+      "enabled": true,
+      "passwordRequired": true
+    }
+  },
+  "checkedAt": "2026-10-18T19:31:51.9521442-03:00",
+  "passwordPolicyConfig": null,
+  "multiTenant": {},
+  "name": "projects/859974935461/config",
+  "blockingFunctions": {},
+  "authorizedDomains": [
+    "localhost",
+    "lastro-hml.firebaseapp.com",
+    "lastro-hml.web.app",
+    "lastro-hml.vercel.app"
+  ],
+  "email": {
+    "callbackUri": "https://lastro-hml.firebaseapp.com/__/auth/action",
+    "method": "DEFAULT",
+    "templates": {
+      "resetPassword": {
+        "senderLocalPart": "noreply",
+        "subject": "Reset your password for %APP_NAME%",
+        "body": "<p>Hello,</p>\n<p>Follow this link to reset your %APP_NAME% password for your %EMAIL% account.</p>\n<p><a href='%LINK%'>%LINK%</a></p>\n<p>If you didn’t ask to reset your password, you can ignore this email.</p>\n<p>Thanks,</p>\n<p>Your %APP_NAME% team</p>",
+        "bodyFormat": "HTML",
+        "replyTo": "noreply"
+      },
+      "changeEmail": {
+        "senderLocalPart": "noreply",
+        "subject": "Your sign-in email was changed for %APP_NAME%",
+        "body": "<p>Hello %DISPLAY_NAME%,</p>\n<p>Your sign-in email for %APP_NAME% was changed to %NEW_EMAIL%.</p>\n<p>If you didn’t ask to change your email, follow this link to reset your sign-in email.</p>\n<p><a href='%LINK%'>%LINK%</a></p>\n<p>Thanks,</p>\n<p>Your %APP_NAME% team</p>",
+        "bodyFormat": "HTML",
+        "replyTo": "noreply"
+      },
+      "verifyEmail": {
+        "senderLocalPart": "noreply",
+        "subject": "Verify your email for %APP_NAME%",
+        "body": "<p>Hello %DISPLAY_NAME%,</p>\n<p>Follow this link to verify your email address.</p>\n<p><a href='%LINK%'>%LINK%</a></p>\n<p>If you didn’t ask to verify this address, you can ignore this email.</p>\n<p>Thanks,</p>\n<p>Your %APP_NAME% team</p>",
+        "bodyFormat": "HTML",
+        "replyTo": "noreply"
+      }
+    }
+  },
+  "mfa": {
+    "state": "DISABLED"
+  },
+  "emailPrivacyConfig": {
+    "enableImprovedEmailPrivacy": true
+  }
+}

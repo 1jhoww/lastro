@@ -1,0 +1,42 @@
+[
+  {
+    "url": "lastro-pyuf1v3f2-jhow-s-projects3.vercel.app",
+    "state": "READY",
+    "createdAt": 1792178915628,
+    "target": "production",
+    "commit": "c2509f52d1c3084a883e9d85fd6ceba475a3db85",
+    "ref": "main"
+  },
+  {
+    "url": "lastro-7aswfeccz-jhow-s-projects3.vercel.app",
+    "state": "READY",
+    "createdAt": 1792129401130,
+    "target": null,
+    "commit": "d6afe04220c7ecb10ad5545a9962416f48e0ac01",
+    "ref": "codex/orders-phase2"
+  },
+  {
+    "url": "lastro-p02354h2b-jhow-s-projects3.vercel.app",
+    "state": "READY",
+    "createdAt": 1792118600828,
+    "target": "production",
+    "commit": "c580a303d57dbf580c4d7994873f060384103580",
+    "ref": "codex/orders-phase2"
+  },
+  {
+    "url": "lastro-qc64bxf0u-jhow-s-projects3.vercel.app",
+    "state": "READY",
+    "createdAt": 1792118179051,
+    "target": null,
+    "commit": "c580a303d57dbf580c4d7994873f060384103580",
+    "ref": "codex/orders-phase2"
+  },
+  {
+    "url": "lastro-61hbo51wa-jhow-s-projects3.vercel.app",
+    "state": "READY",
+    "createdAt": 1792116323676,
+    "target": null,
+    "commit": "732359bde24a2d508551169837b86704d72f7be4",
+    "ref": "codex/preserve-finance-phase1"
+  }
+]

@@ -1,0 +1,124 @@
+{
+  "bindings": [
+    {
+      "role": "roles/artifactregistry.serviceAgent",
+      "members": [
+        "serviceAccount:service-859974935461@gcp-sa-artifactregistry.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/cloudbuild.builds.builder",
+      "members": [
+        "serviceAccount:859974935461@cloudbuild.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/cloudbuild.serviceAgent",
+      "members": [
+        "serviceAccount:service-859974935461@gcp-sa-cloudbuild.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/containerregistry.ServiceAgent",
+      "members": [
+        "serviceAccount:service-859974935461@containerregistry.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/datastore.user",
+      "members": [
+        "serviceAccount:lastro-api-hml@lastro-hml.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/editor",
+      "members": [
+        "serviceAccount:859974935461-compute@developer.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/firebase.managementServiceAgent",
+      "members": [
+        "serviceAccount:service-859974935461@gcp-sa-firebase.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/firebase.sdkAdminServiceAgent",
+      "members": [
+        "serviceAccount:firebase-adminsdk-fbsvc@lastro-hml.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/firebaseauth.admin",
+      "members": [
+        "serviceAccount:firebase-adminsdk-fbsvc@lastro-hml.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/firebaseauth.viewer",
+      "members": [
+        "serviceAccount:lastro-api-hml@lastro-hml.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/firebaserules.system",
+      "members": [
+        "serviceAccount:service-859974935461@firebase-rules.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/firebasestorage.serviceAgent",
+      "members": [
+        "serviceAccount:service-859974935461@gcp-sa-firebasestorage.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/firestore.serviceAgent",
+      "members": [
+        "serviceAccount:service-859974935461@gcp-sa-firestore.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/iam.serviceAccountTokenCreator",
+      "members": [
+        "serviceAccount:firebase-adminsdk-fbsvc@lastro-hml.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/owner",
+      "members": [
+        "user:REDACTED"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/pubsub.serviceAgent",
+      "members": [
+        "serviceAccount:service-859974935461@gcp-sa-pubsub.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    },
+    {
+      "role": "roles/run.serviceAgent",
+      "members": [
+        "serviceAccount:service-859974935461@serverless-robot-prod.iam.gserviceaccount.com"
+      ],
+      "condition": null
+    }
+  ],
+  "auditConfigs": null
+}

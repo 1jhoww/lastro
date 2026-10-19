@@ -1,0 +1,131 @@
+{
+  "before": {
+    "scope": "npm audit --omit=dev",
+    "packages": {
+      "info": 0,
+      "low": 0,
+      "moderate": 17,
+      "high": 50,
+      "critical": 0,
+      "total": 67
+    },
+    "advisories": [
+      {
+        "name": "@grpc/grpc-js",
+        "url": "https://github.com/advisories/GHSA-m9gg-hp2v-232j",
+        "severity": "high",
+        "range": "<1.13.6"
+      },
+      {
+        "name": "@grpc/grpc-js",
+        "url": "https://github.com/advisories/GHSA-f596-whhp-79r4",
+        "severity": "low",
+        "range": "<1.13.6"
+      },
+      {
+        "name": "braces",
+        "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+        "severity": "high",
+        "range": "<=3.0.3"
+      },
+      {
+        "name": "decode-uri-component",
+        "url": "https://github.com/advisories/GHSA-vcc3-ghjq-m6fr",
+        "severity": "moderate",
+        "range": "<=0.4.2"
+      },
+      {
+        "name": "node-forge",
+        "url": "https://github.com/advisories/GHSA-86w9-cpqp-85rv",
+        "severity": "high",
+        "range": "<=1.4.0"
+      },
+      {
+        "name": "sprintf-js",
+        "url": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c",
+        "severity": "moderate",
+        "range": "<=1.1.3"
+      },
+      {
+        "name": "uuid",
+        "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+        "severity": "moderate",
+        "range": "<11.1.1"
+      }
+    ]
+  },
+  "after": {
+    "scope": "npm audit --omit=dev",
+    "packages": {
+      "info": 0,
+      "low": 0,
+      "moderate": 5,
+      "high": 46,
+      "critical": 0,
+      "total": 51
+    },
+    "advisories": [
+      {
+        "name": "braces",
+        "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+        "severity": "high",
+        "range": "<=3.0.3"
+      },
+      {
+        "name": "node-forge",
+        "url": "https://github.com/advisories/GHSA-86w9-cpqp-85rv",
+        "severity": "high",
+        "range": "<=1.4.0"
+      },
+      {
+        "name": "sprintf-js",
+        "url": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c",
+        "severity": "moderate",
+        "range": "<=1.1.3"
+      }
+    ]
+  },
+  "cleanInstallAfter": {
+    "scope": "npm audit --omit=dev",
+    "packages": {
+      "info": 0,
+      "low": 0,
+      "moderate": 5,
+      "high": 46,
+      "critical": 0,
+      "total": 51
+    },
+    "advisories": [
+      {
+        "name": "braces",
+        "url": "https://github.com/advisories/GHSA-vfj7-8cjw-p6xm",
+        "severity": "high",
+        "range": "<=3.0.3"
+      },
+      {
+        "name": "node-forge",
+        "url": "https://github.com/advisories/GHSA-86w9-cpqp-85rv",
+        "severity": "high",
+        "range": "<=1.4.0"
+      },
+      {
+        "name": "sprintf-js",
+        "url": "https://github.com/advisories/GHSA-hp3w-g68c-fv3c",
+        "severity": "moderate",
+        "range": "<=1.1.3"
+      }
+    ]
+  },
+  "backend": {
+    "scope": "npm audit --omit=dev",
+    "packages": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "advisories": []
+  }
+}

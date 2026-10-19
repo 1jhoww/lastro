@@ -1,0 +1,14 @@
+{
+  "id": "prj_jrOM9upMAw6v5uecuCrgpPUGwAM4",
+  "name": "lastro-hml",
+  "framework": null,
+  "nodeVersion": "24.x",
+  "rootDirectory": "frontend",
+  "installCommand": "npm ci",
+  "buildCommand": "npx expo export --platform web",
+  "outputDirectory": "dist",
+  "link": null,
+  "ssoProtection": null,
+  "passwordProtection": null,
+  "productionDeploymentsFastLane": null
+}

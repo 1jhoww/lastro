@@ -1,0 +1,17 @@
+{
+  "name": "projects/lastro-hml/rulesets/e1f9da52-e683-4740-b31a-85698c2ab4f2",
+  "source": {
+    "files": [
+      {
+        "content": "rules_version = '2';\nservice cloud.firestore {\n  match /databases/{database}/documents {\n    match /{document=**} { allow read, write: if false; }\n  }\n}\n",
+        "name": "firestore.rules"
+      }
+    ]
+  },
+  "createTime": "2026-10-15T22:03:06.199391Z",
+  "metadata": {
+    "services": [
+      "cloud.firestore"
+    ]
+  }
+}

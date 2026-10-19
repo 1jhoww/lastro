@@ -7,7 +7,9 @@ import { createApiClient, unwrap, type ApiClient } from '../src/api/client';
 import { ApiError } from '../src/api/errors';
 
 const API = process.env.API_URL ?? 'http://127.0.0.1:3000';
-const AUTH = 'http://127.0.0.1:9099';
+const AUTH = process.env.AUTH_EMULATOR_URL ?? 'http://127.0.0.1:9099';
+if (!/^http:\/\/127\.0\.0\.1:(9099|19099)$/.test(AUTH))
+  throw new Error('E2E exige Auth Emulator local nas portas autorizadas');
 const PROJECT = 'demo-lastro-phase-a';
 export const seedPassword = process.env.SEED_PASSWORD ?? '';
 if (!seedPassword) throw new Error('Defina SEED_PASSWORD com a senha mostrada pelo seed');
@@ -94,15 +96,18 @@ export const header = (tenantId: string) => ({ 'X-Tenant-Id': tenantId });
 
 /** Empresa sintética com administrador (dono do convite) já aceito. */
 export async function createTenant(root: ApiClient, name: string) {
-  const plans = await unwrap(root.GET('/api/v1/admin/plans', {}));
-  const plan = plans.items.find((p) => p.status === 'active');
-  assert(plan, 'nenhum plano ativo no seed');
   const suffix = randomUUID().slice(0, 8);
   const ownerEmail = `admin.${suffix}@lastro.invalid`;
+  const billingStartsOn = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date());
   const created = await unwrap(
     root.POST('/api/v1/admin/tenants', {
       params: { header: { 'Idempotency-Key': randomUUID() } },
-      body: { name, planId: plan.id, ownerEmail },
+      body: { name, planCode: 'profissional', ownerEmail, billingDay: 10, billingStartsOn },
     }),
   );
   const owner = await createVerifiedUser(ownerEmail);
