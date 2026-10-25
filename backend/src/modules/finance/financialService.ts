@@ -14,7 +14,9 @@ import { orderSchema, orderEventSchema } from '../../shared/schemas/orders.js';
 import { digest } from '../../shared/utils/crypto.js';
 import { reservationIdFor } from '../inventory/orderStockAdapter.js';
 import { parseQuantity } from '../inventory/quantities.js';
-import { financialEventHash } from './financialBook.js';
+import { financialEventHash, receivableBasis } from './financialBook.js';
+import { receivableSchema } from '../receivables/orderReceivables.js';
+import { recordAudit } from '../../shared/audit/audit.js';
 import type { SourceChange } from './resolution/sourceIndex.js';
 export class FinancialService {
   readonly book: FinancialBook;
@@ -844,6 +846,195 @@ export class FinancialService {
         this.createDestinations(tx, destinations);
       },
     };
+  }
+  /**
+   * Corrects the due date of one title with an open balance. Amounts, payments, credits,
+   * stock, the financial journal and the commercial terms snapshot taken at confirmation stay
+   * exactly as they were, so the order keeps every path it had (including plain cancellation
+   * while nothing was received).
+   *
+   * Allowed: order confirmed or dispatched, no return in progress and no financial execution
+   * holding the order; title open or partially paid with an outstanding balance. Refused: draft
+   * (edited through the order), canceled order, title paid, canceled or zero. The new date is
+   * today or later and keeps installments in order (between the previous and the next one).
+   *
+   * One transaction rewrites the date wherever it is mirrored (order installment and payment
+   * schedule, original receivable, title projection and its basis hash) and records the change
+   * with both dates in an immutable record, the audit log and the order history. Order, guard
+   * and title versions reject stale or concurrent attempts; the Idempotency-Key replays the
+   * same result.
+   */
+  changeDueDate(
+    actor: Actor,
+    tenantId: string,
+    orderId: string,
+    input: z.infer<typeof s.dueDateChangeInput>,
+    key: string,
+  ) {
+    return this.commands.execute(
+      actor,
+      tenantId,
+      key,
+      'due_date_change',
+      orderId,
+      input,
+      'receivables:manage',
+      s.dueDateChangeResult,
+      false,
+      async (tx, ctx, operationId, now) => {
+        const book = await this.book.load(tx, tenantId, orderId);
+        this.book.assertVersions(book, input);
+        this.book.assertOpen(book);
+        const index = book.titles.findIndex((t) => t.id === input.receivableId);
+        requireCondition(
+          index >= 0,
+          404,
+          'RESOURCE_NOT_FOUND',
+          'Título não pertence a este pedido',
+        );
+        const title = book.titles[index]!;
+        requireCondition(
+          title.version === input.expectedVersion,
+          409,
+          'CONFLICT',
+          'Versão de título desatualizada',
+        );
+        const status = s.titleStatus(title);
+        requireCondition(
+          (status === 'open' || status === 'partially_paid') && title.outstandingCents > 0,
+          409,
+          'DUE_DATE_LOCKED',
+          'Parcela quitada, cancelada ou sem saldo não muda de vencimento',
+        );
+        requireCondition(
+          input.dueDate !== title.dueDate,
+          422,
+          'DUE_DATE_UNCHANGED',
+          'Informe uma data diferente do vencimento atual',
+        );
+        requireCondition(
+          input.dueDate >= companyDate(new Date(now), ctx.tenant.timezone),
+          422,
+          'INVALID_DUE_DATE',
+          'Vencimento não pode ser anterior a hoje',
+        );
+        const previous = book.order.installments[index - 1],
+          next = book.order.installments[index + 1];
+        requireCondition(
+          (!previous || input.dueDate >= previous.dueDate) &&
+            (!next || input.dueDate <= next.dueDate),
+          422,
+          'DUE_DATE_ORDER',
+          'Vencimento precisa ficar entre a parcela anterior e a seguinte',
+        );
+        const baselineRef = this.repo.ref(tenantId, 'receivables', title.id),
+          overlayRef = this.repo.ref(tenantId, 'financialTitles', title.id);
+        const [baseline, overlay] = await Promise.all([
+          this.repo.foundation.read(baselineRef, receivableSchema, tx),
+          this.repo.foundation.read(overlayRef, s.titleSchema, tx),
+        ]);
+        // book.load already proved baseline, projection and order agree on the current date.
+        requireCondition(
+          baseline?.id === title.id && baseline.dueDate === title.dueDate,
+          409,
+          'FINANCIAL_INTEGRITY',
+          'Título original inconsistente',
+        );
+        const nextBaseline = receivableSchema.parse({
+          ...baseline,
+          dueDate: input.dueDate,
+          updatedAt: now,
+        });
+        // The projection exists only after the first financial event. When it does, amounts and
+        // version stay (the journal head still matches them) and only date and basis move.
+        const nextOverlay = overlay
+          ? s.titleSchema.parse({
+              ...overlay,
+              dueDate: input.dueDate,
+              basisHash: receivableBasis(nextBaseline),
+              updatedAt: now,
+            })
+          : null;
+        const dueDates = book.order.installments.map((p, i) =>
+          i === index ? input.dueDate : p.dueDate,
+        );
+        const nextOrder = orderSchema.parse({
+          ...book.order,
+          installments: book.order.installments.map((p, i) =>
+            i === index ? { ...p, dueDate: input.dueDate } : p,
+          ),
+          payment: { ...book.order.payment!, dueDates },
+          version: book.order.version + 1,
+          updatedAt: now,
+          updatedBy: actor.uid,
+        });
+        const orderRef = this.repo.ref(tenantId, 'orders', orderId);
+        assertDocumentFits(orderRef.path, nextOrder);
+        const change = s.dueDateChangeSchema.parse({
+          id: operationId,
+          tenantId,
+          orderId,
+          customerId: book.order.customerId,
+          receivableId: title.id,
+          installmentNumber: title.installmentNumber,
+          previousDueDate: title.dueDate,
+          dueDate: input.dueDate,
+          reason: input.reason,
+          orderVersion: nextOrder.version,
+          actorUid: actor.uid,
+          requestId: actor.requestId,
+          occurredAt: now,
+          schemaVersion: 1,
+        });
+        // Reads are over; every write below commits together or not at all.
+        tx.set(baselineRef, nextBaseline);
+        if (nextOverlay) tx.set(overlayRef, nextOverlay);
+        tx.set(orderRef, nextOrder);
+        tx.create(this.repo.ref(tenantId, 'receivableDueDateChanges', operationId), change);
+        const orderEventId = digest(`order-due-date-event:${operationId}`);
+        tx.create(
+          this.repo.ref(tenantId, 'orderEvents', orderEventId),
+          orderEventSchema.parse({
+            id: orderEventId,
+            tenantId,
+            orderId,
+            version: nextOrder.version,
+            type: 'due_date_changed',
+            previousStatus: book.order.status,
+            status: book.order.status,
+            occurredAt: now,
+            actorUid: actor.uid,
+            reason: input.reason,
+            requestId: actor.requestId,
+            operationId,
+            schemaVersion: 1,
+          }),
+        );
+        recordAudit(
+          this.repo.foundation,
+          tx,
+          actor,
+          tenantId,
+          'finance.due_date_changed',
+          title.id,
+          now,
+          {
+            operationId,
+            orderId,
+            receivableId: title.id,
+            installmentNumber: title.installmentNumber,
+            previousDueDate: title.dueDate,
+            dueDate: input.dueDate,
+            reason: input.reason,
+          },
+        );
+        return {
+          change: s.dueDateChangeView.parse(change),
+          orderVersion: nextOrder.version,
+          guardVersion: book.guard.version,
+        };
+      },
+    );
   }
   cancel(
     actor: Actor,

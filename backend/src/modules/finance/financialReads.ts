@@ -409,6 +409,34 @@ export class FinancialReads {
       { readOnly: true },
     );
   }
+  /** Due-date corrections of one title, newest first, with both dates and the reason. */
+  async dueDateChanges(actor: Actor, tenantId: string, receivableId: string) {
+    return this.repo.foundation.db.runTransaction(
+      async (tx) => {
+        await this.commands.access.tenant(actor, tenantId, 'receivables:read', tx);
+        // Equality only (no composite index); a title is corrected a handful of times at most.
+        const page = await tx.get(
+          this.repo
+            .ref(tenantId, 'receivableDueDateChanges', 'placeholder')
+            .parent.where('receivableId', '==', receivableId)
+            .limit(100),
+        );
+        const items = page.docs.map((d) => {
+          const value = s.dueDateChangeSchema.safeParse(d.data());
+          requireCondition(
+            value.success && value.data.id === d.id && value.data.tenantId === tenantId,
+            500,
+            'INTERNAL_ERROR',
+            'Erro interno do servidor',
+          );
+          return s.dueDateChangeView.parse(value.data);
+        });
+        items.sort((a, b) => b.occurredAt.localeCompare(a.occurredAt) || b.id.localeCompare(a.id));
+        return { items };
+      },
+      { readOnly: true },
+    );
+  }
   async payment(actor: Actor, tenantId: string, id: string) {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {

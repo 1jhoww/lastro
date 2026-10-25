@@ -31,8 +31,19 @@ export class ApiError extends Error {
 
   /** Mensagem para a interface, em pt-BR, derivada do código. */
   get userMessage(): string {
+    // Cotas por hora: "alguns segundos" orientaria errado quando o servidor diz quanto falta.
+    if (this.kind === 'rateLimited' && (this.retryAfterSeconds ?? 0) > 60)
+      return `Limite de tentativas atingido. Tente de novo em ${waitText(this.retryAfterSeconds!)}.`;
     return messages[this.code] ?? fallback[this.kind];
   }
+}
+
+/** "12 min" ou "1 h 5 min" a partir dos segundos de Retry-After. */
+export function waitText(seconds: number): string {
+  const minutes = Math.max(1, Math.ceil(seconds / 60));
+  if (minutes < 60) return `${minutes} min`;
+  const rest = minutes % 60;
+  return `${Math.floor(minutes / 60)} h${rest ? ` ${rest} min` : ''}`;
 }
 
 export function retryAfterSeconds(response: Response) {
@@ -145,7 +156,15 @@ const messages: Record<string, string> = {
   DUPLICATE_SKU: 'Já existe um produto com este SKU.',
   INVALID_ASSIGNEE: 'O responsável escolhido não é um vendedor ativo da empresa.',
   INVALID_CATEGORY: 'Categoria inativa ou inexistente.',
-  INVALID_IMAGE: 'Imagem não aceita. Use JPEG, PNG ou WebP de até 5 MB.',
+  INVALID_IMAGE: 'Imagem inválida ou corrompida. Salve uma cópia em JPEG ou PNG e envie de novo.',
+  IMAGE_TOO_LARGE: 'Arquivo muito grande: o limite é 5 MB.',
+  UNSUPPORTED_IMAGE_FORMAT: 'Formato incompatível. Use JPEG, PNG ou WebP.',
+  IMAGE_RESOLUTION_LIMIT: 'Resolução acima de 50 megapixels. Reduza a foto e envie de novo.',
+  DUE_DATE_LOCKED:
+    'Esta parcela já foi quitada, cancelada ou não tem saldo; o vencimento não pode mudar.',
+  DUE_DATE_UNCHANGED: 'Escolha uma data diferente do vencimento atual.',
+  DUE_DATE_ORDER:
+    'A nova data precisa ficar entre o vencimento da parcela anterior e o da seguinte.',
   INVALID_QUANTITY: 'Quantidade inválida.',
   INVALID_PRECISION: 'Esta unidade não aceita essa quantidade de casas decimais.',
   QUANTITY_LIMIT_EXCEEDED: 'Quantidade acima do limite permitido.',

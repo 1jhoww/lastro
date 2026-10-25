@@ -62,9 +62,26 @@ export const identitySchema = z.strictObject({
   status: z.enum(['active', 'disabled']),
   ...metadata,
 });
+/**
+ * Company logo, kept privately at `tenants/{tenantId}/branding/{id}.webp`. The id changes on
+ * every upload, so a replaced object is never served again.
+ */
+export const tenantLogoSchema = z.object({
+  id: opaqueId,
+  contentType: z.literal('image/webp'),
+  sizeBytes: z
+    .number()
+    .int()
+    .positive()
+    .max(5 * 1024 * 1024),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+});
 export const tenantSchema = z.strictObject({
   id: opaqueId,
   name: z.string().trim().min(2).max(120),
+  /** Absent on companies created before logos existed. */
+  logo: tenantLogoSchema.nullable().default(null),
   timezone: ianaTimezone,
   status: z.enum(['provisioning', 'active']),
   subscriptionId: opaqueId,

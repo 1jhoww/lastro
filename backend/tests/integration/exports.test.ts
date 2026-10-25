@@ -260,7 +260,10 @@ describe('CSV administrativo G nos emuladores', () => {
   it('aplica cota compartilhada de trinta downloads por usuário/hora', async () => {
     for (let i = 0; i < 30; i++) await csv('products').expect(200);
     const last = await csv('customers').expect(429);
-    expect(last.headers['retry-after']).toBe('3600');
+    // Seconds until the clock hour turns, when the counter resets.
+    const retry = Number(last.headers['retry-after']);
+    expect(retry).toBeGreaterThanOrEqual(1);
+    expect(retry).toBeLessThanOrEqual(3600);
     expect(last.body.error.code).toBe('RATE_LIMITED');
   });
   it('downloads não alteram documentos comerciais, estoque ou financeiro', async () => {

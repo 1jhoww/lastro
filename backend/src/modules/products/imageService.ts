@@ -9,48 +9,129 @@ import { Timestamp } from 'firebase-admin/firestore';
 import { opaqueId } from '../../shared/schemas/models.js';
 import { recordAudit } from '../../shared/audit/audit.js';
 export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
-const formats: Record<string, string> = {
-  'image/jpeg': 'jpeg',
-  'image/png': 'png',
-  'image/webp': 'webp',
-};
-export async function normalizeImage(data: unknown, contentType: string | undefined) {
+/**
+ * Decoded pixel budget. It covers 48–50 MP phone photos; the header is checked before any
+ * pixel is decoded, so larger inputs (decompression bombs included) never reach the decoder.
+ */
+export const MAX_IMAGE_PIXELS = 50_000_000;
+export const MAX_IMAGE_SIDE = 12_000;
+/** Longest edge kept for catalog photos: sharp on screen and in PDFs, a fraction of the bytes. */
+export const PRODUCT_IMAGE_EDGE = 2048;
+/** Pixel side of PDF thumbnails: 15 mm printed at about 270 dpi. */
+export const PDF_THUMBNAIL_PX = 160;
+/** Upper bound of photos fetched for one document (orders hold far fewer distinct products). */
+const PDF_THUMBNAIL_LIMIT = 200;
+type ImageFormat = 'jpeg' | 'png' | 'webp';
+/** Declared types accepted as a hint; the signature below decides the real format. */
+const acceptedTypes = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/pjpeg',
+  'image/png',
+  'image/webp',
+  'application/octet-stream',
+]);
+/**
+ * Real format from the file signature. Browsers label files by extension, so a `.jpg` that is
+ * really WebP (common in supplier catalogs) arrives as image/jpeg; the decoder only ever runs
+ * for these three signatures.
+ */
+export function sniffImage(data: Buffer): ImageFormat | null {
+  if (data.length >= 3 && data[0] === 0xff && data[1] === 0xd8 && data[2] === 0xff) return 'jpeg';
+  if (
+    data.length >= 8 &&
+    data.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+  )
+    return 'png';
+  if (
+    data.length >= 12 &&
+    data.subarray(0, 4).toString('latin1') === 'RIFF' &&
+    data.subarray(8, 12).toString('latin1') === 'WEBP'
+  )
+    return 'webp';
+  return null;
+}
+/**
+ * At most two decodes per instance: a 50 MP PNG takes about 200 MB while decoding and the API
+ * runs on 1 GiB instances. Others wait their turn instead of failing.
+ */
+const MAX_DECODES = 2;
+let decoding = 0;
+const waiting: (() => void)[] = [];
+async function withDecodeSlot<T>(work: () => Promise<T>): Promise<T> {
+  if (decoding >= MAX_DECODES) await new Promise<void>((resolve) => waiting.push(resolve));
+  decoding++;
+  try {
+    return await work();
+  } finally {
+    decoding--;
+    waiting.shift()?.();
+  }
+}
+export async function normalizeImage(
+  data: unknown,
+  contentType: string | undefined,
+  maxEdge = PRODUCT_IMAGE_EDGE,
+) {
   requireCondition(
-    Buffer.isBuffer(data) &&
-      data.length > 0 &&
-      data.length <= MAX_IMAGE_BYTES &&
-      contentType &&
-      formats[contentType],
+    Buffer.isBuffer(data) && data.length > 0,
     422,
     'INVALID_IMAGE',
-    'Imagem inválida; use JPEG, PNG ou WebP até 5 MiB',
+    'Imagem vazia ou ilegível',
   );
-  try {
-    const image = sharp(data, { limitInputPixels: 16_000_000, failOn: 'warning', animated: true });
-    const metadata = await image.metadata();
-    requireCondition(
-      metadata.format === formats[contentType] &&
-        (metadata.pages ?? 1) === 1 &&
+  requireCondition(data.length <= MAX_IMAGE_BYTES, 413, 'IMAGE_TOO_LARGE', 'Imagem acima de 5 MiB');
+  const format = sniffImage(data);
+  requireCondition(
+    format !== null &&
+      contentType !== undefined &&
+      acceptedTypes.has(contentType.split(';')[0]!.trim().toLowerCase()),
+    422,
+    'UNSUPPORTED_IMAGE_FORMAT',
+    'Formato não suportado; use JPEG, PNG ou WebP',
+  );
+  return withDecodeSlot(async () => {
+    try {
+      const image = sharp(data, {
+        limitInputPixels: MAX_IMAGE_PIXELS,
+        // Minor encoder quirks (extra bytes, odd markers) are tolerated; broken data is not.
+        failOn: 'error',
+        animated: true,
+        sequentialRead: true,
+      });
+      const metadata = await image.metadata();
+      requireCondition(
+        metadata.format === format && (metadata.pages ?? 1) === 1,
+        422,
+        'INVALID_IMAGE',
+        'Imagem inválida ou animada',
+      );
+      requireCondition(
         metadata.width &&
-        metadata.height &&
-        metadata.width <= 8192 &&
-        metadata.height <= 8192,
-      422,
-      'INVALID_IMAGE',
-      'Imagem inválida',
-    );
-    const result = await image.rotate().webp({ quality: 85 }).toBuffer({ resolveWithObject: true });
-    requireCondition(
-      result.data.length <= MAX_IMAGE_BYTES,
-      422,
-      'INVALID_IMAGE',
-      'Imagem normalizada muito grande',
-    );
-    return { data: result.data, width: result.info.width, height: result.info.height };
-  } catch (error) {
-    if (error instanceof AppError) throw error;
-    throw new AppError(422, 'INVALID_IMAGE', 'Imagem inválida');
-  }
+          metadata.height &&
+          metadata.width <= MAX_IMAGE_SIDE &&
+          metadata.height <= MAX_IMAGE_SIDE &&
+          metadata.width * metadata.height <= MAX_IMAGE_PIXELS,
+        422,
+        'IMAGE_RESOLUTION_LIMIT',
+        'Resolução acima de 50 megapixels',
+      );
+      const result = await image
+        .rotate()
+        .resize({ width: maxEdge, height: maxEdge, fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .toBuffer({ resolveWithObject: true });
+      requireCondition(
+        result.data.length <= MAX_IMAGE_BYTES,
+        422,
+        'INVALID_IMAGE',
+        'Imagem normalizada muito grande',
+      );
+      return { data: result.data, width: result.info.width, height: result.info.height };
+    } catch (error) {
+      if (error instanceof AppError) throw error;
+      throw new AppError(422, 'INVALID_IMAGE', 'Imagem inválida');
+    }
+  });
 }
 export class ImageService {
   constructor(
@@ -206,6 +287,51 @@ export class ImageService {
   }
   async remove(actor: Actor, tenantId: string, id: string, version: number) {
     return this.setImage(actor, tenantId, id, version, null);
+  }
+  /**
+   * JPEG thumbnails for order PDFs, by product id: about 15 mm printed, white behind
+   * transparency, a few KB each so a 50-item order stays small enough for WhatsApp. A photo that
+   * is missing, slow or unreadable is skipped and the line prints without it; the document is
+   * never blocked by one image.
+   */
+  async pdfThumbnails(
+    tenantId: string,
+    images: Readonly<Record<string, { id: string; sizeBytes: number }>>,
+  ): Promise<Map<string, Buffer>> {
+    const entries = Object.entries(images).slice(0, PDF_THUMBNAIL_LIMIT);
+    const result = new Map<string, Buffer>();
+    let next = 0;
+    const worker = async () => {
+      while (next < entries.length) {
+        const [productId, image] = entries[next++]!;
+        const thumbnail = await this.thumbnail(tenantId, productId, image).catch(() => null);
+        if (thumbnail) result.set(productId, thumbnail);
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(6, entries.length) }, worker));
+    return result;
+  }
+  private async thumbnail(
+    tenantId: string,
+    productId: string,
+    image: { id: string; sizeBytes: number },
+  ): Promise<Buffer | null> {
+    const download = this.object(tenantId, productId, image.id).download();
+    void download.catch(() => undefined);
+    const timeout = new Promise<null>((resolve) => setTimeout(() => resolve(null), 4000).unref());
+    const result = await Promise.race([download, timeout]);
+    const data = result?.[0];
+    if (!data || data.length !== image.sizeBytes || data.length > MAX_IMAGE_BYTES) return null;
+    return sharp(data, { limitInputPixels: MAX_IMAGE_PIXELS, failOn: 'none' })
+      .resize({
+        width: PDF_THUMBNAIL_PX,
+        height: PDF_THUMBNAIL_PX,
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .flatten({ background: '#ffffff' })
+      .jpeg({ quality: 72 })
+      .toBuffer();
   }
   async download(actor: Actor, tenantId: string, id: string) {
     const product = await this.products.read(actor, tenantId, id);

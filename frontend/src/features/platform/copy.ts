@@ -17,6 +17,7 @@ export const featureLabel: Record<PlanFeature, string> = {
   'catalog.public': 'Catálogo / vitrine virtual',
   'commercial.sellers': 'Vendedores e carteiras de clientes',
   'commercial.visits': 'Visitas e recompra',
+  'branding.custom': 'Logotipo e fotos nos documentos e no catálogo',
 };
 
 /** Situação financeira da cobrança. Vencida e próxima são alertas, nunca bloqueio de acesso. */

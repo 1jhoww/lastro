@@ -174,7 +174,7 @@ export const orderEvent = z.object({
   id: opaqueId,
   orderId: opaqueId,
   version: expectedVersion,
-  type: z.enum(['created', 'edited', 'confirmed', 'dispatched', 'canceled']),
+  type: z.enum(['created', 'edited', 'confirmed', 'dispatched', 'canceled', 'due_date_changed']),
   previousStatus: orderStatus.nullable(),
   status: orderStatus,
   occurredAt: instant,

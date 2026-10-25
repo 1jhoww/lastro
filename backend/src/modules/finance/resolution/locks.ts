@@ -120,7 +120,13 @@ export class FinancialLocks {
     resourceId: string,
   ) {
     if (
-      ['receipt', 'credit_application', 'financial_cancellation', 'return_intent'].includes(action)
+      [
+        'receipt',
+        'credit_application',
+        'financial_cancellation',
+        'return_intent',
+        'due_date_change',
+      ].includes(action)
     )
       return this.assertOrderAvailable(tx, tenantId, resourceId);
     const collection: CommercialCollection | undefined =

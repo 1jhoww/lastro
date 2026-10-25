@@ -32,7 +32,19 @@ export const catalogRoutes: Route[] = [
     operationId: 'getPublicCatalog',
     scope: 'public',
     params: s.catalogParams,
-    output: s.catalogPublicView,
+    output: s.catalogProfileView,
+  },
+  {
+    method: 'get',
+    path: '/public/catalogs/:slug/logo',
+    operationId: 'getPublicCatalogLogo',
+    scope: 'public',
+    params: s.catalogParams,
+    query: s.catalogLogoQuery,
+    output: empty,
+    binaryOutput: true,
+    description:
+      'Logotipo da distribuidora (WebP) para o cabeçalho do catálogo, somente enquanto o plano incluir identidade visual; sem cache.',
   },
   {
     method: 'get',
@@ -102,6 +114,7 @@ export function publicCatalogRoutes(catalog: CatalogService, config: Config) {
         catalog.page(slug, s.publicPageQuery.parse(query), true),
       getPublicProduct: (slug, id) => catalog.detail(slug, id),
       getPublicProductImage: (slug, id) => catalog.image(slug, id),
+      getPublicCatalogLogo: (slug) => catalog.logo(slug),
       previewPublicQuote: (slug, _id, body) => catalog.preview(slug, s.quoteInput.parse(body)),
       preparePublicWhatsapp: (slug, _id, body) =>
         catalog.whatsapp(slug, s.whatsappInput.parse(body)),
@@ -125,7 +138,7 @@ export function publicCatalogRoutes(catalog: CatalogService, config: Config) {
         if (route.binaryOutput) {
           res
             .type('image/webp')
-            .set('Content-Disposition', 'inline; filename="product.webp"')
+            .set('Content-Disposition', 'inline; filename="image.webp"')
             .send(result);
           return;
         }

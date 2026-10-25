@@ -23,6 +23,10 @@ export const planFeatures = [
   'commercial.sellers',
   // Commercial visits, customer relationship history and repurchase estimates.
   'commercial.visits',
+  // Company logo uploads; logo and product photos in order PDFs; logo in the public catalog.
+  // Without it documents keep the company name and the Lastro identity, and stored logos and
+  // product photos are preserved for a later upgrade.
+  'branding.custom',
 ] as const;
 export type PlanFeature = (typeof planFeatures)[number];
 
@@ -61,6 +65,7 @@ export const planCatalog: Readonly<Record<PlanCode, PlanDefinition>> = Object.fr
       'catalog.public',
       'commercial.sellers',
       'commercial.visits',
+      'branding.custom',
     ] as const),
     offered: true,
   }),
@@ -71,6 +76,7 @@ export const featureLabels: Readonly<Record<PlanFeature, string>> = Object.freez
   'catalog.public': 'Catálogo / vitrine virtual',
   'commercial.sellers': 'Vendedores e carteiras de clientes',
   'commercial.visits': 'Visitas e recompra',
+  'branding.custom': 'Logotipo e fotos nos documentos e no catálogo',
 });
 
 /** Permissions that only exist while the plan includes the feature. */
@@ -78,6 +84,7 @@ const featurePermissions: Readonly<Partial<Record<PlanFeature, readonly Permissi
   Object.freeze({
     'catalog.public': Object.freeze(['catalog:manage'] as const),
     'commercial.visits': Object.freeze(['visits:own:manage'] as const),
+    'branding.custom': Object.freeze(['branding:manage'] as const),
   });
 
 export function isPlanCode(value: unknown): value is PlanCode {
@@ -97,16 +104,16 @@ export interface Entitlements {
 
 /**
  * Capabilities granted by a subscription. The user limit always comes from the contract
- * snapshot, which plan changes keep aligned with the plan. Legacy contracts without an
- * official plan keep every existing capability, so the migration never disables features
- * unexpectedly.
+ * snapshot, which plan changes keep aligned with the plan. A subscription without an official
+ * plan gets no plan-gated feature: premium capabilities are only granted by a plan that lists
+ * them, never by default.
  */
 export function entitlementsFor(subscription: {
   planCode: PlanCode | null;
   userLimit: number;
 }): Entitlements {
   if (subscription.planCode === null)
-    return { planCode: null, userLimit: subscription.userLimit, features: planFeatures };
+    return { planCode: null, userLimit: subscription.userLimit, features: [] };
   return {
     planCode: subscription.planCode,
     userLimit: subscription.userLimit,
@@ -126,6 +133,14 @@ export function planSummary(entitlements: Entitlements) {
 
 export function hasFeature(entitlements: Entitlements, feature: PlanFeature): boolean {
   return entitlements.features.includes(feature);
+}
+
+/**
+ * Company identity (logo, product photos) in order PDFs and in the public catalog. One rule for
+ * every place that shows it; any plan that lists `branding.custom` inherits it.
+ */
+export function brandingAllowed(entitlements: Entitlements): boolean {
+  return hasFeature(entitlements, 'branding.custom');
 }
 
 /** Removes role permissions whose feature the plan does not include. */

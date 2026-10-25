@@ -85,7 +85,23 @@ export interface Cell {
   /** Secondary line in smaller grey type (e.g. SKU). */
   sub?: string;
   bold?: boolean;
+  /** Thumbnail (JPEG/PNG) drawn before the text; only meaningful in the first column. */
+  image?: Buffer;
 }
+/**
+ * Box for the company logo on the first page, in points. Square logos end up 44 × 44, wide ones
+ * up to 140 × 44; the proportions are never changed.
+ */
+const LOGO_MAX_WIDTH = 140;
+const LOGO_MAX_HEIGHT = 44;
+/** PNG/JPEG bytes with their pixel size (PDFKit's typings do not expose image metadata). */
+export interface PdfImage {
+  data: Buffer;
+  width: number;
+  height: number;
+}
+/** Product thumbnail side in tables: 15 mm. */
+export const THUMBNAIL = 42.5;
 export interface BrandedHeader {
   /** Company that issues the document: the protagonist of the page. */
   company: string;
@@ -95,12 +111,15 @@ export interface BrandedHeader {
   subtitle: string;
   /** Short reference repeated on continuation pages and in the footer (e.g. order number). */
   reference: string;
+  /** Company logo, beside the company name on the first page; omitted when absent. */
+  logo?: PdfImage | null;
 }
 
 /**
- * A4 document with the Lastro identity: black on white, company name first, the Lastro logo
- * small in the top right corner, yellow only in details. Pages, headers and footers are drawn
- * here so every generated document paginates, repeats table headings and numbers pages alike.
+ * A4 document with the Lastro identity: black on white, company name first (with the company's
+ * own logo beside it when it has one), the Lastro logo small in the top right corner, yellow
+ * only in details. Pages, headers and footers are drawn here so every generated document
+ * paginates, repeats table headings and numbers pages alike.
  */
 export class BrandedPdf {
   readonly doc: PDFKit.PDFDocument;
@@ -157,6 +176,30 @@ export class BrandedPdf {
       throw new AppError(413, 'DOCUMENT_SIZE_LIMIT', 'Documento excede limite técnico');
   }
 
+  /** Size of the company logo inside its box, proportions unchanged. */
+  private logoSize(image: PdfImage) {
+    const scale = Math.min(LOGO_MAX_WIDTH / image.width, LOGO_MAX_HEIGHT / image.height);
+    return { width: image.width * scale, height: image.height * scale };
+  }
+  /** Draws the company logo at the top left, centred on the box height; false if unreadable. */
+  private companyLogo(image: PdfImage): boolean {
+    try {
+      const { width, height } = this.logoSize(image);
+      this.doc.image(image.data, LEFT, 30 + (LOGO_MAX_HEIGHT - height) / 2, { width, height });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  /** Largest company-name size that fits the header column, or null when none does. */
+  private nameSize(company: string, width: number) {
+    const sizes = [14, 12, 10.5];
+    const doc = this.doc;
+    const fits = (s: number, limit: number) =>
+      doc.font('Heading').fontSize(s).heightOfString(company, { width }) <= limit;
+    return sizes.find((s) => fits(s, 60)) ?? (fits(10.5, 80) ? 10.5 : null);
+  }
+
   /** Lastro horizontal lockup (symbol + "lastro." wordmark), right-aligned at `right`. */
   private logo(right: number, top: number, size: number) {
     const doc = this.doc;
@@ -193,34 +236,44 @@ export class BrandedPdf {
     this.page++;
     const company = oneLine(this.header.company);
     if (this.page === 1) {
-      this.logo(RIGHT, 34, 18);
+      // The company's logo sits on the left and the text column moves beside it; the Lastro
+      // lockup steps back to a smaller size, so the seller's brand leads and the platform still
+      // signs the document. A name too long for the narrower column keeps the full width and
+      // goes without the logo rather than failing.
+      const logo = this.header.logo ? this.logoSize(this.header.logo) : null;
+      const offset = logo ? logo.width + 14 : 0;
+      const branded =
+        logo !== null &&
+        this.nameSize(company, 390 - offset) !== null &&
+        this.companyLogo(this.header.logo!);
+      const brand = branded ? { width: offset, height: LOGO_MAX_HEIGHT } : { width: 0, height: 0 };
+      this.logo(RIGHT, 34, branded ? 14 : 18);
+      const left = LEFT + brand.width;
+      const width = 390 - brand.width;
       // Long company names step down in size instead of pushing the content off the page.
-      const size =
-        [14, 12, 10.5].find(
-          (s) => doc.font('Heading').fontSize(s).heightOfString(company, { width: 390 }) <= 60,
-        ) ?? 10.5;
-      doc.font('Heading').fontSize(size);
-      const height = doc.heightOfString(company, { width: 390 });
-      if (height > 80)
+      const size = this.nameSize(company, width);
+      if (size === null)
         throw new AppError(
           413,
           'DOCUMENT_LAYOUT_LIMIT',
           'Identificação excede limite do cabeçalho',
         );
-      doc.fillColor(INK).text(company, LEFT, 32, { width: 390 });
+      doc.font('Heading').fontSize(size);
+      const height = doc.heightOfString(company, { width });
+      doc.fillColor(INK).text(company, left, 32, { width });
       let y = 32 + height + 7;
       doc
         .font('Heading')
         .fontSize(10)
         .fillColor(INK)
-        .text(this.header.title, LEFT, y, { width: 390, characterSpacing: 0.9 });
+        .text(this.header.title, left, y, { width, characterSpacing: 0.9 });
       y += 15;
-      doc.font('Body').fontSize(8).fillColor(MUTED).text(this.header.subtitle, LEFT, y, {
-        width: 390,
+      doc.font('Body').fontSize(8).fillColor(MUTED).text(this.header.subtitle, left, y, {
+        width,
       });
       y += 15;
-      doc.rect(LEFT, y, 26, 2.5).fill(YELLOW);
-      y += 12;
+      doc.rect(left, y, 26, 2.5).fill(YELLOW);
+      y = Math.max(y + 12, brand.height ? 30 + brand.height + 10 : 0);
       this.rule(y, RULE, 0.6);
       this.y = y + 16;
     } else {
@@ -341,8 +394,16 @@ export class BrandedPdf {
   async table(columns: Column[], rows: Cell[][], tail = 0, size = 9) {
     if (Math.abs(columns.reduce((sum, c) => sum + c.width, 0) - WIDTH) > 0.5)
       throw new AppError(500, 'INTERNAL_ERROR', 'Colunas não ocupam a largura do documento');
+    // Any thumbnail moves the first column's text right on every row, so names stay aligned;
+    // rows without a photo keep their normal height and show no placeholder.
+    const indent = rows.some((row) => row[0]?.image) ? THUMBNAIL + 8 : 0;
     const heights = rows.map((row) =>
-      Math.max(...row.map((cell, i) => this.cellHeight(cell, columns[i]!.width - 10, size))),
+      Math.max(
+        ...row.map((cell, i) =>
+          this.cellHeight(cell, columns[i]!.width - 10 - (i === 0 ? indent : 0), size),
+        ),
+        row[0]?.image ? THUMBNAIL + 10 : 0,
+      ),
     );
     const keep = Math.min(2, rows.length);
     const groupStart = rows.length - keep;
@@ -364,15 +425,17 @@ export class BrandedPdf {
         let x = LEFT;
         for (const [i, cell] of row.entries()) {
           const column = columns[i]!;
-          const width = column.width - 10;
+          const shift = i === 0 ? indent : 0;
+          const width = column.width - 10 - shift;
           const align = column.align ?? 'left';
-          const used = this.write(cell.text, x + 5, this.y + 7, width, {
+          if (i === 0 && cell.image) this.thumbnail(cell.image, x + 5, this.y + 5);
+          const used = this.write(cell.text, x + 5 + shift, this.y + 7, width, {
             size,
             bold: cell.bold,
             align,
           });
           if (cell.sub)
-            this.write(cell.sub, x + 5, this.y + 9 + used, width, {
+            this.write(cell.sub, x + 5 + shift, this.y + 9 + used, width, {
               size: 7.5,
               color: FAINT,
               align,
@@ -385,6 +448,21 @@ export class BrandedPdf {
       }
     } finally {
       this.repeatHeading = null;
+    }
+  }
+
+  /** Product photo fitted (proportions kept) and centred in its 15 mm square; skipped if unreadable. */
+  private thumbnail(image: Buffer, x: number, y: number) {
+    try {
+      this.doc.image(image, x, y, {
+        fit: [THUMBNAIL, THUMBNAIL],
+        align: 'center',
+        valign: 'center',
+      });
+      // Hairline square: photos on white backgrounds still read as one tidy column.
+      this.doc.lineWidth(0.4).strokeColor(HAIRLINE).rect(x, y, THUMBNAIL, THUMBNAIL).stroke();
+    } catch {
+      // A damaged thumbnail never blocks the document: the line keeps its text.
     }
   }
 

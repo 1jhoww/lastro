@@ -18,6 +18,7 @@ const seller = [
 const administrator = [
   ...seller,
   'tenant:update',
+  'branding:manage',
   'users:manage',
   'customers:all:manage',
   'products:manage',
@@ -28,6 +29,7 @@ const administrator = [
   'orders:dispatch',
   'reports:read',
   'receivables:read',
+  'receivables:manage',
   'payments:manage',
   'payment-settings:manage',
   'payments:reverse',
@@ -219,6 +221,14 @@ export const permissionMatrix: readonly PermissionOperation[] = Object.freeze([
     'never',
   ),
   op(
+    'finance.schedule',
+    'Financeiro',
+    'Corrigir vencimentos',
+    'Alterar a data de vencimento de parcelas em aberto, com motivo e histórico.',
+    ['receivables:manage'],
+    'never',
+  ),
+  op(
     'finance.receive',
     'Financeiro',
     'Registrar baixas e créditos',
@@ -280,6 +290,14 @@ export const permissionMatrix: readonly PermissionOperation[] = Object.freeze([
     'Dados da empresa',
     'Alterar nome e fuso da empresa.',
     ['tenant:update'],
+    'never',
+  ),
+  op(
+    'settings.branding',
+    'Configurações',
+    'Identidade visual',
+    'Enviar e trocar o logotipo usado nos documentos e no catálogo.',
+    ['branding:manage'],
     'never',
   ),
   op(

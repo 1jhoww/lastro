@@ -15,13 +15,26 @@ type Props = {
   children: ReactNode;
   /** Barra presa à base, fora da rolagem (ex.: resumo do carrinho no celular). */
   footer?: ReactNode;
+  /**
+   * Cabeçalho próprio no lugar do wordmark do celular e do título (ex.: vitrine pública, que
+   * leva a identidade da distribuidora). Quem passa assume o título acessível da tela.
+   */
+  masthead?: ReactNode;
 };
 
 /**
  * Tela padrão: cabeçalho com título da seção e conteúdo com largura máxima. No celular, o
  * wordmark fica no topo e as ações descem para baixo do título, em largura total.
  */
-export function Screen({ title, description, actions, children, footer, alignActionsEnd }: Props) {
+export function Screen({
+  title,
+  description,
+  actions,
+  children,
+  footer,
+  alignActionsEnd,
+  masthead,
+}: Props) {
   const size = useLayoutSize();
   const insets = useSafeAreaInsets();
   const compact = size === 'compact';
@@ -44,26 +57,35 @@ export function Screen({ title, description, actions, children, footer, alignAct
         keyboardDismissMode="on-drag"
       >
         <View style={styles.inner}>
-          {compact ? (
+          {masthead ?? null}
+          {!masthead && compact ? (
             <View style={styles.topbar}>
               <Wordmark size={22} />
             </View>
           ) : null}
-          <View style={[styles.header, alignActionsEnd && styles.headerEnd, compact && styles.headerCompact]}>
-            <View style={styles.headings}>
-              <Text variant="h1" accessibilityRole="header">
-                {title}
-              </Text>
-              {description ? (
-                <Text variant="body" color={color.textSecondary}>
-                  {description}
+          {masthead ? null : (
+            <View
+              style={[
+                styles.header,
+                alignActionsEnd && styles.headerEnd,
+                compact && styles.headerCompact,
+              ]}
+            >
+              <View style={styles.headings}>
+                <Text variant="h1" accessibilityRole="header">
+                  {title}
                 </Text>
+                {description ? (
+                  <Text variant="body" color={color.textSecondary}>
+                    {description}
+                  </Text>
+                ) : null}
+              </View>
+              {actions ? (
+                <View style={[styles.actions, compact && styles.actionsCompact]}>{actions}</View>
               ) : null}
             </View>
-            {actions ? (
-              <View style={[styles.actions, compact && styles.actionsCompact]}>{actions}</View>
-            ) : null}
-          </View>
+          )}
           {children}
         </View>
       </ScrollView>

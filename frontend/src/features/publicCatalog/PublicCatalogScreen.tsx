@@ -13,6 +13,7 @@ import { unwrap } from '@/api/client';
 import { toApiError } from '@/api/errors';
 import type { PublicProduct } from '@/api/types';
 import { Wordmark } from '@/brand';
+import { StorefrontHeader } from './StorefrontHeader';
 import { reserveViewer } from '@/features/files/presentation';
 import { lineSubtotalPreview } from '@/features/orders/rules';
 import { Screen } from '@/layout/Screen';
@@ -353,11 +354,16 @@ export function PublicCatalogScreen({ slug }: { slug: string }) {
   ) : undefined;
 
   return (
-    <Screen title={catalog.tradeName} description={catalog.description || undefined} footer={bar}>
+    <Screen
+      title={catalog.tradeName}
+      description={catalog.description || undefined}
+      footer={bar}
+      masthead={<StorefrontHeader slug={slug} catalog={catalog} />}
+    >
       <View style={styles.meta}>
         <View style={styles.metaItem}>
           <MessageCircle size={16} color={color.textSecondary} strokeWidth={1.75} />
-          <Text variant="small" color={color.textSecondary}>
+          <Text variant="small" color={color.textSecondary} style={styles.shrink}>
             {`Orçamentos pelo WhatsApp ${formatWhatsapp(catalog.whatsappNumber)}`}
           </Text>
         </View>
@@ -447,6 +453,7 @@ export function PublicCatalogScreen({ slug }: { slug: string }) {
                       hasImage={!!publicImageUrl(apiBaseUrl, p.imagePath, slug, p.id)}
                       showPrices={showPrices}
                       quantity={quantities.get(p.id) ?? 0}
+                      narrow={compact}
                       onQuantity={setQuantity}
                     />
                   </View>
@@ -492,6 +499,7 @@ const ProductCard = memo(function ProductCard({
   hasImage,
   showPrices,
   quantity,
+  narrow,
   onQuantity,
 }: {
   slug: string;
@@ -499,6 +507,8 @@ const ProductCard = memo(function ProductCard({
   hasImage: boolean;
   showPrices: boolean;
   quantity: number;
+  /** Phone grid: two cards side by side, the stepper fills the card width. */
+  narrow: boolean;
   onQuantity: (item: QuoteProduct, milli: number) => void;
 }) {
   const price = showPrices ? p.unitPriceCents : null;
@@ -534,6 +544,7 @@ const ProductCard = memo(function ProductCard({
         value={quantity}
         min={0}
         size="sm"
+        fill={narrow}
         onChange={(milli) =>
           onQuantity({ id: p.id, name: p.name, unit: p.unit, unitPriceCents: price }, milli)
         }
@@ -710,7 +721,9 @@ const listScroll = (Platform.OS === 'web' ? { maxHeight: 'calc(100vh - 360px)' }
 const styles = StyleSheet.create({
   flex: { flex: 1, minWidth: 0 },
   meta: { flexDirection: 'row', flexWrap: 'wrap', gap: space[4], marginTop: -space[3] },
-  metaItem: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
+  // Narrow phones: the WhatsApp line wraps instead of running past the screen edge.
+  metaItem: { flexDirection: 'row', alignItems: 'center', gap: space[2], maxWidth: '100%' },
+  shrink: { flexShrink: 1 },
   layout: { gap: space[6] },
   layoutWide: { flexDirection: 'row', alignItems: 'flex-start' },
   main: { minWidth: 0, gap: space[4] },

@@ -230,6 +230,6 @@ describe('CSV G', () => {
     expect(json).toContain('application/pdf');
     expect(json).toContain('text/csv');
     expect(json).toContain('X-Next-Cursor');
-    expect(Object.values(api.paths).reduce((n, p) => n + Object.keys(p).length, 0)).toBe(153);
+    expect(Object.values(api.paths).reduce((n, p) => n + Object.keys(p).length, 0)).toBe(159);
   });
 });

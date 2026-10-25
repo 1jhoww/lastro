@@ -330,6 +330,46 @@ export const refundInput = z.strictObject({
   reference: z.string().trim().min(1).max(200),
   reason,
 });
+/**
+ * Correction of one open title's due date. Amounts, payments, credits, stock, the journal and
+ * the commercial terms snapshot taken at confirmation stay as they were; the change itself is
+ * kept in this immutable record (both dates and the reason), in the audit log and in the
+ * order history.
+ */
+export const dueDateChangeInput = z.strictObject({
+  ...orderVersions,
+  receivableId: opaqueId,
+  /** Version of the title (financial projection) the person saw. */
+  expectedVersion,
+  dueDate: calendarDate,
+  reason,
+});
+export const dueDateChangeSchema = z.strictObject({
+  id: opaqueId,
+  tenantId: opaqueId,
+  orderId: opaqueId,
+  customerId: opaqueId,
+  receivableId: opaqueId,
+  installmentNumber: z.number().int().min(1).max(12),
+  previousDueDate: calendarDate,
+  dueDate: calendarDate,
+  reason,
+  /** Order version written by the change (its history entry carries the same version). */
+  orderVersion: expectedVersion,
+  actorUid: opaqueId,
+  requestId: z.string().uuid(),
+  occurredAt: instant,
+  schemaVersion: z.literal(1),
+});
+export const dueDateChangeView = z
+  .object(dueDateChangeSchema.shape)
+  .omit({ tenantId: true, schemaVersion: true });
+export const dueDateChangesView = z.object({ items: z.array(dueDateChangeView).max(100) });
+export const dueDateChangeResult = z.object({
+  change: dueDateChangeView,
+  orderVersion: expectedVersion,
+  guardVersion: expectedVersion,
+});
 export const financialResult = z.object({
   operationId: opaqueId,
   orderId: opaqueId,

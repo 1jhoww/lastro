@@ -129,6 +129,12 @@ export type FinancialEvent = DataOf<
 >['items'][number];
 export type ReceiptInput = BodyOf<'/api/v1/orders/{id}/receipts', 'post'>;
 export type FinancialResult = DataOf<'/api/v1/orders/{id}/receipts', 'post'>;
+export type DueDateChangeInput = BodyOf<'/api/v1/orders/{id}/due-date-changes', 'post'>;
+export type DueDateChangeResult = DataOf<'/api/v1/orders/{id}/due-date-changes', 'post'>;
+export type DueDateChange = DataOf<
+  '/api/v1/receivables/{id}/due-date-changes',
+  'get'
+>['items'][number];
 export type CreditLot = DataOf<'/api/v1/customers/{id}/credits', 'get'>['items'][number];
 export type CreditApplication = DataOf<'/api/v1/credit-applications/{id}', 'get'>;
 export type RefundObligation = DataOf<'/api/v1/refund-obligations/{id}', 'get'>;

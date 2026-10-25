@@ -27,12 +27,13 @@ async function legacyCompanies(fixture: Fixture) {
     billingContact: FieldValue.delete(),
     monthlyPriceCents: 20000,
   };
+  // Pilot: owner + a second user, plus the Super Admin counted as a member (old behaviour).
+  // The second user joins before the plan fields are removed: without a plan nobody is invited.
+  await expectStatus(join(fixture, await newUser(fixture, 'segundo'), 'seller'), 200);
   await fixture.firebase.db.doc(`subscriptions/${fixture.tenantA.subscription.id}`).update(legacy);
   await fixture.firebase.db
     .doc(`subscriptions/${fixture.tenantB.subscription.id}`)
     .update({ ...legacy, userLimit: 5 });
-  // Pilot: owner + a second user, plus the Super Admin counted as a member (old behaviour).
-  await expectStatus(join(fixture, await newUser(fixture, 'segundo'), 'seller'), 200);
   const now = new Date().toISOString();
   await fixture.firebase.db
     .doc(`tenants/${fixture.tenantA.tenant.id}/memberships/${fixture.platform.uid}`)

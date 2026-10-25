@@ -92,7 +92,7 @@ describe('Contratos e políticas da fundação', () => {
           Array.isArray(operation.tags) &&
           operation.tags.includes('public'),
       );
-    expect(publicOperations).toHaveLength(7);
+    expect(publicOperations).toHaveLength(8);
     for (const operation of publicOperations) expect(operation).toHaveProperty('security', []);
     for (const r of routeDefinitions.filter((r) => r.scope === 'tenant'))
       expect(r.permission).toBeTruthy();

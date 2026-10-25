@@ -246,7 +246,7 @@ describe('produtos: imagem', () => {
     })) as never;
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/produtos/p1', overrides });
     await fireEvent.press(await screen.findByRole('button', { name: 'Adicionar imagem' }));
-    expect(await screen.findByText(/A imagem não foi aceita/)).toBeTruthy();
+    expect(await screen.findByText(/Imagem inválida ou corrompida/)).toBeTruthy();
   });
 });
 

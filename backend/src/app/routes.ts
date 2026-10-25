@@ -21,6 +21,7 @@ import type { ProductService } from '../modules/products/productService.js';
 import type { CategoryService } from '../modules/categories/categoryService.js';
 import type { ImageService } from '../modules/products/imageService.js';
 import { MAX_IMAGE_BYTES } from '../modules/products/imageService.js';
+import type { TenantLogoService } from '../modules/tenants/logoService.js';
 import { imageRateLimit } from '../middlewares/rateLimit.js';
 import { inventoryRoutes } from './inventoryRoutes.js';
 import type { InventoryService } from '../modules/inventory/inventoryService.js';
@@ -142,6 +143,40 @@ export const routeDefinitions: Route[] = [
     permission: 'tenant:update',
     body: s.updateTenantInput,
     output: s.tenantView,
+    description:
+      'Atualiza nome (2 a 120 caracteres) e fuso da empresa ativa, com controle de versão e auditoria.',
+  },
+  {
+    method: 'put',
+    path: '/tenants/current/logo',
+    operationId: 'uploadCurrentTenantLogo',
+    scope: 'tenant',
+    permission: 'tenant:update',
+    query: s.logoQuery,
+    rawImage: true,
+    output: s.tenantView,
+    description:
+      'Envia ou substitui o logotipo (bytes JPEG, PNG ou WebP até 5 MiB). O servidor detecta o formato real, reduz para até 1024 px e grava WebP privado da empresa; o logotipo anterior é apagado.',
+  },
+  {
+    method: 'get',
+    path: '/tenants/current/logo',
+    operationId: 'getCurrentTenantLogo',
+    scope: 'tenant',
+    permission: 'tenant:read',
+    binaryOutput: true,
+    output: s.tenantLogoView,
+    description: 'Bytes WebP do logotipo da empresa ativa (somente com sessão e empresa).',
+  },
+  {
+    method: 'delete',
+    path: '/tenants/current/logo',
+    operationId: 'removeCurrentTenantLogo',
+    scope: 'tenant',
+    permission: 'tenant:update',
+    query: s.logoQuery,
+    output: s.tenantView,
+    description: 'Remove o logotipo; documentos voltam a mostrar só o nome da empresa.',
   },
   {
     method: 'get',
@@ -300,6 +335,7 @@ export function createRoutes(
   catalog: CatalogService,
   documents: DocumentService,
   exports: ExportService,
+  logos: TenantLogoService,
 ): Router {
   const router = Router();
   const executions = new FinancialExecutions(finance, returns);
@@ -314,7 +350,7 @@ export function createRoutes(
     clock,
     emailChanges,
   );
-  const reports = new ReportService(orders, financialReads, inventory, users.auth);
+  const reports = new ReportService(orders, financialReads, inventory, users.auth, logos);
   const visits = new VisitService(orders, users.auth);
   const deliveries = new DeliveryService(orders);
   const reportFor = (req: Request) => reportSchemas.reportParams.parse(req.params).report;
@@ -534,6 +570,16 @@ export function createRoutes(
         financeSchemas.creditReversalInput.parse(req.body),
         idempotencyKey(req),
       ),
+    changeReceivableDueDate: (req) =>
+      finance.changeDueDate(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        financeSchemas.dueDateChangeInput.parse(req.body),
+        idempotencyKey(req),
+      ),
+    listReceivableDueDateChanges: (req) =>
+      financialReads.dueDateChanges(actorFor(req), selectedTenant(req), idFor(req)),
     cancelOrderFinancially: (req) =>
       finance.cancel(
         actorFor(req),
@@ -854,6 +900,21 @@ export function createRoutes(
     getCurrentTenant: (req) => users.current(actorFor(req), selectedTenant(req)),
     updateCurrentTenant: (req) =>
       users.updateTenant(actorFor(req), selectedTenant(req), s.updateTenantInput.parse(req.body)),
+    uploadCurrentTenantLogo: (req) =>
+      logos.upload(
+        actorFor(req),
+        selectedTenant(req),
+        Number(s.logoQuery.parse(req.query).expectedVersion),
+        req.body,
+        req.get('Content-Type'),
+      ),
+    getCurrentTenantLogo: (req) => logos.download(actorFor(req), selectedTenant(req)),
+    removeCurrentTenantLogo: (req) =>
+      logos.remove(
+        actorFor(req),
+        selectedTenant(req),
+        Number(s.logoQuery.parse(req.query).expectedVersion),
+      ),
     listUsers: (req) =>
       users.list(actorFor(req), selectedTenant(req), limitFor(req), cursorFor(req)),
     inviteUser: (req) =>
@@ -1069,7 +1130,7 @@ export function createRoutes(
           res
             .type('image/webp')
             .set('Cache-Control', 'private, no-store')
-            .set('Content-Disposition', 'inline; filename="product.webp"')
+            .set('Content-Disposition', 'inline; filename="image.webp"')
             .send(result);
           return;
         }

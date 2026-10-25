@@ -29,6 +29,7 @@ export type CommercialCollection =
   | 'orderOperations'
   | 'stockReservations'
   | 'receivables'
+  | 'receivableDueDateChanges'
   | 'orderFinancialGuards'
   | 'payments'
   | 'paymentConditions'

@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { registerFixture, tenantHeaders, bearer, blockSubscription } from '../helpers/fixture.js';
 import { seller, extraSeats, productInput, png, validAddress } from '../helpers/commercial.js';
+import { digest } from '../../src/shared/utils/crypto.js';
+import { IMAGE_UPLOADS_PER_HOUR } from '../../src/middlewares/rateLimit.js';
 const f = registerFixture();
 const ah = () => tenantHeaders(f.ownerA, f.tenantA.tenant.id);
 const bh = () => tenantHeaders(f.ownerB, f.tenantB.tenant.id);
@@ -224,10 +226,19 @@ describe('Imagens privadas', () => {
       .send('<svg><script/></svg>')
       .expect(422);
     await request(f.app).put(path).set(ah()).send({ url: 'http://127.0.0.1/private' }).expect(422);
+    // Forged MIME: script content labelled as a raster type. The file signature decides, so a
+    // real PNG labelled image/jpeg is accepted elsewhere, but this never reaches the decoder.
+    const forged = await request(f.app)
+      .put(path)
+      .set(ah())
+      .set('Content-Type', 'image/png')
+      .send(Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><script/></svg>'))
+      .expect(422);
+    expect(forged.body.error.code).toBe('UNSUPPORTED_IMAGE_FORMAT');
     await request(f.app)
       .put(path)
       .set(ah())
-      .set('Content-Type', 'image/jpeg')
+      .set('Content-Type', 'image/gif')
       .send(await png())
       .expect(422);
     await request(f.app)
@@ -304,25 +315,37 @@ describe('Imagens privadas', () => {
       .send(await png())
       .expect(403);
   });
-  it('limite de upload é compartilhado por ator', async () => {
-    const product = await request(f.app)
-      .post('/api/v1/products')
-      .set(ah())
-      .send(productInput())
-      .expect(201);
-    const path = `/api/v1/products/${product.body.data.id}/image?expectedVersion=1`;
-    for (let i = 0; i < 30; i++)
-      await request(f.app)
-        .put(path)
+  it('limite de upload é compartilhado por ator, conta recusas e vale entre produtos', async () => {
+    const create = async () =>
+      (await request(f.app).post('/api/v1/products').set(ah()).send(productInput()).expect(201))
+        .body.data.id as string;
+    const [a, b] = [await create(), await create()];
+    const put = (id: string, body: Buffer) =>
+      request(f.app)
+        .put(`/api/v1/products/${id}/image?expectedVersion=1`)
         .set(ah())
         .set('Content-Type', 'image/png')
-        .send(Buffer.from('invalid'))
-        .expect(422);
+        .send(body);
+    // The quota is 300/h; start this user's current-hour counter near it instead of sending 300.
+    const window = Math.floor(Date.now() / 3_600_000);
+    await f.firebase.db
+      .doc(`rateLimits/${digest(`image-upload:${f.ownerA.uid}:${window}`)}`)
+      .set({ count: IMAGE_UPLOADS_PER_HOUR - 2, expiresAt: new Date(Date.now() + 7_200_000) });
+    await put(a, Buffer.from('invalid')).expect(422);
+    await put(b, Buffer.from('invalid')).expect(422);
+    const blocked = await put(a, await png()).expect(429);
+    expect(blocked.body.error.code).toBe('RATE_LIMITED');
+    expect(Number(blocked.headers['retry-after'])).toBeLessThanOrEqual(3600);
+    // Another user keeps a quota of their own.
+    const bh = tenantHeaders(f.ownerB, f.tenantB.tenant.id);
+    const other = (
+      await request(f.app).post('/api/v1/products').set(bh).send(productInput()).expect(201)
+    ).body.data.id as string;
     await request(f.app)
-      .put(path)
-      .set(ah())
+      .put(`/api/v1/products/${other}/image?expectedVersion=1`)
+      .set(bh)
       .set('Content-Type', 'image/png')
       .send(await png())
-      .expect(429);
+      .expect(200);
   });
 });

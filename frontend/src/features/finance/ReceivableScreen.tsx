@@ -43,6 +43,7 @@ import {
   orderCode,
 } from './presentation';
 import { ReceiptAction } from './ReceiptForm';
+import { DueDateAction, DueDateHistory } from './DueDateChange';
 import { useRefetchStaleOnFocus } from './cacheUpdates';
 import { Touchable } from '@/ui/Touchable';
 import { focusRing, showFocusRing, type InteractionState } from '@/ui/interaction';
@@ -205,6 +206,16 @@ function TitleDetail({ title, onRefreshTitle }: { title: Receivable; onRefreshTi
                     {`Vencimento ${formatDate(title.dueDate)}${hint ? ` · ${hint}` : ''}`}
                   </Text>
                 </View>
+                {state.data ? (
+                  <View style={styles.dueAction}>
+                    <DueDateAction
+                      title={title}
+                      state={state.data}
+                      today={today}
+                      blocked={blocked}
+                    />
+                  </View>
+                ) : null}
               </View>
               {state.data ? (
                 <View style={wide ? styles.action : compact ? null : styles.actionMedium}>
@@ -294,6 +305,7 @@ function TitleDetail({ title, onRefreshTitle }: { title: Receivable; onRefreshTi
               />
             </ListPanelInner>
           </Panel>
+          <DueDateHistory receivableId={title.id} />
           <Disclosure label="Histórico completo do pedido" summary="todos os eventos financeiros">
             <ListPanel
               query={history.query}
@@ -529,6 +541,7 @@ const styles = StyleSheet.create({
   summaryStack: { flexDirection: 'column', alignItems: 'stretch' },
   balance: { marginVertical: space[1] },
   dueRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: space[2] },
+  dueAction: { marginTop: space[3] },
   action: { width: 260 },
   actionMedium: { alignItems: 'flex-start' },
   amounts: {

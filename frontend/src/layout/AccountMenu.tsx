@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { useTenant } from '@/features/session/useTenant';
+import { CompanyMark } from '@/features/company/CompanyMark';
 import { roleLabel, useSession } from '@/session/SessionContext';
 import { color, space } from '@/theme';
 import { Button, IconButton, Skeleton, Text } from '@/ui';
@@ -29,13 +30,21 @@ export function AccountMenu({ rail = false }: { rail?: boolean }) {
   return (
     <View style={styles.root}>
       <View style={styles.identity}>
-        {tenant.isPending ? (
-          <Skeleton width="70%" height={16} />
-        ) : (
-          <Text variant="bodyStrong" color={color.onStructure} numberOfLines={1}>
-            {tenant.data?.name ?? 'Empresa'}
-          </Text>
-        )}
+        <View style={styles.company}>
+          <CompanyMark tenant={tenant.data} />
+          {tenant.isPending ? (
+            <Skeleton width="70%" height={16} />
+          ) : (
+            <Text
+              variant="bodyStrong"
+              color={color.onStructure}
+              numberOfLines={1}
+              style={styles.companyName}
+            >
+              {tenant.data?.name ?? 'Empresa'}
+            </Text>
+          )}
+        </View>
         <Text variant="caption" color={color.onStructureSecondary} numberOfLines={1}>
           {[session.me?.name, session.role ? roleLabel[session.role] : null]
             .filter(Boolean)
@@ -74,6 +83,8 @@ export function AccountMenu({ rail = false }: { rail?: boolean }) {
 const styles = StyleSheet.create({
   root: { paddingHorizontal: space[3], gap: space[3] },
   identity: { gap: 2 },
+  company: { flexDirection: 'row', alignItems: 'center', gap: space[2] },
+  companyName: { flexShrink: 1 },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
   rail: { alignItems: 'center' },
 });

@@ -61,6 +61,21 @@ export const catalogPublicView = z.object({
   whatsappNumber: catalogFields.whatsappNumber,
   showPrices: z.boolean(),
 });
+/**
+ * Storefront header: the public settings plus the company logo (path and pixel size), only while the
+ * plan includes branding.custom and a logo is stored. The path changes with the logo, so a
+ * replaced or withdrawn logo is never served from an old address.
+ */
+export const catalogProfileView = catalogPublicView.extend({
+  logo: z
+    .object({
+      path: z.string(),
+      width: z.number().int().positive(),
+      height: z.number().int().positive(),
+    })
+    .nullable(),
+});
+export const catalogLogoQuery = z.strictObject({ v: opaqueId.optional() });
 export const publicCategoryView = z.object({ id: opaqueId, name: z.string() });
 export const publicProductView = z.object({
   id: opaqueId,

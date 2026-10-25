@@ -12,6 +12,8 @@ export const queryKeys = {
     ['tenant', tenantId, 'reports', id, query] as const,
   /** Nome de cada empresa na tela de escolha (só leitura de tenants/current). */
   tenantSummary: (tenantId: string) => ['tenant', tenantId, 'summary'] as const,
+  /** Bytes do logotipo: a chave inclui o id do logotipo, então trocar o arquivo troca a chave. */
+  tenantLogo: (tenantId: string, logoId: string) => ['tenant', tenantId, 'logo', logoId] as const,
   users: (tenantId: string) => ['tenant', tenantId, 'users'] as const,
   customers: (tenantId: string) => ['tenant', tenantId, 'customers'] as const,
   customerList: (tenantId: string, filters: object) =>
@@ -74,6 +76,8 @@ export const queryKeys = {
     ['tenant', tenantId, 'finance', 'receivables', filters] as const,
   receivable: (tenantId: string, id: string) =>
     ['tenant', tenantId, 'finance', 'receivable', id] as const,
+  dueDateChanges: (tenantId: string, receivableId: string) =>
+    ['tenant', tenantId, 'finance', 'receivable', receivableId, 'due-date-changes'] as const,
   payments: (tenantId: string, orderId: string) =>
     ['tenant', tenantId, 'finance', 'payments', orderId] as const,
   financialHistory: (tenantId: string, orderId: string) =>

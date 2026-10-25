@@ -28,6 +28,7 @@ import { termsAt, termsInstallments, commercialTerms } from '../finance/paymentC
 import { termsSnapshot, methodSnapshot } from '../../shared/schemas/paymentSettings.js';
 import { FinancialLocks } from '../finance/resolution/locks.js';
 import { checkReadBudget } from '../../shared/operations/readBudget.js';
+import { brandingAllowed } from '../plans/catalog.js';
 export class OrderService {
   readonly financialLocks: FinancialLocks;
   constructor(
@@ -506,10 +507,19 @@ export class OrderService {
       id,
       ctx.membership.role === 'seller',
     );
+    // The plan decides the document identity at generation time: a downgrade never deletes
+    // the stored logo, it only stops putting it (and product photos) in new documents.
+    const branded = brandingAllowed(ctx.entitlements);
     return {
       order,
       customer,
-      tenant: { name: ctx.tenant.name, timezone: ctx.tenant.timezone },
+      branded,
+      tenant: {
+        id: ctx.tenant.id,
+        name: ctx.tenant.name,
+        timezone: ctx.tenant.timezone,
+        logo: branded ? ctx.tenant.logo : null,
+      },
     };
   }
   async command(

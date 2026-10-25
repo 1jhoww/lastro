@@ -8,7 +8,9 @@ import { ListRow, Panel } from '@/ui';
  * usuários da empresa. Isso é administrado pela Hepta na área da plataforma.
  */
 export default function Settings() {
-  const { permissions } = useSession();
+  const { permissions, membership } = useSession();
+  // Discreet pointer for administrators whose plan lacks the storefront: no prompt, no sales page.
+  const catalogInPlan = membership?.plan.features.includes('catalog.public') ?? false;
   const manageUsers = permissions.includes('users:manage');
   const admin = permissions.includes('tenant:update');
 
@@ -18,7 +20,7 @@ export default function Settings() {
         <ListRow
           icon={Building}
           title="Empresa"
-          description="Nome e fuso horário usados nos vencimentos."
+          description="Nome, logotipo e fuso horário da empresa."
           href="/configuracoes/empresa"
           last={!manageUsers && !admin}
         />
@@ -44,6 +46,14 @@ export default function Settings() {
             title="Catálogo público"
             description="Publicação e orçamento por WhatsApp."
             href="/configuracoes/catalogo"
+            last
+          />
+        ) : admin && !catalogInPlan ? (
+          <ListRow
+            icon={Store}
+            title="Catálogo público"
+            description="Vitrine com sua marca e orçamento por WhatsApp. Disponível no plano Profissional."
+            disabled
             last
           />
         ) : null}

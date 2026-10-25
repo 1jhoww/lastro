@@ -12,6 +12,7 @@ import {
   calendarDate,
   billingContactSchema,
   operationId,
+  tenantLogoSchema,
 } from './models.js';
 import { planFeatures } from '../../modules/plans/catalog.js';
 export const empty = z.strictObject({});
@@ -72,6 +73,12 @@ export const updateTenantInput = z.strictObject({
   timezone: ianaTimezone.optional(),
   expectedVersion: z.number().int().positive(),
 });
+/** Documents the binary logo response (the body itself is WebP bytes). */
+export const tenantLogoView = tenantLogoSchema;
+/** Raw-body logo upload/removal: the company version travels in the query string. */
+export const logoQuery = z.strictObject({
+  expectedVersion: z.string().regex(/^[1-9][0-9]{0,8}$/),
+});
 export const inviteInput = z.strictObject({ email, role });
 export const ownerInviteInput = z.strictObject({
   ownerEmail: email,
@@ -95,6 +102,7 @@ export const reissueInvitationInput = z.strictObject({ email: email.optional() }
 export const tenantView = z.object({
   id: opaqueId,
   name: z.string(),
+  logo: tenantLogoSchema.nullable(),
   timezone: z.string(),
   status: z.enum(['provisioning', 'active']),
   version: z.number(),

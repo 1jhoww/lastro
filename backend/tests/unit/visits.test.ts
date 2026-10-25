@@ -141,12 +141,12 @@ describe('Registros de visita', () => {
 });
 
 describe('Permissões e plano', () => {
-  it('Essencial não recebe visitas e recompra; Profissional e contrato legado recebem', () => {
+  it('Essencial e assinatura sem plano não recebem visitas e recompra; Profissional recebe', () => {
     const allowed = (planCode: 'essencial' | 'profissional' | null) =>
       withinPlan(permissionsFor('administrator'), entitlementsFor({ planCode, userLimit: 2 }));
     expect(allowed('essencial')).not.toContain('visits:own:manage');
     expect(allowed('profissional')).toContain('visits:own:manage');
-    expect(allowed(null)).toContain('visits:own:manage');
+    expect(allowed(null)).not.toContain('visits:own:manage');
     // Delivery confirmation belongs to Pedidos and exists on every plan.
     expect(allowed('essencial')).toContain('orders:own:deliver');
   });

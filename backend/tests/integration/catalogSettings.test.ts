@@ -27,6 +27,7 @@ describe('F1 configuração administrativa do catálogo', () => {
     const publicValue = (await request(f.app).get(publicPath()).expect(200)).body.data;
     expect(Object.keys(publicValue).sort()).toEqual([
       'description',
+      'logo',
       'showPrices',
       'slug',
       'tradeName',

@@ -31,7 +31,13 @@ const history = async (fixture: Fixture, id = fixture.tenantA.subscription.id) =
       .get(path(fixture, '/history', id))
       .set(bearer(fixture.platform))
   ).body.data.items as { action: string; changes: Record<string, unknown> }[];
-const allFeatures = ['users.invite', 'catalog.public', 'commercial.sellers', 'commercial.visits'];
+const allFeatures = [
+  'users.invite',
+  'catalog.public',
+  'commercial.sellers',
+  'commercial.visits',
+  'branding.custom',
+];
 
 describe('Criação de empresa com plano oficial', () => {
   it('Essencial recebe limite de 1 usuário, valor de referência e dados de cobrança', async () => {
@@ -107,7 +113,7 @@ describe('Criação de empresa com plano oficial', () => {
       ['essencial', 1, 11900],
       ['profissional', 2, 19900],
     ]);
-    expect(catalog.features).toHaveLength(4);
+    expect(catalog.features).toHaveLength(5);
   });
 });
 
@@ -202,10 +208,12 @@ describe('Troca de plano', () => {
     expect(same.body.error.code).toBe('VALIDATION_ERROR');
   });
   it('contrato legado com mais usuários não é rebaixado sem resolução', async () => {
+    // Users joined under the old terms; a contract without a plan cannot invite anyone now.
+    await f.firebase.db.doc(`subscriptions/${f.tenantA.subscription.id}`).update({ userLimit: 5 });
+    for (const label of ['a', 'b']) await expectStatus(join(f, await newUser(f, label)), 200);
     await f.firebase.db
       .doc(`subscriptions/${f.tenantA.subscription.id}`)
-      .update({ planCode: null, planId: 'legado', userLimit: 5 });
-    for (const label of ['a', 'b']) await expectStatus(join(f, await newUser(f, label)), 200);
+      .update({ planCode: null, planId: 'legado' });
     const preview = (
       await request(f.app)
         .get(path(f, '/plan-change'))

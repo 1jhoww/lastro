@@ -127,11 +127,30 @@ describe('Plano Profissional', () => {
     const me = (await request(f.app).get('/api/v1/me').set(bearer(f.ownerA)).expect(200)).body.data;
     expect(me.memberships[0].permissions).toContain('catalog:manage');
   });
-  it('contrato legado preserva limite e recursos contratados', async () => {
+  it('assinatura sem plano válido preserva o limite e não recebe recursos premium', async () => {
     await onPlan(f, null, 2);
     const me = (await request(f.app).get('/api/v1/me').set(bearer(f.ownerA)).expect(200)).body.data;
-    expect(me.memberships[0].plan).toMatchObject({ code: null, name: null, userLimit: 2 });
-    expect(me.memberships[0].permissions).toContain('catalog:manage');
+    expect(me.memberships[0].plan).toMatchObject({
+      code: null,
+      name: null,
+      userLimit: 2,
+      features: [],
+    });
+    for (const premium of ['catalog:manage', 'visits:own:manage', 'branding:manage'])
+      expect(me.memberships[0].permissions).not.toContain(premium);
+    // Backend enforcement, not only hidden buttons: the API refuses the premium operations.
+    const tenantId = f.tenantA.tenant.id;
+    const logo = await request(f.app)
+      .put('/api/v1/tenants/current/logo?expectedVersion=1')
+      .set(tenantHeaders(f.ownerA, tenantId))
+      .set('Content-Type', 'image/png')
+      .send(Buffer.from('89504e470d0a1a0a', 'hex'))
+      .expect(403);
+    expect(logo.body.error.code).toBe('FEATURE_NOT_IN_PLAN');
+    await request(f.app)
+      .get('/api/v1/catalog-settings')
+      .set(tenantHeaders(f.ownerA, tenantId))
+      .expect(403);
   });
 });
 

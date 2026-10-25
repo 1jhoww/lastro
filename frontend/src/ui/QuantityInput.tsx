@@ -24,6 +24,11 @@ type Props = {
   max?: number;
   /** Compacto (36 px) para listas densas no desktop; no celular use o padrão de 44 px. */
   size?: 'md' | 'sm';
+  /**
+   * Cards estreitos do celular: ocupa a largura do contêiner, botões nas pontas e valor no
+   * centro, sem a sigla da unidade (o card já a mostra), para caber até quatro dígitos.
+   */
+  fill?: boolean;
 };
 
 /** Texto editável sem separador de milhar, para não confundir com decimal. */
@@ -33,7 +38,16 @@ const editable = (milli: number) => formatQuantity(milli).replace(/\./g, '');
  * Stepper com digitação livre. Botões somam uma unidade inteira; KG/L aceitam até três casas
  * digitadas. Texto inválido não altera o valor confirmado.
  */
-export function QuantityInput({ value, onChange, unit, label, min = 0, max, size = 'md' }: Props) {
+export function QuantityInput({
+  value,
+  onChange,
+  unit,
+  label,
+  min = 0,
+  max,
+  size = 'md',
+  fill = false,
+}: Props) {
   const small = size === 'sm';
   // Texto em edição; null mostra o valor confirmado (que pode mudar pelos botões).
   const [draft, setDraft] = useState<string | null>(null);
@@ -46,7 +60,7 @@ export function QuantityInput({ value, onChange, unit, label, min = 0, max, size
   const step = (dir: 1 | -1) => onChange(clamp(value + dir * QUANTITY_SCALE, min, max));
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, fill && styles.rootFill]}>
       <StepButton
         icon="minus"
         label={`Diminuir ${label}`}
@@ -54,7 +68,7 @@ export function QuantityInput({ value, onChange, unit, label, min = 0, max, size
         disabled={value <= min}
         onPress={() => step(-1)}
       />
-      <View style={styles.field}>
+      <View style={[styles.field, fill && styles.fieldFill]}>
         <TextInput
           value={draft ?? editable(value)}
           onChangeText={setDraft}
@@ -66,12 +80,15 @@ export function QuantityInput({ value, onChange, unit, label, min = 0, max, size
           style={[
             styles.input,
             small && styles.inputSmall,
+            fill && styles.inputFill,
             Platform.OS === 'web' && ({ outlineStyle: 'none' } as object),
           ]}
         />
-        <Text variant="small" color={color.textSecondary}>
-          {unitLabel[unit]}
-        </Text>
+        {fill ? null : (
+          <Text variant="small" color={color.textSecondary}>
+            {unitLabel[unit]}
+          </Text>
+        )}
       </View>
       <StepButton
         icon="plus"
@@ -134,12 +151,17 @@ const styles = StyleSheet.create({
     borderRadius: radius.md,
   },
   stepSmall: { width: 36, height: 36 },
+  // Fill: the field takes the space between the buttons and may shrink, never the buttons.
+  rootFill: { alignSelf: 'stretch', justifyContent: 'space-between' },
   field: {
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: space[1],
     paddingHorizontal: space[1],
   },
+  // The value may use the buttons' empty inner edge (icons stay centered), so five digits fit
+  // in a 320 px phone card without shrinking the buttons or the font.
+  fieldFill: { flex: 1, minWidth: 0, paddingHorizontal: 0, marginHorizontal: -3 },
   input: {
     ...typeScale.figure,
     color: color.text,
@@ -149,4 +171,5 @@ const styles = StyleSheet.create({
     paddingVertical: space[2],
   },
   inputSmall: { minWidth: 36, maxWidth: 72, paddingVertical: space[1] },
+  inputFill: { flex: 1, minWidth: 0, maxWidth: undefined, textAlign: 'center' },
 });

@@ -48,26 +48,36 @@ export function apiRateLimit(config: Config, repo: FoundationRepository): Reques
 export function invitationRateLimit(repo: FoundationRepository): RequestHandler {
   return actorRateLimit(repo, 'invitation');
 }
+/**
+ * Product photos and company logos per user per clock hour. A company loading its initial
+ * catalog sends hundreds of photos in one sitting; 300/h (5 per minute on average) covers that
+ * while capping one account at about 1.5 GB of input per hour. Each upload still needs an
+ * authenticated, permitted user, the 5 MiB body limit and at most two concurrent decodes.
+ */
+export const IMAGE_UPLOADS_PER_HOUR = 300;
 export function imageRateLimit(repo: FoundationRepository): RequestHandler {
-  return actorRateLimit(repo, 'image-upload');
+  return actorRateLimit(repo, 'image-upload', IMAGE_UPLOADS_PER_HOUR);
 }
 export function downloadRateLimit(repo: FoundationRepository): RequestHandler {
   return actorRateLimit(repo, 'document-export');
 }
-function actorRateLimit(repo: FoundationRepository, operation: string): RequestHandler {
+function actorRateLimit(repo: FoundationRepository, operation: string, limit = 30): RequestHandler {
   return async (req, res, next) => {
     if (!req.actor) throw new AppError(401, 'UNAUTHORIZED', 'Autenticação necessária');
-    const window = Math.floor(Date.now() / 3_600_000);
+    const now = Date.now();
+    const window = Math.floor(now / 3_600_000);
     const ref = repo.global('rateLimits', digest(`${operation}:${req.actor.uid}:${window}`));
     const count = await repo.db.runTransaction(async (tx) => {
       const data = (await tx.get(ref)).data();
-      if (typeof data?.count === 'number' && data.count >= 30) return 31;
+      if (typeof data?.count === 'number' && data.count >= limit) return limit + 1;
       const value = typeof data?.count === 'number' ? data.count + 1 : 1;
       tx.set(ref, { count: value, expiresAt: Timestamp.fromMillis((window + 2) * 3_600_000) });
       return value;
     });
-    if (count > 30) {
-      res.setHeader('Retry-After', '3600');
+    if (count > limit) {
+      // The counter resets when the clock hour turns, not one hour after the last attempt.
+      const seconds = Math.ceil(((window + 1) * 3_600_000 - now) / 1000);
+      res.setHeader('Retry-After', String(Math.max(1, seconds)));
       throw new AppError(429, 'RATE_LIMITED', 'Muitas tentativas');
     }
     next();

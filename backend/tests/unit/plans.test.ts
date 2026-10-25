@@ -90,11 +90,15 @@ describe('Recursos por assinatura', () => {
     ]);
     expect(hasFeature(profissional, 'users.invite')).toBe(true);
   });
-  it('contrato legado preserva todos os recursos e o limite contratado', () => {
+  it('assinatura sem plano válido mantém o limite contratado e não recebe recursos premium', () => {
     const legacy = entitlementsFor({ planCode: null, userLimit: 5 });
     expect(legacy.userLimit).toBe(5);
-    expect([...legacy.features]).toEqual([...planFeatures]);
-    expect(withinPlan(permissionsFor('administrator'), legacy)).toContain('catalog:manage');
+    expect([...legacy.features]).toEqual([]);
+    const permissions = withinPlan(permissionsFor('administrator'), legacy);
+    for (const premium of ['catalog:manage', 'visits:own:manage', 'branding:manage'] as const)
+      expect(permissions).not.toContain(premium);
+    // Modules outside the plan catalog stay available, as on Essencial.
+    expect(permissions).toContain('orders:all:manage');
   });
   it('limite de usuários vem do contrato, não do nome do plano', () => {
     expect(entitlementsFor({ planCode: 'profissional', userLimit: 2 }).userLimit).toBe(2);

@@ -178,7 +178,7 @@ export function ProductForm({
                 hint={
                   editing
                     ? 'Não muda depois da primeira movimentação de estoque.'
-                    : 'KG e L aceitam até 3 casas; as demais, só inteiros.'
+                    : 'KG e L aceitam até 3 casas; as demais, só inteiros. Depois da primeira entrada de estoque, a unidade não muda mais.'
                 }
               />
             )}

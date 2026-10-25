@@ -35,6 +35,7 @@ export const eventLabel: Record<OrderEvent['type'], string> = {
   confirmed: 'Pedido confirmado (estoque reservado)',
   dispatched: 'Pedido expedido (saída do estoque)',
   canceled: 'Pedido cancelado',
+  due_date_changed: 'Vencimento corrigido',
 };
 
 /** "PED-1A2B3C4D" a partir do identificador comercial completo ("PED-<UUID>"). */

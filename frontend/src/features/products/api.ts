@@ -6,6 +6,7 @@ import type { Product, ProductCreate, ProductUpdate, StatusFilter } from '@/api/
 import { listParams, useCursorList } from '@/features/catalog/useCursorList';
 import { tenantHeader, useTenantApi } from '@/session/SessionContext';
 import { blobToDataUri } from '@/lib/blob';
+import { prepareImage, type PickedImage } from '@/lib/imageFiles';
 
 export type ProductFilters = {
   q: string;
@@ -114,17 +115,17 @@ export function useSetProductStatus(id: string) {
 
 /* ---------- Imagem ---------- */
 
-export const IMAGE_MAX_BYTES = 5 * 1024 * 1024;
-export const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
-export type ImageType = (typeof IMAGE_TYPES)[number];
-
-export type PickedImage = { uri: string; type: ImageType; sizeBytes?: number };
+export { IMAGE_MAX_BYTES, IMAGE_TYPES } from '@/lib/imageFiles';
+export type { ImageType, PickedImage } from '@/lib/imageFiles';
+/** Lado maior enviado pelo navegador; o servidor guarda no máximo 2048 px. */
+const PRODUCT_IMAGE_EDGE = 2048;
 
 /**
  * Upload pelo único fluxo do contrato: PUT com os bytes crus e o Content-Type da imagem
- * (sem multipart, URL ou SVG). O backend valida, converte para WebP e grava no Storage da
- * empresa; a resposta é o produto com a nova versão. Usado pelo hook abaixo e pelo cadastro,
- * logo depois de criar o produto.
+ * (sem multipart, URL ou SVG). O formato vem da assinatura do arquivo e, no navegador, fotos
+ * grandes são reduzidas antes de subir. O backend valida de novo, converte para WebP e grava
+ * no Storage da empresa; a resposta é o produto com a nova versão. Usado pelo hook abaixo e
+ * pelo cadastro, logo depois de criar o produto.
  */
 export async function uploadProductImage(
   api: ApiClient,
@@ -133,16 +134,7 @@ export async function uploadProductImage(
   image: PickedImage,
   expectedVersion: number,
 ): Promise<Product> {
-  if (image.sizeBytes !== undefined && image.sizeBytes > IMAGE_MAX_BYTES)
-    throw new ApiError(422, 'INVALID_IMAGE', 'Imagem acima de 5 MB');
-  let bytes: Blob;
-  try {
-    bytes = await (await fetch(image.uri)).blob();
-  } catch (e) {
-    throw toApiError(e);
-  }
-  if (bytes.size > IMAGE_MAX_BYTES)
-    throw new ApiError(422, 'INVALID_IMAGE', 'Imagem acima de 5 MB');
+  const { body, type } = await prepareImage(image, PRODUCT_IMAGE_EDGE);
   return unwrap(
     api.PUT('/api/v1/products/{id}/image', {
       params: {
@@ -150,9 +142,9 @@ export async function uploadProductImage(
         path: { id },
         query: { expectedVersion: String(expectedVersion) },
       },
-      body: bytes as never,
+      body: body as never,
       bodySerializer: (b: unknown) => b as BodyInit,
-      headers: { 'Content-Type': image.type },
+      headers: { 'Content-Type': type },
     }),
   );
 }

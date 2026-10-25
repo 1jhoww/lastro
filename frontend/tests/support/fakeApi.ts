@@ -92,6 +92,7 @@ const seller = [
 const administrator = [
   ...seller,
   'tenant:update',
+  'branding:manage',
   'users:manage',
   'customers:all:manage',
   'products:manage',
@@ -102,6 +103,7 @@ const administrator = [
   'orders:dispatch',
   'reports:read',
   'receivables:read',
+  'receivables:manage',
   'payments:manage',
   'payment-settings:manage',
   'payments:reverse',
@@ -125,8 +127,18 @@ export const membership = (
     code: null,
     name: null,
     userLimit: 2,
-    features: ['users.invite', 'catalog.public', 'commercial.sellers', 'commercial.visits'] as (
-      'users.invite' | 'catalog.public' | 'commercial.sellers' | 'commercial.visits'
+    features: [
+      'users.invite',
+      'catalog.public',
+      'commercial.sellers',
+      'commercial.visits',
+      'branding.custom',
+    ] as (
+      | 'users.invite'
+      | 'catalog.public'
+      | 'commercial.sellers'
+      | 'commercial.visits'
+      | 'branding.custom'
     )[],
   },
 });
@@ -134,6 +146,7 @@ export const membership = (
 export const tenant = (id: string, name: string) => ({
   id,
   name,
+  logo: null,
   timezone: 'America/Sao_Paulo',
   status: 'active',
   version: 1,

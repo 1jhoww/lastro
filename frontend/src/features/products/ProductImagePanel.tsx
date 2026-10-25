@@ -1,42 +1,19 @@
 import { useState } from 'react';
 import { ActivityIndicator, Image, StyleSheet, View } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { toApiError } from '@/api/errors';
 import type { Product } from '@/api/types';
+import { imageFailure, pickImageFile } from '@/lib/imageFiles';
 import { color, radius, space } from '@/theme';
 import { Alert, Button, ConfirmDialog, Panel, Text, useToast } from '@/ui';
 import { ImageIcon, ImagePlus, Package } from '@/ui/icons';
 import {
-  IMAGE_MAX_BYTES,
-  IMAGE_TYPES,
   useProductImage,
   useRemoveProductImage,
   useUploadProductImage,
-  type ImageType,
   type PickedImage,
 } from './api';
 
-const typeFromUri = (uri: string): ImageType | null => {
-  const m = /\.(jpe?g|png|webp)(?:\?|$)/i.exec(uri)?.[1]?.toLowerCase();
-  if (!m) return null;
-  return m === 'png' ? 'image/png' : m === 'webp' ? 'image/webp' : 'image/jpeg';
-};
-
-/** Escolhe uma foto da galeria e valida tipo e tamanho antes de enviar. */
-export async function pickImage(): Promise<PickedImage | { error: string } | null> {
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ['images'],
-    allowsMultipleSelection: false,
-    quality: 0.85,
-  });
-  if (result.canceled || !result.assets[0]) return null;
-  const asset = result.assets[0];
-  const type = (asset.mimeType as ImageType | undefined) ?? typeFromUri(asset.uri) ?? 'image/jpeg';
-  if (!IMAGE_TYPES.includes(type)) return { error: 'Use uma imagem JPEG, PNG ou WebP.' };
-  if (asset.fileSize !== undefined && asset.fileSize > IMAGE_MAX_BYTES)
-    return { error: 'A imagem tem mais de 5 MB. Escolha uma menor.' };
-  return { uri: asset.uri, type, sizeBytes: asset.fileSize };
-}
+/** Escolhe uma foto da galeria e confere formato e tamanho antes de enviar. */
+export const pickImage = () => pickImageFile(2048);
 
 /** Miniatura de lista: foto privada (buscada com a sessão) ou o mesmo ícone de "sem imagem". */
 export function ProductThumb({
@@ -101,9 +78,25 @@ export function ProductImageEditor({
   const toast = useToast();
   const [pickError, setPickError] = useState<string | null>(null);
   const [confirmRemove, setConfirmRemove] = useState(false);
+  // Last photo chosen, kept so a failed upload can be retried without picking it again.
+  const [last, setLast] = useState<PickedImage | null>(null);
   const has = Boolean(product.image);
   const busy = upload.isPending || remove.isPending;
 
+  const send = (picked: PickedImage) => {
+    upload.reset();
+    remove.reset();
+    upload.mutate(
+      { image: picked, expectedVersion },
+      {
+        onSuccess: (next) => {
+          setLast(null);
+          onChanged?.(next);
+          toast.show(has ? 'Imagem substituída' : 'Imagem adicionada');
+        },
+      },
+    );
+  };
   const choose = async () => {
     setPickError(null);
     upload.reset();
@@ -114,24 +107,17 @@ export function ProductImageEditor({
       setPickError(picked.error);
       return;
     }
-    upload.mutate(
-      { image: picked, expectedVersion },
-      {
-        onSuccess: (next) => {
-          onChanged?.(next);
-          toast.show(has ? 'Imagem substituída' : 'Imagem adicionada');
-        },
-      },
-    );
+    setLast(picked);
+    send(picked);
   };
 
-  const failure =
-    pickError ??
-    (upload.error
-      ? uploadMessage(upload.error)
+  const failure = pickError
+    ? { message: pickError, retryable: false }
+    : upload.error
+      ? imageFailure(upload.error)
       : remove.error
-        ? uploadMessage(remove.error)
-        : null);
+        ? imageFailure(remove.error)
+        : null;
 
   return (
     <View style={styles.editor}>
@@ -142,8 +128,24 @@ export function ProductImageEditor({
         message={has && image.isError ? 'Não foi possível carregar a imagem.' : undefined}
       />
       {failure ? (
-        <Alert tone="danger" title={remove.error ? 'Imagem não removida' : 'Imagem não enviada'}>
-          {failure}
+        <Alert
+          tone="danger"
+          title={remove.error ? 'Imagem não removida' : 'Imagem não enviada'}
+          action={
+            failure.retryable && upload.error && last && canManage ? (
+              <Button
+                label="Tentar de novo"
+                size="sm"
+                variant="outline"
+                disabled={busy}
+                onPress={() => send(last)}
+              />
+            ) : undefined
+          }
+        >
+          {upload.error && has
+            ? `${failure.message} A imagem anterior continua no produto.`
+            : failure.message}
         </Alert>
       ) : null}
       {canManage ? (
@@ -212,6 +214,65 @@ export function PendingImagePicker({
         onRemove={() => onChange(null)}
         note={value ? 'Enviada ao salvar o produto.' : undefined}
       />
+    </View>
+  );
+}
+
+/**
+ * Produto salvo, imagem não. A foto escolhida aparece marcada como não salva, com o motivo e
+ * as saídas possíveis; nada some sozinho, a pessoa decide como seguir.
+ */
+export function ImageUploadFailure({
+  image,
+  error,
+  busy,
+  onRetry,
+  onChooseOther,
+  onSkip,
+}: {
+  image: PickedImage;
+  error: unknown;
+  busy: boolean;
+  onRetry: () => void;
+  onChooseOther: () => void;
+  onSkip: () => void;
+}) {
+  const failure = imageFailure(error);
+  return (
+    <View style={styles.editor}>
+      <ImageFrame label="Imagem escolhida, não salva" uri={image.uri} loading={busy} />
+      <Alert tone="danger" title="A imagem não foi salva">
+        {failure.message}
+      </Alert>
+      <View style={styles.actions}>
+        {failure.retryable ? (
+          <Button
+            label="Tentar de novo"
+            size="sm"
+            loading={busy}
+            disabled={busy}
+            onPress={onRetry}
+          />
+        ) : null}
+        <Button
+          label="Escolher outra imagem"
+          icon={ImagePlus}
+          size="sm"
+          variant={failure.retryable ? 'outline' : 'strong'}
+          disabled={busy}
+          onPress={onChooseOther}
+        />
+        <Button
+          label="Continuar sem imagem"
+          size="sm"
+          variant="ghost"
+          disabled={busy}
+          onPress={onSkip}
+        />
+      </View>
+      <Text variant="caption" color={color.textSecondary}>
+        Você também pode adicionar a imagem depois, na ficha do produto.
+      </Text>
     </View>
   );
 }
@@ -290,16 +351,8 @@ function ImageActions({
   );
 }
 
-export function uploadMessage(error: unknown): string {
-  const err = toApiError(error);
-  if (err.code === 'INVALID_IMAGE')
-    return 'A imagem não foi aceita. Use JPEG, PNG ou WebP de até 5 MB, sem animação.';
-  if (err.code === 'CONFLICT')
-    return 'O produto mudou enquanto você enviava. Carregue a versão atual e envie de novo.';
-  if (err.kind === 'server')
-    return 'O servidor não conseguiu guardar a imagem. Se o armazenamento de arquivos não estiver configurado neste ambiente, o envio não funciona.';
-  return err.userMessage;
-}
+/** Motivo de uma falha de envio, para avisos fora deste painel. */
+export const uploadMessage = (error: unknown) => imageFailure(error).message;
 
 const styles = StyleSheet.create({
   panelBody: { paddingTop: space[1] },

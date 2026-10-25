@@ -21,6 +21,7 @@ import { requireCondition } from '../../shared/errors/appError.js';
 import { checkReadBudget, exportPolicy, ReadGate } from '../../shared/operations/readBudget.js';
 import type { Download } from '../documents/download.js';
 import { reportCsv, reportFilename, reportPdf } from './reportFiles.js';
+import type { TenantLogoService } from '../tenants/logoService.js';
 import { hasFeature } from '../plans/catalog.js';
 import { featureNotInPlan, requirePermission } from '../users/permissions.js';
 import { formatQuantity, parseQuantity } from '../inventory/quantities.js';
@@ -288,6 +289,7 @@ export class ReportService {
     readonly financial: FinancialReads,
     readonly inventory: InventoryService,
     readonly auth: Auth,
+    readonly logos?: Pick<TenantLogoService, 'pdfLogoFor'>,
   ) {}
   private get repo() {
     return this.orders.repo;
@@ -310,8 +312,10 @@ export class ReportService {
       async () => {
         const view = await this.build(actor, tenantId, id, query);
         checkReadBudget();
+        const logo =
+          format === 'pdf' && this.logos ? await this.logos.pdfLogoFor(tenantId) : null;
         const bytes =
-          format === 'csv' ? reportCsv(view) : await reportPdf(view, this.orders.clock());
+          format === 'csv' ? reportCsv(view) : await reportPdf(view, this.orders.clock(), logo);
         return { bytes, filename: reportFilename(view, format), rowCount: view.rows.length };
       },
       undefined,

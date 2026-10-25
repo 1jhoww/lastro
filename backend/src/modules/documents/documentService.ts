@@ -5,6 +5,9 @@ import { requireCondition } from '../../shared/errors/appError.js';
 import { PdfRenderer, type DocumentSource } from './pdfRenderer.js';
 import type { Download } from './download.js';
 import { ReadGate, checkReadBudget, documentPolicy } from '../../shared/operations/readBudget.js';
+import type { TenantLogoService } from '../tenants/logoService.js';
+import type { ImageService } from '../products/imageService.js';
+import { productSchema } from '../../shared/schemas/commercial.js';
 
 export class DocumentService {
   private inFlight = 0;
@@ -12,14 +15,37 @@ export class DocumentService {
     readonly orders: OrderService,
     readonly renderer = new PdfRenderer(),
     readonly budget = new ReadGate(),
+    readonly logos?: Pick<TenantLogoService, 'pdfLogo'>,
+    readonly images?: Pick<ImageService, 'pdfThumbnails'>,
   ) {}
   async source(actor: Actor, tenantId: string, id: string): Promise<DocumentSource> {
     return this.orders.repo.foundation.db.runTransaction(
       async (tx) => {
         const source = await this.orders.authorizedSnapshot(tx, actor, tenantId, id);
         const customer = source.customer;
+        // Photos are found by product id (never by name), in the same authorized read. Their ids
+        // are part of the fingerprint below, so a photo swapped mid-render is caught too.
+        const products =
+          source.branded && source.order.lines.length
+            ? await this.orders.repo.foundation.readMany(
+                source.order.lines.map((l) =>
+                  this.orders.repo.ref(tenantId, 'products', l.productId),
+                ),
+                productSchema,
+                tx,
+              )
+            : [];
+        const productImages = Object.fromEntries(
+          products.flatMap((p) =>
+            p?.image && p.tenantId === tenantId
+              ? [[p.id, { id: p.image.id, sizeBytes: p.image.sizeBytes }]]
+              : [],
+          ),
+        );
         return {
           tenant: source.tenant,
+          branded: source.branded,
+          productImages,
           order: source.order,
           // Registration data, read under the same authorization as the order.
           customer: customer
@@ -59,8 +85,20 @@ export class DocumentService {
     try {
       const source = await this.source(actor, tenantId, id);
       checkReadBudget();
+      // The source carries the logo id, so a logo swapped mid-render is caught below too.
       const fingerprint = digest(stableJson(source));
-      const bytes = await this.renderer.render(source, kind, this.orders.clock());
+      const { id: companyId, logo: companyLogo } = source.tenant;
+      const branded = Boolean(source.branded);
+      const [logo, thumbnails] = await Promise.all([
+        this.logos && companyId && companyLogo
+          ? this.logos.pdfLogo({ id: companyId, logo: companyLogo }, branded)
+          : null,
+        this.images && branded && source.productImages
+          ? this.images.pdfThumbnails(tenantId, source.productImages)
+          : new Map<string, Buffer>(),
+      ]);
+      checkReadBudget();
+      const bytes = await this.renderer.render(source, kind, this.orders.clock(), logo, thumbnails);
       checkReadBudget();
       const current = await this.source(actor, tenantId, id);
       checkReadBudget();

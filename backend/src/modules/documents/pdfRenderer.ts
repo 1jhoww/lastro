@@ -1,5 +1,6 @@
 import { AppError } from '../../shared/errors/appError.js';
 import type { Order } from '../../shared/schemas/orders.js';
+import type { Tenant } from '../../shared/schemas/models.js';
 import {
   BrandedPdf,
   LEFT,
@@ -12,6 +13,7 @@ import {
   oneLine,
   orderNumber,
   type Cell,
+  type PdfImage,
 } from './pdfLayout.js';
 
 export { MAX_PDF_BYTES, MAX_PDF_PAGES, MAX_RENDER_MS } from './pdfLayout.js';
@@ -33,7 +35,11 @@ export interface CustomerContact {
   } | null;
 }
 export interface DocumentSource {
-  tenant: { name: string; timezone: string };
+  tenant: { id?: string; name: string; timezone: string; logo?: Tenant['logo'] };
+  /** Plan includes the company identity (branding.custom); absent means plain documents. */
+  branded?: boolean;
+  /** Current photo of each product in the order, by product id (branded documents only). */
+  productImages?: Record<string, { id: string; sizeBytes: number }>;
   order: Order;
   customer: CustomerContact | null;
 }
@@ -70,12 +76,24 @@ export function addressLines(address: CustomerContact['address']): string[] {
   return [street, [place, postal].filter(Boolean).join(' — ')].filter(Boolean);
 }
 const quantity = (line: Order['lines'][number]) => `${brQuantity(line.quantity)} ${line.unit}`;
+/** Full product name and SKU from the order line; the photo is looked up by product id. */
+const productCell = (
+  line: Order['lines'][number],
+  thumbnails: ReadonlyMap<string, Buffer>,
+): Cell => {
+  const image = thumbnails.get(line.productId);
+  return { text: oneLine(line.name), sub: `SKU ${oneLine(line.sku)}`, ...(image ? { image } : {}) };
+};
 
 export class PdfRenderer {
   async render(
     source: DocumentSource,
     kind: 'commercial' | 'packing',
     emittedAt: Date,
+    /** Company logo as PNG (see TenantLogoService.pdfLogo); null keeps the name alone. */
+    logo: PdfImage | null = null,
+    /** Product thumbnails by product id (ImageService.pdfThumbnails); missing ones print none. */
+    thumbnails: ReadonlyMap<string, Buffer> = new Map(),
   ): Promise<Buffer> {
     const { order } = source;
     if (kind === 'packing' && order.status !== 'confirmed' && order.status !== 'dispatched')
@@ -88,12 +106,14 @@ export class PdfRenderer {
       kind === 'commercial'
         ? {
             company: source.tenant.name,
+            logo,
             title: 'PEDIDO COMERCIAL',
             subtitle: 'Documento não fiscal',
             reference: orderNumber(order.commercialId),
           }
         : {
             company: source.tenant.name,
+            logo,
             title: 'ROMANEIO DE ENTREGA',
             subtitle: 'Comprovante de recebimento — Documento não fiscal',
             reference: orderNumber(order.commercialId),
@@ -107,8 +127,8 @@ export class PdfRenderer {
     try {
       pdf.newPage();
       this.parties(pdf, source, kind);
-      if (kind === 'commercial') await this.commercial(pdf, source);
-      else await this.packing(pdf, source);
+      if (kind === 'commercial') await this.commercial(pdf, source, thumbnails);
+      else await this.packing(pdf, source, thumbnails);
       return await pdf.finish();
     } catch (error) {
       pdf.destroy();
@@ -169,7 +189,11 @@ export class PdfRenderer {
     pdf.y = Math.max(left, right) + 14;
   }
 
-  private async commercial(pdf: BrandedPdf, source: DocumentSource) {
+  private async commercial(
+    pdf: BrandedPdf,
+    source: DocumentSource,
+    thumbnails: ReadonlyMap<string, Buffer>,
+  ) {
     const { order } = source;
     const discount = order.discountCents > 0;
     const totals = [
@@ -184,7 +208,7 @@ export class PdfRenderer {
     const totalsHeight = (discount ? 34 : 0) + 30;
     if (order.lines.length) {
       const rows: Cell[][] = order.lines.map((line) => [
-        { text: oneLine(line.name), sub: `SKU ${oneLine(line.sku)}` },
+        productCell(line, thumbnails),
         { text: quantity(line) },
         { text: brl(line.unitPriceCents) },
         { text: brl(line.subtotalCents) },
@@ -268,7 +292,11 @@ export class PdfRenderer {
    * quantity is exactly what leaves with this delivery; values are the line totals, discount
    * included, and add up to the order total.
    */
-  private async packing(pdf: BrandedPdf, source: DocumentSource) {
+  private async packing(
+    pdf: BrandedPdf,
+    source: DocumentSource,
+    thumbnails: ReadonlyMap<string, Buffer>,
+  ) {
     const { order } = source;
     const receiptHeight = 250;
     await pdf.table(
@@ -278,7 +306,7 @@ export class PdfRenderer {
         { label: 'Valor', width: 105, align: 'right' },
       ],
       order.lines.map((line) => [
-        { text: oneLine(line.name), sub: `SKU ${oneLine(line.sku)}` },
+        productCell(line, thumbnails),
         { text: quantity(line) },
         { text: brl(line.totalCents) },
       ]),

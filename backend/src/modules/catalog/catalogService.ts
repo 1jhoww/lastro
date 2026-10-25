@@ -8,13 +8,14 @@ import {
   searchKey,
   type Product,
 } from '../../shared/schemas/commercial.js';
-import { tenantSchema, subscriptionSchema } from '../../shared/schemas/models.js';
+import { tenantSchema, subscriptionSchema, type Tenant } from '../../shared/schemas/models.js';
 import type { CommercialRepository } from '../../infrastructure/repositories/commercialRepository.js';
 import type { AccessService } from '../auth/accessService.js';
 import type { Actor } from '../../shared/types/context.js';
 import type { Firebase } from '../../infrastructure/firebase/client.js';
 import { publicCatalogAllowed } from '../users/permissions.js';
-import { entitlementsFor, hasFeature } from '../plans/catalog.js';
+import { brandingAllowed, entitlementsFor, hasFeature } from '../plans/catalog.js';
+import type { TenantLogoService } from '../tenants/logoService.js';
 import { AppError, requireCondition } from '../../shared/errors/appError.js';
 import { recordAudit } from '../../shared/audit/audit.js';
 import { digest, stableJson, equalDigest } from '../../shared/utils/crypto.js';
@@ -32,6 +33,7 @@ export class CatalogService {
     readonly access: AccessService,
     readonly firebase: Firebase,
     readonly clock: () => Date,
+    readonly logos?: Pick<TenantLogoService, 'bytes'>,
   ) {}
 
   async settings(tx: Transaction, tenantId: string) {
@@ -127,6 +129,10 @@ export class CatalogService {
     });
   }
   async resolve(tx: Transaction, slug: string) {
+    return (await this.resolveCompany(tx, slug)).catalog;
+  }
+  /** Published catalog with its company and contract, all re-read on every public request. */
+  async resolveCompany(tx: Transaction, slug: string) {
     const reservation = await this.repo.foundation.read(
       this.repo.foundation.global('catalogSlugs', slug),
       s.catalogSlugSchema,
@@ -169,16 +175,57 @@ export class CatalogService {
       'CATALOG_UNAVAILABLE',
       'Catálogo indisponível',
     );
-    return catalog;
+    return { catalog, tenant, branded: brandingAllowed(entitlementsFor(subscription)) };
+  }
+  /** Logo shown in the storefront: only while the plan includes the company identity. */
+  private storefrontLogo(company: { tenant: { logo: Tenant['logo'] }; branded: boolean }) {
+    return company.branded ? company.tenant.logo : null;
   }
   publicView(catalog: s.CatalogSettings) {
     return s.catalogPublicView.parse(catalog);
   }
   async profile(slug: string) {
     return this.repo.foundation.db.runTransaction(
-      async (tx) => this.publicView(await this.resolve(tx, slug)),
+      async (tx) => {
+        const company = await this.resolveCompany(tx, slug),
+          logo = this.storefrontLogo(company);
+        return s.catalogProfileView.parse({
+          ...this.publicView(company.catalog),
+          logo: logo
+            ? {
+                path: `/api/v1/public/catalogs/${slug}/logo?v=${logo.id}`,
+                width: logo.width,
+                height: logo.height,
+              }
+            : null,
+        });
+      },
       { readOnly: true },
     );
+  }
+  async logo(slug: string) {
+    const read = () =>
+      this.repo.foundation.db.runTransaction(
+        async (tx) => {
+          const company = await this.resolveCompany(tx, slug),
+            logo = this.storefrontLogo(company);
+          requireCondition(logo, 404, 'CATALOG_LOGO_UNAVAILABLE', 'Logotipo indisponível');
+          return { tenantId: company.tenant.id, logo };
+        },
+        { readOnly: true },
+      );
+    const before = await read();
+    const data = this.logos ? await this.logos.bytes(before.tenantId, before.logo) : null;
+    requireCondition(data, 404, 'CATALOG_LOGO_UNAVAILABLE', 'Logotipo indisponível');
+    // Recheck after Storage I/O: a downgrade or a new logo meanwhile must not leak the old one.
+    const after = await read();
+    requireCondition(
+      before.tenantId === after.tenantId && before.logo.id === after.logo.id,
+      409,
+      'CONFLICT',
+      'Logotipo alterado; tente novamente',
+    );
+    return data;
   }
   async product(tx: Transaction, catalog: s.CatalogSettings, id: string) {
     const product = await this.repo.foundation.read(

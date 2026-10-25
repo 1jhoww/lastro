@@ -14,6 +14,7 @@ import { errorHandler } from '../middlewares/errorHandler.js';
 import { apiRateLimit } from '../middlewares/rateLimit.js';
 import { AppError } from '../shared/errors/appError.js';
 import { createRoutes } from './routes.js';
+import { TenantLogoService } from '../modules/tenants/logoService.js';
 import { openApiDocument } from '../modules/auth/openapi.js';
 import { CommercialRepository } from '../infrastructure/repositories/commercialRepository.js';
 import { CustomerService } from '../modules/customers/customerService.js';
@@ -70,7 +71,8 @@ export function createApp(
   const finance = new FinancialService(financialCommands, paymentSettings, orderStock);
   const financialReads = new FinancialReads(financialCommands);
   const returns = new ReturnService(finance, new ReturnStockAdapter(inventory));
-  const catalog = new CatalogService(commercial, access, firebase, clock);
+  const logos = new TenantLogoService(repo, access, firebase, clock);
+  const catalog = new CatalogService(commercial, access, firebase, clock, logos);
   const orders = new OrderService(
     commercial,
     access,
@@ -80,7 +82,7 @@ export function createApp(
     paymentSettings,
   );
   const downloadBudget = new ReadGate();
-  const documents = new DocumentService(orders, undefined, downloadBudget);
+  const documents = new DocumentService(orders, undefined, downloadBudget, logos, images);
   const exports = new ExportService(
     customers,
     products,
@@ -180,6 +182,7 @@ export function createApp(
       catalog,
       documents,
       exports,
+      logos,
     ),
   );
   app.use((_req, _res) => {

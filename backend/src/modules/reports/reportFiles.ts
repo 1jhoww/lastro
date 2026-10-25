@@ -10,6 +10,7 @@ import {
   calendarDate,
   oneLine,
   type Cell,
+  type PdfImage,
   type Column,
 } from '../documents/pdfLayout.js';
 
@@ -156,7 +157,11 @@ function columnWidths(pdf: BrandedPdf, view: ReportView): Column[] {
 }
 
 /** A4 report with the same identity as the order documents. */
-export async function reportPdf(view: ReportView, emittedAt: Date): Promise<Buffer> {
+export async function reportPdf(
+  view: ReportView,
+  emittedAt: Date,
+  logo: PdfImage | null = null,
+): Promise<Buffer> {
   if (view.rows.length > MAX_REPORT_PDF_ROWS)
     throw new AppError(
       413,
@@ -166,6 +171,7 @@ export async function reportPdf(view: ReportView, emittedAt: Date): Promise<Buff
   const pdf = new BrandedPdf(
     {
       company: view.company,
+      logo,
       title: `RELATÓRIO · ${view.title.toUpperCase()}`,
       subtitle: periodText(view),
       reference: view.title,
