@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <style>.l{fill:#111111}@media (prefers-color-scheme:dark){.l{fill:#F6F3ED}}</style>
+  <path class="l" d="M14 4h14a14 14 0 0 1 14 14v40a4 4 0 0 0 4 4h40a14 14 0 0 1 14 14v6a14 14 0 0 1-14 14H14A14 14 0 0 1 0 82V18A14 14 0 0 1 14 4z"/>
+  <rect x="54" y="4" width="42" height="42" rx="10" fill="#F3B800"/>
+</svg>

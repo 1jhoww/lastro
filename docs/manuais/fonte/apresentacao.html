@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Lastro · Apresentação do app</title>
+<meta name="author" content="Hepta Studios">
+<meta name="description" content="Apresentação do Lastro: vendas, estoque e financeiro da distribuidora em um só lugar.">
+<style>
+/*
+ * Apresentação do Lastro em A4 paisagem. Cores de frontend/src/theme/tokens.ts e fonte Inter.
+ * Gerada por gerar-apresentacao.mjs. Cada <section class="slide"> é uma página.
+ */
+@font-face { font-family: 'Inter'; font-weight: 400; src: url('__FONTS__/Inter_400Regular.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 500; src: url('__FONTS__/Inter_500Medium.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 600; src: url('__FONTS__/Inter_600SemiBold.woff2') format('woff2'); }
+@font-face { font-family: 'Inter'; font-weight: 700; src: url('__FONTS__/Inter_700Bold.woff2') format('woff2'); }
+
+:root {
+  --carvao: #111111;
+  --grafite: #2a2a2a;
+  --bege: #f6f3ed;
+  --amarelo: #f3b800;
+  --areia: #e4dccf;
+  --surface: #fcfbf8;
+  --sunken: #efebe3;
+  --text-2: #5e5a53;
+  --on-2: #cfcac0;
+  --on-muted: #8f8a80;
+  --danger: #b42318;
+  --danger-soft: #fbe9e7;
+  --success: #1f6b45;
+  --success-soft: #e5f2ea;
+  --warning: #7a5a00;
+  --warning-soft: #fdf1c7;
+}
+
+@page { size: A4 landscape; margin: 0; }
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { margin: 0; font-family: 'Inter', sans-serif; color: var(--carvao); background: var(--bege); counter-reset: slide; }
+
+.slide {
+  position: relative;
+  width: 297mm;
+  height: 209.8mm;
+  overflow: hidden;
+  break-after: page;
+  background: var(--bege);
+  padding: 15mm 17mm 17mm;
+  counter-increment: slide;
+}
+.slide:last-child { break-after: auto; }
+/* Conteúdo centralizado na vertical quando não há captura. */
+.slide.centro { display: flex; flex-direction: column; justify-content: center; padding-bottom: 22mm; }
+.slide.escuro { background: var(--carvao); color: var(--bege); }
+
+/* Rodapé de cada slide */
+.slide:not(.capa)::after {
+  content: counter(slide);
+  position: absolute;
+  right: 17mm;
+  bottom: 8mm;
+  font-size: 8pt;
+  font-weight: 600;
+  color: var(--text-2);
+}
+.slide:not(.capa)::before {
+  content: 'lastro · apresentação do app';
+  position: absolute;
+  left: 17mm;
+  bottom: 8mm;
+  font-size: 8pt;
+  color: var(--text-2);
+}
+.slide.escuro::after, .slide.escuro::before { color: var(--on-muted); }
+
+.wordmark { font-weight: 600; letter-spacing: -0.055em; line-height: 1; white-space: nowrap; }
+.wordmark .ponto { display: inline-block; width: 0.2em; height: 0.2em; border-radius: 50%; background: var(--amarelo); margin-left: 0.04em; }
+
+.rotulo {
+  font-size: 8.5pt;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--warning);
+  margin: 0 0 3mm;
+}
+.escuro .rotulo { color: var(--amarelo); }
+h1 { margin: 0; font-size: 40pt; line-height: 1.04; font-weight: 600; letter-spacing: -0.03em; }
+h2 { margin: 0 0 4mm; font-size: 25pt; line-height: 1.1; font-weight: 600; letter-spacing: -0.025em; }
+h3 { margin: 0 0 2mm; font-size: 13.5pt; font-weight: 600; letter-spacing: -0.01em; }
+p { margin: 0 0 3mm; font-size: 11pt; line-height: 1.5; }
+.lead { font-size: 13pt; line-height: 1.5; color: var(--text-2); max-width: 200mm; }
+.escuro .lead { color: var(--on-2); }
+.pequeno { font-size: 9pt; color: var(--text-2); line-height: 1.45; }
+.escuro .pequeno { color: var(--on-muted); }
+strong { font-weight: 600; }
+
+/* Capa */
+.capa { background: var(--carvao); color: var(--bege); padding: 18mm 20mm; }
+.capa .marca { display: flex; align-items: center; gap: 4mm; }
+.capa .marca svg { width: 13mm; height: 13mm; }
+.capa .marca .wordmark { font-size: 26pt; }
+.capa .titulo { position: absolute; left: 20mm; top: 58mm; width: 150mm; }
+.capa h1 { font-size: 44pt; }
+.capa .lead { margin-top: 6mm; font-size: 14pt; max-width: 140mm; color: var(--on-2); }
+.capa .simbolo { position: absolute; right: 24mm; top: 56mm; width: 76mm; height: 76mm; }
+.capa .rodape { position: absolute; left: 20mm; right: 20mm; bottom: 16mm; display: flex; justify-content: space-between; align-items: flex-end; }
+.capa .slogan { font-size: 14pt; font-weight: 500; }
+.capa .hepta { margin-top: 1.5mm; font-size: 9.5pt; color: var(--on-muted); }
+.capa .versao { font-size: 8pt; color: var(--on-muted); text-align: right; max-width: 90mm; }
+
+/* Duas colunas: texto e captura */
+.dupla { display: grid; grid-template-columns: 88mm 1fr; gap: 10mm; align-items: center; height: 100%; padding-bottom: 4mm; }
+.dupla.invertida { grid-template-columns: 1fr 88mm; }
+.lista { list-style: none; margin: 4mm 0 0; padding: 0; }
+.lista li { position: relative; padding-left: 6mm; margin: 0 0 2.8mm; font-size: 11pt; line-height: 1.45; }
+.lista li::before { content: ''; position: absolute; left: 0; top: 1.9mm; width: 2.4mm; height: 2.4mm; border-radius: 0.7mm; background: var(--amarelo); }
+
+/* Moldura de navegador para as capturas de 1280 px */
+.janela { border-radius: 3mm; overflow: hidden; background: var(--surface); border: 1px solid var(--areia); box-shadow: 0 3mm 8mm rgba(17,17,17,0.10); }
+.janela .barra { height: 6mm; background: var(--carvao); display: flex; align-items: center; gap: 1.5mm; padding: 0 3mm; }
+.janela .barra i { width: 2mm; height: 2mm; border-radius: 50%; background: var(--grafite); }
+.janela .barra i:first-child { background: var(--amarelo); }
+.janela .barra span { margin-left: 3mm; font-size: 6.5pt; color: var(--on-muted); }
+.janela img { display: block; width: 100%; }
+
+/* Cartões */
+.grade { display: grid; gap: 5mm; }
+.g2 { grid-template-columns: 1fr 1fr; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+.cartao { background: var(--surface); border: 1px solid var(--areia); border-radius: 3.5mm; padding: 6mm; }
+.escuro .cartao { background: #1c1c1c; border-color: var(--grafite); }
+.cartao p { font-size: 10.5pt; line-height: 1.5; color: var(--text-2); margin: 0; }
+.escuro .cartao p { color: var(--on-2); }
+.cartao .icone { width: 9mm; height: 9mm; border-radius: 2.2mm; background: var(--amarelo); display: flex; align-items: center; justify-content: center; margin-bottom: 4mm; }
+.cartao .icone svg { width: 5mm; height: 5mm; stroke: var(--carvao); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.cartao .modulos { margin-top: 3mm; display: flex; flex-wrap: wrap; gap: 1.5mm; }
+.chip { display: inline-block; font-size: 8pt; font-weight: 600; padding: 0.6mm 2.2mm; border-radius: 999px; background: var(--sunken); color: var(--carvao); }
+.escuro .chip { background: var(--grafite); color: var(--bege); }
+.chip.amarelo { background: var(--amarelo); color: var(--carvao); }
+
+/* Fluxo da venda */
+.fluxo { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3mm; margin-top: 8mm; }
+.etapa { position: relative; background: var(--surface); border: 1px solid var(--areia); border-radius: 3mm; padding: 5mm 4.5mm; min-height: 84mm; }
+.etapa .n { width: 7mm; height: 7mm; border-radius: 50%; background: var(--carvao); color: var(--bege); font-size: 9pt; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 3mm; }
+.etapa h3 { font-size: 12.5pt; }
+.etapa p { font-size: 9.6pt; color: var(--text-2); margin: 0 0 2.5mm; line-height: 1.4; }
+.etapa .efeito { font-size: 8.6pt; line-height: 1.35; padding: 1.6mm 2mm; border-radius: 1.6mm; margin-top: 1.5mm; }
+.efeito.est { background: var(--sunken); }
+.efeito.fin { background: var(--warning-soft); color: var(--warning); }
+.etapa:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -3mm;
+  top: 9mm;
+  width: 3mm;
+  height: 0.6mm;
+  background: var(--amarelo);
+}
+.legenda { display: flex; gap: 6mm; margin-top: 6mm; font-size: 9.5pt; color: var(--text-2); align-items: center; }
+.legenda span { display: inline-flex; align-items: center; gap: 2mm; }
+.legenda b { width: 4mm; height: 2.6mm; border-radius: 0.8mm; display: inline-block; }
+
+/* Saldos de estoque */
+.saldo { margin-top: 5mm; }
+.saldo .trilho { display: flex; height: 9mm; border-radius: 2mm; overflow: hidden; }
+.saldo .disp { flex: 62; background: var(--amarelo); display: flex; align-items: center; padding-left: 3mm; font-size: 8.5pt; font-weight: 600; }
+.saldo .res { flex: 38; background: var(--carvao); color: var(--bege); display: flex; align-items: center; padding-left: 3mm; font-size: 8.5pt; font-weight: 600; }
+.saldo .fis { margin-top: 1.5mm; font-size: 8.5pt; color: var(--text-2); border-top: 0.5mm solid var(--carvao); padding-top: 1mm; }
+
+/* Celulares */
+.celulares { display: flex; gap: 7mm; justify-content: center; margin-top: 6mm; }
+.celular { width: 52mm; border-radius: 6mm; padding: 2mm; background: var(--carvao); box-shadow: 0 3mm 8mm rgba(17,17,17,0.16); }
+.celular img { display: block; width: 100%; height: 106.7mm; object-fit: cover; object-position: top; border-radius: 4.2mm; }
+.celular + figcaption { display: none; }
+.cel-legenda { text-align: center; margin-top: 2.5mm; font-size: 8.5pt; color: var(--text-2); }
+
+/* Planos */
+.plano { background: var(--surface); border: 1px solid var(--areia); border-radius: 4mm; padding: 7mm; }
+.plano.destaque { background: var(--carvao); color: var(--bege); border-color: var(--carvao); }
+.plano h3 { font-size: 17pt; margin-bottom: 1mm; }
+.plano .sub { font-size: 9.5pt; color: var(--text-2); margin-bottom: 5mm; }
+.plano.destaque .sub { color: var(--on-2); }
+.plano ul { list-style: none; margin: 0; padding: 0; }
+.plano li { font-size: 10pt; padding: 2mm 0; border-top: 1px solid var(--areia); display: flex; gap: 2.5mm; align-items: baseline; }
+.plano.destaque li { border-top-color: var(--grafite); }
+.plano li::before { content: '✓'; font-weight: 700; color: var(--success); }
+.plano.destaque li::before { color: var(--amarelo); }
+.plano li.nao { color: var(--text-2); }
+.plano li.nao::before { content: '–'; color: var(--text-2); }
+
+/* Estatísticas da capa de módulos */
+.numeros { display: flex; gap: 12mm; margin-top: 9mm; }
+.numeros div { border-left: 1mm solid var(--amarelo); padding-left: 4mm; }
+.numeros b { display: block; font-size: 26pt; font-weight: 600; letter-spacing: -0.03em; line-height: 1.05; }
+.numeros span { font-size: 9pt; color: var(--on-2); }
+</style>
+</head>
+<body>
+
+<!-- 1. Capa -->
+<section class="slide capa">
+  <div class="marca">
+    <svg viewBox="0 0 100 100" aria-hidden="true"><path fill="#F6F3ED" d="M14 4h14a14 14 0 0 1 14 14v40a4 4 0 0 0 4 4h40a14 14 0 0 1 14 14v6a14 14 0 0 1-14 14H14A14 14 0 0 1 0 82V18A14 14 0 0 1 14 4z"/><rect x="54" y="4" width="42" height="42" rx="10" fill="#F3B800"/></svg>
+    <span class="wordmark">lastro<span class="ponto"></span></span>
+  </div>
+  <div class="titulo">
+    <div class="rotulo">Apresentação do app</div>
+    <h1>Vendas, estoque e financeiro da distribuidora em um só lugar.</h1>
+    <p class="lead">Do pedido do vendedor ao dinheiro na conta, com cada etapa registrada e cada pessoa vendo só o que precisa.</p>
+  </div>
+  <svg class="simbolo" viewBox="0 0 100 100" aria-hidden="true"><path fill="#2A2A2A" d="M14 4h14a14 14 0 0 1 14 14v40a4 4 0 0 0 4 4h40a14 14 0 0 1 14 14v6a14 14 0 0 1-14 14H14A14 14 0 0 1 0 82V18A14 14 0 0 1 14 4z"/><rect x="54" y="4" width="42" height="42" rx="10" fill="#F3B800"/></svg>
+  <div class="rodape">
+    <div>
+      <div class="slogan">Uma base sólida para o seu negócio.</div>
+      <div class="hepta">by hepta</div>
+    </div>
+    <div class="versao">Versão beta · outubro de 2026. As telas mostradas usam dados fictícios de demonstração.</div>
+  </div>
+</section>
+
+<!-- 2. O que é -->
+<section class="slide centro escuro">
+  <div class="rotulo">O que é o Lastro</div>
+  <h2>Um sistema de vendas B2B feito para a rotina da distribuidora.</h2>
+  <p class="lead">Funciona no navegador do computador e do celular, com os mesmos dados. Cada empresa tem seu próprio espaço, sua equipe e seus cadastros.</p>
+  <div class="grade g4" style="margin-top: 9mm">
+    <div class="cartao">
+      <div class="icone"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2M9 12h6M9 16h4"/></svg></div>
+      <h3>Vender</h3>
+      <p>Pedidos em uma página, carteira de clientes por vendedor e registro de visitas.</p>
+      <div class="modulos"><span class="chip">Pedidos</span><span class="chip">Clientes</span><span class="chip">Visitas</span></div>
+    </div>
+    <div class="cartao">
+      <div class="icone"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg></div>
+      <h3>Controlar</h3>
+      <p>Cadastro de produtos e um estoque que separa o que está livre do que já foi vendido.</p>
+      <div class="modulos"><span class="chip">Produtos</span><span class="chip">Estoque</span></div>
+    </div>
+    <div class="cartao">
+      <div class="icone"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2s1.3 1.7 3 2 3 .9 3 2-1.3 2-3 2c-1.4 0-2.5-.5-3-1.5M12 6v2M12 16v2"/></svg></div>
+      <h3>Receber</h3>
+      <p>Parcelas geradas na confirmação, baixas, estornos, créditos e devoluções rastreáveis.</p>
+      <div class="modulos"><span class="chip">Financeiro</span><span class="chip">Devoluções</span></div>
+    </div>
+    <div class="cartao">
+      <div class="icone"><svg viewBox="0 0 24 24"><path d="M3 3v18h18M7 15l4-4 3 3 5-6"/></svg></div>
+      <h3>Acompanhar</h3>
+      <p>Painel do dia, relatórios em CSV e PDF e uma vitrine para orçamentos pelo WhatsApp.</p>
+      <div class="modulos"><span class="chip">Início</span><span class="chip">Relatórios</span><span class="chip">Catálogo</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. Para quem -->
+<section class="slide centro">
+  <div class="rotulo">Para quem</div>
+  <h2>Dois perfis, cada um com a tela do seu trabalho.</h2>
+  <div class="grade g2" style="margin-top: 7mm">
+    <div class="cartao">
+      <div class="icone"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <h3>Administrador</h3>
+      <p style="margin-bottom: 4mm">Gerencia a empresa inteira.</p>
+      <ul class="lista">
+        <li>Vê pedidos e clientes de toda a equipe e define a carteira de cada vendedor.</li>
+        <li>Cadastra produtos, preços, estoque, condições e formas de pagamento.</li>
+        <li>Registra pagamentos, estornos, reembolsos, devoluções e cancelamentos.</li>
+        <li>Convida pessoas e ajusta as permissões de cada vendedor.</li>
+      </ul>
+    </div>
+    <div class="cartao">
+      <div class="icone"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg></div>
+      <h3>Vendedor</h3>
+      <p style="margin-bottom: 4mm">Atende a própria carteira, no escritório ou na rua.</p>
+      <ul class="lista">
+        <li>Cadastra os próprios clientes e lança, confirma e expede os próprios pedidos.</li>
+        <li>Consulta o disponível em estoque antes de prometer ao cliente.</li>
+        <li>Registra visitas e vê quem está perto de comprar de novo.</li>
+        <li>Não acessa o financeiro nem dados de outros vendedores.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="pequeno" style="margin-top: 6mm">As permissões são conferidas pelo servidor em cada operação, não apenas escondidas na tela.</p>
+</section>
+
+<!-- 4. Jornada da venda -->
+<section class="slide centro">
+  <div class="rotulo">A jornada da venda</div>
+  <h2>Cada passo tem um efeito claro no estoque e no financeiro.</h2>
+  <div class="fluxo">
+    <div class="etapa"><div class="n">1</div><h3>Cliente</h3><p>Cadastro com CEP automático, na carteira do vendedor.</p></div>
+    <div class="etapa"><div class="n">2</div><h3>Rascunho</h3><p>Produtos, preços e pagamento em uma página. Pode ser editado à vontade.</p><div class="efeito est">Estoque não muda</div></div>
+    <div class="etapa"><div class="n">3</div><h3>Confirmação</h3><p>O pedido vira compromisso e não pode mais ser editado.</p><div class="efeito est">Itens reservados</div><div class="efeito fin">Parcelas a receber geradas</div></div>
+    <div class="etapa"><div class="n">4</div><h3>Saída</h3><p>Os produtos saem para entrega, com pedido comercial e romaneio em PDF.</p><div class="efeito est">Sai do estoque físico</div></div>
+    <div class="etapa"><div class="n">5</div><h3>Entrega</h3><p>Registro de quem recebeu e quando. Entra no histórico do cliente.</p></div>
+    <div class="etapa"><div class="n">6</div><h3>Recebimento</h3><p>Baixa total ou parcial de cada parcela, com forma e data.</p><div class="efeito fin">Saldo da parcela atualizado</div></div>
+  </div>
+  <div class="legenda">
+    <span><b style="background: var(--sunken)"></b>Efeito no estoque</span>
+    <span><b style="background: var(--warning-soft)"></b>Efeito no financeiro</span>
+    <span>Se o cliente devolver, a devolução faz o caminho de volta: recebimento físico e acerto financeiro.</span>
+  </div>
+</section>
+
+<!-- 5. Início -->
+<section class="slide">
+  <div class="dupla">
+    <div>
+      <div class="rotulo">Início</div>
+      <h2>O que precisa de atenção, assim que você entra.</h2>
+      <ul class="lista">
+        <li>Rascunhos a confirmar e pedidos aguardando saída.</li>
+        <li>Valores a receber e parcelas vencidas, para quem cuida do financeiro.</li>
+        <li>Produtos abaixo do estoque mínimo e próximos vencimentos.</li>
+        <li>Botão <strong>Novo pedido</strong> sempre à mão.</li>
+      </ul>
+    </div>
+    <div class="janela"><div class="barra"><i></i><i></i><i></i><span>Início</span></div><img src="{{img:admin-dashboard-1280.png}}" alt="Tela Início do administrador"></div>
+  </div>
+</section>
+
+<!-- 6. Pedidos -->
+<section class="slide">
+  <div class="dupla">
+    <div>
+      <div class="rotulo">Pedidos</div>
+      <h2>Um pedido completo em uma única tela.</h2>
+      <ul class="lista">
+        <li>Busca de cliente e produto pelo início do nome, com o disponível ao lado de cada item.</li>
+        <li>Condição cadastrada, vencimentos manuais ou "definir depois".</li>
+        <li>Confirmação que reserva o estoque e gera as parcelas, sem retrabalho.</li>
+        <li>Pedido comercial e romaneio em PDF, prontos para o WhatsApp.</li>
+        <li>Desconto aprovado pelo administrador e cancelamento com motivo.</li>
+      </ul>
+    </div>
+    <div class="janela"><div class="barra"><i></i><i></i><i></i><span>Novo pedido</span></div><img src="{{img:admin-pedido-novo-1280.png}}" alt="Tela de novo pedido"></div>
+  </div>
+</section>
+
+<!-- 7. Clientes -->
+<section class="slide">
+  <div class="dupla">
+    <div>
+      <div class="rotulo">Clientes</div>
+      <h2>Carteiras organizadas por vendedor.</h2>
+      <ul class="lista">
+        <li>Cadastro com CPF ou CNPJ conferido e endereço preenchido pelo CEP.</li>
+        <li>Cada vendedor vê só os clientes da própria carteira.</li>
+        <li>Transferência de carteira em dois cliques, sem perder o histórico.</li>
+        <li>Desativar em vez de apagar: pedidos e histórico ficam guardados.</li>
+      </ul>
+    </div>
+    <div class="janela"><div class="barra"><i></i><i></i><i></i><span>Clientes</span></div><img src="{{img:admin-clientes-1280.png}}" alt="Lista de clientes"></div>
+  </div>
+</section>
+
+<!-- 8. Visitas -->
+<section class="slide">
+  <div class="dupla">
+    <div>
+      <div class="rotulo">Visitas e recompra</div>
+      <h2>Saiba quem visitar antes que o cliente compre de outro.</h2>
+      <ul class="lista">
+        <li>Registro de visitas presenciais e contatos remotos, com ou sem pedido.</li>
+        <li>Entregas confirmadas entram sozinhas no histórico do cliente.</li>
+        <li>Estimativa de recompra pela frequência real de compras do último ano.</li>
+        <li>Filtro de clientes com estimativa vencida para a rotina da semana.</li>
+      </ul>
+    </div>
+    <div class="janela"><div class="barra"><i></i><i></i><i></i><span>Recompra</span></div><img src="{{img:admin-recompra-1280.png}}" alt="Tela de recompra"></div>
+  </div>
+</section>
+
+<!-- 9. Produtos -->
+<section class="slide">
+  <div class="dupla">
+    <div>
+      <div class="rotulo">Produtos</div>
+      <h2>Catálogo de produtos simples de manter.</h2>
+      <ul class="lista">
+        <li>SKU único, unidade (UN, CX, PCT, KG, L) e preço de tabela.</li>
+        <li>Mudança de preço vale para os próximos pedidos; os antigos mantêm o preço deles.</li>
+        <li>Foto do produto (JPEG, PNG ou WebP), categoria e estoque mínimo para reposição.</li>
+        <li>Escolha produto a produto o que aparece na vitrine pública.</li>
+      </ul>
+    </div>
+    <div class="janela"><div class="barra"><i></i><i></i><i></i><span>Produtos</span></div><img src="{{img:admin-produtos-1280.png}}" alt="Lista de produtos"></div>
+  </div>
+</section>
+
+<!-- 10. Estoque -->
+<section class="slide">
+  <div class="dupla">
+    <div>
+      <div class="rotulo">Estoque</div>
+      <h2>O disponível de verdade, sem vender o que já foi vendido.</h2>
+      <div class="saldo">
+        <div class="trilho"><div class="disp">Disponível</div><div class="res">Reservado</div></div>
+        <div class="fis"><strong>Físico</strong> = disponível + reservado para pedidos confirmados</div>
+      </div>
+      <ul class="lista">
+        <li>Entradas e ajustes sempre com motivo, em um histórico que não se apaga.</li>
+        <li>Reserva, saída e devolução movimentam o estoque sozinhas.</li>
+        <li>Lista de reposição com o que falta para o mínimo.</li>
+      </ul>
+    </div>
+    <div class="janela"><div class="barra"><i></i><i></i><i></i><span>Estoque</span></div><img src="{{img:admin-estoque-1280.png}}" alt="Saldos de estoque"></div>
+  </div>
+</section>
+
+<!-- 11. Financeiro -->
+<section class="slide">
+  <div class="dupla">
+    <div>
+      <div class="rotulo">Financeiro</div>
+      <h2>Contas a receber que fecham com os pedidos.</h2>
+      <ul class="lista">
+        <li>Parcelas nascem da confirmação do pedido, com vencimentos da condição escolhida.</li>
+        <li>Baixa total ou parcial, com forma, data e comprovante.</li>
+        <li>Estorno no lugar de exclusão: o erro fica corrigido e documentado.</li>
+        <li>Vencimento corrigido na própria parcela, com motivo e histórico, sem refazer o pedido.</li>
+        <li>Crédito do cliente e reembolso a fazer, gerados por cancelamento ou devolução.</li>
+      </ul>
+      <p class="pequeno" style="margin-top: 4mm">O Lastro registra o que aconteceu no banco; ele não faz Pix nem transferências.</p>
+    </div>
+    <div class="janela"><div class="barra"><i></i><i></i><i></i><span>Contas a receber</span></div><img src="{{img:admin-financeiro-receber-1280.png}}" alt="Contas a receber"></div>
+  </div>
+</section>
+
+<!-- 12. Devoluções -->
+<section class="slide centro">
+  <div class="rotulo">Devoluções</div>
+  <h2>Devolução em três etapas, cada uma com seu efeito.</h2>
+  <div class="grade g3" style="margin-top: 8mm">
+    <div class="cartao">
+      <div class="icone"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h11a5 5 0 0 1 0 10h-3"/></svg></div>
+      <h3>1. Registrar</h3>
+      <p>O administrador informa no pedido o que o cliente vai devolver e o motivo.</p>
+      <div class="modulos"><span class="chip">Estoque não muda</span><span class="chip">Financeiro não muda</span></div>
+    </div>
+    <div class="cartao">
+      <div class="icone"><svg viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8"/></svg></div>
+      <h3>2. Receber</h3>
+      <p>Na chegada, separa o que volta para venda do que veio danificado. Pode ser em partes.</p>
+      <div class="modulos"><span class="chip amarelo">Vendáveis voltam ao estoque</span></div>
+    </div>
+    <div class="cartao">
+      <div class="icone"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg></div>
+      <h3>3. Acertar</h3>
+      <p>O Lastro abate as parcelas em aberto e transforma o que já foi pago em crédito ou reembolso.</p>
+      <div class="modulos"><span class="chip amarelo">Crédito ou reembolso</span></div>
+    </div>
+  </div>
+  <p class="pequeno" style="margin-top: 7mm">Itens danificados têm decisão própria: abater o valor integral, parte dele ou nenhum. Tudo fica no histórico da devolução.</p>
+</section>
+
+<!-- 13. Relatórios -->
+<section class="slide">
+  <div class="dupla">
+    <div>
+      <div class="rotulo">Relatórios</div>
+      <h2>Números da empresa com dois cliques.</h2>
+      <ul class="lista">
+        <li>14 relatórios de vendas, financeiro e estoque.</li>
+        <li>Filtros por período, cliente, produto e vendedor.</li>
+        <li>Download em CSV para planilha ou PDF para enviar.</li>
+        <li>Vendedor vê só a própria carteira, quando o administrador libera.</li>
+      </ul>
+    </div>
+    <div class="janela"><div class="barra"><i></i><i></i><i></i><span>Relatórios</span></div><img src="{{img:admin-relatorios-1280.png}}" alt="Relatórios"></div>
+  </div>
+</section>
+
+<!-- 14. Catálogo público -->
+<section class="slide">
+  <div class="dupla">
+    <div>
+      <div class="rotulo">Catálogo público</div>
+      <h2>Uma vitrine que vira orçamento no WhatsApp.</h2>
+      <ul class="lista">
+        <li>Link próprio da distribuidora, aberto sem login, com o logotipo da empresa.</li>
+        <li>O cliente escolhe produtos e quantidades e envia o orçamento pronto.</li>
+        <li>Preços visíveis ou "sob consulta", conforme a empresa preferir.</li>
+        <li>Não cria pedido nem reserva estoque: você fecha a venda no Lastro.</li>
+      </ul>
+    </div>
+    <div class="janela"><div class="barra"><i></i><i></i><i></i><span>Vitrine do cliente</span></div><img src="{{img:public-catalogo-1280.png}}" alt="Catálogo público visto pelo cliente"></div>
+  </div>
+</section>
+
+<!-- 15. Celular -->
+<section class="slide centro">
+  <div class="rotulo">No celular</div>
+  <h2>O vendedor leva o Lastro no bolso.</h2>
+  <p class="lead">Mesmos dados do computador, com barra inferior e botão de novo pedido no centro.</p>
+  <div class="celulares">
+    <div><div class="celular"><img src="{{img:seller-dashboard-390.png}}" alt="Início no celular"></div><div class="cel-legenda">Início</div></div>
+    <div><div class="celular"><img src="{{img:seller-pedidos-390.png}}" alt="Pedidos no celular"></div><div class="cel-legenda">Pedidos</div></div>
+    <div><div class="celular"><img src="{{img:seller-pedido-detalhe-390.png}}" alt="Pedido no celular"></div><div class="cel-legenda">Ficha do pedido</div></div>
+    <div><div class="celular"><img src="{{img:seller-estoque-390.png}}" alt="Estoque no celular"></div><div class="cel-legenda">Disponível em estoque</div></div>
+  </div>
+</section>
+
+<!-- 16. Planos -->
+<section class="slide centro">
+  <div class="rotulo">Planos</div>
+  <h2>Comece enxuto e cresça com a equipe.</h2>
+  <div class="grade g2" style="margin-top: 7mm">
+    <div class="plano">
+      <h3>Essencial</h3>
+      <div class="sub">Para quem vende e administra sozinho · 1 usuário</div>
+      <ul>
+        <li>Pedidos, clientes, produtos e estoque</li>
+        <li>Financeiro, devoluções e documentos em PDF com o nome da empresa</li>
+        <li>Relatórios em tela, CSV e PDF</li>
+        <li class="nao">Convite de outros usuários</li>
+        <li class="nao">Vendedores, carteiras, visitas e catálogo público</li>
+        <li class="nao">Logotipo da empresa e fotos dos produtos nos PDFs</li>
+      </ul>
+    </div>
+    <div class="plano destaque">
+      <h3>Profissional</h3>
+      <div class="sub">Para administrador e equipe comercial · 2 usuários</div>
+      <ul>
+        <li>Tudo do Essencial</li>
+        <li>Convite de usuários adicionais</li>
+        <li>Perfil Vendedor com carteira de clientes e permissões por pessoa</li>
+        <li>Visitas e estimativa de recompra</li>
+        <li>Catálogo público com orçamento pelo WhatsApp</li>
+        <li>Logotipo da empresa nos PDFs e no catálogo, com fotos dos produtos no pedido e no romaneio</li>
+      </ul>
+    </div>
+  </div>
+  <p class="pequeno" style="margin-top: 5mm">Valores e condições de contratação: fale com a Hepta. O acesso de suporte do Lastro não ocupa vaga do plano.</p>
+</section>
+
+<!-- 17. Confiabilidade -->
+<section class="slide centro escuro">
+  <div class="rotulo">Confiável por desenho</div>
+  <h2>Regras que protegem o seu dinheiro e o seu estoque.</h2>
+  <div class="grade g3" style="margin-top: 7mm">
+    <div class="cartao"><h3>Nada some</h3><p>Clientes e produtos são desativados, pagamentos são estornados. O histórico fica.</p></div>
+    <div class="cartao"><h3>Histórico de tudo</h3><p>Cada movimentação de estoque e operação financeira guarda quem fez, quando e por quê.</p></div>
+    <div class="cartao"><h3>Sem lançamento em dobro</h3><p>Se a internet cair ao confirmar, expedir, receber ou movimentar estoque, repetir é seguro: o servidor não duplica.</p></div>
+    <div class="cartao"><h3>Permissão no servidor</h3><p>O vendedor não abre dados de outra carteira nem por link direto.</p></div>
+    <div class="cartao"><h3>Senha nas operações sensíveis</h3><p>Estornos, reembolsos e cancelamentos financeiros pedem confirmação de senha.</p></div>
+    <div class="cartao"><h3>Cada empresa no seu espaço</h3><p>Usuários, cadastros e números de uma empresa não se misturam com os de outra.</p></div>
+  </div>
+</section>
+
+<!-- 18. Encerramento -->
+<section class="slide escuro">
+  <div class="dupla" style="grid-template-columns: 1fr 100mm">
+    <div>
+      <div class="rotulo">Próximos passos</div>
+      <h2 style="font-size: 30pt">Comece pelo convite e pelo primeiro pedido.</h2>
+      <p class="lead">Cada módulo tem um manual do usuário em PDF, com passo a passo, avisos e o que cada perfil pode fazer.</p>
+      <div class="numeros">
+        <div><b>11</b><span>manuais por módulo</span></div>
+        <div><b>2</b><span>perfis de acesso</span></div>
+        <div><b>14</b><span>relatórios</span></div>
+      </div>
+    </div>
+    <div class="cartao">
+      <h3 style="margin-bottom: 3mm">Manuais disponíveis</h3>
+      <div class="modulos">
+        <span class="chip amarelo">Primeiros passos</span>
+        <span class="chip">Pedidos</span><span class="chip">Financeiro</span><span class="chip">Clientes</span>
+        <span class="chip">Visitas e recompra</span><span class="chip">Produtos</span><span class="chip">Estoque</span>
+        <span class="chip">Devoluções</span><span class="chip">Relatórios</span>
+        <span class="chip">Usuários e permissões</span><span class="chip">Catálogo público</span>
+      </div>
+      <p style="margin-top: 7mm; font-size: 14pt; font-weight: 500; color: var(--bege)">Uma base sólida para o seu negócio.</p>
+      <p style="margin-top: 1mm">by hepta</p>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

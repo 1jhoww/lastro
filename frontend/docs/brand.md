@@ -50,7 +50,7 @@ Pendências para a Hepta:
 2. Ícone do app em 1024×1024 e camadas do ícone adaptativo do Android (frente, fundo, monocromático).
 3. Splash: símbolo isolado em PNG com transparência.
 
-Até lá, `assets/` mantém os ícones padrão do template Expo; `app.json` já usa as cores da marca.
+Até lá, os ícones do app nativo em `assets/` (ícone, ícone adaptativo e splash) continuam os do template Expo; `app.json` já usa as cores da marca. Na versão web, o favicon (`public/favicon.svg` e `public/favicon.ico`), o `apple-touch-icon` e `assets/favicon.png` usam o símbolo de [`src/brand/Symbol.tsx`](../src/brand/Symbol.tsx), gerados por [`scripts/generate-web-icons.cjs`](../scripts/generate-web-icons.cjs); o modelo `public/index.html` declara esses ícones com `?v=` para renovar o cache do navegador.
 
 ## Como a marca aparece na interface
 
