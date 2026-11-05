@@ -386,6 +386,25 @@ describe('clientes: detalhe e edição', () => {
     expect(await screen.findByText('Cadastro não encontrado')).toBeTruthy();
   });
 
+  it('sem vendedores no plano, carteira e transferência não aparecem', async () => {
+    const { gateway, server } = world('administrator');
+    const base = membership('t1', 'administrator');
+    server
+      .on('GET', '/api/v1/me', () =>
+        ok({
+          uid: 'u1',
+          email: 'ana@lastro.test',
+          platformAdmin: false,
+          memberships: [{ ...base, plan: { ...base.plan, features: [] } }],
+        }),
+      )
+      .on('GET', '/api/v1/customers/c1', () => ok(customer('c1', { assignedTo: 'seller2' })));
+    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/clientes/c1', overrides });
+    await screen.findByRole('header', { name: 'Cliente c1' });
+    expect(screen.queryByText('Carteira')).toBeNull();
+    expect(screen.queryByText('Transferir para')).toBeNull();
+  });
+
   it('vendedor não vê desativar nem transferência de carteira', async () => {
     const { gateway, server } = world('seller');
     server.on('GET', '/api/v1/customers/c1', () => ok(customer('c1', { assignedTo: 'u1' })));

@@ -39,8 +39,10 @@ export default function CustomerDetail() {
 }
 
 function CustomerView({ customer: c }: { customer: Customer }) {
-  const { permissions } = useSession();
+  const { permissions, membership } = useSession();
   const admin = permissions.includes('customers:all:manage');
+  // Carteira só existe no plano com vendedores; os responsáveis gravados ficam preservados.
+  const portfolios = membership?.plan.features.includes('commercial.sellers') ?? false;
   // Recurso do plano: só existe quando o servidor emite a permissão.
   const relationship = permissions.includes('visits:own:manage');
   const compact = useLayoutSize() === 'compact';
@@ -129,9 +131,11 @@ function CustomerView({ customer: c }: { customer: Customer }) {
         side={
           <>
             {relationship ? <CustomerPurchasePanel customerId={c.id} /> : null}
-            <Panel title="Carteira">
-              {admin ? <Assignment customer={c} /> : <Text variant="body">Na sua carteira.</Text>}
-            </Panel>
+            {portfolios ? (
+              <Panel title="Carteira">
+                {admin ? <Assignment customer={c} /> : <Text variant="body">Na sua carteira.</Text>}
+              </Panel>
+            ) : null}
             <Panel title="Registro">
               <View style={styles.facts}>
                 <Fact

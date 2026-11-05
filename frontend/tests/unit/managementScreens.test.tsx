@@ -1,6 +1,8 @@
 import { fireEvent, screen, waitFor } from 'expo-router/testing-library';
 import PurchasesRoute from '@/app/(app)/compras/index';
 import PurchaseRoute from '@/app/(app)/compras/[id]/index';
+import SupplierCreditRoute from '@/app/(app)/financeiro/creditos-fornecedor/[id]';
+import SupplierCreditsRoute from '@/app/(app)/financeiro/creditos-fornecedor/index';
 import PayableRoute from '@/app/(app)/financeiro/pagar/[id]';
 import PayablesRoute from '@/app/(app)/financeiro/pagar/index';
 import ManagementRoute from '@/app/(app)/financeiro/gestao';
@@ -36,6 +38,10 @@ const gestaoPermissions = [
   'payables:manage',
   'payables:pay',
   'payables:reverse',
+  'supplier-credits:read',
+  'recurring:read',
+  'recurring:manage',
+  'financial-dashboard:read',
   'financial-reports:read',
 ];
 function world(permissions: string[] = gestaoPermissions) {
@@ -66,6 +72,8 @@ function world(permissions: string[] = gestaoPermissions) {
   return { gateway, server };
 }
 const overrides = {
+  '(app)/financeiro/creditos-fornecedor/index': SupplierCreditsRoute,
+  '(app)/financeiro/creditos-fornecedor/[id]': SupplierCreditRoute,
   '(app)/compras/index': PurchasesRoute,
   '(app)/compras/[id]/index': PurchaseRoute,
   '(app)/financeiro/pagar/index': PayablesRoute,
@@ -188,6 +196,11 @@ describe('navegação do Gestão', () => {
     expect(keys(['receivables:read', 'payables:read'])).toEqual(['financeiro']);
     expect(keys(['payables:read'])).toEqual(['contas-pagar']);
   });
+  it('quem só tem o histórico de créditos chega a ele, sem atalho repetido', () => {
+    expect(keys(['supplier-credits:read'])).toEqual(['creditos-fornecedor']);
+    expect(keys(['payables:read', 'supplier-credits:read'])).toEqual(['contas-pagar']);
+    expect(keys(['receivables:read', 'supplier-credits:read'])).toEqual(['financeiro']);
+  });
 });
 
 describe('entrada avulsa', () => {
@@ -228,6 +241,57 @@ describe('cadastro de cliente e fornecedor', () => {
 });
 
 describe('telas do Gestão', () => {
+  describe('créditos de fornecedores sem compras no plano', () => {
+    const creditView = {
+      id: 'c1',
+      supplierId: 'f1',
+      supplierName: 'Distribuidora Exemplo',
+      purchaseId: 'p1',
+      purchaseCode: 'C-41',
+      closureId: 'e1',
+      kind: 'credit',
+      originalCents: 12000,
+      appliedCents: 0,
+      recoveredCents: 0,
+      balanceCents: 12000,
+      hasBalance: true,
+      status: 'open',
+      issuedOn: '2026-10-01',
+      version: 1,
+      createdAt: '2026-10-01T12:00:00.000Z',
+      updatedAt: '2026-10-01T12:00:00.000Z',
+      createdBy: 'u1',
+      updatedBy: 'u1',
+    };
+    it('mostra o crédito só para consulta, sem ações nem link para compras', async () => {
+      const { gateway, server } = world(['tenant:read', 'supplier-credits:read']);
+      server
+        .on('GET', '/api/v1/supplier-credits/c1', () => ok(creditView))
+        .on('GET', '/api/v1/supplier-credits/c1/movements', () => ok({ items: [] }));
+      await renderApp({
+        gateway,
+        fetch: server.fetch,
+        initialUrl: '/financeiro/creditos-fornecedor/c1',
+        overrides,
+      });
+      expect(await screen.findByText('Saldo')).toBeTruthy();
+      expect(screen.queryByRole('button', { name: 'Usar em um título' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Registrar devolução' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Ver a compra' })).toBeNull();
+    });
+    it('sem a permissão, a rota nega o acesso sem consultar o servidor', async () => {
+      const { gateway, server } = world(['tenant:read', 'payables:read']);
+      await renderApp({
+        gateway,
+        fetch: server.fetch,
+        initialUrl: '/financeiro/creditos-fornecedor',
+        overrides,
+      });
+      expect(await screen.findByText('Você não tem acesso a esta área')).toBeTruthy();
+      expect(server.calls.some((c) => c.path.includes('supplier-credits'))).toBe(false);
+    });
+  });
+
   it('sem permissão, compras nem consulta o servidor', async () => {
     const { gateway, server } = world(['tenant:read']);
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/compras', overrides });
@@ -292,8 +356,7 @@ describe('telas do Gestão', () => {
     titles: [],
     ...extra,
   });
-  const partial = () =>
-    purchase({ status: 'partially_received', closure: null, canceledAt: null });
+  const partial = () => purchase({ status: 'partially_received', closure: null, canceledAt: null });
   const closing = (server: ReturnType<typeof world>['server']) =>
     server
       .on('GET', '/api/v1/purchases/p1', () => ok(partial()))

@@ -125,7 +125,7 @@ export function PermissionsDialog({
         A carteira de clientes continua valendo: o vendedor só vê os próprios clientes e pedidos.
         Operações administrativas são exclusivas de administradores.
       </Text>
-      {byModule(matrix).map(([module, operations]) => (
+      {byModule(matrix.filter((o) => o.inPlan)).map(([module, operations]) => (
         <View key={module} style={styles.module}>
           <Text variant="smallStrong">{module}</Text>
           {operations.map((operation) => {
@@ -135,9 +135,7 @@ export function PermissionsDialog({
                 ? 'Sempre incluída'
                 : operation.seller === 'never'
                   ? 'Somente administradores'
-                  : !operation.inPlan
-                    ? 'Fora do plano contratado'
-                    : null;
+                  : null;
             return (
               <View key={operation.id} style={styles.operation}>
                 <View style={styles.flex}>

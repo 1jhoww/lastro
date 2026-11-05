@@ -3,7 +3,7 @@ import { SupplierCreditsScreen } from '@/features/management/SupplierCredits';
 
 export default function Route() {
   return (
-    <ManagementAccess permission="payables:read" title="Créditos de fornecedores">
+    <ManagementAccess permission="supplier-credits:read" title="Créditos de fornecedores">
       <SupplierCreditsScreen />
     </ManagementAccess>
   );

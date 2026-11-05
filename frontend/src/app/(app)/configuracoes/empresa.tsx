@@ -15,13 +15,13 @@ import { imageFailure, pickImageFile, type PickedImage } from '@/lib/imageFiles'
 import { useSession } from '@/session/SessionContext';
 import { color, radius, space, useLayoutSize } from '@/theme';
 import { Alert, Button, ConfirmDialog, Panel, Skeleton, Text, TextField, useToast } from '@/ui';
-import { Building, ImagePlus, Lock } from '@/ui/icons';
+import { Building, ImagePlus } from '@/ui/icons';
 
 /**
  * Dados da empresa ativa. Quem tem `tenant:update` (administrador) altera o nome; enviar o
  * logotipo exige `branding:manage`, que o servidor só concede quando o plano inclui identidade
- * visual (Profissional). O logotipo aparece nos PDFs e no catálogo ao lado da identidade do
- * Lastro, que continua sempre presente. Sem o recurso, um logotipo já guardado é mantido.
+ * visual. O logotipo aparece nos PDFs e no catálogo ao lado da identidade do Lastro, que continua
+ * sempre presente. Sem o recurso a área não aparece, e um logotipo já guardado fica preservado.
  */
 export default function CompanySettings() {
   const tenant = useTenant();
@@ -36,7 +36,11 @@ export default function CompanySettings() {
     <Screen
       title="Empresa"
       description={
-        canEdit ? 'Nome e logotipo usados nos documentos e no catálogo.' : 'Dados da empresa.'
+        canEdit
+          ? branding.included
+            ? 'Nome e logotipo usados nos documentos e no catálogo.'
+            : 'Nome usado nos documentos.'
+          : 'Dados da empresa.'
       }
     >
       {tenant.isError ? (
@@ -97,7 +101,7 @@ function Identity({
   const wide = useLayoutSize() !== 'compact';
   return (
     <View style={[styles.identity, wide && styles.identityWide]}>
-      <LogoEditor tenant={tenant} branding={branding} showPlanNote={canEdit} />
+      {branding.included ? <LogoEditor tenant={tenant} branding={branding} /> : null}
       <View style={styles.nameColumn}>
         {canEdit ? (
           // A new saved name (here, in another tab or by another person) restarts the field.
@@ -178,11 +182,9 @@ function NameEditor({ tenant }: { tenant: Tenant }) {
 function LogoEditor({
   tenant,
   branding,
-  showPlanNote,
 }: {
   tenant: Tenant;
   branding: Branding;
-  showPlanNote: boolean;
 }) {
   const logo = useCompanyLogo(tenant);
   const upload = useUploadCompanyLogo();
@@ -298,16 +300,6 @@ function LogoEditor({
           JPEG, PNG ou WebP, até 5 MB. PNG com fundo transparente fica melhor nos documentos.
         </Text>
       ) : null}
-      {showPlanNote && !branding.included ? (
-        <View style={styles.planNote}>
-          <Lock size={14} color={color.textSecondary} strokeWidth={1.75} />
-          <Text variant="caption" color={color.textSecondary} style={styles.planNoteText}>
-            {has
-              ? 'Logotipo guardado. Ele volta aos pedidos, romaneios e ao catálogo no plano Profissional.'
-              : 'Logotipo nos pedidos, romaneios e no catálogo: disponível no plano Profissional.'}
-          </Text>
-        </View>
-      ) : null}
       <ConfirmDialog
         visible={confirmRemove}
         title="Remover logotipo?"
@@ -368,6 +360,4 @@ const styles = StyleSheet.create({
   nameColumn: { flex: 1, minWidth: 0, alignSelf: 'stretch' },
   nameEditor: { gap: space[3] },
   row: { flexDirection: 'row', flexWrap: 'wrap', gap: space[2] },
-  planNote: { flexDirection: 'row', alignItems: 'flex-start', gap: space[2] },
-  planNoteText: { flex: 1 },
 });

@@ -37,7 +37,7 @@ function essencial(withLogo = false) {
 }
 
 describe('Plano Essencial: identidade visual', () => {
-  it('sem botão de envio, com indicação discreta do Profissional; nome continua editável', async () => {
+  it('sem o recurso, a área de logotipo não aparece; nome continua editável', async () => {
     const { gateway, server } = essencial();
     await renderApp({
       gateway,
@@ -47,13 +47,10 @@ describe('Plano Essencial: identidade visual', () => {
     });
     expect(await screen.findByLabelText('Nome da empresa')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Adicionar logotipo' })).toBeNull();
-    expect(
-      screen.getByText(
-        'Logotipo nos pedidos, romaneios e no catálogo: disponível no plano Profissional.',
-      ),
-    ).toBeTruthy();
+    expect(screen.queryByText('Logotipo')).toBeNull();
+    expect(screen.queryByText(/plano Profissional/)).toBeNull();
   });
-  it('logotipo guardado após downgrade: mantido, removível, sem substituição', async () => {
+  it('logotipo guardado após downgrade não aparece nem é oferecido', async () => {
     const { gateway, server } = essencial(true);
     await renderApp({
       gateway,
@@ -61,23 +58,17 @@ describe('Plano Essencial: identidade visual', () => {
       initialUrl: '/configuracoes/empresa',
       overrides,
     });
-    expect(
-      await screen.findByText(
-        'Logotipo guardado. Ele volta aos pedidos, romaneios e ao catálogo no plano Profissional.',
-      ),
-    ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Remover' })).toBeTruthy();
+    expect(await screen.findByLabelText('Nome da empresa')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Remover' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Substituir' })).toBeNull();
+    expect(screen.queryByText(/plano Profissional/)).toBeNull();
   });
-  it('configurações indicam o catálogo como recurso do Profissional, sem link', async () => {
+  it('configurações não mostram o catálogo fora do plano', async () => {
     const { gateway, server } = essencial();
     await renderApp({ gateway, fetch: server.fetch, initialUrl: '/configuracoes', overrides });
-    expect(
-      await screen.findByText(
-        'Vitrine com sua marca e orçamento por WhatsApp. Disponível no plano Profissional.',
-      ),
-    ).toBeTruthy();
-    expect(screen.queryByRole('link', { name: /Catálogo público/ })).toBeNull();
+    expect(await screen.findByText('Nome e fuso horário da empresa.')).toBeTruthy();
+    expect(screen.queryByText('Catálogo público')).toBeNull();
+    expect(screen.getByText('Usuários')).toBeTruthy();
   });
 });
 

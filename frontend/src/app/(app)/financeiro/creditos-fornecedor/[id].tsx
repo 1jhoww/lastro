@@ -5,7 +5,7 @@ import { SupplierCreditDetail } from '@/features/management/SupplierCredits';
 export default function Route() {
   const { id } = useLocalSearchParams<{ id: string }>();
   return (
-    <ManagementAccess permission="payables:read" title="Crédito de fornecedor">
+    <ManagementAccess permission="supplier-credits:read" title="Crédito de fornecedor">
       <SupplierCreditDetail id={id} />
     </ManagementAccess>
   );

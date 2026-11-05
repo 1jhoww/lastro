@@ -55,7 +55,7 @@ export function RecurringScreen() {
   const { permissions } = useSession();
   const compact = useLayoutSize() === 'compact';
   const toast = useToast();
-  const manage = permissions.includes('payables:manage');
+  const manage = permissions.includes('recurring:manage');
   const { query, items } = useRecurringExpenses();
   const command = useRecurringCommand();
   const generate = useGenerateRecurring();

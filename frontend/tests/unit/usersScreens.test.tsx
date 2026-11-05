@@ -212,14 +212,20 @@ describe('usuários', () => {
     });
     expect(await screen.findByText('Plano Essencial')).toBeTruthy();
     expect(screen.getByText('Sem vagas livres')).toBeTruthy();
-    expect(screen.getByText('Convites adicionais não fazem parte do seu plano')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Convidar usuário' })).toBeNull();
+    expect(screen.queryByText(/Profissional/)).toBeNull();
+    expect(screen.queryByText(/Convites adicionais/)).toBeNull();
+    expect(
+      screen.getByText(
+        'Recursos do plano: Clientes e pedidos, Produtos e estoque, Contas a receber, Relatórios comerciais, Empresa e equipe.',
+      ),
+    ).toBeTruthy();
     // Reativar exigiria vaga: a tela explica antes de o servidor recusar.
     await fireEvent.press(screen.getByRole('button', { name: 'Editar Davi Admin' }));
     expect(await screen.findByText('Sem vaga para reativar')).toBeTruthy();
     expect(screen.getByLabelText('Acesso ativo').props.disabled).toBe(true);
     expect(screen.queryByRole('radio', { name: 'Vendedor' })).toBeNull();
-    expect(screen.getByText('O perfil Vendedor faz parte do plano Profissional.')).toBeTruthy();
+    expect(screen.queryByText(/Profissional/)).toBeNull();
   });
 
   it('Profissional sem vagas livres orienta a liberar uma vaga', async () => {
@@ -312,6 +318,15 @@ describe('matriz de permissões', () => {
       inPlan: true,
     },
     {
+      id: 'purchases.view',
+      module: 'Compras',
+      label: 'Consultar compras',
+      description: 'Compras da empresa.',
+      seller: 'grantable',
+      requires: [],
+      inPlan: false,
+    },
+    {
       id: 'finance.reverse',
       module: 'Financeiro',
       label: 'Estornar',
@@ -356,6 +371,8 @@ describe('matriz de permissões', () => {
     );
     expect(await screen.findByText('Permissões do vendedor')).toBeTruthy();
     expect(screen.getByText('Somente administradores')).toBeTruthy();
+    expect(screen.queryByText('Consultar compras')).toBeNull();
+    expect(screen.queryByText('Compras')).toBeNull();
     expect(
       screen.getByRole('checkbox', { name: 'Estornar' }).props.accessibilityState.disabled,
     ).toBe(true);

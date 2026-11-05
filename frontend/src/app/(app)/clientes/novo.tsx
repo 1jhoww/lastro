@@ -11,8 +11,9 @@ import { Alert, Button, useToast } from '@/ui';
 export default function NewCustomer() {
   const router = useRouter();
   const toast = useToast();
-  const { permissions } = useSession();
+  const { permissions, membership } = useSession();
   const admin = permissions.includes('customers:all:manage');
+  const sellers = membership?.plan.features.includes('commercial.sellers') ?? false;
   const suppliers = permissions.includes('suppliers:manage');
   const { relacionamento } = useLocalSearchParams<{ relacionamento?: string }>();
   const supplierFirst = suppliers && relacionamento === 'fornecedor';
@@ -29,7 +30,9 @@ export default function NewCustomer() {
         supplierFirst
           ? 'Se a empresa já é cliente, o CPF/CNPJ encontra o cadastro existente.'
           : admin
-            ? 'Começa sem responsável; o vendedor é definido depois, na ficha.'
+            ? sellers
+              ? 'Começa sem responsável; o vendedor é definido depois, na ficha.'
+              : 'Cadastre os dados do cliente.'
             : 'O cliente entra na sua carteira.'
       }
     >

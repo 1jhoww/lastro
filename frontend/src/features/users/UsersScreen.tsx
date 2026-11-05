@@ -9,7 +9,6 @@ import { toApiError } from '@/api/errors';
 import { queryKeys } from '@/api/queryKeys';
 import type { Member, MembershipPlan, PendingInvitation, Role, UsersPage } from '@/api/types';
 import { IssuedInviteCard } from '@/features/invitations/IssuedInviteCard';
-import { featureLabel } from '@/features/platform/copy';
 import { Screen } from '@/layout/Screen';
 import { formatDate } from '@/lib/dates';
 import { roleLabel, useSession, useTenantApi } from '@/session/SessionContext';
@@ -35,6 +34,7 @@ import {
 import { Mail, Pencil, RefreshCw, ShieldCheck, UserPlus, X } from '@/ui/icons';
 import { memberLabel, useReissueInvitation, useUpdateMember } from './api';
 import { PermissionsDialog } from './PermissionsDialog';
+import { contractedResources } from './planResources';
 
 type StatusFilter = 'all' | 'active' | 'disabled';
 const statusFilters: { value: StatusFilter; label: string }[] = [
@@ -176,11 +176,7 @@ export function UsersScreen() {
       }
     >
       {plan && capacity ? <SeatsPanel plan={plan} capacity={capacity} /> : null}
-      {!plan || !capacity ? null : !canInvite ? (
-        <Alert title="Convites adicionais não fazem parte do seu plano">
-          {`O plano ${plan.name ?? 'contratado'} permite ${plan.userLimit === 1 ? '1 usuário' : `${plan.userLimit} usuários`}. Para convidar mais pessoas, fale com o Lastro sobre o plano Profissional.`}
-        </Alert>
-      ) : !hasSeat ? (
+      {plan && capacity && canInvite && !hasSeat ? (
         <Alert tone="warning" title="Todos os acessos estão ocupados">
           {`Seu plano permite até ${plan.userLimit === 1 ? '1 usuário' : `${plan.userLimit} usuários`}. Revogue um convite pendente ou desative um usuário para liberar uma vaga.`}
         </Alert>
@@ -316,6 +312,7 @@ export function UsersScreen() {
 
 /** Plano contratado e vagas: usuários ativos e convites pendentes. */
 function SeatsPanel({ plan, capacity }: { plan: MembershipPlan; capacity: UsersPage['capacity'] }) {
+  const { permissions } = useSession();
   const used = capacity.activeUsers + capacity.reservedInvitations;
   return (
     <Panel
@@ -333,9 +330,7 @@ function SeatsPanel({ plan, capacity }: { plan: MembershipPlan; capacity: UsersP
       }
     >
       <Text variant="small" color={color.textSecondary}>
-        {plan.features.length
-          ? `Recursos do plano: ${plan.features.map((f) => featureLabel[f]).join(', ')}.`
-          : 'Inclui clientes, produtos, pedidos, financeiro, relatórios e documentos. Convites adicionais, vitrine e vendedores fazem parte do Profissional.'}
+        {`Recursos do plano: ${contractedResources(plan, permissions).join(', ')}.`}
       </Text>
     </Panel>
   );
@@ -474,11 +469,6 @@ function EditMemberDialog({
           <Text variant="small" color={color.textSecondary}>
             {roleDescription[role]}
           </Text>
-          {!sellers && member.role !== 'seller' ? (
-            <Text variant="small" color={color.textSecondary}>
-              O perfil Vendedor faz parte do plano Profissional.
-            </Text>
-          ) : null}
         </View>
         <Switch
           label="Acesso ativo"
@@ -654,11 +644,6 @@ function InviteDialog({
                 <Text variant="small" color={color.textSecondary}>
                   {roleDescription[field.value]}
                 </Text>
-                {sellers ? null : (
-                  <Text variant="small" color={color.textSecondary}>
-                    O perfil Vendedor faz parte do plano Profissional.
-                  </Text>
-                )}
               </View>
             )}
           />

@@ -213,9 +213,11 @@ function CreditView({ credit: c }: { credit: SupplierCredit }) {
                 <Fact label="Compra" value={`#${c.purchaseCode}`} />
               </Facts>
             </Panel>
-            <Link href={`/compras/${c.purchaseId}` as Href} asChild>
-              <Button label="Ver a compra" variant="outline" fullWidth />
-            </Link>
+            {permissions.includes('purchases:read') ? (
+              <Link href={`/compras/${c.purchaseId}` as Href} asChild>
+                <Button label="Ver a compra" variant="outline" fullWidth />
+              </Link>
+            ) : null}
           </>
         }
       />

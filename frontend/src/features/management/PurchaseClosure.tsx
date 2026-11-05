@@ -178,7 +178,7 @@ export function ClosurePanel({ purchase: p }: { purchase: Purchase }) {
         <Text variant="small" color={color.textSecondary}>
           {summary.reason}
         </Text>
-        {summary.creditId && permissions.includes('payables:read') ? (
+        {summary.creditId && permissions.includes('supplier-credits:read') ? (
           <Link href={`/financeiro/creditos-fornecedor/${summary.creditId}` as Href} asChild>
             <Button label="Ver crédito do fornecedor" variant="outline" fullWidth />
           </Link>

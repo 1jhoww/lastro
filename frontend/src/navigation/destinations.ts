@@ -59,6 +59,10 @@ export type Permission =
   | 'payables:manage'
   | 'payables:pay'
   | 'payables:reverse'
+  | 'supplier-credits:read'
+  | 'recurring:read'
+  | 'recurring:manage'
+  | 'financial-dashboard:read'
   | 'financial-reports:read';
 
 export type Destination = {
@@ -73,7 +77,7 @@ export type Destination = {
   /** Módulo sem contrato de API ainda (Fase E). */
   pending?: boolean;
   /** Atalho dispensável quando a pessoa já chega à área por um destino mais completo. */
-  hiddenWith?: Permission;
+  hiddenWith?: Permission[];
 };
 
 export const destinations: Destination[] = [
@@ -146,7 +150,16 @@ export const destinations: Destination[] = [
     href: '/financeiro/pagar' as Href,
     icon: Wallet,
     anyOf: ['payables:read'],
-    hiddenWith: 'receivables:read',
+    hiddenWith: ['receivables:read'],
+  },
+  {
+    // Consulta do que ficou de compras encerradas, para quem não chega aqui por outra seção.
+    key: 'creditos-fornecedor',
+    label: 'Créditos de fornecedores',
+    href: '/financeiro/creditos-fornecedor' as Href,
+    icon: Wallet,
+    anyOf: ['supplier-credits:read'],
+    hiddenWith: ['receivables:read', 'payables:read'],
   },
   {
     key: 'configuracoes',
@@ -174,7 +187,7 @@ export const destinations: Destination[] = [
 export function visibleDestinations(permissions: readonly string[]): Destination[] {
   const granted = new Set(permissions);
   return destinations.filter(
-    (d) => d.anyOf.some((p) => granted.has(p)) && !(d.hiddenWith && granted.has(d.hiddenWith)),
+    (d) => d.anyOf.some((p) => granted.has(p)) && !d.hiddenWith?.some((p) => granted.has(p)),
   );
 }
 

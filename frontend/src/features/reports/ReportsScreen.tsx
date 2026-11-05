@@ -329,8 +329,10 @@ function FilterBar({
   invalid: boolean;
 }) {
   const compact = useLayoutSize() === 'compact';
-  const { permissions } = useSession();
-  const seller = entry.filters.includes('seller');
+  const { permissions, membership } = useSession();
+  const seller =
+    entry.filters.includes('seller') &&
+    (membership?.plan.features.includes('commercial.sellers') ?? false);
   const members = useMembers(seller && permissions.includes('users:manage'));
   const [picking, setPicking] = useState(false);
   const suppliers = useSuppliers('', entry.filters.includes('supplier'));

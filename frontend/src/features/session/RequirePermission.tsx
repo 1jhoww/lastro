@@ -4,11 +4,13 @@ import { Screen } from '@/layout/Screen';
 import type { Permission } from '@/navigation/destinations';
 import { useSession } from '@/session/SessionContext';
 import { Button, EmptyState, Panel } from '@/ui';
-import { Lock } from '@/ui/icons';
+import { CircleAlert } from '@/ui/icons';
 
 /**
  * Restringe uma tela por permissão de /me. Sem permissão, mostra acesso negado em vez de
- * montar a tela (e suas consultas). O backend recusaria as chamadas de qualquer forma.
+ * montar a tela (e suas consultas). O backend recusaria as chamadas de qualquer forma. Só se chega
+ * aqui por link direto: a navegação não mostra o que a pessoa não pode usar. A mensagem é neutra
+ * porque a causa pode ser o perfil ou o contrato, e não oferece nada.
  */
 export function RequirePermission({
   anyOf,
@@ -29,9 +31,9 @@ export function AccessDenied({ title }: { title: string }) {
     <Screen title={title}>
       <Panel flush>
         <EmptyState
-          icon={Lock}
+          icon={CircleAlert}
           title="Você não tem acesso a esta área"
-          description="Seu perfil nesta empresa não inclui esta função. Se precisar dela, fale com um administrador."
+          description="Esta função não está disponível para você."
           action={
             <Link href="/" asChild>
               <Button label="Ir para o início" variant="strong" />
