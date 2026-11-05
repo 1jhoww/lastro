@@ -51,13 +51,14 @@ Os 150 publicados ficaram intactos. Estão em uso por telas já em homologação
 - **`products`, 61 no total.** Mesmo padrão de combinação completa de `status`, `categoryId`, `sku` e `catalogVisible`, com duas ordenações e duas direções. É a coleção com escrita mais cara.
 - **`inventory`, 16.** Cada ajuste de saldo paga todos eles.
 
-Remover índice publicado é uma alteração no ambiente e precisa de autorização própria. `firebase deploy --only firestore:indexes` sem `--force` só acrescenta, então não remove nenhum deles.
+Remover índice publicado é uma alteração no ambiente e precisa de autorização própria.
 
 ## Impacto da publicação
 
 - São 34 índices em coleções vazias ou de baixo volume. `customers` é a única com dados: 8 índices sobre `isSupplier`, campo que registros antigos não têm. Eles não entram nesses índices, o que é o comportamento desejado, porque só fornecedores são consultados por ele.
 - Registros antigos não precisam de reescrita.
 - A API nova depende desses índices. Publique e aguarde `READY` antes de publicar a API, ou as listas de compras e títulos respondem erro em vez de lista vazia.
+- A publicação segue comandos individuais, descritos em `ops/prepublication/gestao-indices-plano.md`. Além dos índices, faltam 32 isenções de campo das coleções novas.
 
 ## Cobertura
 

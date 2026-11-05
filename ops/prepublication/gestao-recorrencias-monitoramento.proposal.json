@@ -1,0 +1,39 @@
+{
+  "status": "DRAFT_NOT_CREATED",
+  "project": "lastro-hml",
+  "job": "lastro-recurring-hml",
+  "logMetrics": [
+    {
+      "name": "recurring_generation_failures",
+      "description": "Falhas por empresa, recorrência ou execução da geração diária",
+      "filter": "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"lastro-recurring-hml\" AND severity>=ERROR AND jsonPayload.event=~\"^recurring\\.generation\\.\""
+    },
+    {
+      "name": "recurring_generation_completed",
+      "description": "Execuções concluídas da geração diária, inclusive com falhas parciais",
+      "filter": "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"lastro-recurring-hml\" AND jsonPayload.event=\"recurring.generation.completed\" AND jsonPayload.dryRun=false"
+    }
+  ],
+  "alertPolicies": [
+    {
+      "id": "recurring-failed",
+      "enabled": false,
+      "metric": "logging.googleapis.com/user/recurring_generation_failures",
+      "condition": "soma maior que 0 em 5 minutos",
+      "documentation": "Veja os eventos company_failed e recurrence_failed. Corrija o dado e execute o job de novo: não duplica."
+    },
+    {
+      "id": "recurring-missing",
+      "enabled": false,
+      "metric": "logging.googleapis.com/user/recurring_generation_completed",
+      "condition": "ausência por 26 horas",
+      "documentation": "Confira se o agendador está ativo e se a execução começou. Execute o job manualmente."
+    }
+  ],
+  "notificationChannel": {
+    "create": false,
+    "type": "email",
+    "addressSource": "arquivo privado, fora do repositório"
+  },
+  "gate": "Criar só com aprovação. Conferir custo de métricas e de condições de alerta no console."
+}

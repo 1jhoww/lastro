@@ -4,6 +4,10 @@ Prioridade atual: [plano do beta controlado](beta-execution-plan.md). G2/G3/G5 e
 
 Data da base: 18/10/2026. Destino exclusivo: projeto `lastro-hml`, Firestore `(default)`, Cloud Run `lastro-api-hml` em `southamerica-east1` e Vercel `lastro-hml`. Os arquivos `*.proposal.json` são documentos de revisão; não são scripts de aplicação ou arquivos completos para `services replace`, `set-iam-policy` ou deploy Firebase.
 
+## Lastro Gestão
+
+Preparação de 05/11/2026, sem execução: [inventário](gestao-inventario-hml.md), [índices](gestao-indices-plano.md), [ambientes](gestao-ambientes.md), [agendamento](gestao-recorrencias-agendamento.md) e [recuperação](gestao-recuperacao.md). O checklist final está em [backend/docs](../../backend/docs/gestao-production-checklist.md).
+
 ## Restrição de custo e autorização
 
 O usuário exige não adicionar recursos que gerem custo agora e quer permanecer nos créditos de teste. A referência anterior de R$100 mensais **não autoriza cobrança, upgrade da conta ou consumo novo faturável**. Saldo, validade e condições dos créditos não foram comprovados. Billing habilitado não prova que a conta continua exclusivamente em Free Trial.

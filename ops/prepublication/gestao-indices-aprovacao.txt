@@ -1,0 +1,73 @@
+# Lastro Gestão: comandos individuais para lastro-hml. Nada aqui foi executado.
+# Gerado comparando firestore.indexes.json com o estado remoto de 05/11/2026.
+# Confira o estado remoto de novo antes de usar. Plano: gestao-indices-plano.md
+
+# Etapa 1: 32 isenções de campo, em coleções ainda vazias.
+gcloud firestore indexes fields update notes --project=lastro-hml --database="(default)" --collection-group=purchases --disable-indexes
+gcloud firestore indexes fields update lines --project=lastro-hml --database="(default)" --collection-group=purchases --disable-indexes
+gcloud firestore indexes fields update installments --project=lastro-hml --database="(default)" --collection-group=purchases --disable-indexes
+gcloud firestore indexes fields update paymentCondition --project=lastro-hml --database="(default)" --collection-group=purchases --disable-indexes
+gcloud firestore indexes fields update supplierName --project=lastro-hml --database="(default)" --collection-group=purchases --disable-indexes
+gcloud firestore indexes fields update notes --project=lastro-hml --database="(default)" --collection-group=purchaseReceipts --disable-indexes
+gcloud firestore indexes fields update items --project=lastro-hml --database="(default)" --collection-group=purchaseReceipts --disable-indexes
+gcloud firestore indexes fields update notes --project=lastro-hml --database="(default)" --collection-group=payables --disable-indexes
+gcloud firestore indexes fields update description --project=lastro-hml --database="(default)" --collection-group=payables --disable-indexes
+gcloud firestore indexes fields update beneficiaryName --project=lastro-hml --database="(default)" --collection-group=payables --disable-indexes
+gcloud firestore indexes fields update categoryName --project=lastro-hml --database="(default)" --collection-group=payables --disable-indexes
+gcloud firestore indexes fields update notes --project=lastro-hml --database="(default)" --collection-group=payablePayments --disable-indexes
+gcloud firestore indexes fields update description --project=lastro-hml --database="(default)" --collection-group=payablePayments --disable-indexes
+gcloud firestore indexes fields update beneficiaryName --project=lastro-hml --database="(default)" --collection-group=payablePayments --disable-indexes
+gcloud firestore indexes fields update method --project=lastro-hml --database="(default)" --collection-group=payablePayments --disable-indexes
+gcloud firestore indexes fields update lines --project=lastro-hml --database="(default)" --collection-group=orderCostSnapshots --disable-indexes
+gcloud firestore indexes fields update previous --project=lastro-hml --database="(default)" --collection-group=productCostEvents --disable-indexes
+gcloud firestore indexes fields update next --project=lastro-hml --database="(default)" --collection-group=productCostEvents --disable-indexes
+gcloud firestore indexes fields update reason --project=lastro-hml --database="(default)" --collection-group=productCostEvents --disable-indexes
+gcloud firestore indexes fields update notes --project=lastro-hml --database="(default)" --collection-group=recurringExpenses --disable-indexes
+gcloud firestore indexes fields update description --project=lastro-hml --database="(default)" --collection-group=recurringExpenses --disable-indexes
+gcloud firestore indexes fields update beneficiaryName --project=lastro-hml --database="(default)" --collection-group=recurringExpenses --disable-indexes
+gcloud firestore indexes fields update categoryName --project=lastro-hml --database="(default)" --collection-group=recurringExpenses --disable-indexes
+gcloud firestore indexes fields update items --project=lastro-hml --database="(default)" --collection-group=purchaseClosures --disable-indexes
+gcloud firestore indexes fields update titles --project=lastro-hml --database="(default)" --collection-group=purchaseClosures --disable-indexes
+gcloud firestore indexes fields update notes --project=lastro-hml --database="(default)" --collection-group=purchaseClosures --disable-indexes
+gcloud firestore indexes fields update reason --project=lastro-hml --database="(default)" --collection-group=purchaseClosures --disable-indexes
+gcloud firestore indexes fields update supplierName --project=lastro-hml --database="(default)" --collection-group=supplierCredits --disable-indexes
+gcloud firestore indexes fields update purchaseCode --project=lastro-hml --database="(default)" --collection-group=supplierCredits --disable-indexes
+gcloud firestore indexes fields update notes --project=lastro-hml --database="(default)" --collection-group=supplierCreditMovements --disable-indexes
+gcloud firestore indexes fields update payableDescription --project=lastro-hml --database="(default)" --collection-group=supplierCreditMovements --disable-indexes
+gcloud firestore indexes fields update reversalReason --project=lastro-hml --database="(default)" --collection-group=supplierCreditMovements --disable-indexes
+
+# Etapa 2: 34 índices compostos.
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=purchases --query-scope=collection --field-config=field-path=status,order=ascending --field-config=field-path=number,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=purchases --query-scope=collection --field-config=field-path=supplierId,order=ascending --field-config=field-path=number,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=purchases --query-scope=collection --field-config=field-path=pendingReceipt,order=ascending --field-config=field-path=number,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=purchases --query-scope=collection --field-config=field-path=status,order=ascending --field-config=field-path=supplierId,order=ascending --field-config=field-path=number,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=purchases --query-scope=collection --field-config=field-path=supplierId,order=ascending --field-config=field-path=pendingReceipt,order=ascending --field-config=field-path=number,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=purchaseEvents --query-scope=collection --field-config=field-path=purchaseId,order=ascending --field-config=field-path=occurredAt,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=purchaseReceipts --query-scope=collection --field-config=field-path=purchaseId,order=ascending --field-config=field-path=number,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=hasBalance,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=hasBalance,order=ascending --field-config=field-path=beneficiaryId,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=hasBalance,order=ascending --field-config=field-path=categoryId,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=hasBalance,order=ascending --field-config=field-path=origin,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=hasBalance,order=ascending --field-config=field-path=originReference,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=status,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=status,order=ascending --field-config=field-path=beneficiaryId,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=status,order=ascending --field-config=field-path=categoryId,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=status,order=ascending --field-config=field-path=origin,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=status,order=ascending --field-config=field-path=originReference,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=beneficiaryId,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=categoryId,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=origin,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payables --query-scope=collection --field-config=field-path=originReference,order=ascending --field-config=field-path=dueDate,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=payablePayments --query-scope=collection --field-config=field-path=payableId,order=ascending --field-config=field-path=paidOn,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=productCostEvents --query-scope=collection --field-config=field-path=productId,order=ascending --field-config=field-path=occurredAt,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=expenseCategories --query-scope=collection --field-config=field-path=status,order=ascending --field-config=field-path=nameKey,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=recurringExpenses --query-scope=collection --field-config=field-path=status,order=ascending --field-config=field-path=createdAt,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=supplierCredits --query-scope=collection --field-config=field-path=hasBalance,order=ascending --field-config=field-path=createdAt,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=customers --query-scope=collection --field-config=field-path=isSupplier,order=ascending --field-config=field-path=nameKey,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=customers --query-scope=collection --field-config=field-path=isSupplier,order=ascending --field-config=field-path=nameKey,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=customers --query-scope=collection --field-config=field-path=isSupplier,order=ascending --field-config=field-path=createdAt,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=customers --query-scope=collection --field-config=field-path=isSupplier,order=ascending --field-config=field-path=createdAt,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=customers --query-scope=collection --field-config=field-path=isSupplier,order=ascending --field-config=field-path=status,order=ascending --field-config=field-path=nameKey,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=customers --query-scope=collection --field-config=field-path=isSupplier,order=ascending --field-config=field-path=status,order=ascending --field-config=field-path=nameKey,order=descending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=customers --query-scope=collection --field-config=field-path=isSupplier,order=ascending --field-config=field-path=status,order=ascending --field-config=field-path=createdAt,order=ascending
+gcloud firestore indexes composite create --project=lastro-hml --database="(default)" --collection-group=customers --query-scope=collection --field-config=field-path=isSupplier,order=ascending --field-config=field-path=status,order=ascending --field-config=field-path=createdAt,order=descending

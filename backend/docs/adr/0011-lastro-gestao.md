@@ -71,7 +71,7 @@ Fica como **perda com mercadorias não entregues**, linha própria do resultado 
 | Mercadorias cobradas e não entregues | Valor não entregue da compra encerrada            |
 | Resultado estimado                   | Reduz pelo valor da linha acima                   |
 
-O reconhecimento é na data do encerramento, quando a perda deixa de ser expectativa. O caixa é outra coisa: o dinheiro só sai quando os títulos são pagos, pelo fluxo normal de contas a pagar. Abatimento e crédito do fornecedor não geram essa linha, porque neles a empresa não fica com a perda. Se o fornecedor devolver depois, a devolução não existe nesse tratamento: quem espera receber de volta deve escolher crédito do fornecedor ao encerrar.
+O reconhecimento é na data do encerramento, quando a perda deixa de ser expectativa. O caixa é outra coisa: o dinheiro só sai quando os títulos são pagos, pelo fluxo normal de contas a pagar. Abatimento e crédito do fornecedor não geram essa linha, porque neles a empresa não fica com a perda. Quem espera receber de volta deve escolher crédito do fornecedor ao encerrar: a cobrança integral não prevê devolução.
 
 ## Crédito de fornecedor
 
