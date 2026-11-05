@@ -24,6 +24,7 @@
     "seed:local": "tsx scripts/seed-local.ts",
     "migrate:plans": "tsx src/jobs/migratePlans.ts",
     "job:billing": "node dist/src/jobs/billingCycle.js",
+    "job:recurring": "node dist/src/jobs/recurringExpenses.js",
     "openapi": "tsx scripts/export-openapi.ts",
     "types:api": "openapi-typescript docs/api/openapi.json -o docs/api/generated-types.ts",
     "audit:dependencies": "npm audit --omit=dev",

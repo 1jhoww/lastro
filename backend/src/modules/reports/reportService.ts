@@ -23,9 +23,12 @@ import type { Download } from '../documents/download.js';
 import { reportCsv, reportFilename, reportPdf } from './reportFiles.js';
 import type { TenantLogoService } from '../tenants/logoService.js';
 import { hasFeature } from '../plans/catalog.js';
+import { addDays, daysBetween } from './dates.js';
 import { featureNotInPlan, requirePermission } from '../users/permissions.js';
 import { formatQuantity, parseQuantity } from '../inventory/quantities.js';
 import { brl, orderNumber } from '../documents/pdfLayout.js';
+import { expenseCategorySchema } from '../../shared/schemas/management.js';
+import { managementReport, type ManagementReportId } from './managementReports.js';
 
 export const REPORT_CAPS = {
   orders: 2500,
@@ -35,7 +38,6 @@ export const REPORT_CAPS = {
   products: 3000,
 } as const;
 const MAX_SPAN_DAYS = 366;
-const DAY = 86_400_000;
 
 type Category = ReportView['category'];
 type Filter = keyof ReportQuery;
@@ -46,6 +48,75 @@ interface Definition {
   filters: Filter[];
   statuses?: NonNullable<ReportQuery['status']>[];
 }
+const payableStatuses: NonNullable<ReportQuery['status']>[] = [
+  'open',
+  'partially_paid',
+  'paid',
+  'canceled',
+];
+const managementDefinitions: Record<ManagementReportId, Definition> = {
+  'payables-period': {
+    category: 'management',
+    title: 'Contas a pagar por período',
+    description: 'Títulos por vencimento, com valores pagos e em aberto.',
+    filters: ['from', 'to', 'status', 'supplierId', 'categoryId'],
+    statuses: payableStatuses,
+  },
+  'payables-supplier': {
+    category: 'management',
+    title: 'Contas a pagar por fornecedor',
+    description: 'O que cada fornecedor ou beneficiário tem a receber da empresa.',
+    filters: ['from', 'to', 'supplierId', 'categoryId'],
+  },
+  'payables-overdue': {
+    category: 'management',
+    title: 'Títulos a pagar vencidos',
+    description: 'Títulos vencidos com saldo em aberto.',
+    filters: ['from', 'to', 'supplierId', 'categoryId'],
+  },
+  'payable-payments': {
+    category: 'management',
+    title: 'Pagamentos realizados',
+    description: 'Dinheiro efetivamente pago, pela data do pagamento.',
+    filters: ['from', 'to'],
+  },
+  'purchases-supplier': {
+    category: 'management',
+    title: 'Compras por fornecedor',
+    description: 'Quanto foi comprado de cada fornecedor.',
+    filters: ['from', 'to', 'supplierId'],
+  },
+  'purchases-product': {
+    category: 'management',
+    title: 'Compras por produto',
+    description: 'Quantidades e valores comprados de cada produto.',
+    filters: ['from', 'to', 'supplierId', 'productId'],
+  },
+  'cost-evolution': {
+    category: 'management',
+    title: 'Evolução dos custos de aquisição',
+    description: 'Alterações de custo médio e de referência.',
+    filters: ['from', 'to', 'productId'],
+  },
+  'product-profitability': {
+    category: 'management',
+    title: 'Rentabilidade por produto',
+    description: 'Faturamento, custo das mercadorias vendidas e margem bruta.',
+    filters: ['from', 'to', 'productId'],
+  },
+  'cash-flow': {
+    category: 'management',
+    title: 'Fluxo de caixa',
+    description: 'Entradas e saídas realizadas e o saldo do período.',
+    filters: ['from', 'to'],
+  },
+  'expenses-category': {
+    category: 'management',
+    title: 'Despesas por categoria',
+    description: 'Despesas operacionais por competência.',
+    filters: ['from', 'to', 'categoryId'],
+  },
+};
 export const reportDefinitions: Record<ReportId, Definition> = {
   'sales-period': {
     category: 'commercial',
@@ -136,6 +207,7 @@ export const reportDefinitions: Record<ReportId, Definition> = {
     description: 'Entradas, saídas, ajustes e reservas registrados.',
     filters: ['from', 'to', 'productId', 'movement'],
   },
+  ...managementDefinitions,
 };
 
 const orderStatusLabel: Record<Order['status'], string> = {
@@ -159,10 +231,12 @@ const movementLabel: Record<Movement['type'], string> = {
   STOCK_RESERVATION_RELEASE: 'Reserva liberada',
   STOCK_DISPATCH: 'Expedição',
   STOCK_RETURN: 'Devolução recebida',
+  STOCK_PURCHASE_ENTRY: 'Recebimento de compra',
+  STOCK_PURCHASE_REVERSAL: 'Estorno de recebimento',
 };
 const movementGroup: Record<NonNullable<ReportQuery['movement']>, Movement['type'][]> = {
-  entries: ['STOCK_ENTRY', 'STOCK_RETURN'],
-  exits: ['STOCK_DISPATCH'],
+  entries: ['STOCK_ENTRY', 'STOCK_RETURN', 'STOCK_PURCHASE_ENTRY'],
+  exits: ['STOCK_DISPATCH', 'STOCK_PURCHASE_REVERSAL'],
   adjustments: ['STOCK_ADJUSTMENT_IN', 'STOCK_ADJUSTMENT_OUT'],
   reservations: ['STOCK_RESERVATION', 'STOCK_RESERVATION_RELEASE'],
 };
@@ -192,10 +266,6 @@ const dateParts = (date: Date, timezone: string) =>
   }).format(date);
 export const localDay = (instant: string, timezone: string) =>
   dateParts(new Date(instant), timezone);
-export const addDays = (date: string, days: number) =>
-  new Date(Date.parse(`${date}T12:00:00Z`) + days * DAY).toISOString().slice(0, 10);
-const daysBetween = (from: string, to: string) =>
-  Math.round((Date.parse(`${to}T12:00:00Z`) - Date.parse(`${from}T12:00:00Z`)) / DAY);
 function offsetMs(at: number, timezone: string) {
   const parts = Object.fromEntries(
     new Intl.DateTimeFormat('en-US', {
@@ -345,9 +415,13 @@ export class ReportService {
           requirePermission(ctx.membership, ctx.entitlements, 'receivables:read');
         if (definition.category === 'inventory')
           requirePermission(ctx.membership, ctx.entitlements, 'inventory:manage');
+        if (definition.category === 'management')
+          requirePermission(ctx.membership, ctx.entitlements, 'financial-reports:read');
         if (id === 'sales-sellers' && !hasFeature(ctx.entitlements, 'commercial.sellers'))
           throw featureNotInPlan();
-        const portfolio = await this.scopeFor(ctx, tx, query);
+        // Management reports are company-wide by nature; holding them is an explicit grant.
+        const portfolio =
+          definition.category === 'management' ? null : await this.scopeFor(ctx, tx, query);
         const now = this.orders.clock();
         const env: Env = {
           tx,
@@ -430,6 +504,20 @@ export class ReportService {
         return this.stock(env, id, query);
       case 'stock-movements':
         return this.movements(env, query);
+      default:
+        return managementReport(
+          {
+            repo: this.repo,
+            tx: env.tx,
+            tenantId: env.tenantId,
+            timezone: env.timezone,
+            today: env.today,
+            period: (q, defaults, limits) => this.period(q, defaults, limits),
+            zonedStart,
+          },
+          id,
+          query,
+        );
     }
   }
 
@@ -1248,6 +1336,22 @@ export class ReportService {
         env.tx,
       );
       labels.push({ label: 'Produto', value: product?.name ?? 'Produto não encontrado' });
+    }
+    if (query.supplierId) {
+      const supplier = await this.repo.foundation.read(
+        this.repo.ref(env.tenantId, 'customers', query.supplierId),
+        customerSchema,
+        env.tx,
+      );
+      labels.push({ label: 'Fornecedor', value: supplier?.name ?? 'Fornecedor não encontrado' });
+    }
+    if (query.categoryId) {
+      const category = await this.repo.foundation.read(
+        this.repo.ref(env.tenantId, 'expenseCategories', query.categoryId),
+        expenseCategorySchema,
+        env.tx,
+      );
+      labels.push({ label: 'Categoria', value: category?.name ?? 'Categoria não encontrada' });
     }
     if (query.sellerUid)
       labels.push({

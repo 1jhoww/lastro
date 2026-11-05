@@ -2579,6 +2579,538 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "purchases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "number",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "purchases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "supplierId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "number",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "purchases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "pendingReceipt",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "number",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "purchases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "supplierId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "number",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "purchases",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "supplierId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "pendingReceipt",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "number",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "purchaseEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "purchaseId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "purchaseReceipts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "purchaseId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "number",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "hasBalance",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "hasBalance",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "beneficiaryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "hasBalance",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "hasBalance",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "origin",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "hasBalance",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "originReference",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "beneficiaryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "origin",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "originReference",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "beneficiaryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "categoryId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "origin",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payables",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "originReference",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "dueDate",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "payablePayments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "payableId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "paidOn",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "productCostEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "productId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "expenseCategories",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "recurringExpenses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "supplierCredits",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "hasBalance",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isSupplier",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isSupplier",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isSupplier",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isSupplier",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isSupplier",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isSupplier",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "nameKey",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isSupplier",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "customers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "isSupplier",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "DESCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": [
@@ -3016,6 +3548,166 @@
     {
       "collectionGroup": "deliveries",
       "fieldPath": "receivedBy",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchases",
+      "fieldPath": "notes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchases",
+      "fieldPath": "lines",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchases",
+      "fieldPath": "installments",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchases",
+      "fieldPath": "paymentCondition",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchases",
+      "fieldPath": "supplierName",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchaseReceipts",
+      "fieldPath": "notes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchaseReceipts",
+      "fieldPath": "items",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "payables",
+      "fieldPath": "notes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "payables",
+      "fieldPath": "description",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "payables",
+      "fieldPath": "beneficiaryName",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "payables",
+      "fieldPath": "categoryName",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "payablePayments",
+      "fieldPath": "notes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "payablePayments",
+      "fieldPath": "description",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "payablePayments",
+      "fieldPath": "beneficiaryName",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "payablePayments",
+      "fieldPath": "method",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "orderCostSnapshots",
+      "fieldPath": "lines",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "productCostEvents",
+      "fieldPath": "previous",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "productCostEvents",
+      "fieldPath": "next",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "productCostEvents",
+      "fieldPath": "reason",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "recurringExpenses",
+      "fieldPath": "notes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "recurringExpenses",
+      "fieldPath": "description",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "recurringExpenses",
+      "fieldPath": "beneficiaryName",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "recurringExpenses",
+      "fieldPath": "categoryName",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchaseClosures",
+      "fieldPath": "items",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchaseClosures",
+      "fieldPath": "titles",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchaseClosures",
+      "fieldPath": "notes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "purchaseClosures",
+      "fieldPath": "reason",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "supplierCredits",
+      "fieldPath": "supplierName",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "supplierCredits",
+      "fieldPath": "purchaseCode",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "supplierCreditMovements",
+      "fieldPath": "notes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "supplierCreditMovements",
+      "fieldPath": "payableDescription",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "supplierCreditMovements",
+      "fieldPath": "reversalReason",
       "indexes": []
     }
   ]

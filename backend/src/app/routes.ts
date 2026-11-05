@@ -65,6 +65,15 @@ import { CompanyService } from '../modules/platformAdmin/companyService.js';
 import * as platformSchemas from '../shared/schemas/platform.js';
 import { SubscriptionService } from '../modules/platformAdmin/subscriptionService.js';
 import { EmailChangeService } from '../modules/users/emailChangeService.js';
+import { managementRoutes } from './managementRoutes.js';
+import * as management from '../shared/schemas/management.js';
+import { CostService } from '../modules/costing/costService.js';
+import { PurchaseService } from '../modules/purchasing/purchaseService.js';
+import { PayableService } from '../modules/payables/payableService.js';
+import { SupplierCreditService } from '../modules/payables/supplierCreditService.js';
+import { RecurringService } from '../modules/payables/recurringService.js';
+import { ManagementService } from '../modules/finance/managementService.js';
+import { zonedStart } from '../modules/reports/reportService.js';
 
 export interface Route {
   method: 'get' | 'post' | 'patch' | 'delete' | 'put';
@@ -85,6 +94,7 @@ export interface Route {
   description?: string;
 }
 export const routeDefinitions: Route[] = [
+  ...managementRoutes,
   ...executionRoutes,
   ...documentRoutes,
   ...reportRoutes,
@@ -353,8 +363,284 @@ export function createRoutes(
   const reports = new ReportService(orders, financialReads, inventory, users.auth, logos);
   const visits = new VisitService(orders, users.auth);
   const deliveries = new DeliveryService(orders);
+  const costs = new CostService(orders.repo, access, clock);
+  const purchases = new PurchaseService(finance.commands, paymentSettings, inventory);
+  const payables = new PayableService(finance.commands, paymentSettings);
+  const recurring = new RecurringService(finance.commands, payables);
+  const supplierCredits = new SupplierCreditService(finance.commands);
+  const managementOverview = new ManagementService(financialReads, zonedStart);
   const reportFor = (req: Request) => reportSchemas.reportParams.parse(req.params).report;
   const handlers: Record<string, (req: Request) => Promise<unknown>> = {
+    listSupplierOptions: (req) =>
+      customers.suppliers(
+        actorFor(req),
+        selectedTenant(req),
+        commercial.supplierOptionsQuery.parse(req.query),
+      ),
+    getProductCosts: (req) => costs.get(actorFor(req), selectedTenant(req), idFor(req)),
+    updateProductReferenceCost: (req) =>
+      costs.updateReference(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.productCostUpdate.parse(req.body),
+      ),
+    listProductCostHistory: (req) =>
+      costs.history(actorFor(req), selectedTenant(req), idFor(req), s.pageQuery.parse(req.query)),
+    getPurchaseCostSuggestion: (req) =>
+      costs.suggestion(actorFor(req), selectedTenant(req), idFor(req)),
+    listPurchases: (req) =>
+      purchases.list(actorFor(req), selectedTenant(req), management.purchaseQuery.parse(req.query)),
+    createPurchase: (req) =>
+      purchases.create(
+        actorFor(req),
+        selectedTenant(req),
+        management.purchaseCreate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    getPurchase: (req) => purchases.get(actorFor(req), selectedTenant(req), idFor(req)),
+    updatePurchase: (req) =>
+      purchases.update(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.purchaseUpdate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    previewPurchasePayment: (req) =>
+      purchases.preview(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.purchasePreviewInput.parse(req.body),
+      ),
+    confirmPurchase: (req) =>
+      purchases.confirm(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.purchaseConfirm.parse(req.body),
+        idempotencyKey(req),
+      ),
+    amendPurchase: (req) =>
+      purchases.amend(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.purchaseAmendment.parse(req.body),
+        idempotencyKey(req),
+      ),
+    reopenPurchase: (req) =>
+      purchases.reopen(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.purchaseReasonCommand.parse(req.body),
+        idempotencyKey(req),
+      ),
+    cancelPurchase: (req) =>
+      purchases.cancel(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.purchaseReasonCommand.parse(req.body),
+        idempotencyKey(req),
+      ),
+    getPurchaseHistory: (req) =>
+      purchases.history(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        s.pageQuery.parse(req.query),
+      ),
+    listPurchaseReceipts: (req) =>
+      purchases.receipts(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        s.pageQuery.parse(req.query),
+      ),
+    receivePurchase: (req) =>
+      purchases.receive(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.receiptInput.parse(req.body),
+        idempotencyKey(req),
+      ),
+    previewPurchaseClosure: (req) =>
+      purchases.closurePreview(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.purchaseClosurePreviewInput.parse(req.body),
+      ),
+    closePurchase: (req) =>
+      purchases.close(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.purchaseClosureInput.parse(req.body),
+        idempotencyKey(req),
+      ),
+    getPurchaseClosure: (req) => purchases.closure(actorFor(req), selectedTenant(req), idFor(req)),
+    listSupplierCredits: (req) =>
+      supplierCredits.list(
+        actorFor(req),
+        selectedTenant(req),
+        management.supplierCreditQuery.parse(req.query),
+      ),
+    getSupplierCredit: (req) =>
+      supplierCredits.get(actorFor(req), selectedTenant(req), idFor(req)),
+    listSupplierCreditMovements: (req) =>
+      supplierCredits.movements(actorFor(req), selectedTenant(req), idFor(req)),
+    applySupplierCredit: (req) =>
+      supplierCredits.apply(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.supplierCreditApplication.parse(req.body),
+        idempotencyKey(req),
+      ),
+    recoverSupplierCredit: (req) =>
+      supplierCredits.recover(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.supplierCreditRecovery.parse(req.body),
+        idempotencyKey(req),
+      ),
+    reverseSupplierCreditMovement: (req) =>
+      supplierCredits.reverse(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.supplierCreditReversal.parse(req.body),
+        idempotencyKey(req),
+      ),
+    reversePurchaseReceipt: (req) =>
+      purchases.reverseReceipt(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.receiptReversalInput.parse(req.body),
+        idempotencyKey(req),
+      ),
+    listPayables: (req) =>
+      payables.list(actorFor(req), selectedTenant(req), management.payableQuery.parse(req.query)),
+    createPayable: (req) =>
+      payables.create(
+        actorFor(req),
+        selectedTenant(req),
+        management.payableCreate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    getPayable: (req) => payables.get(actorFor(req), selectedTenant(req), idFor(req)),
+    updatePayable: (req) =>
+      payables.update(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.payableUpdate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    cancelPayable: (req) =>
+      payables.cancel(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.payableCancel.parse(req.body),
+        idempotencyKey(req),
+      ),
+    payPayable: (req) =>
+      payables.pay(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.payablePaymentInput.parse(req.body),
+        idempotencyKey(req),
+      ),
+    listPayablePayments: (req) =>
+      payables.payments(
+        actorFor(req),
+        selectedTenant(req),
+        management.payablePaymentQuery.parse(req.query),
+      ),
+    reversePayablePayment: (req) =>
+      payables.reverse(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.paymentReversalInput.parse(req.body),
+        idempotencyKey(req),
+      ),
+    listExpenseCategories: (req) =>
+      recurring.categories(
+        actorFor(req),
+        selectedTenant(req),
+        management.expenseCategoryQuery.parse(req.query),
+      ),
+    createExpenseCategory: (req) =>
+      recurring.createCategory(
+        actorFor(req),
+        selectedTenant(req),
+        management.expenseCategoryCreate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    seedExpenseCategories: (req) =>
+      recurring.seedCategories(actorFor(req), selectedTenant(req), idempotencyKey(req)),
+    updateExpenseCategory: (req) =>
+      recurring.updateCategory(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.expenseCategoryUpdate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    listRecurringExpenses: (req) =>
+      recurring.list(
+        actorFor(req),
+        selectedTenant(req),
+        management.recurringExpenseQuery.parse(req.query),
+      ),
+    createRecurringExpense: (req) =>
+      recurring.create(
+        actorFor(req),
+        selectedTenant(req),
+        management.recurringExpenseCreate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    generateRecurringExpenses: (req) => recurring.generate(actorFor(req), selectedTenant(req)),
+    getRecurringExpense: (req) => recurring.get(actorFor(req), selectedTenant(req), idFor(req)),
+    updateRecurringExpense: (req) =>
+      recurring.update(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.recurringExpenseUpdate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    commandRecurringExpense: (req) =>
+      recurring.command(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        management.recurringExpenseCommand.parse(req.body),
+        idempotencyKey(req),
+      ),
+    getManagementOverview: (req) =>
+      managementOverview.overview(
+        actorFor(req),
+        selectedTenant(req),
+        management.managementQuery.parse(req.query),
+      ),
+    getFinanceSettings: (req) => managementOverview.settings(actorFor(req), selectedTenant(req)),
+    updateFinanceSettings: (req) =>
+      managementOverview.updateSettings(
+        actorFor(req),
+        selectedTenant(req),
+        management.financeSettingsInput.parse(req.body),
+      ),
     listVisits: (req) =>
       visits.list(actorFor(req), selectedTenant(req), visitSchemas.visitQuery.parse(req.query)),
     createVisit: (req) =>

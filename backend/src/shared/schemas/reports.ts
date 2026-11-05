@@ -17,6 +17,16 @@ export const reportIds = [
   'stock-low',
   'stock-empty',
   'stock-movements',
+  'payables-period',
+  'payables-supplier',
+  'payables-overdue',
+  'payable-payments',
+  'purchases-supplier',
+  'purchases-product',
+  'cost-evolution',
+  'product-profitability',
+  'cash-flow',
+  'expenses-category',
 ] as const;
 export type ReportId = (typeof reportIds)[number];
 export const reportId = z.enum(reportIds);
@@ -44,6 +54,8 @@ export const reportQuery = z
     productId: opaqueId.optional(),
     sellerUid: opaqueId.optional(),
     movement: z.enum(movementGroups).optional(),
+    supplierId: opaqueId.optional(),
+    categoryId: opaqueId.optional(),
   })
   .refine((v) => !v.from || !v.to || v.from <= v.to, 'Período inválido');
 export type ReportQuery = z.infer<typeof reportQuery>;
@@ -60,7 +72,7 @@ export const reportValueKind = z.enum([
 export type ReportValueKind = z.infer<typeof reportValueKind>;
 export const reportView = z.object({
   report: reportId,
-  category: z.enum(['commercial', 'financial', 'inventory']),
+  category: z.enum(['commercial', 'financial', 'inventory', 'management']),
   title: z.string(),
   description: z.string(),
   company: z.string(),
@@ -93,7 +105,10 @@ export const reportView = z.object({
     z.object({
       cells: z.record(z.string(), z.union([z.string(), z.number(), z.null()])),
       link: z
-        .object({ kind: z.enum(['order', 'customer', 'product', 'title']), id: opaqueId })
+        .object({
+          kind: z.enum(['order', 'customer', 'product', 'title', 'payable', 'purchase']),
+          id: opaqueId,
+        })
         .nullable(),
     }),
   ),

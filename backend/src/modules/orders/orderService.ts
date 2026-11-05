@@ -28,7 +28,9 @@ import { termsAt, termsInstallments, commercialTerms } from '../finance/paymentC
 import { termsSnapshot, methodSnapshot } from '../../shared/schemas/paymentSettings.js';
 import { FinancialLocks } from '../finance/resolution/locks.js';
 import { checkReadBudget } from '../../shared/operations/readBudget.js';
-import { brandingAllowed } from '../plans/catalog.js';
+import { brandingAllowed, hasFeature } from '../plans/catalog.js';
+import { orderCostSnapshot } from '../costing/orderCosts.js';
+import type { OrderCostSnapshot } from '../../shared/schemas/management.js';
 export class OrderService {
   readonly financialLocks: FinancialLocks;
   constructor(
@@ -90,6 +92,12 @@ export class OrderService {
       409,
       'CUSTOMER_INACTIVE',
       'Cliente inativo',
+    );
+    requireCondition(
+      !active || customer.relationships.includes('customer'),
+      409,
+      'CUSTOMER_INACTIVE',
+      'Cadastro sem relacionamento de cliente',
     );
     return customer;
   }
@@ -588,6 +596,7 @@ export class OrderService {
       );
       let next = { ...order, version: order.version + 1, updatedAt: now, updatedBy: actor.uid };
       let finance: { apply(): void } | undefined;
+      let costs: OrderCostSnapshot | undefined;
       if (action === 'confirm') {
         requireCondition(
           customer && order.payment && order.lines.length > 0,
@@ -660,6 +669,9 @@ export class OrderService {
           confirmedBy: actor.uid,
         };
         finance = await this.financial.prepare(tx, next, 'confirm', now);
+        // Sold cost is frozen with the sale: later receipts never restate past margins.
+        if (hasFeature(ctx.entitlements, 'costing.products'))
+          costs = await orderCostSnapshot(this.repo, tx, tenantId, id, next.lines, now);
       } else if (action === 'dispatch')
         next = {
           ...next,
@@ -709,6 +721,7 @@ export class OrderService {
       // All preparation above only reads. No external effect belongs inside this callback.
       prepared?.apply();
       finance?.apply();
+      if (costs) tx.set(this.repo.ref(tenantId, 'orderCostSnapshots', id), costs);
       tx.set(this.repo.ref(tenantId, 'orders', id), validated);
       this.event(
         tx,
