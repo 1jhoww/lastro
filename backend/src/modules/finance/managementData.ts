@@ -154,6 +154,7 @@ export async function profitability(
     (a, t) => a + expenseValue(t),
     0,
   );
+  const undeliveredLossCents = await chargedUndelivered(env, range);
   const missing = new Set(lines.filter((l) => l.costCents === null).map((l) => l.orderId));
   return {
     revenueCents,
@@ -162,7 +163,8 @@ export async function profitability(
     grossProfitCents,
     grossMarginBp: costedRevenueCents > 0 ? marginBp(grossProfitCents, costedRevenueCents) : null,
     operatingExpensesCents,
-    estimatedResultCents: grossProfitCents - operatingExpensesCents,
+    undeliveredLossCents,
+    estimatedResultCents: grossProfitCents - operatingExpensesCents - undeliveredLossCents,
     ordersWithoutCost: missing.size,
   };
 }
@@ -340,7 +342,10 @@ export async function openSupplierCredits(env: ManagementEnv) {
     'créditos de fornecedor',
   );
 }
-/** Purchases closed in the period with the supplier charging for goods that never arrived. */
+/**
+ * Goods the supplier charged and never delivered, recognized on the closing date. Never reaches
+ * COGS: nothing was sold, and the stock value stays what really arrived.
+ */
 export async function chargedUndelivered(env: ManagementEnv, range: Range) {
   const closures = await scanAll(
     env.repo,

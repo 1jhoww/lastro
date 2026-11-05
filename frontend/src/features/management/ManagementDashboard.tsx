@@ -395,6 +395,12 @@ function Results({ data }: { data: ManagementOverview }) {
             label="Despesas operacionais"
             value={formatCents(-p.operatingExpensesCents)}
           />
+          {p.undeliveredLossCents ? (
+            <SummaryRow
+              label="Mercadorias cobradas e não entregues"
+              value={formatCents(-p.undeliveredLossCents)}
+            />
+          ) : null}
           <SummaryRow
             label="Resultado estimado"
             value={formatCents(p.estimatedResultCents)}

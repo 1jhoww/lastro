@@ -230,6 +230,13 @@ describe('Encerrar saldo pendente', () => {
     const panel = await api(f).get('/finance/management').expect(200);
     expect(panel.body.data.payables.openCents).toBe(30000);
     expect(panel.body.data.notes.join(' ')).toContain('cobradas e não entregues');
+    expect(panel.body.data.profitability).toMatchObject({
+      cogsCents: 0,
+      grossProfitCents: 0,
+      operatingExpensesCents: 0,
+      undeliveredLossCents: 20000,
+      estimatedResultCents: -20000,
+    });
   });
 
   it('crédito do fornecedor mantém os títulos e compensa outra compra sem mexer no caixa', async () => {
@@ -240,6 +247,8 @@ describe('Encerrar saldo pendente', () => {
     expect(done.status).toBe(201);
     expect(await titles(purchase)).toEqual(before);
     const creditId = done.body.data.closure.creditId as string;
+    const result = await api(f).get('/finance/management').expect(200);
+    expect(result.body.data.profitability.undeliveredLossCents).toBe(0);
     const listed = await api(f).get('/supplier-credits').expect(200);
     expect(listed.body.data.items.map((c: { id: string }) => c.id)).toContain(creditId);
 

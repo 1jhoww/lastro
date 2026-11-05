@@ -15615,6 +15615,7 @@ export interface operations {
                                 grossProfitCents: number;
                                 grossMarginBp: number | null;
                                 operatingExpensesCents: number;
+                                undeliveredLossCents: number;
                                 estimatedResultCents: number;
                                 ordersWithoutCost: number;
                             };

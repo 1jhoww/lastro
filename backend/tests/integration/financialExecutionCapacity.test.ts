@@ -23,6 +23,8 @@ import { activeGenerationId } from '../../src/modules/finance/resolution/sourceI
 import { stableJson } from '../../src/shared/utils/crypto.js';
 import { financialCapacityReport } from '../helpers/financialCapacityReport.js';
 const f = registerFixture({ rateLimitMax: 100_000 });
+// Each case took close to an hour locally; slower machines raise this instead of editing the test.
+const caseTimeoutMs = Number(process.env.FINANCIAL_CAPACITY_TIMEOUT_MS ?? 3_600_000);
 describe('F02: 20 mil fontes válidas diretas, não recebimentos HTTP', () => {
   for (const kind of ['cancellation', 'return'] as const)
     it(`${kind}: 20.000 centavos, publicação única, retomada e prova fragmentada`, async () => {
@@ -269,5 +271,5 @@ describe('F02: 20 mil fontes válidas diretas, não recebimentos HTTP', () => {
       };
       await financialCapacityReport(record);
       console.info(JSON.stringify(record));
-    }, 3_600_000);
+    }, caseTimeoutMs);
 });

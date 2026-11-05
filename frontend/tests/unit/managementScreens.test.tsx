@@ -442,6 +442,7 @@ describe('telas do Gestão', () => {
           grossProfitCents: 0,
           grossMarginBp: null,
           operatingExpensesCents: 0,
+          undeliveredLossCents: 0,
           estimatedResultCents: 0,
           ordersWithoutCost: 0,
         },

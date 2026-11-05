@@ -12,6 +12,21 @@ import { requireCondition } from '../../shared/errors/appError.js';
 import { digest } from '../../shared/utils/crypto.js';
 import { recordAudit } from '../../shared/audit/audit.js';
 
+/**
+ * Defaults are not stored: the schema restores them on read, and a plain customer keeps the shape
+ * the previous API version can read. Rolling back stays possible until suppliers are really used.
+ */
+export function customerRecord(customer: s.Customer) {
+  const { relationships, isSupplier, contactName, ...rest } = customer;
+  const plain = relationships.length === 1 && relationships[0] === 'customer';
+  return {
+    ...rest,
+    ...(plain ? {} : { relationships }),
+    ...(isSupplier ? { isSupplier } : {}),
+    ...(contactName === null ? {} : { contactName }),
+  };
+}
+
 export class CustomerService {
   constructor(
     readonly repo: CommercialRepository,
@@ -258,7 +273,7 @@ export class CustomerService {
         schemaVersion: 1,
       });
       this.writeReservation(tenantId, id, null, customer.document, tx);
-      tx.create(this.repo.ref(tenantId, 'customers', id), customer);
+      tx.create(this.repo.ref(tenantId, 'customers', id), customerRecord(customer));
       recordAudit(this.repo.foundation, tx, actor, tenantId, 'customer.created', id, now, {
         assignedTo,
       });
@@ -311,7 +326,7 @@ export class CustomerService {
         updatedBy: actor.uid,
       });
       this.writeReservation(tenantId, id, customer.document, next.document, tx);
-      tx.set(this.repo.ref(tenantId, 'customers', id), next);
+      tx.set(this.repo.ref(tenantId, 'customers', id), customerRecord(next));
       recordAudit(this.repo.foundation, tx, actor, tenantId, 'customer.updated', id, now, {
         fields: Object.keys(changes),
       });
@@ -348,7 +363,7 @@ export class CustomerService {
         updatedAt: now,
         updatedBy: actor.uid,
       });
-      tx.set(this.repo.ref(tenantId, 'customers', id), next);
+      tx.set(this.repo.ref(tenantId, 'customers', id), customerRecord(next));
       recordAudit(
         this.repo.foundation,
         tx,

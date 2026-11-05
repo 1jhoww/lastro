@@ -8,7 +8,6 @@ import { companyDate } from '../orders/calculation.js';
 import { addDays, daysBetween } from '../reports/dates.js';
 import type { FinancialReads } from './financialReads.js';
 import {
-  chargedUndelivered,
   flowByPeriod,
   openPayables,
   openSupplierCredits,
@@ -22,7 +21,6 @@ import {
 const MAX_SPAN_DAYS = 366;
 const RECEIVABLE_LOOKBACK_DAYS = 365;
 const RECEIVABLE_CAP = 3000;
-const money = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 /**
  * Consolidated finance of Lastro Gestão: what is in and out of the cash register, what is expected
@@ -184,7 +182,6 @@ export class ManagementService {
           ).filter((t) => t.outstandingCents > 0);
           const payables = await openPayables(env);
           const credits = await openSupplierCredits(env);
-          const charged = await chargedUndelivered(env, period);
           const forecast = await recurringForecast(env, limit);
           const realizedRows = await realizedMoney(env, period);
           const cash = await this.cashBalance(env);
@@ -208,9 +205,9 @@ export class ManagementService {
             notes.push(
               `${profit.ordersWithoutCost} pedido(s) do período não têm custo registrado e ficam fora da margem bruta.`,
             );
-          if (charged > 0)
+          if (profit.undeliveredLossCents > 0)
             notes.push(
-              `${money.format(charged / 100)} em mercadorias cobradas e não entregues, em compras encerradas no período. Esse valor não está no custo das mercadorias vendidas nem nas despesas.`,
+              'Mercadorias cobradas e não entregues aparecem em linha própria: reduzem o resultado estimado, mas não o custo das mercadorias vendidas nem a margem bruta.',
             );
           return s.managementOverview.parse({
             period,

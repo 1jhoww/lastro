@@ -872,6 +872,8 @@ export const managementOverview = z.object({
     grossProfitCents: z.number().int().safe(),
     grossMarginBp: z.number().int().nullable(),
     operatingExpensesCents: z.number().int().safe(),
+    /** Goods charged and never delivered: outside COGS and the gross margin, on its own line. */
+    undeliveredLossCents: z.number().int().safe(),
     estimatedResultCents: z.number().int().safe(),
     ordersWithoutCost: z.number().int().min(0),
   }),
