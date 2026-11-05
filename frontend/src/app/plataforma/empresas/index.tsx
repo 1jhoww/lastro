@@ -23,7 +23,7 @@ import {
 } from '@/ui';
 import { Building, Plus, SearchX } from '@/ui/icons';
 
-type PlanFilter = 'all' | PlanCode | 'legacy';
+type PlanFilter = 'all' | PlanCode | 'custom' | 'legacy';
 type StatusFilter = 'all' | SubscriptionStatus;
 type AttentionFilter = 'all' | 'overdue' | 'open';
 
@@ -86,6 +86,7 @@ export default function PlatformCompanies() {
               { value: 'essencial', label: 'Essencial' },
               { value: 'profissional', label: 'Profissional' },
               { value: 'gestao', label: 'Gestão' },
+              { value: 'custom', label: 'Personalizado' },
               { value: 'legacy', label: 'Legado' },
             ]}
           />

@@ -7,7 +7,17 @@ import { NavMarker } from '@/layout/NavMarker';
 import { useSession } from '@/session/SessionContext';
 import { color, fontFamily, layout, radius, space, useLayoutSize } from '@/theme';
 import { Button, Text } from '@/ui';
-import { ArrowLeft, Banknote, Building, CreditCard, House, LogOut, Mail, UserRound } from '@/ui/icons';
+import {
+  ArrowLeft,
+  Banknote,
+  Building,
+  CreditCard,
+  House,
+  Layers,
+  LogOut,
+  Mail,
+  UserRound,
+} from '@/ui/icons';
 import { Touchable } from '@/ui/Touchable';
 import { focusRing, showFocusRing, type InteractionState } from '@/ui/interaction';
 import { ReauthGate } from './ReauthGate';
@@ -16,6 +26,7 @@ const items = [
   { href: '/plataforma', label: 'Visão geral', icon: House },
   { href: '/plataforma/empresas', label: 'Empresas', icon: Building },
   { href: '/plataforma/assinaturas', label: 'Assinaturas', icon: CreditCard },
+  { href: '/plataforma/planos', label: 'Planos personalizados', icon: Layers },
   { href: '/plataforma/cobrancas', label: 'Cobranças', icon: Banknote },
   { href: '/plataforma/convites', label: 'Convites', icon: Mail },
 ] as const;
@@ -195,7 +206,7 @@ const styles = StyleSheet.create({
     paddingBottom: space[6],
     gap: space[1],
   },
-  list: { flex: 1, paddingHorizontal: space[3], gap: 2 },
+  list: { flex: 1, paddingHorizontal: space[2], gap: 2 },
   item: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -18,7 +18,7 @@ export function useOverview() {
 
 export type CompanyFilters = {
   q?: string;
-  planCode?: PlanCode | 'legacy';
+  planCode?: PlanCode | 'custom' | 'legacy';
   status?: SubscriptionStatus;
   attention?: 'overdue' | 'open';
 };
@@ -54,6 +54,52 @@ export function usePlanChangePreview(subscriptionId: string, planCode: PlanCode 
         }),
       ),
     { enabled: planCode !== null },
+  );
+}
+
+export function useCustomPlans(status?: 'active' | 'inactive') {
+  const { api, key } = usePlatformApi();
+  return usePlatformQuery([...key('custom-plans'), status ?? 'all'], () =>
+    unwrap(api.GET('/api/v1/admin/custom-plans', { params: { query: status ? { status } : {} } })),
+  );
+}
+
+export function useCustomPlan(id: string) {
+  const { api, key } = usePlatformApi();
+  return usePlatformQuery(key('custom-plan', id), () =>
+    unwrap(api.GET('/api/v1/admin/custom-plans/{id}', { params: { path: { id } } })),
+  );
+}
+
+export function useCustomPlanHistory(id: string) {
+  const { api, key } = usePlatformApi();
+  return usePlatformQuery(key('custom-plan-history', id), () =>
+    unwrap(api.GET('/api/v1/admin/custom-plans/{id}/history', { params: { path: { id } } })),
+  );
+}
+
+export function useCustomPlanPreview(subscriptionId: string, planId: string | null) {
+  const { api, key } = usePlatformApi();
+  return usePlatformQuery(
+    key('plan-change', 'custom', subscriptionId, planId ?? ''),
+    () =>
+      unwrap(
+        api.GET('/api/v1/admin/subscriptions/{id}/custom-plan-change', {
+          params: { path: { id: subscriptionId }, query: { planId: planId as string } },
+        }),
+      ),
+    { enabled: planId !== null },
+  );
+}
+
+export function useContractDiff(subscriptionId: string) {
+  const { api, key } = usePlatformApi();
+  return usePlatformQuery(key('contract-diff', subscriptionId), () =>
+    unwrap(
+      api.GET('/api/v1/admin/subscriptions/{id}/contract-diff', {
+        params: { path: { id: subscriptionId } },
+      }),
+    ),
   );
 }
 

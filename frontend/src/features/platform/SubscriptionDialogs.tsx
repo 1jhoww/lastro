@@ -44,7 +44,8 @@ function ErrorLine({ error }: { error: unknown }) {
 /**
  * Troca de plano com prévia do servidor: vagas que precisam ser liberadas e recursos que a
  * empresa perde. Downgrade só é enviado com vagas livres e com cada recurso perdido confirmado.
- * O valor contratado só muda se o Super Admin escolher um novo.
+ * O valor contratado só muda se o Super Admin escolher um novo. Contrato gratuito não tem valor
+ * a herdar: vai para o preço oficial, salvo condição especial informada e confirmada.
  */
 export function ChangePlanDialog({ subscription, visible, onClose }: DialogProps) {
   const { api } = usePlatformApi();
@@ -53,6 +54,7 @@ export function ChangePlanDialog({ subscription, visible, onClose }: DialogProps
   const [target, setTarget] = useState<PlanCode | null>(null);
   const [acknowledged, setAcknowledged] = useState<PlanFeature[]>([]);
   const [newPrice, setNewPrice] = useState<number | null>(null);
+  const [priceConfirmed, setPriceConfirmed] = useState(false);
   const [reason, setReason] = useState('');
   const [tried, setTried] = useState(false);
   const preview = usePlanChangePreview(subscription.id, visible ? target : null);
@@ -62,10 +64,18 @@ export function ChangePlanDialog({ subscription, visible, onClose }: DialogProps
   const lost = preview.data?.lostFeatures ?? [];
   const blocked = (preview.data?.excessSeats ?? 0) > 0;
   const allAcknowledged = lost.every((f) => acknowledged.includes(f));
+  const free = preview.data?.monthlyPriceCents === 0;
+  const officialPrice = preview.data?.referencePriceCents ?? 0;
+  // Em contrato gratuito, `newPrice` é a condição especial; sem ela, vale o preço oficial.
+  const finalPrice = free ? (newPrice ?? officialPrice) : newPrice;
+  const pickPrice = (cents: number | null) => {
+    setNewPrice(cents);
+    setPriceConfirmed(false);
+  };
   const close = () => {
     setTarget(null);
     setAcknowledged([]);
-    setNewPrice(null);
+    pickPrice(null);
     setReason('');
     setTried(false);
     change.reset();
@@ -81,7 +91,8 @@ export function ChangePlanDialog({ subscription, visible, onClose }: DialogProps
             planCode: target as PlanCode,
             acknowledgedLostFeatures: lost,
             reason: reason.trim(),
-            ...(newPrice !== null ? { monthlyPriceCents: newPrice } : {}),
+            ...(finalPrice !== null ? { monthlyPriceCents: finalPrice } : {}),
+            ...(free && newPrice !== null ? { negotiatedPriceConfirmed: priceConfirmed } : {}),
           },
         }),
       ),
@@ -94,7 +105,9 @@ export function ChangePlanDialog({ subscription, visible, onClose }: DialogProps
   );
   const submit = () => {
     setTried(true);
+    const unconfirmed = free && newPrice !== null && !priceConfirmed;
     if (!target || !preview.data || blocked || !allAcknowledged || !validReason(reason)) return;
+    if (unconfirmed) return;
     change.mutate(undefined);
   };
 
@@ -131,7 +144,7 @@ export function ChangePlanDialog({ subscription, visible, onClose }: DialogProps
               onPress={() => {
                 setTarget(p.code);
                 setAcknowledged([]);
-                setNewPrice(null);
+                pickPrice(null);
               }}
               pressStyle={(s: InteractionState) => [
                 styles.option,
@@ -194,19 +207,46 @@ export function ChangePlanDialog({ subscription, visible, onClose }: DialogProps
               ) : null}
             </View>
           ) : null}
-          <View style={styles.group}>
-            <Checkbox
-              label={`Alterar o valor mensal (atual ${formatCents(preview.data.monthlyPriceCents)})`}
-              description="Sem marcar, o valor contratado continua o mesmo."
-              checked={newPrice !== null}
-              onChange={(checked) =>
-                setNewPrice(checked ? preview.data!.referencePriceCents : null)
-              }
-            />
-            {newPrice !== null ? (
-              <CurrencyInput label="Novo valor mensal" value={newPrice} onChange={setNewPrice} />
-            ) : null}
-          </View>
+          {free ? (
+            <View style={styles.group}>
+              <Alert title="Contrato gratuito">
+                {`O valor passa a ${formatCents(officialPrice)} por mês, preço oficial do ${planLabel(preview.data.targetPlanCode)}. A cobrança começa na data da troca, sem cobrar o período gratuito.`}
+              </Alert>
+              <Checkbox
+                label="Conceder condição especial"
+                description="Informe e confirme outro valor para esta empresa."
+                checked={newPrice !== null}
+                onChange={(checked) => pickPrice(checked ? officialPrice : null)}
+              />
+              {newPrice !== null ? (
+                <>
+                  <CurrencyInput label="Valor negociado" value={newPrice} onChange={pickPrice} />
+                  <Checkbox
+                    label={`Confirmo o valor negociado de ${formatCents(newPrice)} por mês`}
+                    checked={priceConfirmed}
+                    onChange={setPriceConfirmed}
+                  />
+                  {tried && !priceConfirmed ? (
+                    <Text variant="small" color={color.danger}>
+                      Confirme o valor negociado.
+                    </Text>
+                  ) : null}
+                </>
+              ) : null}
+            </View>
+          ) : (
+            <View style={styles.group}>
+              <Checkbox
+                label={`Alterar o valor mensal (atual ${formatCents(preview.data.monthlyPriceCents)})`}
+                description="Sem marcar, o valor contratado continua o mesmo."
+                checked={newPrice !== null}
+                onChange={(checked) => pickPrice(checked ? officialPrice : null)}
+              />
+              {newPrice !== null ? (
+                <CurrencyInput label="Novo valor mensal" value={newPrice} onChange={pickPrice} />
+              ) : null}
+            </View>
+          )}
         </>
       ) : null}
       <ReasonField

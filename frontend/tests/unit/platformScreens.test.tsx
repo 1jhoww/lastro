@@ -203,6 +203,91 @@ describe('Super Admin: empresas', () => {
     );
   });
 
+  describe('saída de contrato gratuito para plano oficial', () => {
+    const openFree = async () => {
+      const { gateway, server } = platformWorld();
+      server
+        .on('GET', '/api/v1/admin/companies/ta', () => ok(companyDetail()))
+        .on('GET', '/api/v1/admin/charges', () => ok({ items: [], nextCursor: null }))
+        .on('GET', '/api/v1/admin/subscriptions/ta/history', () => ok({ items: [] }))
+        .on('GET', '/api/v1/admin/plan-catalog', () => ok(catalog))
+        .on('GET', '/api/v1/admin/subscriptions/ta/plan-change', () =>
+          ok({
+            subscriptionVersion: 3,
+            currentPlanCode: 'custom',
+            targetPlanCode: 'essencial',
+            targetUserLimit: 1,
+            activeUsers: 1,
+            reservedInvitations: 0,
+            excessSeats: 0,
+            lostFeatures: [],
+            publicCatalogEnabled: false,
+            monthlyPriceCents: 0,
+            referencePriceCents: 11900,
+          }),
+        )
+        .on('POST', '/api/v1/admin/subscriptions/ta/plan', (c) =>
+          ok({ ...companyDetail().subscription, ...(c.body as object), planCode: 'essencial' }),
+        );
+      await renderApp({
+        gateway,
+        fetch: server.fetch,
+        initialUrl: '/plataforma/empresas/ta',
+        overrides,
+      });
+      await fireEvent.press(await screen.findByRole('button', { name: 'Trocar plano' }));
+      await fireEvent.press(await screen.findByRole('radio', { name: 'Essencial' }));
+      await screen.findByText(/preço oficial do Essencial/);
+      await fireEvent.changeText(screen.getByLabelText('Motivo'), 'Fim da cortesia');
+      return server;
+    };
+
+    it('sugere o preço oficial e não oferece manter o valor atual', async () => {
+      const server = await openFree();
+      expect(screen.queryByText('Sem marcar, o valor contratado continua o mesmo.')).toBeNull();
+      await fireEvent.press(screen.getByRole('button', { name: 'Confirmar troca' }));
+      await waitFor(() =>
+        expect(server.calls.find((c) => c.method === 'POST')?.body).toEqual({
+          expectedVersion: 3,
+          planCode: 'essencial',
+          acknowledgedLostFeatures: [],
+          reason: 'Fim da cortesia',
+          monthlyPriceCents: 11900,
+        }),
+      );
+    });
+    it('condição especial só é enviada com valor confirmado', async () => {
+      const server = await openFree();
+      await fireEvent.press(screen.getByRole('checkbox', { name: 'Conceder condição especial' }));
+      await fireEvent.changeText(screen.getByLabelText('Valor negociado'), '5000');
+      await fireEvent.press(screen.getByRole('button', { name: 'Confirmar troca' }));
+      expect(await screen.findByText('Confirme o valor negociado.')).toBeTruthy();
+      expect(server.calls.some((c) => c.method === 'POST')).toBe(false);
+      await fireEvent.press(
+        screen.getByRole('checkbox', { name: /Confirmo o valor negociado de R\$\s50,00/ }),
+      );
+      await fireEvent.press(screen.getByRole('button', { name: 'Confirmar troca' }));
+      await waitFor(() =>
+        expect(server.calls.find((c) => c.method === 'POST')?.body).toMatchObject({
+          monthlyPriceCents: 5000,
+          negotiatedPriceConfirmed: true,
+        }),
+      );
+    });
+    it('mudar o valor depois de confirmar exige nova confirmação', async () => {
+      const server = await openFree();
+      await fireEvent.press(screen.getByRole('checkbox', { name: 'Conceder condição especial' }));
+      await fireEvent.changeText(screen.getByLabelText('Valor negociado'), '5000');
+      await fireEvent.press(
+        screen.getByRole('checkbox', { name: /Confirmo o valor negociado de R\$\s50,00/ }),
+      );
+      await fireEvent.changeText(screen.getByLabelText('Valor negociado'), '6000');
+      await fireEvent.press(screen.getByRole('button', { name: 'Confirmar troca' }));
+      expect(await screen.findByText('Confirme o valor negociado.')).toBeTruthy();
+      expect(server.calls.some((c) => c.method === 'POST')).toBe(false);
+    });
+  });
+
   it('downgrade só é enviado com recursos confirmados, motivo e valor preservado', async () => {
     const { gateway, server } = platformWorld();
     server

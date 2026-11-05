@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { unwrap } from '@/api/client';
 import { toApiError } from '@/api/errors';
 import { queryKeys } from '@/api/queryKeys';
+import type { PlanCode } from '@/api/types';
 import { addDays } from '@/lib/calendar';
 import { IssuedInviteCard } from '@/features/invitations/IssuedInviteCard';
 import { todayIn } from '@/features/orders/rules';
@@ -24,10 +25,12 @@ import { focusRing, showFocusRing, type InteractionState } from '@/ui/interactio
 
 /** Datas de cobrança seguem o fuso de operação do Lastro, como no backend. */
 const BILLING_TIMEZONE = 'America/Sao_Paulo';
+const CUSTOM = 'custom:';
 
 const schema = z.object({
   name: z.string().trim().min(2, 'Use pelo menos 2 caracteres.').max(120, 'Nome longo demais.'),
-  planCode: z.enum(['essencial', 'profissional', 'gestao'], { error: 'Escolha um plano.' }),
+  /** Código do plano oficial, ou `custom:<id>` para um plano personalizado. */
+  plan: z.string({ error: 'Escolha um plano.' }).min(1, 'Escolha um plano.'),
   ownerEmail: z
     .string()
     .trim()
@@ -44,7 +47,8 @@ type Values = z.input<typeof schema>;
 
 /**
  * Cria empresa + assinatura + convite do primeiro administrador numa só operação do backend.
- * O plano vem do catálogo oficial; o valor começa no preço de referência e pode ser negociado.
+ * O plano vem do catálogo oficial ou das ofertas personalizadas ativas; o valor começa no preço
+ * de referência (ou no valor da oferta) e pode ser negociado.
  * A Idempotency-Key é mantida enquanto o formulário não muda: repetir após falha de rede não
  * cria uma segunda empresa.
  */
@@ -61,6 +65,11 @@ export default function NewTenant() {
     unwrap(api.GET('/api/v1/admin/plan-catalog')),
   );
   const offered = catalog.data?.items.filter((p) => p.offered) ?? [];
+  const customPlans = usePlatformQuery(queryKeys.platform(uid, 'custom-plans', 'active'), () =>
+    unwrap(
+      api.GET('/api/v1/admin/custom-plans', { params: { query: { status: 'active' } } }),
+    ),
+  );
 
   const { control, handleSubmit, formState, reset, setValue } = useForm<Values>({
     resolver: zodResolver(schema),
@@ -83,7 +92,9 @@ export default function NewTenant() {
           body: {
             name: v.name,
             ownerEmail: v.ownerEmail.toLowerCase(),
-            planCode: v.planCode,
+            ...(v.plan.startsWith(CUSTOM)
+              ? { customPlanId: v.plan.slice(CUSTOM.length) }
+              : { planCode: v.plan as PlanCode }),
             monthlyPriceCents: v.monthlyPriceCents,
             billingDay: Number(v.billingDay),
             billingStartsOn: v.billingStartsOn,
@@ -170,7 +181,7 @@ export default function NewTenant() {
           />
           <Controller
             control={control}
-            name="planCode"
+            name="plan"
             render={({ field }) => (
               <View style={styles.plans} accessibilityRole="radiogroup" accessibilityLabel="Plano">
                 <Text variant="smallStrong">Plano</Text>
@@ -217,9 +228,41 @@ export default function NewTenant() {
                     </Touchable>
                   );
                 })}
-                {formState.errors.planCode ? (
+                {customPlans.data?.items.map((p) => {
+                  const value = `${CUSTOM}${p.id}`;
+                  const selected = field.value === value;
+                  return (
+                    <Touchable
+                      key={p.id}
+                      accessibilityRole="radio"
+                      accessibilityState={{ selected }}
+                      accessibilityLabel={p.name}
+                      onPress={() => {
+                        changed();
+                        field.onChange(value);
+                        setValue('monthlyPriceCents', p.monthlyPriceCents);
+                      }}
+                      pressStyle={(s: InteractionState) => [
+                        styles.plan,
+                        selected && styles.planSelected,
+                        showFocusRing(s) && focusRing(),
+                      ]}
+                    >
+                      <View style={styles.planCopy}>
+                        <Text variant="bodyStrong">{p.name}</Text>
+                        <Text variant="small" color={color.textSecondary}>
+                          {`Personalizado: ${p.monthlyPriceCents === 0 ? 'gratuito' : `${formatCents(p.monthlyPriceCents)} por mês`}, ${
+                            p.userLimit === 1 ? '1 usuário' : `até ${p.userLimit} usuários`
+                          }`}
+                        </Text>
+                      </View>
+                      {selected ? <Check size={18} color={color.text} /> : null}
+                    </Touchable>
+                  );
+                })}
+                {formState.errors.plan ? (
                   <Text variant="small" color={color.danger}>
-                    {formState.errors.planCode.message}
+                    {formState.errors.plan.message}
                   </Text>
                 ) : null}
               </View>

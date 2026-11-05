@@ -1,11 +1,12 @@
-import type { ChargeSituation, PlanCode, PlanFeature } from '@/api/types';
+import type { ChargeSituation, ContractPlanCode, PlanFeature } from '@/api/types';
 import { formatIsoDate } from '@/lib/calendar';
 import { formatCents } from '@/lib/money';
 import type { BadgeTone } from '@/ui';
 
 /** Nome exibido do plano; contratos anteriores ao catálogo oficial aparecem como legado. */
-export function planLabel(code: PlanCode | null, name?: string | null): string {
+export function planLabel(code: ContractPlanCode | null, name?: string | null): string {
   if (name) return name;
+  if (code === 'custom') return 'Personalizado';
   if (code === 'essencial') return 'Essencial';
   if (code === 'profissional') return 'Profissional';
   if (code === 'gestao') return 'Gestão';
@@ -19,10 +20,13 @@ export const featureLabel: Record<PlanFeature, string> = {
   'commercial.sellers': 'Vendedores e carteiras de clientes',
   'commercial.visits': 'Visitas e recompra',
   'branding.custom': 'Logotipo e fotos nos documentos e no catálogo',
-  'purchasing.orders': 'Fornecedores, compras e recebimento de mercadorias',
+  'purchasing.suppliers': 'Fornecedores',
+  'purchasing.orders': 'Compras e recebimento de mercadorias',
   'costing.products': 'Custos de aquisição, margens e rentabilidade',
-  'finance.payables': 'Contas a pagar, despesas e recorrências',
-  'finance.management': 'Fluxo de caixa, painel e relatórios financeiros',
+  'finance.payables': 'Contas a pagar e despesas',
+  'finance.recurring': 'Despesas recorrentes',
+  'finance.dashboard': 'Dashboard financeiro e fluxo de caixa',
+  'finance.management': 'Relatórios financeiros',
 };
 
 /** Situação financeira da cobrança. Vencida e próxima são alertas, nunca bloqueio de acesso. */
@@ -54,6 +58,9 @@ export function competenceLabel(competence: string): string {
   return `${names[Number(month) - 1] ?? month}/${year}`;
 }
 
+/** Mensalidade para leitura: zero é contrato gratuito, sem cobrança. */
+export const priceLabel = (cents: number) => (cents === 0 ? 'Gratuito' : formatCents(cents));
+
 export const dateOrDash = (value: string | null | undefined) =>
   value ? formatIsoDate(value) : '—';
 
@@ -67,9 +74,21 @@ export function historyLabel(action: string, changes: Record<string, unknown>): 
   const cents = (value: unknown) => (typeof value === 'number' ? formatCents(value) : '—');
   switch (action) {
     case 'tenant.created':
-      return `Empresa criada no plano ${planLabel((changes.planCode as PlanCode) ?? null)}, ${cents(changes.monthlyPriceCents)} por mês.`;
+      return `Empresa criada no plano ${planLabel((changes.planCode as ContractPlanCode) ?? null)}, ${cents(changes.monthlyPriceCents)} por mês.`;
     case 'subscription.plan.changed':
-      return `Plano alterado de ${planLabel((changes.previousPlanCode as PlanCode) ?? null)} para ${planLabel((changes.planCode as PlanCode) ?? null)}; valor ${cents(changes.previousMonthlyPriceCents)} → ${cents(changes.monthlyPriceCents)}.${reason}`;
+      return `Plano alterado de ${planLabel((changes.previousPlanCode as ContractPlanCode) ?? null)} para ${planLabel((changes.planCode as ContractPlanCode) ?? null)}; valor ${cents(changes.previousMonthlyPriceCents)} → ${cents(changes.monthlyPriceCents)}.${reason}`;
+    case 'subscription.custom_plan.assigned':
+      return `Vinculada ao plano personalizado ${String(changes.planName)} (versão ${String(changes.planVersion)}); valor ${cents(changes.previousMonthlyPriceCents)} → ${cents(changes.monthlyPriceCents)}.${reason}`;
+    case 'subscription.contract.changed':
+      return `Contrato alterado individualmente: valor ${cents(changes.previousMonthlyPriceCents)} → ${cents(changes.monthlyPriceCents)}, limite ${String(changes.previousUserLimit)} → ${String(changes.userLimit)} usuários.${reason}`;
+    case 'custom_plan.created':
+      return `Plano criado: ${changes.monthlyPriceCents === 0 ? 'gratuito' : `${cents(changes.monthlyPriceCents)} por mês`}, até ${String(changes.userLimit)} usuários.`;
+    case 'custom_plan.updated':
+      return `Nova versão da oferta (${String(changes.version)}). Contratos existentes não mudaram.${reason}`;
+    case 'custom_plan.deactivated':
+      return `Plano desativado para novos contratos.${reason}`;
+    case 'custom_plan.reactivated':
+      return `Plano reativado.${reason}`;
     case 'subscription.activated':
       return `Cobrança ativada: ${cents(changes.monthlyPriceCents)} por mês, vencimento dia ${String(changes.billingDay)}, a partir de ${dateOrDash(changes.billingStartsOn as string)}.${reason}`;
     case 'subscription.terms.updated':

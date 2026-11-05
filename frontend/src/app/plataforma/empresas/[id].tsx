@@ -9,7 +9,18 @@ import {
   CompanyInvitationsPanel,
   CompanyUsersPanel,
 } from '@/features/platform/CompanyAccess';
-import { dateOrDash, featureLabel, historyLabel, planLabel } from '@/features/platform/copy';
+import {
+  dateOrDash,
+  featureLabel,
+  historyLabel,
+  planLabel,
+  priceLabel,
+} from '@/features/platform/copy';
+import {
+  AssignCustomPlanDialog,
+  ContractDialog,
+} from '@/features/platform/customPlans/ContractDialogs';
+import { ContractPanel } from '@/features/platform/customPlans/ContractPanel';
 import { PlatformHeader } from '@/features/platform/PlatformHeader';
 import { BackLink, Detail, LoadError, LoadingRows } from '@/features/platform/PlatformParts';
 import {
@@ -25,7 +36,15 @@ import { color, space } from '@/theme';
 import { Alert, Badge, Button, EmptyState, Panel, Skeleton, Text } from '@/ui';
 import { Banknote } from '@/ui/icons';
 
-type DialogKind = 'plan' | 'terms' | 'activate' | 'suspend' | 'reactivate' | 'charge';
+type DialogKind =
+  | 'plan'
+  | 'custom-plan'
+  | 'contract'
+  | 'terms'
+  | 'activate'
+  | 'suspend'
+  | 'reactivate'
+  | 'charge';
 
 /**
  * Detalhe administrativo de uma empresa: contrato, vagas, usuários, convites, cobranças e
@@ -111,6 +130,20 @@ export default function PlatformCompany() {
                 onPress={() => setDialog('plan')}
               />
               <Button
+                label="Plano personalizado"
+                size="sm"
+                variant="outline"
+                onPress={() => setDialog('custom-plan')}
+              />
+              {s.planCode === 'custom' ? (
+                <Button
+                  label="Alterar contrato"
+                  size="sm"
+                  variant="outline"
+                  onPress={() => setDialog('contract')}
+                />
+              ) : null}
+              <Button
                 label="Ajustar condições"
                 size="sm"
                 variant="outline"
@@ -136,7 +169,11 @@ export default function PlatformCompany() {
         }
       >
         <Detail label="Plano">{planLabel(s.planCode, s.planName)}</Detail>
-        <Detail label="Valor mensal contratado">{formatCents(s.monthlyPriceCents)}</Detail>
+        <Detail label="Valor mensal contratado">
+          {s.monthlyPriceCents === 0
+            ? `${priceLabel(0)}, sem cobrança`
+            : formatCents(s.monthlyPriceCents)}
+        </Detail>
         <Detail label="Dia de vencimento">
           {s.billingDay === null ? 'Definido na ativação' : `Dia ${s.billingDay}`}
         </Detail>
@@ -150,6 +187,8 @@ export default function PlatformCompany() {
         </Detail>
         <Detail label="Observações internas">{s.commercialNotes || '—'}</Detail>
       </Panel>
+
+      {s.planCode === 'custom' ? <ContractPanel subscription={s} /> : null}
 
       <Panel
         title="Vagas e recursos"
@@ -194,6 +233,17 @@ export default function PlatformCompany() {
       <HistoryPanel subscriptionId={s.id} />
 
       {dialog === 'plan' ? <ChangePlanDialog subscription={s} visible onClose={close} /> : null}
+      {dialog === 'custom-plan' ? (
+        <AssignCustomPlanDialog subscription={s} visible onClose={close} />
+      ) : null}
+      {dialog === 'contract' ? (
+        <ContractDialog
+          subscription={s}
+          occupiedSeats={data.capacity.activeUsers + data.capacity.reservedInvitations}
+          visible
+          onClose={close}
+        />
+      ) : null}
       {dialog === 'terms' ? <TermsDialog subscription={s} visible onClose={close} /> : null}
       {dialog === 'activate' ? <ActivateDialog subscription={s} visible onClose={close} /> : null}
       {dialog === 'suspend' || dialog === 'reactivate' ? (

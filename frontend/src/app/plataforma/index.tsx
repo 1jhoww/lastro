@@ -68,6 +68,7 @@ export default function PlatformOverviewScreen() {
                 value={String(data.plans.gestao)}
                 caption={data.plans.legacy ? `${data.plans.legacy} em contrato legado` : undefined}
               />,
+              <Stat key="custom" label="Personalizados" value={String(data.plans.custom)} />,
             ]}
           </MetricStrip>
           <MetricStrip>
