@@ -7,6 +7,7 @@ import { useCategoryLookup } from '@/features/categories/api';
 import { DetailColumns, Fact, Facts } from '@/features/catalog/DetailParts';
 import { RecordError, RecordLoading } from '@/features/catalog/RecordStates';
 import { ProductStockPanel } from '@/features/inventory/ProductStockPanel';
+import { ProductCostPanel } from '@/features/management/ProductCostPanel';
 import { ProductImagePanel } from '@/features/products/ProductImagePanel';
 import { useProduct, useSetProductStatus } from '@/features/products/api';
 import { Screen } from '@/layout/Screen';
@@ -122,6 +123,7 @@ function ProductView({ product: p }: { product: Product }) {
                 />
               </Facts>
             </Panel>
+            {permissions.includes('costs:read') ? <ProductCostPanel productId={p.id} /> : null}
             <Panel title="Descrição">
               <Text
                 variant="body"

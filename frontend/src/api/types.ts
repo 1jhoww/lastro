@@ -72,6 +72,37 @@ type BodyOf<P extends keyof paths, M extends keyof paths[P]> = paths[P][M] exten
   ? B
   : never;
 
+export type SupplierOption = DataOf<'/api/v1/suppliers', 'get'>['items'][number];
+export type ProductCosts = DataOf<'/api/v1/products/{id}/costs', 'get'>;
+export type Purchase = DataOf<'/api/v1/purchases/{id}', 'get'>;
+export type PurchaseLine = Purchase['lines'][number];
+export type PurchaseCreateBody = BodyOf<'/api/v1/purchases', 'post'>;
+export type PurchaseUpdateBody = BodyOf<'/api/v1/purchases/{id}', 'patch'>;
+export type PurchaseConfirmBody = BodyOf<'/api/v1/purchases/{id}/confirm', 'post'>;
+export type PurchaseAmendmentBody = BodyOf<'/api/v1/purchases/{id}/amendments', 'post'>;
+export type PurchaseReceiptBody = BodyOf<'/api/v1/purchases/{id}/receipts', 'post'>;
+export type PurchaseReceipt = DataOf<'/api/v1/purchases/{id}/receipts', 'get'>['items'][number];
+export type PurchaseClosureBody = BodyOf<'/api/v1/purchases/{id}/close', 'post'>;
+export type SupplierCredit = DataOf<'/api/v1/supplier-credits/{id}', 'get'>;
+export type SupplierCreditMovement = DataOf<
+  '/api/v1/supplier-credits/{id}/movements',
+  'get'
+>['items'][number];
+export type Payable = DataOf<'/api/v1/payables/{id}', 'get'>;
+export type PayablePayment = DataOf<'/api/v1/payable-payments', 'get'>['items'][number];
+export type PayableBody = BodyOf<'/api/v1/payables', 'post'>;
+export type PayableUpdateBody = BodyOf<'/api/v1/payables/{id}', 'patch'>;
+export type PayablePaymentBody = BodyOf<'/api/v1/payables/{id}/payments', 'post'>;
+export type ExpenseCategory = DataOf<'/api/v1/expense-categories', 'get'>['items'][number];
+export type RecurringExpense = DataOf<'/api/v1/recurring-expenses/{id}', 'get'>;
+export type RecurringCreateBody = BodyOf<'/api/v1/recurring-expenses', 'post'>;
+export type RecurringUpdateBody = BodyOf<'/api/v1/recurring-expenses/{id}', 'patch'>;
+export type ManagementOverview = DataOf<'/api/v1/finance/management', 'get'>;
+export type ManagementQuery = NonNullable<
+  paths['/api/v1/finance/management']['get']['parameters']['query']
+>;
+export type FinanceSettingsInput = BodyOf<'/api/v1/finance/settings', 'put'>;
+
 export type CustomersPage = DataOf<'/api/v1/customers', 'get'>;
 export type Customer = DataOf<'/api/v1/customers/{id}', 'get'>;
 export type CustomerCreate = BodyOf<'/api/v1/customers', 'post'>;

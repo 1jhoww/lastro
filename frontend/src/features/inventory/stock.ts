@@ -41,6 +41,8 @@ export const movementTypeLabel: Record<MovementType, string> = {
   STOCK_RESERVATION_RELEASE: 'Reserva liberada',
   STOCK_DISPATCH: 'Expedição',
   STOCK_RETURN: 'Devolução recebida',
+  STOCK_PURCHASE_ENTRY: 'Recebimento de compra',
+  STOCK_PURCHASE_REVERSAL: 'Estorno de recebimento',
 };
 
 export const movementTypes = Object.keys(movementTypeLabel) as MovementType[];
@@ -49,7 +51,7 @@ export const movementTypes = Object.keys(movementTypeLabel) as MovementType[];
 export function originLabel(m: Pick<Movement, 'origin' | 'type'>): string {
   if (m.origin === 'administrative')
     return m.type === 'STOCK_ENTRY' ? 'Entrada manual' : 'Ajuste manual';
-  return 'Automática (pedido)';
+  return m.origin === 'purchase' ? 'Automática (compra)' : 'Automática (pedido)';
 }
 
 /**

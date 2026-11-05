@@ -25,6 +25,12 @@ import {
 } from '@/ui';
 import { Pencil, Plus, SearchX, Users } from '@/ui/icons';
 
+type Relationship = 'customer' | 'supplier' | 'all';
+const relationshipOptions: { value: Relationship; label: string }[] = [
+  { value: 'customer', label: 'Clientes' },
+  { value: 'supplier', label: 'Fornecedores' },
+  { value: 'all', label: 'Todos' },
+];
 const statusOptions: { value: StatusFilter; label: string }[] = [
   { value: 'active', label: 'Ativos' },
   { value: 'inactive', label: 'Inativos' },
@@ -34,6 +40,8 @@ const statusOptions: { value: StatusFilter; label: string }[] = [
 export default function Customers() {
   const { permissions } = useSession();
   const admin = permissions.includes('customers:all:manage');
+  const canSupply = permissions.includes('suppliers:manage');
+  const [relationship, setRelationship] = useState<Relationship>('customer');
   const compact = useLayoutSize() === 'compact';
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState<StatusFilter>('active');
@@ -49,9 +57,10 @@ export default function Customers() {
       q: byDocument ? '' : q,
       status,
       ...(byDocument ? { document: byDocument } : {}),
-      ...(admin && assignedTo !== 'any' ? { assignedTo } : {}),
+      ...(admin && assignedTo !== 'any' && relationship !== 'supplier' ? { assignedTo } : {}),
+      ...(relationship !== 'customer' ? { relationship } : {}),
     }),
-    [q, byDocument, status, admin, assignedTo],
+    [q, byDocument, status, admin, assignedTo, relationship],
   );
   const { query, items } = useCustomerList(filters);
 
@@ -150,7 +159,7 @@ export default function Customers() {
 
   return (
     <Screen
-      title="Clientes"
+      title={canSupply ? 'Clientes e fornecedores' : 'Clientes'}
       description={
         query.isPending
           ? admin
@@ -159,11 +168,26 @@ export default function Customers() {
           : countLabel(items.length, Boolean(query.hasNextPage), 'cliente', 'clientes')
       }
       actions={
-        <Link href="/clientes/novo" asChild>
-          <Button label="Novo cliente" icon={Plus} variant="strong" fullWidth={compact} />
-        </Link>
+        <>
+          {canSupply ? (
+            <Link href={'/clientes/novo?relacionamento=fornecedor' as Href} asChild>
+              <Button label="Novo fornecedor" icon={Plus} variant="outline" fullWidth={compact} />
+            </Link>
+          ) : null}
+          <Link href="/clientes/novo" asChild>
+            <Button label="Novo cliente" icon={Plus} variant="strong" fullWidth={compact} />
+          </Link>
+        </>
       }
     >
+      {canSupply ? (
+        <Segmented
+          label="Relacionamento"
+          options={relationshipOptions}
+          value={relationship}
+          onChange={setRelationship}
+        />
+      ) : null}
       <View style={[styles.toolbar, compact && styles.toolbarCompact]}>
         <View style={styles.search}>
           <SearchField
@@ -175,7 +199,7 @@ export default function Customers() {
           />
         </View>
         <Segmented label="Situação" options={statusOptions} value={status} onChange={setStatus} />
-        {admin ? (
+        {admin && relationship !== 'supplier' ? (
           <View style={[styles.owner, compact && styles.ownerCompact]}>
             <Select
               label="Responsável"

@@ -29,6 +29,9 @@ export const customerFormSchema = z
       .min(2, 'Informe o nome com pelo menos 2 caracteres.')
       .max(160, 'Use até 160 caracteres.'),
     tradeName: optionalText(160, 'Use até 160 caracteres.'),
+    contactName: optionalText(160, 'Use até 160 caracteres.'),
+    isCustomer: z.boolean(),
+    isSupplier: z.boolean(),
     document: z
       .string()
       .trim()
@@ -68,6 +71,12 @@ export const customerFormSchema = z
     notes: optionalText(2000, 'Use até 2000 caracteres.'),
   })
   .superRefine((v, ctx) => {
+    if (!v.isCustomer && !v.isSupplier)
+      ctx.addIssue({
+        code: 'custom',
+        path: ['isCustomer'],
+        message: 'Marque cliente, fornecedor ou os dois.',
+      });
     if (!v.noNumber && !v.number.trim())
       ctx.addIssue({
         code: 'custom',
@@ -81,6 +90,9 @@ export type CustomerFormValues = z.infer<typeof customerFormSchema>;
 export const emptyCustomerForm: CustomerFormValues = {
   name: '',
   tradeName: '',
+  contactName: '',
+  isCustomer: true,
+  isSupplier: false,
   document: '',
   email: '',
   phone: '',
@@ -101,6 +113,9 @@ export function customerToForm(c: Customer): CustomerFormValues {
   return {
     name: c.name,
     tradeName: c.tradeName ?? '',
+    contactName: c.contactName ?? '',
+    isCustomer: c.relationships.includes('customer'),
+    isSupplier: c.relationships.includes('supplier'),
     document: formatDocument(c.document),
     email: c.email ?? '',
     phone: formatPhone(c.phone),
@@ -117,6 +132,18 @@ export function customerToForm(c: Customer): CustomerFormValues {
 }
 
 const orNull = (v: string) => (v.trim() ? v.trim() : null);
+const relationshipsOf = (v: CustomerFormValues): ('customer' | 'supplier')[] => [
+  ...(v.isCustomer ? (['customer'] as const) : []),
+  ...(v.isSupplier ? (['supplier'] as const) : []),
+];
+/** O padrão do servidor é cliente: só viaja quando há fornecedor na decisão. */
+const relationshipChange = (v: CustomerFormValues, previous?: readonly string[]) => {
+  const next = relationshipsOf(v);
+  const same = previous
+    ? next.length === previous.length && next.every((r) => previous.includes(r))
+    : next.length === 1 && next[0] === 'customer';
+  return same ? {} : { relationships: next };
+};
 
 /** Endereço completo, como o contrato exige ao gravar. */
 function address(v: CustomerFormValues): CustomerCreate['address'] {
@@ -135,6 +162,8 @@ function address(v: CustomerFormValues): CustomerCreate['address'] {
 export function formToCreate(v: CustomerFormValues): CustomerCreate {
   const body: CustomerCreate = { name: v.name.trim(), address: address(v) };
   if (v.tradeName.trim()) body.tradeName = v.tradeName.trim();
+  if (v.contactName.trim()) body.contactName = v.contactName.trim();
+  Object.assign(body, relationshipChange(v));
   if (v.document.trim()) body.document = normalizeDocument(v.document);
   if (v.email.trim()) body.email = v.email.trim();
   if (v.phone.trim()) body.phone = v.phone.trim();
@@ -143,11 +172,17 @@ export function formToCreate(v: CustomerFormValues): CustomerCreate {
 }
 
 /** Corpo de edição: opcionais vazios viram null para limpar o valor salvo. Sem status/responsável. */
-export function formToUpdate(v: CustomerFormValues, expectedVersion: number): CustomerUpdate {
+export function formToUpdate(
+  v: CustomerFormValues,
+  expectedVersion: number,
+  relationships: readonly string[] = ['customer'],
+): CustomerUpdate {
   return {
     expectedVersion,
     name: v.name.trim(),
     tradeName: orNull(v.tradeName),
+    contactName: orNull(v.contactName),
+    ...relationshipChange(v, relationships),
     document: v.document.trim() ? normalizeDocument(v.document) : null,
     email: orNull(v.email),
     phone: orNull(v.phone),

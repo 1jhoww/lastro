@@ -85,6 +85,7 @@ export default function PlatformCompanies() {
               { value: 'all', label: 'Todos os planos' },
               { value: 'essencial', label: 'Essencial' },
               { value: 'profissional', label: 'Profissional' },
+              { value: 'gestao', label: 'Gestão' },
               { value: 'legacy', label: 'Legado' },
             ]}
           />

@@ -111,6 +111,7 @@ describe('formulário de cliente', () => {
       expectedVersion: 3,
       name: 'Mercado',
       tradeName: null,
+      contactName: null,
       document: null,
       email: null,
       phone: null,

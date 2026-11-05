@@ -27,7 +27,7 @@ const BILLING_TIMEZONE = 'America/Sao_Paulo';
 
 const schema = z.object({
   name: z.string().trim().min(2, 'Use pelo menos 2 caracteres.').max(120, 'Nome longo demais.'),
-  planCode: z.enum(['essencial', 'profissional'], { error: 'Escolha um plano.' }),
+  planCode: z.enum(['essencial', 'profissional', 'gestao'], { error: 'Escolha um plano.' }),
   ownerEmail: z
     .string()
     .trim()

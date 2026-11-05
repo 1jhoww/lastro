@@ -166,6 +166,8 @@ export const customer = (id: string, overrides: Record<string, unknown> = {}) =>
   id,
   name: `Cliente ${id}`,
   tradeName: null,
+  contactName: null,
+  relationships: ['customer'],
   document: null,
   email: null,
   phone: null,

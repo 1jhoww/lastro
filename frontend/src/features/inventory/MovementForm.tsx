@@ -35,7 +35,7 @@ const copy = {
     confirmTitle: 'Confirmar entrada?',
     confirm: 'Registrar entrada',
     done: 'Entrada registrada',
-    reasonHint: 'Ex.: Nota fiscal 1234 do fornecedor. Fica no histórico.',
+    reasonHint: 'Ex.: Bonificação do fornecedor. Fica no histórico.',
   },
   adjustment: {
     review: 'Revisar ajuste',
@@ -70,7 +70,7 @@ export function MovementForm({ kind, stock }: { kind: MovementKind; stock: Stock
   const current = figuresOf(stock);
   const text = copy[kind];
 
-  const schema = useMemo(() => movementFormSchema(unit), [unit]);
+  const schema = useMemo(() => movementFormSchema(unit, kind), [unit, kind]);
   const { control, handleSubmit } = useForm<MovementFormValues>({
     defaultValues: emptyMovementForm,
     resolver: zodResolver(schema),
@@ -197,6 +197,7 @@ export function MovementForm({ kind, stock }: { kind: MovementKind; stock: Stock
             render={({ field, fieldState }) => (
               <TextField
                 label="Motivo"
+                optional={kind === 'entry'}
                 value={field.value}
                 onChangeText={field.onChange}
                 onBlur={field.onBlur}
@@ -266,7 +267,7 @@ export function MovementForm({ kind, stock }: { kind: MovementKind; stock: Stock
               label={kind === 'entry' ? 'Entrada' : review.delta > 0 ? 'Acrescentar' : 'Retirar'}
               value={formatQuantity(Math.abs(review.delta), unit)}
             />
-            <ReviewLine label="Motivo" value={review.body.reason} />
+            {review.body.reason ? <ReviewLine label="Motivo" value={review.body.reason} /> : null}
             {review.body.notes ? <ReviewLine label="Observação" value={review.body.notes} /> : null}
             <ImpactTable
               unit={unit}

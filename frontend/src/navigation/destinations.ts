@@ -4,6 +4,8 @@ import {
   CalendarCheck,
   CircleDollarSign,
   ClipboardList,
+  ShoppingCart,
+  Wallet,
   House,
   Package,
   Settings,
@@ -44,7 +46,20 @@ export type Permission =
   | 'payment-settings:manage'
   | 'reports:read'
   | 'documents:own:read'
-  | 'visits:own:manage';
+  | 'visits:own:manage'
+  | 'suppliers:manage'
+  | 'purchases:read'
+  | 'purchases:create'
+  | 'purchases:edit'
+  | 'purchases:confirm'
+  | 'purchases:receive'
+  | 'purchases:close'
+  | 'costs:read'
+  | 'payables:read'
+  | 'payables:manage'
+  | 'payables:pay'
+  | 'payables:reverse'
+  | 'financial-reports:read';
 
 export type Destination = {
   key: string;
@@ -57,6 +72,8 @@ export type Destination = {
   primaryOnMobile?: boolean;
   /** Módulo sem contrato de API ainda (Fase E). */
   pending?: boolean;
+  /** Atalho dispensável quando a pessoa já chega à área por um destino mais completo. */
+  hiddenWith?: Permission;
 };
 
 export const destinations: Destination[] = [
@@ -108,11 +125,28 @@ export const destinations: Destination[] = [
     anyOf: ['inventory:manage', 'inventory:available:read'],
   },
   {
+    key: 'compras',
+    label: 'Compras',
+    href: '/compras' as Href,
+    icon: ShoppingCart,
+    // Recurso do plano Gestão: o servidor só emite a permissão quando a assinatura inclui o módulo.
+    anyOf: ['purchases:read'],
+  },
+  {
     key: 'financeiro',
     label: 'Financeiro',
     href: '/financeiro',
     icon: CircleDollarSign,
     anyOf: ['receivables:read', 'payments:manage'],
+  },
+  {
+    // Quem recebeu só contas a pagar, sem acesso ao financeiro da empresa.
+    key: 'contas-pagar',
+    label: 'Contas a pagar',
+    href: '/financeiro/pagar' as Href,
+    icon: Wallet,
+    anyOf: ['payables:read'],
+    hiddenWith: 'receivables:read',
   },
   {
     key: 'configuracoes',
@@ -139,7 +173,9 @@ export const destinations: Destination[] = [
 
 export function visibleDestinations(permissions: readonly string[]): Destination[] {
   const granted = new Set(permissions);
-  return destinations.filter((d) => d.anyOf.some((p) => granted.has(p)));
+  return destinations.filter(
+    (d) => d.anyOf.some((p) => granted.has(p)) && !(d.hiddenWith && granted.has(d.hiddenWith)),
+  );
 }
 
 export function canCreateOrder(permissions: readonly string[]): boolean {

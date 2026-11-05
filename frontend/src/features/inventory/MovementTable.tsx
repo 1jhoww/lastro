@@ -18,6 +18,8 @@ const tone: Record<Movement['type'], BadgeTone> = {
   STOCK_RESERVATION_RELEASE: 'neutral',
   STOCK_DISPATCH: 'strong',
   STOCK_RETURN: 'success',
+  STOCK_PURCHASE_ENTRY: 'success',
+  STOCK_PURCHASE_REVERSAL: 'warning',
 };
 
 const signed = (milli: number, unit: Movement['unit']) =>

@@ -5,6 +5,7 @@ import { useCustomer, useUpdateCustomer } from '@/features/customers/api';
 import { customerToForm, formToUpdate } from '@/features/customers/form';
 import { addressComplete } from '@/features/customers/presentation';
 import { Screen } from '@/layout/Screen';
+import { useSession } from '@/session/SessionContext';
 import { useToast } from '@/ui';
 
 export default function EditCustomer() {
@@ -13,6 +14,7 @@ export default function EditCustomer() {
   const toast = useToast();
   const customer = useCustomer(id);
   const update = useUpdateCustomer(id);
+  const { permissions } = useSession();
 
   if (customer.isPending) return <RecordLoading title="Editar cliente" />;
   if (customer.isError || !customer.data)
@@ -32,6 +34,7 @@ export default function EditCustomer() {
       <CustomerForm
         // Nova versão (após conflito e recarga) remonta o formulário com os dados atuais.
         key={c.version}
+        suppliers={permissions.includes('suppliers:manage')}
         defaultValues={customerToForm(c)}
         incompleteAddress={!addressComplete(c.address)}
         submitting={update.isPending}
@@ -43,7 +46,7 @@ export default function EditCustomer() {
         }}
         onSubmit={(values) => {
           if (update.isPending) return;
-          update.mutate(formToUpdate(values, c.version), {
+          update.mutate(formToUpdate(values, c.version, c.relationships), {
             onSuccess: () => {
               toast.show('Cliente salvo');
               router.replace(`/clientes/${c.id}` as Href);

@@ -13,6 +13,8 @@ export type CustomerFilters = {
   assignedTo?: string;
   /** CPF/CNPJ normalizado: busca exata, no lugar da busca por nome. */
   document?: string;
+  /** Sem valor, só clientes. Fornecedores dependem do plano e da permissão. */
+  relationship?: 'customer' | 'supplier' | 'all';
 };
 
 /**
@@ -30,6 +32,7 @@ export function useCustomerList(filters: CustomerFilters) {
             ...listParams(filters),
             ...(filters.assignedTo ? { assignedTo: filters.assignedTo } : {}),
             ...(filters.document ? { document: filters.document } : {}),
+            ...(filters.relationship ? { relationship: filters.relationship } : {}),
             ...(cursor ? { cursor } : {}),
           },
         },
@@ -86,6 +89,34 @@ export function useUpdateCustomer(id: string) {
   return useMutation({
     mutationFn: (body: CustomerUpdate) =>
       unwrap(api.PATCH('/api/v1/customers/{id}', { params: { header, path: { id } }, body })),
+    onSuccess: store,
+  });
+}
+
+/** Acha pelo CPF/CNPJ o cadastro que já existe e acrescenta o relacionamento de fornecedor. */
+export function useLinkSupplier() {
+  const { api, header } = useTenantApi();
+  const store = useCustomerCache();
+  return useMutation({
+    mutationFn: async (document: string) => {
+      const found = await unwrap(
+        api.GET('/api/v1/customers', {
+          params: { header, query: { document, relationship: 'all', status: 'all' } },
+        }),
+      );
+      const record = found.items[0];
+      if (!record) throw new Error('Cadastro não encontrado');
+      if (record.relationships.includes('supplier')) return record;
+      return unwrap(
+        api.PATCH('/api/v1/customers/{id}', {
+          params: { header, path: { id: record.id } },
+          body: {
+            relationships: [...record.relationships, 'supplier'],
+            expectedVersion: record.version,
+          },
+        }),
+      );
+    },
     onSuccess: store,
   });
 }

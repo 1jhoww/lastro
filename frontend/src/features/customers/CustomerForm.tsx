@@ -20,7 +20,7 @@ import {
 import { useDiscardGuard } from '@/features/catalog/useDiscardGuard';
 import { brazilianStates, maskPhone, maskPostalCode } from '@/lib/document';
 import { color, space } from '@/theme';
-import { Alert, Button, Checkbox, Select, TextField, type TextFieldProps } from '@/ui';
+import { Alert, Button, Checkbox, Select, Text, TextField, type TextFieldProps } from '@/ui';
 import { CircleCheck } from '@/ui/icons';
 import { customerFormSchema, type CustomerFormValues } from './form';
 import { lookupPostalCode, type PostalCodeAddress, type PostalCodeResult } from './viaCep';
@@ -34,6 +34,8 @@ type Props = {
   onReload?: () => void;
   /** Cliente antigo, gravado antes da obrigatoriedade do endereço: pede a complementação. */
   incompleteAddress?: boolean;
+  /** Plano e perfil permitem marcar o cadastro como fornecedor. */
+  suppliers?: boolean;
 };
 
 const stateOptions = brazilianStates.map((uf) => ({ value: uf, label: uf }));
@@ -54,6 +56,7 @@ export function CustomerForm({
   onCancel,
   onReload,
   incompleteAddress,
+  suppliers,
 }: Props) {
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerFormSchema),
@@ -72,7 +75,7 @@ export function CustomerForm({
   useEffect(() => {
     if (!error) return;
     if (toApiError(error).code === 'DUPLICATE_DOCUMENT')
-      setError('document', { message: 'Já existe um cliente com este CPF/CNPJ nesta empresa.' });
+      setError('document', { message: 'Já existe um cadastro com este CPF/CNPJ nesta empresa.' });
   }, [error, setError]);
 
   const submit = handleSubmit(onSubmit);
@@ -81,6 +84,34 @@ export function CustomerForm({
   return (
     <FormBody>
       {showBanner ? <SubmitError error={error} onReload={onReload} /> : null}
+
+      {suppliers ? (
+        <FormGroup title="Relacionamento" description="O mesmo cadastro pode ser os dois.">
+          <FieldRow weights={[1, 1]}>
+            <Controller
+              control={control}
+              name="isCustomer"
+              render={({ field, fieldState }) => (
+                <View>
+                  <Checkbox label="Cliente" checked={field.value} onChange={field.onChange} />
+                  {fieldState.error ? (
+                    <Text variant="small" color={color.danger}>
+                      {fieldState.error.message}
+                    </Text>
+                  ) : null}
+                </View>
+              )}
+            />
+            <Controller
+              control={control}
+              name="isSupplier"
+              render={({ field }) => (
+                <Checkbox label="Fornecedor" checked={field.value} onChange={field.onChange} />
+              )}
+            />
+          </FieldRow>
+        </FormGroup>
+      ) : null}
 
       <FormGroup title="Identificação">
         <FieldRow weights={[3, 2, 2]}>
@@ -132,6 +163,13 @@ export function CustomerForm({
             autoComplete="email"
           />
         </FieldRow>
+        <Field
+          control={control}
+          name="contactName"
+          label="Contato responsável"
+          optional
+          autoCapitalize="words"
+        />
         <Field
           control={control}
           name="notes"
@@ -310,7 +348,7 @@ function usePostalCodeAutofill(
 
 type FieldProps = {
   control: Control<CustomerFormValues>;
-  name: Exclude<FieldPath<CustomerFormValues>, 'noNumber'>;
+  name: Exclude<FieldPath<CustomerFormValues>, 'noNumber' | 'isCustomer' | 'isSupplier'>;
   /** Formata enquanto digita (CEP, telefone). */
   mask?: (value: string) => string;
   /** Recebe o valor já formatado, depois de gravado no formulário. */

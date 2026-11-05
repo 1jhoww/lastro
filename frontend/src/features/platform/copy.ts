@@ -8,6 +8,7 @@ export function planLabel(code: PlanCode | null, name?: string | null): string {
   if (name) return name;
   if (code === 'essencial') return 'Essencial';
   if (code === 'profissional') return 'Profissional';
+  if (code === 'gestao') return 'Gestão';
   return 'Legado';
 }
 
@@ -18,6 +19,10 @@ export const featureLabel: Record<PlanFeature, string> = {
   'commercial.sellers': 'Vendedores e carteiras de clientes',
   'commercial.visits': 'Visitas e recompra',
   'branding.custom': 'Logotipo e fotos nos documentos e no catálogo',
+  'purchasing.orders': 'Fornecedores, compras e recebimento de mercadorias',
+  'costing.products': 'Custos de aquisição, margens e rentabilidade',
+  'finance.payables': 'Contas a pagar, despesas e recorrências',
+  'finance.management': 'Fluxo de caixa, painel e relatórios financeiros',
 };
 
 /** Situação financeira da cobrança. Vencida e próxima são alertas, nunca bloqueio de acesso. */

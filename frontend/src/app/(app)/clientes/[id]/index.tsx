@@ -105,6 +105,13 @@ function CustomerView({ customer: c }: { customer: Customer }) {
           <>
             <Panel title="Dados">
               <Facts>
+                <Fact
+                  label="Relacionamento"
+                  value={c.relationships
+                    .map((r) => (r === 'supplier' ? 'Fornecedor' : 'Cliente'))
+                    .join(' e ')}
+                />
+                <Fact label="Contato responsável" value={c.contactName ?? ''} />
                 <Fact label={kind ?? 'CPF ou CNPJ'} value={formatDocument(c.document)} />
                 <Fact label="Telefone" value={formatPhone(c.phone)} />
                 <Fact label="E-mail" value={c.email ?? ''} />

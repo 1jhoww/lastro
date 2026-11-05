@@ -222,7 +222,7 @@ describe('clientes: cadastro', () => {
     await fillAddress();
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar cliente' }));
     expect(
-      await screen.findByText('Já existe um cliente com este CPF/CNPJ nesta empresa.'),
+      await screen.findByText('Já existe um cadastro com este CPF/CNPJ nesta empresa.'),
     ).toBeTruthy();
   });
 });

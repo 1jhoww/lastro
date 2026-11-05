@@ -61,6 +61,11 @@ export default function PlatformOverviewScreen() {
                 key="profissional"
                 label="No Profissional"
                 value={String(data.plans.profissional)}
+              />,
+              <Stat
+                key="gestao"
+                label="No Gestão"
+                value={String(data.plans.gestao)}
                 caption={data.plans.legacy ? `${data.plans.legacy} em contrato legado` : undefined}
               />,
             ]}

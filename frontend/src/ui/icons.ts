@@ -5,6 +5,14 @@
 export type { LucideIcon } from 'lucide-react-native';
 
 export { default as Archive } from 'lucide-react-native/icons/archive';
+export { default as CirclePause } from 'lucide-react-native/icons/circle-pause';
+export { default as CirclePlay } from 'lucide-react-native/icons/circle-play';
+export { default as PackageCheck } from 'lucide-react-native/icons/package-check';
+export { default as PackageX } from 'lucide-react-native/icons/package-x';
+export { default as ReceiptText } from 'lucide-react-native/icons/receipt-text';
+export { default as Repeat } from 'lucide-react-native/icons/repeat';
+export { default as ShoppingCart } from 'lucide-react-native/icons/shopping-cart';
+export { default as TrendingUp } from 'lucide-react-native/icons/trending-up';
 export { default as ArrowLeft } from 'lucide-react-native/icons/arrow-left';
 export { default as ArrowLeftRight } from 'lucide-react-native/icons/arrow-left-right';
 export { default as Ban } from 'lucide-react-native/icons/ban';
@@ -52,7 +60,6 @@ export { default as MapPinOff } from 'lucide-react-native/icons/map-pin-off';
 export { default as MessageCircle } from 'lucide-react-native/icons/message-circle';
 export { default as Minus } from 'lucide-react-native/icons/minus';
 export { default as Package } from 'lucide-react-native/icons/package';
-export { default as PackageCheck } from 'lucide-react-native/icons/package-check';
 export { default as PackageOpen } from 'lucide-react-native/icons/package-open';
 export { default as Palette } from 'lucide-react-native/icons/palette';
 export { default as Pencil } from 'lucide-react-native/icons/pencil';

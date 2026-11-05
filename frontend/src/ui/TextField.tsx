@@ -119,6 +119,7 @@ const styles = StyleSheet.create({
   disabled: { backgroundColor: color.surfaceSunken },
   input: {
     flex: 1,
+    minWidth: 0,
     minHeight: 46,
     ...typeScale.body,
     fontFamily: fontFamily.regular,

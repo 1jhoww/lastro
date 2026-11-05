@@ -31,16 +31,20 @@ export function quantityMessage(unit: Unit): string {
     : 'Use um número inteiro maior que zero para esta unidade.';
 }
 
-export function movementFormSchema(unit: Unit) {
+export function movementFormSchema(unit: Unit, kind: 'entry' | 'adjustment' = 'adjustment') {
   return z
     .object({
       quantity: z.string().trim().min(1, 'Informe a quantidade.'),
       direction: z.enum(['in', 'out']),
+      // Entrada avulsa não exige justificativa; o histórico guarda quem, quando e quanto.
       reason: z
         .string()
         .trim()
-        .min(3, 'Descreva o motivo com pelo menos 3 caracteres.')
-        .max(200, 'Use até 200 caracteres.'),
+        .max(200, 'Use até 200 caracteres.')
+        .refine(
+          (v) => (kind === 'entry' && v.length === 0) || v.length >= 3,
+          'Descreva o motivo com pelo menos 3 caracteres.',
+        ),
       notes: z.string().trim().max(1000, 'Use até 1000 caracteres.'),
     })
     .superRefine((v, ctx) => {
@@ -68,7 +72,7 @@ export function toEntryBody(productId: string, v: MovementFormValues, unit: Unit
   return {
     productId,
     quantity: toApiQuantity(quantityMilli(v, unit)),
-    reason: v.reason.trim(),
+    ...(v.reason.trim() ? { reason: v.reason.trim() } : {}),
     ...notesOf(v),
   };
 }
