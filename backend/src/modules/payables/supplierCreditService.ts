@@ -6,9 +6,11 @@ import * as s from '../../shared/schemas/management.js';
 import { requireCondition } from '../../shared/errors/appError.js';
 import { recordAudit } from '../../shared/audit/audit.js';
 import { digest, stableJson } from '../../shared/utils/crypto.js';
+import { featureNotInPlan } from '../users/permissions.js';
 import { cursorPage } from '../../shared/operations/cursorPage.js';
 import type { FinancialCommands } from '../finance/financialCommands.js';
 import { companyDate } from '../orders/calculation.js';
+import { supplierCreditsAvailable } from './supplierCreditAccess.js';
 import { creditedTitle, uncreditedTitle } from './titles.js';
 
 const MAX_MOVEMENTS = 200;
@@ -111,6 +113,13 @@ export class SupplierCreditService {
     );
     return title;
   }
+  /** Reading follows the role; applying or recovering a credit still needs the payables feature. */
+  private async requireReadable(actor: Actor, tenantId: string, tx: Transaction) {
+    const ctx = await this.commands.access.tenant(actor, tenantId, 'supplier-credits:read', tx);
+    const db = this.repo.foundation.db;
+    if (!(await supplierCreditsAvailable(db, tenantId, ctx.entitlements, tx)))
+      throw featureNotInPlan();
+  }
   private requireUsable(credit: s.SupplierCredit, expectedVersion: number, amountCents: number) {
     requireCondition(credit.version === expectedVersion, 409, 'CONFLICT', 'Versão desatualizada');
     requireCondition(
@@ -153,7 +162,7 @@ export class SupplierCreditService {
   async list(actor: Actor, tenantId: string, input: z.infer<typeof s.supplierCreditQuery>) {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {
-        await this.commands.access.tenant(actor, tenantId, 'payables:read', tx);
+        await this.requireReadable(actor, tenantId, tx);
         const status = input.status ?? 'open';
         let query: Query = this.repo.ref(tenantId, 'supplierCredits', 'placeholder').parent;
         if (status !== 'all') query = query.where('hasBalance', '==', status === 'open');
@@ -174,7 +183,7 @@ export class SupplierCreditService {
   async get(actor: Actor, tenantId: string, id: string) {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {
-        await this.commands.access.tenant(actor, tenantId, 'payables:read', tx);
+        await this.requireReadable(actor, tenantId, tx);
         return this.load(tx, tenantId, id);
       },
       { readOnly: true },
@@ -183,7 +192,7 @@ export class SupplierCreditService {
   async movements(actor: Actor, tenantId: string, id: string) {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {
-        await this.commands.access.tenant(actor, tenantId, 'payables:read', tx);
+        await this.requireReadable(actor, tenantId, tx);
         await this.load(tx, tenantId, id);
         const page = await tx.get(
           this.repo

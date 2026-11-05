@@ -106,7 +106,12 @@ describe('Recursos por assinatura', () => {
     const profissional = entitlementsFor({ planCode: 'profissional', userLimit: 2 });
     const permissions = withinPlan(permissionsFor('administrator'), profissional);
     expect(permissions).toContain('catalog:manage');
-    for (const gated of ['purchases:read', 'costs:read', 'payables:read', 'suppliers:manage'] as const)
+    for (const gated of [
+      'purchases:read',
+      'costs:read',
+      'payables:read',
+      'suppliers:manage',
+    ] as const)
       expect(permissions).not.toContain(gated);
     expect(hasFeature(profissional, 'users.invite')).toBe(true);
   });
@@ -129,7 +134,15 @@ describe('Recursos por assinatura', () => {
     const gestao = entitlementsFor({ planCode: 'gestao', userLimit: 5 });
     expect(lostFeatures(gestao, essencial).sort()).toEqual([...planFeatures].sort());
     expect(lostFeatures(gestao, profissional).sort()).toEqual(
-      ['costing.products', 'finance.management', 'finance.payables', 'purchasing.orders'].sort(),
+      [
+        'costing.products',
+        'finance.dashboard',
+        'finance.management',
+        'finance.payables',
+        'finance.recurring',
+        'purchasing.orders',
+        'purchasing.suppliers',
+      ].sort(),
     );
     expect(lostFeatures(essencial, profissional)).toEqual([]);
   });

@@ -3,7 +3,13 @@ import { FieldPath, type Firestore, type QueryDocumentSnapshot } from 'firebase-
 const PAGE_SIZE = 200;
 
 export type RollbackBlocker =
-  'plan_gestao' | 'supplier_record' | 'customer_contact' | 'purchase_stock_movement';
+  | 'plan_gestao'
+  | 'plan_custom'
+  | 'charge_gestao'
+  | 'charge_custom'
+  | 'supplier_record'
+  | 'customer_contact'
+  | 'purchase_stock_movement';
 
 /**
  * Says whether the API version before Lastro Gestão can still read the database. That version has
@@ -12,9 +18,30 @@ export type RollbackBlocker =
  */
 export async function rollbackBlockers(db: Firestore) {
   const blockers: { tenantId: string; reason: RollbackBlocker }[] = [];
-  const contracts = await db.collection('subscriptions').where('planCode', '==', 'gestao').get();
+  const contracts = await db
+    .collection('subscriptions')
+    .where('planCode', 'in', ['gestao', 'custom'])
+    .get();
   for (const doc of contracts.docs)
-    blockers.push({ tenantId: String(doc.get('tenantId')), reason: 'plan_gestao' });
+    blockers.push({
+      tenantId: String(doc.get('tenantId')),
+      reason: doc.get('planCode') === 'custom' ? 'plan_custom' : 'plan_gestao',
+    });
+  // A charge keeps the plan it was issued under, so it outlives the contract moving to another plan.
+  const charges = await db
+    .collection('billingCharges')
+    .where('planCode', 'in', ['gestao', 'custom'])
+    .select('tenantId', 'planCode')
+    .get();
+  const chargeBlockers = new Set<string>();
+  for (const doc of charges.docs) {
+    const tenantId = String(doc.get('tenantId'));
+    const reason: RollbackBlocker =
+      doc.get('planCode') === 'custom' ? 'charge_custom' : 'charge_gestao';
+    if (chargeBlockers.has(`${tenantId}:${reason}`)) continue;
+    chargeBlockers.add(`${tenantId}:${reason}`);
+    blockers.push({ tenantId, reason });
+  }
   const tenants = db
     .collection('tenants')
     .orderBy(FieldPath.documentId())

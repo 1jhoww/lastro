@@ -8,6 +8,8 @@ import {
   subscriptionStatus,
   ianaTimezone,
   planCode,
+  contractPlanCode,
+  customContractSchema,
   billingDay,
   calendarDate,
   billingContactSchema,
@@ -31,17 +33,23 @@ export const createPlanInput = z.strictObject({
 const expectedVersion = z.number().int().positive();
 const reason = z.string().trim().min(3).max(200);
 const internalNotes = z.string().trim().max(500).nullable();
-export const createTenantInput = z.strictObject({
-  name: z.string().trim().min(2).max(120),
-  ownerEmail: email,
-  planCode,
-  /** Contracted price; the plan's reference price when omitted. */
-  monthlyPriceCents: termsShape.monthlyPriceCents.optional(),
-  billingDay,
-  billingStartsOn: calendarDate,
-  billingContact: billingContactSchema.nullable().optional(),
-  commercialNotes: internalNotes.optional(),
-});
+export const createTenantInput = z
+  .strictObject({
+    name: z.string().trim().min(2).max(120),
+    ownerEmail: email,
+    /** Official plan; a custom plan comes in `customPlanId` instead. */
+    planCode: planCode.optional(),
+    customPlanId: opaqueId.optional(),
+    /** Contracted price; the plan's reference (or negotiated) price when omitted. */
+    monthlyPriceCents: termsShape.monthlyPriceCents.optional(),
+    billingDay,
+    billingStartsOn: calendarDate,
+    billingContact: billingContactSchema.nullable().optional(),
+    commercialNotes: internalNotes.optional(),
+  })
+  .refine((input) => (input.planCode === undefined) !== (input.customPlanId === undefined), {
+    message: 'Informe um plano oficial ou um plano personalizado',
+  });
 export const activateSubscriptionInput = z.strictObject({
   expectedVersion,
   monthlyPriceCents: termsShape.monthlyPriceCents,
@@ -53,8 +61,13 @@ export const planChangeQuery = z.strictObject({ planCode });
 export const changePlanInput = z.strictObject({
   expectedVersion,
   planCode,
-  /** Unchanged when omitted: a plan change never alters the price silently. */
+  /**
+   * Unchanged when omitted: a plan change never alters the price silently. A free contract has
+   * no price to inherit, so leaving it requires this field.
+   */
   monthlyPriceCents: termsShape.monthlyPriceCents.optional(),
+  /** Leaving a free contract for anything but the official price needs this explicit yes. */
+  negotiatedPriceConfirmed: z.boolean().optional(),
   /** Must list exactly the features the change removes. */
   acknowledgedLostFeatures: z.array(z.enum(planFeatures)).max(planFeatures.length),
   reason,
@@ -172,7 +185,7 @@ export const emailChangeView = z.object({
 export const myEmailChangeView = z.object({ emailChange: emailChangeView.nullable() });
 export const membershipPlanView = z.object({
   /** Null for legacy contracts created before the official plans. */
-  code: planCode.nullable(),
+  code: contractPlanCode.nullable(),
   name: z.string().nullable(),
   userLimit: z.number(),
   features: z.array(z.enum(planFeatures)),
@@ -195,10 +208,11 @@ export const subscriptionView = z.object({
   ...termsShape,
   startsAt: instant,
   commercialNotes: z.string().nullable(),
-  planCode: planCode.nullable(),
+  planCode: contractPlanCode.nullable(),
   billingDay: z.number().nullable(),
   billingStartsOn: calendarDate.nullable(),
   billingContact: billingContactSchema.nullable(),
+  customContract: customContractSchema.nullable().optional(),
   version: z.number(),
   createdAt: instant,
   updatedAt: instant,
@@ -215,12 +229,25 @@ export const planCatalogView = z.object({
       offered: z.boolean(),
     }),
   ),
-  /** Every plan-gated capability, for comparison tables. */
-  features: z.array(z.object({ code: z.enum(planFeatures), label: z.string() })),
+  /** Every plan-gated capability, for comparison tables and for composing a custom plan. */
+  features: z.array(
+    z.object({
+      code: z.enum(planFeatures),
+      label: z.string(),
+      description: z.string(),
+      category: z.string(),
+      requires: z.array(z.enum(planFeatures)),
+    }),
+  ),
+  categories: z.array(z.object({ code: z.string(), label: z.string() })),
+  /** Modules included in every plan: shown, never selectable. */
+  baseResources: z.array(
+    z.object({ code: z.string(), label: z.string(), description: z.string() }),
+  ),
 });
 export const planChangePreviewView = z.object({
   subscriptionVersion: z.number(),
-  currentPlanCode: planCode.nullable(),
+  currentPlanCode: contractPlanCode.nullable(),
   targetPlanCode: planCode,
   targetUserLimit: z.number(),
   activeUsers: z.number(),

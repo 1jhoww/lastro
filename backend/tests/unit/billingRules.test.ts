@@ -89,5 +89,6 @@ describe('Situação das cobranças', () => {
       '2027-01-10',
     );
     expect(nextDueDate({ ...active, status: 'suspended' }, '2026-10-05')).toBeNull();
+    expect(nextDueDate({ ...active, monthlyPriceCents: 0 }, '2026-10-05')).toBeNull();
   });
 });

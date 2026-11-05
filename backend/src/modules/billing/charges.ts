@@ -3,7 +3,7 @@ import {
   calendarDate,
   instant,
   opaqueId,
-  planCode,
+  contractPlanCode,
   termsShape,
   type Subscription,
 } from '../../shared/schemas/models.js';
@@ -49,7 +49,7 @@ export const chargeSchema = z.strictObject({
   notes,
   origin: z.enum(['automatic', 'manual']),
   /** Plan when the charge was issued, for reports; null for legacy contracts. */
-  planCode: planCode.nullable(),
+  planCode: contractPlanCode.nullable(),
   version: z.number().int().positive(),
   createdAt: instant,
   updatedAt: instant,
@@ -106,13 +106,21 @@ export function chargesDue(
     );
 }
 
-/** Next due date on or after today, for subscriptions with billing terms. */
+/** Next due date on or after today, for subscriptions with billing terms. Free ones have none. */
 export function nextDueDate(
-  subscription: Pick<Subscription, 'status' | 'billingDay' | 'billingStartsOn'>,
+  subscription: Pick<
+    Subscription,
+    'status' | 'billingDay' | 'billingStartsOn' | 'monthlyPriceCents'
+  >,
   today: string,
 ): string | null {
   const { billingDay, billingStartsOn } = subscription;
-  if (subscription.status !== 'active' || billingDay === null || billingStartsOn === null)
+  if (
+    subscription.status !== 'active' ||
+    billingDay === null ||
+    billingStartsOn === null ||
+    subscription.monthlyPriceCents === 0
+  )
     return null;
   const from = billingStartsOn > today ? billingStartsOn : today;
   const month = from.slice(0, 7);

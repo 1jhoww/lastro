@@ -63,6 +63,8 @@ import * as billingSchemas from '../shared/schemas/billing.js';
 import { BillingService } from '../modules/billing/billingService.js';
 import { CompanyService } from '../modules/platformAdmin/companyService.js';
 import * as platformSchemas from '../shared/schemas/platform.js';
+import * as customPlanSchemas from '../shared/schemas/customPlans.js';
+import { CustomPlanService } from '../modules/platformAdmin/customPlanService.js';
 import { SubscriptionService } from '../modules/platformAdmin/subscriptionService.js';
 import { EmailChangeService } from '../modules/users/emailChangeService.js';
 import { managementRoutes } from './managementRoutes.js';
@@ -350,6 +352,7 @@ export function createRoutes(
   const router = Router();
   const executions = new FinancialExecutions(finance, returns);
   const subscriptions = new SubscriptionService(platform.repo, platform.access, clock);
+  const customPlans = new CustomPlanService(platform.repo, platform.access, platform, clock);
   const billing = new BillingService(platform.repo, platform.access, platform.config, clock);
   const emailChanges = new EmailChangeService(platform.repo, platform.access, users.auth, clock);
   const companies = new CompanyService(
@@ -490,8 +493,7 @@ export function createRoutes(
         selectedTenant(req),
         management.supplierCreditQuery.parse(req.query),
       ),
-    getSupplierCredit: (req) =>
-      supplierCredits.get(actorFor(req), selectedTenant(req), idFor(req)),
+    getSupplierCredit: (req) => supplierCredits.get(actorFor(req), selectedTenant(req), idFor(req)),
     listSupplierCreditMovements: (req) =>
       supplierCredits.movements(actorFor(req), selectedTenant(req), idFor(req)),
     applySupplierCredit: (req) =>
@@ -1256,6 +1258,62 @@ export function createRoutes(
     listSubscriptions: (req) =>
       platform.list(actorFor(req), 'subscriptions', limitFor(req), cursorFor(req)),
     getPlanCatalog: (req) => subscriptions.catalog(actorFor(req)),
+    listCustomPlans: (req) =>
+      customPlans.list(actorFor(req), customPlanSchemas.customPlanQuery.parse(req.query)),
+    createCustomPlan: (req) =>
+      customPlans.create(
+        actorFor(req),
+        customPlanSchemas.createCustomPlanInput.parse(req.body),
+        idempotencyKey(req),
+      ),
+    getCustomPlan: (req) => customPlans.get(actorFor(req), idFor(req)),
+    updateCustomPlan: (req) =>
+      customPlans.update(
+        actorFor(req),
+        idFor(req),
+        customPlanSchemas.updateCustomPlanInput.parse(req.body),
+      ),
+    duplicateCustomPlan: (req) =>
+      customPlans.duplicate(
+        actorFor(req),
+        idFor(req),
+        customPlanSchemas.duplicateCustomPlanInput.parse(req.body),
+        idempotencyKey(req),
+      ),
+    deactivateCustomPlan: (req) =>
+      customPlans.setStatus(
+        actorFor(req),
+        idFor(req),
+        'inactive',
+        customPlanSchemas.customPlanCommandInput.parse(req.body),
+      ),
+    reactivateCustomPlan: (req) =>
+      customPlans.setStatus(
+        actorFor(req),
+        idFor(req),
+        'active',
+        customPlanSchemas.customPlanCommandInput.parse(req.body),
+      ),
+    getCustomPlanHistory: (req) => customPlans.history(actorFor(req), idFor(req)),
+    previewCustomPlanChange: (req) =>
+      subscriptions.previewCustomPlan(
+        actorFor(req),
+        idFor(req),
+        customPlanSchemas.customPlanPreviewQuery.parse(req.query).planId,
+      ),
+    assignCustomPlan: (req) =>
+      subscriptions.assignCustomPlan(
+        actorFor(req),
+        idFor(req),
+        customPlanSchemas.assignCustomPlanInput.parse(req.body),
+      ),
+    changeSubscriptionContract: (req) =>
+      subscriptions.changeContract(
+        actorFor(req),
+        idFor(req),
+        customPlanSchemas.changeContractInput.parse(req.body),
+      ),
+    getSubscriptionContractDiff: (req) => subscriptions.contractDiff(actorFor(req), idFor(req)),
     previewPlanChange: (req) =>
       subscriptions.previewPlanChange(
         actorFor(req),

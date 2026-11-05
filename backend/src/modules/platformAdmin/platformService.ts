@@ -24,6 +24,7 @@ import type { Actor } from '../../shared/types/context.js';
 import { recordAudit } from '../../shared/audit/audit.js';
 import { planCatalog } from '../plans/catalog.js';
 import { requireBillingStart } from './subscriptionService.js';
+import { customContractFrom, offeredPlan } from './customPlanService.js';
 import {
   digest,
   stableJson,
@@ -94,9 +95,25 @@ export class PlatformService {
           },
         };
       }
-      const plan = planCatalog[input.planCode];
-      requireCondition(plan.offered, 422, 'VALIDATION_ERROR', 'Plano indisponível');
+      const plan = input.planCode ? planCatalog[input.planCode] : null;
+      const customPlan = input.customPlanId
+        ? await offeredPlan(this.repo, tx, input.customPlanId)
+        : null;
+      requireCondition(plan?.offered ?? customPlan, 422, 'VALIDATION_ERROR', 'Plano indisponível');
       requireBillingStart(input.billingStartsOn, this.clock());
+      const contract = customPlan
+        ? customContractFrom(
+            customPlan,
+            input.monthlyPriceCents ?? customPlan.monthlyPriceCents,
+            now,
+          )
+        : {
+            planId: plan!.code,
+            planVersion: plan!.version,
+            planCode: plan!.code,
+            monthlyPriceCents: input.monthlyPriceCents ?? plan!.referencePriceCents,
+            userLimit: plan!.userLimit,
+          };
       const tenant = tenantSchema.parse({
         id,
         name: input.name,
@@ -113,13 +130,9 @@ export class PlatformService {
       const subscription = subscriptionSchema.parse({
         id,
         tenantId: id,
-        planId: plan.code,
-        planVersion: plan.version,
-        planCode: plan.code,
+        ...contract,
         status: 'active',
         signupFeeCents: 0,
-        monthlyPriceCents: input.monthlyPriceCents ?? plan.referencePriceCents,
-        userLimit: plan.userLimit,
         startsAt: now,
         billingDay: input.billingDay,
         billingStartsOn: input.billingStartsOn,
@@ -166,8 +179,9 @@ export class PlatformService {
         schemaVersion: 1,
       });
       recordAudit(this.repo, tx, actor, null, 'tenant.created', id, now, {
-        planCode: plan.code,
-        planVersion: plan.version,
+        planCode: contract.planCode,
+        planId: contract.planId,
+        planVersion: contract.planVersion,
         monthlyPriceCents: subscription.monthlyPriceCents,
         userLimit: subscription.userLimit,
         billingDay: subscription.billingDay,

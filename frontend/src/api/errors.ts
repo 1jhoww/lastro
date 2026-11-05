@@ -148,6 +148,13 @@ const messages: Record<string, string> = {
   SUPPORT_ACCESS_ENDED: 'Este acesso de suporte terminou: a pessoa não é mais Super Admin.',
   PLATFORM_ACCOUNT_PROTECTED: 'Contas do Super Admin não são alteradas por este fluxo.',
   FEATURE_NOT_IN_PLAN: 'Este recurso não está incluído no plano contratado pela empresa.',
+  FEATURE_LOSS_UNCONFIRMED: 'Confirme cada recurso que a empresa deixará de ter.',
+  PLAN_DEPENDENCY_MISSING:
+    'Um recurso escolhido depende de outro que ficou de fora. Revise a seleção de recursos.',
+  PLAN_PRICE_REQUIRED: 'Informe o valor do novo plano: o contrato gratuito não é herdado.',
+  NEGOTIATED_PRICE_UNCONFIRMED: 'Confirme o valor negociado para esta empresa.',
+  PLAN_USER_LIMIT_INVALID: 'Convites de usuários adicionais exigem pelo menos 2 usuários.',
+  CUSTOM_PLAN_INACTIVE: 'Este plano personalizado foi desativado e não aceita novos contratos.',
   CUSTOMER_ADMIN_REQUIRED:
     'O primeiro administrador precisa ser alguém da empresa cliente, não a conta de Super Admin.',
   INVITATION_EXPIRED: 'Este convite venceu. Peça um novo ao administrador.',

@@ -285,6 +285,12 @@ export class BillingService {
         'CONFLICT',
         'Assinatura encerrada não recebe cobranças',
       );
+      requireCondition(
+        input.amountCents > 0 || subscription.monthlyPriceCents > 0,
+        422,
+        'VALIDATION_ERROR',
+        'Contrato gratuito não recebe cobrança sem valor',
+      );
       const id = chargeId(subscription.id, input.competence);
       requireCondition(
         !(await tx.get(this.ref(id))).exists,

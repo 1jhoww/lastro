@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { calendarDate, instant, opaqueId, planCode, termsShape } from './models.js';
+import { calendarDate, contractPlanCode, instant, opaqueId, termsShape } from './models.js';
 import { chargeSituation, chargeStatus, competence } from '../../modules/billing/charges.js';
 
 const expectedVersion = z.number().int().positive();
@@ -21,7 +21,7 @@ export const chargeView = z.object({
   paidAmountCents: z.number().nullable(),
   notes: z.string().nullable(),
   origin: z.enum(['automatic', 'manual']),
-  planCode: planCode.nullable(),
+  planCode: contractPlanCode.nullable(),
   version: z.number(),
   createdAt: instant,
   updatedAt: instant,

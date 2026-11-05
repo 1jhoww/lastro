@@ -45,7 +45,10 @@ export type SubscriptionsPage = DataOf<'/api/v1/admin/subscriptions', 'get'>;
 export type Subscription = SubscriptionsPage['items'][number];
 export type SubscriptionStatus = Subscription['status'];
 export type MembershipPlan = Membership['plan'];
-export type PlanCode = NonNullable<MembershipPlan['code']>;
+/** Código no contrato: plano oficial ou `custom` (termos na cópia do contrato). */
+export type ContractPlanCode = NonNullable<MembershipPlan['code']>;
+/** Planos oficiais do catálogo. */
+export type PlanCode = Exclude<ContractPlanCode, 'custom'>;
 export type PlanFeature = MembershipPlan['features'][number];
 
 export type PlatformOverview = DataOf<'/api/v1/admin/overview', 'get'>;
@@ -55,6 +58,12 @@ export type CompanyDetail = DataOf<'/api/v1/admin/companies/{id}', 'get'>;
 export type CompanySubscription = CompanyDetail['subscription'];
 export type PlanCatalog = DataOf<'/api/v1/admin/plan-catalog', 'get'>;
 export type PlanChangePreview = DataOf<'/api/v1/admin/subscriptions/{id}/plan-change', 'get'>;
+export type CustomPlanList = DataOf<'/api/v1/admin/custom-plans', 'get'>;
+export type CustomPlanRow = CustomPlanList['items'][number];
+export type CustomPlanDetail = DataOf<'/api/v1/admin/custom-plans/{id}', 'get'>;
+export type CustomPlanView = CustomPlanDetail['plan'];
+export type LinkedCompany = CustomPlanDetail['companies'][number];
+export type ContractDiff = DataOf<'/api/v1/admin/subscriptions/{id}/contract-diff', 'get'>;
 export type HistoryEntry = DataOf<
   '/api/v1/admin/subscriptions/{id}/history',
   'get'

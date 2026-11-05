@@ -45,7 +45,7 @@ export class ManagementService {
   async settings(actor: Actor, tenantId: string) {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {
-        await this.commands.access.tenant(actor, tenantId, 'financial-reports:read', tx);
+        await this.commands.access.tenant(actor, tenantId, 'financial-dashboard:read', tx);
         const settings = await this.repo.foundation.read(
           this.settingsRef(tenantId),
           s.financeSettingsSchema,
@@ -148,7 +148,7 @@ export class ManagementService {
           const ctx = await this.commands.access.tenant(
             actor,
             tenantId,
-            'financial-reports:read',
+            'financial-dashboard:read',
             tx,
           );
           const today = companyDate(this.commands.clock(), ctx.tenant.timezone);

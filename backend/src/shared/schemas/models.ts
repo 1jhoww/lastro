@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { Timestamp } from 'firebase-admin/firestore';
-import { planCodes } from '../../modules/plans/catalog.js';
+import { contractPlanCodes, planCodes } from '../../modules/plans/catalog.js';
 
 export const opaqueId = z.string().regex(/^[A-Za-z0-9_-]{1,128}$/);
 export const instant = z.iso.datetime();
@@ -24,6 +24,8 @@ export const subscriptionStatus = z.enum([
   'canceled',
 ]);
 export const planCode = z.enum(planCodes);
+/** Official plan or `custom`; the contract snapshot holds a custom plan's terms. */
+export const contractPlanCode = z.enum(contractPlanCodes);
 /** Calendar date (YYYY-MM-DD) interpreted in America/Sao_Paulo. */
 export const calendarDate = z.iso.date();
 /** Due day limited to 28 so every month has it. */
@@ -149,6 +151,46 @@ export const planSchema = z.strictObject({
   status: z.enum(['active', 'archived']),
   ...metadata,
 });
+/**
+ * Feature codes are stored as plain text, never as the current enum: a code retired later must not
+ * make a contract unreadable. `recognizedFeatures` decides what each stored list grants.
+ */
+const storedFeatures = z.array(z.string().min(1).max(64)).max(64);
+/** Negotiated monthly value. Zero is a free contract: a courtesy, which never generates charges. */
+export const customPlanPrice = termsShape.monthlyPriceCents;
+export const customPlanSchema = z.strictObject({
+  id: opaqueId,
+  name: z.string().trim().min(2).max(120),
+  /** Internal notes: never shown to the company. */
+  description: z.string().trim().max(500),
+  status: z.enum(['active', 'inactive']),
+  monthlyPriceCents: customPlanPrice,
+  userLimit: termsShape.userLimit,
+  features: storedFeatures,
+  /** Official plan used as the starting point, if any. */
+  sourcePlanCode: planCode.nullable(),
+  /** Custom plan this one was duplicated from, if any. */
+  duplicatedFromId: opaqueId.nullable(),
+  version: z.number().int().positive(),
+  createdBy: opaqueId,
+  updatedBy: opaqueId,
+  ...metadata,
+});
+/**
+ * What the company contracted, copied from the custom plan. Price and user limit stay in the
+ * subscription fields every other flow reads; `origin` keeps the offer as it was when contracted.
+ */
+export const customContractSchema = z.strictObject({
+  planName: z.string().trim().min(2).max(120),
+  sourcePlanCode: planCode.nullable(),
+  features: storedFeatures,
+  contractedAt: instant,
+  origin: z.strictObject({
+    monthlyPriceCents: customPlanPrice,
+    userLimit: termsShape.userLimit,
+    features: storedFeatures,
+  }),
+});
 export const subscriptionSchema = z.strictObject({
   id: opaqueId,
   tenantId: opaqueId,
@@ -159,13 +201,18 @@ export const subscriptionSchema = z.strictObject({
   startsAt: instant,
   commercialNotes: z.string().max(500).nullable(),
   // Fields below were added with the official plans; older documents read them as null.
-  /** Official plan; null for legacy contracts created before the plan catalog. */
-  planCode: planCode.nullable().default(null),
+  /** Official plan or `custom`; null for legacy contracts created before the plan catalog. */
+  planCode: contractPlanCode.nullable().default(null),
   /** Monthly due day; null until billing is activated. */
   billingDay: billingDay.nullable().default(null),
   /** First day that can be charged; charges never cover dates before it. */
   billingStartsOn: calendarDate.nullable().default(null),
   billingContact: billingContactSchema.nullable().default(null),
+  /**
+   * Only on contracts of custom plans. Never stored as null or defaulted: a contract without one
+   * stays in the format the previous API version reads, which keeps a rollback possible.
+   */
+  customContract: customContractSchema.nullable().optional(),
   version: z.number().int().positive(),
   ...metadata,
 });
@@ -197,6 +244,8 @@ export type Invitation = z.infer<typeof invitationSchema>;
 export type EmailChange = z.infer<typeof emailChangeSchema>;
 export type Plan = z.infer<typeof planSchema>;
 export type Subscription = z.infer<typeof subscriptionSchema>;
+export type CustomPlan = z.infer<typeof customPlanSchema>;
+export type CustomContract = z.infer<typeof customContractSchema>;
 export type Audit = z.infer<typeof auditSchema>;
 export type Idempotency = z.infer<typeof idempotencySchema>;
 export type Role = z.infer<typeof role>;

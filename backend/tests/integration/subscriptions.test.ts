@@ -114,7 +114,7 @@ describe('Criação de empresa com plano oficial', () => {
       ['profissional', 2, 19900],
       ['gestao', 5, 29900],
     ]);
-    expect(catalog.features).toHaveLength(9);
+    expect(catalog.features).toHaveLength(12);
   });
 });
 

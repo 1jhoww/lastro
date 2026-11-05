@@ -60,6 +60,7 @@ export class FoundationRepository {
       | 'identities'
       | 'tenants'
       | 'plans'
+      | 'customPlans'
       | 'subscriptions'
       | 'platformAdmins'
       | 'auditLogs'

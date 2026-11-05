@@ -65,6 +65,35 @@ beforeEach(async () => {
 });
 
 describe('Geração diária de títulos recorrentes', () => {
+  /** Contract on a custom plan, as a plan assignment writes it. */
+  const custom = async (tenantId: string, features: string[]) =>
+    f.firebase.db.doc(`subscriptions/${tenantId}`).update({
+      planCode: 'custom',
+      customContract: {
+        planName: 'Oferta negociada',
+        sourcePlanCode: null,
+        features,
+        contractedAt: new Date().toISOString(),
+        origin: { monthlyPriceCents: 25000, userLimit: 5, features },
+      },
+    });
+
+  it('contrato personalizado gera títulos só quando contratou recorrências', async () => {
+    await gestao(f, tenantB());
+    const withFeature = await pending(tenantA());
+    const without = await pending(tenantB(), f.ownerB, 'Aluguel');
+    await custom(tenantA(), ['finance.payables', 'finance.recurring']);
+    await custom(tenantB(), ['finance.payables']);
+    const run = await runRecurringGeneration({
+      db: f.firebase.db,
+      recurring: service(),
+      log: silent,
+    });
+    expect(run.failed).toBe(0);
+    expect(await issued(tenantA(), withFeature)).toBeGreaterThan(0);
+    expect(await issued(tenantB(), without)).toBe(0);
+  });
+
   it('simulação não grava; execução cria; repetição não duplica', async () => {
     const id = await pending(tenantA());
     const simulated = await runRecurringGeneration({

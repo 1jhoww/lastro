@@ -45,6 +45,7 @@ import {
   withinPlan,
   type Entitlements,
 } from '../plans/catalog.js';
+import { supplierCreditsAvailable } from '../payables/supplierCreditAccess.js';
 import {
   occupiedSeats,
   reservedSeats,
@@ -173,10 +174,16 @@ export class UserService {
                 ? ('canceled' as const)
                 : ('allowed' as const);
         const entitlements = entitlementsFor(subscription);
+        const permissions = access === 'allowed' ? effectivePermissions(member, entitlements) : [];
+        const noCredits =
+          permissions.includes('supplier-credits:read') &&
+          !(await supplierCreditsAvailable(this.repo.db, member.tenantId, entitlements));
         return {
           tenantId: member.tenantId,
           role: member.role,
-          permissions: access === 'allowed' ? effectivePermissions(member, entitlements) : [],
+          permissions: noCredits
+            ? permissions.filter((permission) => permission !== 'supplier-credits:read')
+            : permissions,
           access,
           plan: planSummary(entitlements),
         };

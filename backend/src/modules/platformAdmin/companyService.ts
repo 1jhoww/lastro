@@ -19,7 +19,7 @@ import { companyQuery } from '../../shared/schemas/platform.js';
 import type { Actor } from '../../shared/types/context.js';
 import { recordPlatformAudit } from '../../shared/audit/audit.js';
 import { invitationToken } from '../../shared/utils/crypto.js';
-import { entitlementsFor, planCatalog } from '../plans/catalog.js';
+import { entitlementsFor } from '../plans/catalog.js';
 import { pendingInvitations, reservedSeats } from '../users/capacity.js';
 import { billingDate } from '../billing/calendar.js';
 import { chargeSchema, nextDueDate, situationOf, type Charge } from '../billing/charges.js';
@@ -102,7 +102,7 @@ export class CompanyService {
       ),
     ]);
     const statuses = { active: 0, pending: 0, suspended: 0, canceled: 0 };
-    const plans = { essencial: 0, profissional: 0, gestao: 0, legacy: 0 };
+    const plans = { essencial: 0, profissional: 0, gestao: 0, custom: 0, legacy: 0 };
     let mrrCents = 0;
     for (const { subscription } of contracts) {
       // Legacy past_due keeps access and billing: it counts as active.
@@ -147,7 +147,7 @@ export class CompanyService {
       subscriptionVersion: subscription.version,
       subscriptionStatus: subscription.status,
       planCode: subscription.planCode,
-      planName: subscription.planCode ? planCatalog[subscription.planCode].name : null,
+      planName: entitlementsFor(subscription).planName,
       monthlyPriceCents: subscription.monthlyPriceCents,
       billingDay: subscription.billingDay,
       nextDueDate: nextDueDate(subscription, today),
@@ -231,7 +231,7 @@ export class CompanyService {
       tenant: tenantView.parse(tenant),
       subscription: {
         ...subscriptionView.parse(subscription),
-        planName: subscription.planCode ? planCatalog[subscription.planCode].name : null,
+        planName: entitlements.planName,
         nextDueDate: nextDueDate(subscription, billingDate(now)),
         features: [...entitlements.features],
       },

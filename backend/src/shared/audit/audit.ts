@@ -3,6 +3,27 @@ import type { Transaction } from 'firebase-admin/firestore';
 import type { FoundationRepository } from '../../infrastructure/repositories/foundationRepository.js';
 import type { Actor } from '../types/context.js';
 import { auditSchema } from '../schemas/models.js';
+/** Audited changes of a platform resource, most recent first. */
+export async function auditHistory(repo: FoundationRepository, resourceId: string) {
+  const logs = await repo.db
+    .collection('auditLogs')
+    .where('resourceId', '==', resourceId)
+    .orderBy('occurredAt', 'desc')
+    .limit(100)
+    .get();
+  return {
+    items: logs.docs.map((doc) => {
+      const log = auditSchema.parse(doc.data());
+      return {
+        id: log.id,
+        action: log.action,
+        actorUid: log.actorUid,
+        occurredAt: log.occurredAt,
+        changes: log.changes,
+      };
+    }),
+  };
+}
 /**
  * Super Admin action about one company, kept in the platform log (never readable by the
  * company) and tagged with its tenant for history queries.

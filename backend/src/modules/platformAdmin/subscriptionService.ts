@@ -4,7 +4,7 @@ import { FoundationRepository } from '../../infrastructure/repositories/foundati
 import { AccessService } from '../auth/accessService.js';
 import { AppError, requireCondition } from '../../shared/errors/appError.js';
 import {
-  auditSchema,
+  customPlanSchema,
   subscriptionSchema,
   tenantSchema,
   type Subscription,
@@ -17,17 +17,31 @@ import {
   subscriptionTermsInput,
   subscriptionView,
 } from '../../shared/schemas/http.js';
-import type { Actor } from '../../shared/types/context.js';
-import { recordPlatformAudit } from '../../shared/audit/audit.js';
 import {
+  assignCustomPlanInput,
+  changeContractInput,
+  contractDiffView,
+  customPlanPreviewView,
+} from '../../shared/schemas/customPlans.js';
+import type { Actor } from '../../shared/types/context.js';
+import { auditHistory, recordPlatformAudit } from '../../shared/audit/audit.js';
+import {
+  baseResources,
+  customPlanCode,
   entitlementsFor,
+  featureCatalog,
+  featureCategories,
   featureLabels,
   lostFeatures,
   planCatalog,
   planCodes,
   planFeatures,
+  recognizedFeatures,
+  requireValidComposition,
   type PlanCode,
+  type PlanFeature,
 } from '../plans/catalog.js';
+import { contractAdjusted, customContractFrom, offeredPlan } from './customPlanService.js';
 import { pendingInvitations, reservedSeats } from '../users/capacity.js';
 import { addDays, billingDate } from '../billing/calendar.js';
 
@@ -45,6 +59,28 @@ export function requireBillingStart(date: string, now: Date): void {
 const sameFeatures = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && [...a].sort().join() === [...b].sort().join();
 
+interface ContractTerms {
+  monthlyPriceCents: number;
+  userLimit: number;
+  features: readonly PlanFeature[];
+}
+const compare = (contract: ContractTerms, reference: ContractTerms) => {
+  const difference = {
+    monthlyPriceDeltaCents: contract.monthlyPriceCents - reference.monthlyPriceCents,
+    userLimitDelta: contract.userLimit - reference.userLimit,
+    addedFeatures: contract.features.filter((f) => !reference.features.includes(f)),
+    removedFeatures: reference.features.filter((f) => !contract.features.includes(f)),
+  };
+  return {
+    ...difference,
+    same:
+      difference.monthlyPriceDeltaCents === 0 &&
+      difference.userLimitDelta === 0 &&
+      difference.addedFeatures.length === 0 &&
+      difference.removedFeatures.length === 0,
+  };
+};
+
 /**
  * Super Admin commands over a company's contract. Each command requires the expected
  * version, a reason and writes the previous and new values to the platform audit log.
@@ -59,7 +95,7 @@ export class SubscriptionService {
 
   async catalog(actor: Actor) {
     await this.access.platform(actor);
-    const label = (code: (typeof planFeatures)[number]) => ({ code, label: featureLabels[code] });
+    const label = (code: PlanFeature) => ({ code, label: featureLabels[code] });
     return {
       items: planCodes.map((code) => {
         const plan = planCatalog[code];
@@ -73,7 +109,13 @@ export class SubscriptionService {
           offered: plan.offered,
         };
       }),
-      features: planFeatures.map(label),
+      features: planFeatures.map((code) => featureCatalog[code]),
+      categories: featureCategories,
+      baseResources: baseResources.map(({ code, label: name, description }) => ({
+        code,
+        label: name,
+        description,
+      })),
     };
   }
 
@@ -164,15 +206,28 @@ export class SubscriptionService {
     audit: Record<string, unknown>,
   ) {
     const now = this.clock().toISOString();
+    const merged = { ...previous, ...changes };
+    // Leaving a custom plan removes the field: official contracts keep their stored format.
+    if (!merged.customContract) delete merged.customContract;
+    // A free contract that starts to be paid is charged from now on, never for the free months.
+    const today = billingDate(this.clock());
+    const startsPaying = previous.monthlyPriceCents === 0 && merged.monthlyPriceCents > 0;
+    if (startsPaying && merged.billingStartsOn && merged.billingStartsOn < today)
+      merged.billingStartsOn = today;
     const next = subscriptionSchema.parse({
-      ...previous,
-      ...changes,
+      ...merged,
       version: previous.version + 1,
       updatedAt: now,
     });
     tx.set(this.repo.global('subscriptions', previous.id), next);
     recordPlatformAudit(this.repo, tx, actor, previous.tenantId, action, previous.id, now, {
       ...audit,
+      ...(next.billingStartsOn !== previous.billingStartsOn
+        ? {
+            previousBillingStartsOn: previous.billingStartsOn,
+            billingStartsOn: next.billingStartsOn,
+          }
+        : {}),
       previousVersion: previous.version,
       version: next.version,
     });
@@ -218,6 +273,20 @@ export class SubscriptionService {
       this.requireVersion(subscription, input.expectedVersion);
       this.requireOpen(subscription);
       const { target, lost } = this.planChange(subscription, input.planCode);
+      const fromFree = subscription.monthlyPriceCents === 0;
+      const negotiated = fromFree && input.monthlyPriceCents !== target.referencePriceCents;
+      requireCondition(
+        !fromFree || input.monthlyPriceCents !== undefined,
+        422,
+        'PLAN_PRICE_REQUIRED',
+        'Um contrato gratuito não leva R$ 0,00 para o novo plano: informe o valor',
+      );
+      requireCondition(
+        !negotiated || input.negotiatedPriceConfirmed === true,
+        422,
+        'NEGOTIATED_PRICE_UNCONFIRMED',
+        'Confirme o valor negociado, diferente do preço oficial do plano',
+      );
       requireCondition(
         sameFeatures(lost, input.acknowledgedLostFeatures),
         409,
@@ -240,6 +309,7 @@ export class SubscriptionService {
           planVersion: target.version,
           userLimit: target.userLimit,
           monthlyPriceCents: input.monthlyPriceCents ?? subscription.monthlyPriceCents,
+          customContract: null,
         },
         'subscription.plan.changed',
         {
@@ -251,9 +321,235 @@ export class SubscriptionService {
           monthlyPriceCents: input.monthlyPriceCents ?? subscription.monthlyPriceCents,
           lostFeatures: lost,
           ...seats,
+          ...(fromFree
+            ? { referencePriceCents: target.referencePriceCents, negotiatedPrice: negotiated }
+            : {}),
           reason: input.reason,
         },
       );
+    });
+  }
+
+  private async customTarget(tx: Transaction, subscription: Subscription, planId: string) {
+    const plan = await offeredPlan(this.repo, tx, planId);
+    const target = entitlementsFor({
+      planCode: customPlanCode,
+      userLimit: plan.userLimit,
+      customContract: { planName: plan.name, features: plan.features },
+    });
+    const current = entitlementsFor(subscription);
+    return {
+      plan,
+      lost: lostFeatures(current, target),
+      gained: lostFeatures(target, current),
+    };
+  }
+
+  /** What moving this company to a custom plan implies, before anything changes. */
+  async previewCustomPlan(actor: Actor, id: string, planId: string) {
+    return this.repo.db.runTransaction(
+      async (tx) => {
+        await this.access.platform(actor, tx);
+        const { subscription, tenant } = await this.load(tx, id);
+        const { plan, lost, gained } = await this.customTarget(tx, subscription, planId);
+        const seats = await this.occupancy(tx, tenant.id, tenant.activeUsers);
+        return customPlanPreviewView.parse({
+          subscriptionVersion: subscription.version,
+          planId: plan.id,
+          planVersion: plan.version,
+          planName: plan.name,
+          targetUserLimit: plan.userLimit,
+          ...seats,
+          excessSeats: Math.max(0, seats.activeUsers + seats.reservedInvitations - plan.userLimit),
+          lostFeatures: lost,
+          gainedFeatures: gained,
+          publicCatalogEnabled: await this.publicCatalogEnabled(tx, tenant.id),
+          monthlyPriceCents: subscription.monthlyPriceCents,
+          offerPriceCents: plan.monthlyPriceCents,
+        });
+      },
+      { readOnly: true },
+    );
+  }
+
+  /**
+   * Creates this company's contract from a custom plan: first contract on it, migration from an
+   * official plan, replacement of another custom plan, or a move to the plan's newest version.
+   * Takes effect immediately for limits and features. Data of a lost feature stays stored, access
+   * to it stops, and nobody is deactivated: the change is refused until the company fits the limit.
+   */
+  async assignCustomPlan(actor: Actor, id: string, input: z.infer<typeof assignCustomPlanInput>) {
+    return this.repo.db.runTransaction(async (tx) => {
+      await this.access.platform(actor, tx);
+      const { subscription, tenant } = await this.load(tx, id);
+      const { plan, lost } = await this.customTarget(tx, subscription, input.planId);
+      const seats = await this.occupancy(tx, tenant.id, tenant.activeUsers);
+      this.requireVersion(subscription, input.expectedVersion);
+      this.requireOpen(subscription);
+      requireCondition(
+        plan.version === input.planVersion,
+        409,
+        'CONFLICT',
+        'A oferta mudou depois da revisão; confira os novos termos',
+      );
+      requireCondition(
+        subscription.planId !== plan.id ||
+          subscription.planVersion !== plan.version ||
+          contractAdjusted(subscription),
+        422,
+        'VALIDATION_ERROR',
+        'A empresa já está nesta versão do plano',
+      );
+      requireCondition(
+        sameFeatures(lost, input.acknowledgedLostFeatures),
+        409,
+        'FEATURE_LOSS_UNCONFIRMED',
+        'Confirme os recursos que a empresa deixará de ter',
+      );
+      requireCondition(
+        seats.activeUsers + seats.reservedInvitations <= plan.userLimit,
+        409,
+        'USER_LIMIT_REACHED',
+        'A empresa ocupa mais vagas do que o plano permite; libere vagas antes da troca',
+      );
+      const now = this.clock().toISOString();
+      const monthlyPriceCents = input.monthlyPriceCents ?? plan.monthlyPriceCents;
+      return this.commit(
+        tx,
+        actor,
+        subscription,
+        customContractFrom(plan, monthlyPriceCents, now),
+        'subscription.custom_plan.assigned',
+        {
+          previousPlanCode: subscription.planCode,
+          previousPlanId: subscription.planId,
+          previousPlanVersion: subscription.planVersion,
+          planId: plan.id,
+          planName: plan.name,
+          planVersion: plan.version,
+          previousUserLimit: subscription.userLimit,
+          userLimit: plan.userLimit,
+          previousMonthlyPriceCents: subscription.monthlyPriceCents,
+          monthlyPriceCents,
+          features: recognizedFeatures(plan.features),
+          lostFeatures: lost,
+          ...seats,
+          reason: input.reason,
+        },
+      );
+    });
+  }
+
+  /**
+   * Individual change of one contract: the plan it came from stays as it is, and so does every
+   * other company. Plan id and version are kept, which is how the difference to the offer shows.
+   */
+  async changeContract(actor: Actor, id: string, input: z.infer<typeof changeContractInput>) {
+    return this.repo.db.runTransaction(async (tx) => {
+      await this.access.platform(actor, tx);
+      const { subscription, tenant } = await this.load(tx, id);
+      const seats = await this.occupancy(tx, tenant.id, tenant.activeUsers);
+      this.requireVersion(subscription, input.expectedVersion);
+      this.requireOpen(subscription);
+      const contract = subscription.customContract;
+      requireCondition(
+        subscription.planCode === customPlanCode && contract,
+        409,
+        'CONFLICT',
+        'Somente contratos de plano personalizado têm recursos individuais',
+      );
+      const features = recognizedFeatures(input.features ?? contract.features);
+      const userLimit = input.userLimit ?? subscription.userLimit;
+      const monthlyPriceCents = input.monthlyPriceCents ?? subscription.monthlyPriceCents;
+      requireValidComposition({ features, userLimit });
+      const known = recognizedFeatures(contract.features);
+      const lost = known.filter((f) => !features.includes(f));
+      requireCondition(
+        !sameFeatures(known, features) ||
+          userLimit !== subscription.userLimit ||
+          monthlyPriceCents !== subscription.monthlyPriceCents,
+        422,
+        'VALIDATION_ERROR',
+        'Informe uma alteração',
+      );
+      requireCondition(
+        sameFeatures(lost, input.acknowledgedLostFeatures),
+        409,
+        'FEATURE_LOSS_UNCONFIRMED',
+        'Confirme os recursos que a empresa deixará de ter',
+      );
+      requireCondition(
+        seats.activeUsers + seats.reservedInvitations <= userLimit,
+        409,
+        'USER_LIMIT_REACHED',
+        'A empresa ocupa mais vagas do que o novo limite permite; libere vagas antes',
+      );
+      return this.commit(
+        tx,
+        actor,
+        subscription,
+        {
+          userLimit,
+          monthlyPriceCents,
+          customContract: { ...contract, features: [...features] },
+        },
+        'subscription.contract.changed',
+        {
+          previousUserLimit: subscription.userLimit,
+          userLimit,
+          previousMonthlyPriceCents: subscription.monthlyPriceCents,
+          monthlyPriceCents,
+          previousFeatures: contract.features,
+          features,
+          lostFeatures: lost,
+          ...seats,
+          reason: input.reason,
+        },
+      );
+    });
+  }
+
+  /** Compares one contract with the offer as it was signed and as it is today. */
+  async contractDiff(actor: Actor, id: string) {
+    await this.access.platform(actor);
+    const subscription = await this.repo.read(
+      this.repo.global('subscriptions', id),
+      subscriptionSchema,
+    );
+    const contract = subscription?.customContract;
+    requireCondition(contract, 404, 'RESOURCE_NOT_FOUND', 'Recurso não encontrado');
+    const plan = await this.repo.read(
+      this.repo.global('customPlans', subscription.planId),
+      customPlanSchema,
+    );
+    requireCondition(plan, 404, 'RESOURCE_NOT_FOUND', 'Recurso não encontrado');
+    const terms = (source: {
+      monthlyPriceCents: number;
+      userLimit: number;
+      features: readonly string[];
+    }): ContractTerms => ({
+      monthlyPriceCents: source.monthlyPriceCents,
+      userLimit: source.userLimit,
+      features: recognizedFeatures(source.features),
+    });
+    const current = terms({
+      monthlyPriceCents: subscription.monthlyPriceCents,
+      userLimit: subscription.userLimit,
+      features: contract.features,
+    });
+    const origin = terms(contract.origin);
+    const offer = terms(plan);
+    return contractDiffView.parse({
+      planId: plan.id,
+      planName: contract.planName,
+      contractedVersion: subscription.planVersion,
+      currentVersion: plan.version,
+      planStatus: plan.status,
+      contract: current,
+      origin,
+      current: offer,
+      againstOrigin: compare(current, origin),
+      againstCurrent: compare(current, offer),
     });
   }
 
@@ -384,23 +680,6 @@ export class SubscriptionService {
       subscriptionSchema,
     );
     if (!subscription) throw new AppError(404, 'RESOURCE_NOT_FOUND', 'Recurso não encontrado');
-    const logs = await this.repo.db
-      .collection('auditLogs')
-      .where('resourceId', '==', id)
-      .orderBy('occurredAt', 'desc')
-      .limit(100)
-      .get();
-    return {
-      items: logs.docs.map((doc) => {
-        const log = auditSchema.parse(doc.data());
-        return {
-          id: log.id,
-          action: log.action,
-          actorUid: log.actorUid,
-          occurredAt: log.occurredAt,
-          changes: log.changes,
-        };
-      }),
-    };
+    return auditHistory(this.repo, id);
   }
 }

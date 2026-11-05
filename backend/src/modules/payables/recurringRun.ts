@@ -1,6 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import { FieldPath, type Firestore, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
-import { planCatalog, planCodes } from '../plans/catalog.js';
+import {
+  customPlanCode,
+  entitlementsFor,
+  hasFeature,
+  planCatalog,
+  planCodes,
+} from '../plans/catalog.js';
 import { subscriptionSchema, tenantSchema } from '../../shared/schemas/models.js';
 import type { Actor } from '../../shared/types/context.js';
 import type { RecurringService } from './recurringService.js';
@@ -52,7 +58,8 @@ export interface RunSummary {
 }
 
 /**
- * Daily issue of recurring expenses for every company whose plan has the feature. A failure stays
+ * Daily issue of recurring expenses for every company that contracted the feature: official plans
+ * listing it and custom contracts, whose snapshot decides each company. A failure stays
  * inside its company, or its recurrence, and is reported at the end: the caller exits with an error
  * and a retry only issues what is missing, since a title is unique by recurrence and due date.
  */
@@ -62,7 +69,10 @@ export async function runRecurringGeneration(options: RunOptions): Promise<RunSu
   const startedAt = Date.now();
   const summary = { contracts: 0, companies: 0, skipped: 0, examined: 0, created: 0, failed: 0 };
   log('INFO', 'recurring.generation.started', { dryRun, requestId: actor.requestId });
-  const plans = planCodes.filter((code) => planCatalog[code].features.includes('finance.payables'));
+  const plans = [
+    ...planCodes.filter((code) => planCatalog[code].features.includes('finance.recurring')),
+    customPlanCode,
+  ];
   const contracts = db
     .collection('subscriptions')
     .where('planCode', 'in', plans)
@@ -75,7 +85,11 @@ export async function runRecurringGeneration(options: RunOptions): Promise<RunSu
       summary.contracts++;
       try {
         const subscription = subscriptionSchema.parse(doc.data());
-        if (subscription.status === 'suspended' || subscription.status === 'canceled') {
+        if (
+          subscription.status === 'suspended' ||
+          subscription.status === 'canceled' ||
+          !hasFeature(entitlementsFor(subscription), 'finance.recurring')
+        ) {
           summary.skipped++;
           continue;
         }

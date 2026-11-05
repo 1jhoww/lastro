@@ -66,7 +66,7 @@ export class RecurringService {
   async categories(actor: Actor, tenantId: string, input: z.infer<typeof s.expenseCategoryQuery>) {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {
-        await this.commands.access.tenant(actor, tenantId, 'payables:read', tx);
+        await this.commands.access.tenant(actor, tenantId, 'recurring:read', tx);
         const status = input.status ?? 'active';
         const base = this.repo.ref(tenantId, 'expenseCategories', 'placeholder').parent;
         const query = status === 'all' ? base : base.where('status', '==', status);
@@ -112,7 +112,7 @@ export class RecurringService {
       'expense-category.create',
       'new',
       input,
-      'payables:manage',
+      'recurring:manage',
       s.expenseCategoryView,
       false,
       async (tx, _ctx, _operationId, now) => {
@@ -167,7 +167,7 @@ export class RecurringService {
       'expense-category.update',
       id,
       input,
-      'payables:manage',
+      'recurring:manage',
       s.expenseCategoryView,
       false,
       async (tx, _ctx, _operationId, now) => {
@@ -223,7 +223,7 @@ export class RecurringService {
       'expense-category.seed',
       'new',
       {},
-      'payables:manage',
+      'recurring:manage',
       s.seededCategories,
       false,
       async (tx, _ctx, _operationId, now) => {
@@ -250,7 +250,7 @@ export class RecurringService {
   async list(actor: Actor, tenantId: string, input: z.infer<typeof s.recurringExpenseQuery>) {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {
-        const ctx = await this.commands.access.tenant(actor, tenantId, 'payables:read', tx);
+        const ctx = await this.commands.access.tenant(actor, tenantId, 'recurring:read', tx);
         const today = companyDate(this.commands.clock(), ctx.tenant.timezone);
         const base = this.repo.ref(tenantId, 'recurringExpenses', 'placeholder').parent;
         const query = input.status ? base.where('status', '==', input.status) : base;
@@ -272,7 +272,7 @@ export class RecurringService {
   async get(actor: Actor, tenantId: string, id: string) {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {
-        const ctx = await this.commands.access.tenant(actor, tenantId, 'payables:read', tx);
+        const ctx = await this.commands.access.tenant(actor, tenantId, 'recurring:read', tx);
         return this.view(
           await this.load(tx, tenantId, id),
           companyDate(this.commands.clock(), ctx.tenant.timezone),
@@ -295,7 +295,7 @@ export class RecurringService {
       'recurring.create',
       'new',
       input,
-      'payables:manage',
+      'recurring:manage',
       s.recurringExpenseView,
       false,
       async (tx, ctx, _operationId, now) => {
@@ -354,7 +354,7 @@ export class RecurringService {
       'recurring.update',
       id,
       input,
-      'payables:manage',
+      'recurring:manage',
       s.recurringExpenseView,
       false,
       async (tx, ctx, _operationId, now) => {
@@ -452,7 +452,7 @@ export class RecurringService {
       `recurring.${input.action}`,
       id,
       input,
-      'payables:manage',
+      'recurring:manage',
       s.recurringExpenseView,
       false,
       async (tx, ctx, _operationId, now) => {
@@ -506,7 +506,7 @@ export class RecurringService {
   }
   /** Issues what is due on demand, for companies waiting for the daily job. */
   async generate(actor: Actor, tenantId: string) {
-    const ctx = await this.commands.access.tenant(actor, tenantId, 'payables:manage');
+    const ctx = await this.commands.access.tenant(actor, tenantId, 'recurring:manage');
     return this.generateFor(actor, ctx.tenant.id, ctx.tenant.timezone);
   }
   /**
@@ -542,7 +542,7 @@ export class RecurringService {
     }
   }
   private async advance(actor: Actor, tenantId: string, id: string) {
-    const ctx = await this.commands.access.tenant(actor, tenantId, 'payables:read');
+    const ctx = await this.commands.access.tenant(actor, tenantId, 'recurring:read');
     await this.issue(actor, tenantId, id, ctx.tenant.timezone);
   }
   /**

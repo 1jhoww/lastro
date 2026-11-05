@@ -57,7 +57,7 @@ describe('Visão geral do Super Admin', () => {
       status: 'canceled',
     });
     const view = (await admin(f, 'get', '/overview').expect(200)).body.data;
-    expect(view.plans).toEqual({ essencial: 0, profissional: 0, gestao: 0, legacy: 1 });
+    expect(view.plans).toEqual({ essencial: 0, profissional: 0, gestao: 0, custom: 0, legacy: 1 });
     expect(view.subscriptions).toMatchObject({ active: 1, canceled: 1 });
     expect(view.mrrCents).toBe(19900);
   });
