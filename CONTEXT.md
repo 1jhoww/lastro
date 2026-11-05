@@ -41,7 +41,7 @@ Vínculo do Super Admin a uma empresa, que não ocupa vaga e só vale enquanto e
 _Avoid_: Usuário da empresa, administrador da empresa.
 
 **Plano**:
-Oferta comercial oficial definida pelo sistema (Essencial, Profissional), com limite de usuários e recursos.
+Oferta comercial oficial definida pelo sistema (Essencial, Profissional, Gestão), com limite de usuários e recursos.
 _Avoid_: Contrato vigente de uma empresa, plano cadastrado livremente.
 
 **Recurso do plano**:
@@ -63,6 +63,10 @@ _Avoid_: Data de pagamento, mês de vencimento.
 **Cliente comercial**:
 Pessoa ou organização atendida pela empresa, com contato e documento fiscal opcional.
 _Avoid_: Empresa contratante, identidade de login.
+
+**Fornecedor**:
+Relacionamento de um cadastro da empresa do qual ela compra; o mesmo cadastro pode também ser cliente.
+_Avoid_: Cadastro separado de fornecedores, cliente duplicado.
 
 **Carteira comercial**:
 Clientes cujo responsável atual é um vendedor da empresa; propriedade verificada pelo servidor.
@@ -127,6 +131,58 @@ _Avoid_: Visita presencial, registro de expedição.
 **Estimativa de recompra**:
 Data provável de nova compra: última compra confirmada mais a mediana dos intervalos entre compras confirmadas do último ano.
 _Avoid_: Previsão garantida, meta de venda.
+
+**Pedido de compra**:
+Compromisso da empresa com um fornecedor, com um ou mais produtos, condição de pagamento e previsão de entrega.
+_Avoid_: Entrada de estoque, conta a pagar.
+
+**Recebimento de mercadoria**:
+Entrada física de uma compra confirmada, total ou parcial, que movimenta o estoque e atualiza o custo médio.
+_Avoid_: Recebimento (dinheiro de cliente), pagamento ao fornecedor.
+
+**Entrada avulsa**:
+Movimentação administrativa de estoque sem compra nem título, que não altera o custo médio.
+_Avoid_: Recebimento de mercadoria, compra simplificada.
+
+**Custo de referência**:
+Custo informado pela empresa e sugerido nas compras; só um recebimento preenche, e apenas quando vazio.
+_Avoid_: Custo médio, preço de venda.
+
+**Custo médio**:
+Média ponderada móvel do custo apropriado das compras recebidas, usada para o custo das mercadorias vendidas.
+_Avoid_: Último custo, média simples.
+
+**Custo apropriado**:
+Valor do item na compra somado à sua parte de frete, despesas e descontos.
+_Avoid_: Custo unitário digitado, despesa operacional.
+
+**Encerramento de saldo pendente**:
+Decisão de que o restante de uma compra parcialmente recebida não será entregue, com efeito financeiro escolhido entre abatimento, cobrança integral e crédito do fornecedor; não pode ser desfeita.
+_Avoid_: Cancelamento parcial, baixa de compra.
+
+**Crédito de fornecedor**:
+Valor que o fornecedor deve à empresa depois de um encerramento, usado em título de compra do mesmo fornecedor ou devolvido em dinheiro.
+_Avoid_: Crédito de cliente, desconto.
+
+**Valor a recuperar**:
+Crédito de fornecedor registrado como dinheiro pago a maior que a empresa pretende receber de volta.
+_Avoid_: Reembolso, que é dinheiro devolvido a cliente.
+
+**Título a pagar**:
+Obrigação da empresa, com valor original e saldo próprios, nascida de compra, despesa, recorrência ou lançamento manual.
+_Avoid_: Pagamento, despesa paga.
+
+**Pagamento de título**:
+Registro de dinheiro pago a um título, com juros, multa e desconto separados do valor abatido; estornado, permanece no histórico.
+_Avoid_: Baixa que altera o valor original, recebimento físico.
+
+**Despesa recorrente**:
+Regra que gera títulos a pagar por vencimento, sem duplicar por recorrência e data.
+_Avoid_: Assinatura, título único.
+
+**Resultado estimado**:
+Lucro bruto menos despesas operacionais do período, para gestão.
+_Avoid_: Lucro líquido contábil.
 
 **Recebível**:
 Obrigação a receber originada de uma parcela do pedido confirmado, com valor original e saldo em aberto próprios.
