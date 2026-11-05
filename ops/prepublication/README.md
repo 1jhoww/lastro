@@ -6,7 +6,7 @@ Data da base: 18/10/2026. Destino exclusivo: projeto `lastro-hml`, Firestore `(d
 
 ## Lastro Gestão
 
-Preparação de 05/11/2026, sem execução: [inventário](gestao-inventario-hml.md), [índices](gestao-indices-plano.md), [ambientes](gestao-ambientes.md), [agendamento](gestao-recorrencias-agendamento.md) e [recuperação](gestao-recuperacao.md). O checklist final está em [backend/docs](../../backend/docs/gestao-production-checklist.md).
+Em 05/11/2026 o responsável confirmou clientes reais em `lastro-hml`, que passa a ser tratado como produção. Onde este diretório diz homologação de `lastro-hml`, leia produção. Preparação sem execução: [inventário](gestao-inventario-hml.md), [índices](gestao-indices-plano.md), [ambientes](gestao-ambientes.md), [agendamento](gestao-recorrencias-agendamento.md) e [recuperação](gestao-recuperacao.md). O checklist final está em [backend/docs](../../backend/docs/gestao-production-checklist.md).
 
 ## Restrição de custo e autorização
 

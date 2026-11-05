@@ -1,6 +1,6 @@
 # Lastro Gestão: agendamento das recorrências
 
-Preparado, sem nada criado. Os exemplos são de homologação. Em produção, troque os sufixos e peça autorização separada.
+Preparado, sem nada criado. Os exemplos usam `lastro-hml`, que tem clientes reais e é produção. **Não ative ali sem autorização.** Valide antes no ambiente de homologação novo, trocando projeto e sufixos.
 
 O código está pronto e foi exercitado em emulador, com execução real, simulação, repetição, paralelismo e falhas isoladas: [recurringRun.test.ts](../../backend/tests/integration/recurringRun.test.ts).
 

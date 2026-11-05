@@ -4,67 +4,68 @@ Proposta. Nenhum recurso foi criado ou alterado.
 
 ## Situação atual
 
-Há um só ambiente, `lastro-hml`. O alvo Production da Vercel significa "frontend principal de homologação". Preview, Production e testes dividem o mesmo banco, a mesma API e a mesma base de usuários.
+O responsável confirmou em 05/11/2026 que as 2 assinaturas ativas são de clientes reais. Portanto, **`lastro-hml` é produção, apesar do nome**. Não existe homologação de verdade.
 
-Isso impede três coisas: testar sem risco para quem já usa, recuperar dados sem afetar todos, e dar permissões diferentes para quem opera cada ambiente.
+Três consequências imediatas:
 
-## Decisão que vem primeiro
+- Publicar o Gestão em `lastro-hml` é deploy em produção, e esse deploy não está autorizado.
+- Preview da Vercel, testes remotos e contas de teste usam o mesmo banco dos clientes.
+- A regra do [plano beta](beta-execution-plan.md) foi ultrapassada: dados financeiros reais só deveriam entrar depois de validar a recuperação, e hoje não há PITR nem backup.
 
-As 2 assinaturas ativas em `lastro-hml` são de clientes reais?
+## Opções
 
-- **Não:** crie a produção vazia. `lastro-hml` continua como homologação.
-- **Sim:** essas empresas precisam migrar para a produção nova com janela combinada. Até lá, trate `lastro-hml` como produção: backup antes de tudo, e testes só em empresa de teste.
+| Critério                  | A: criar homologação nova                 | B: criar produção nova e migrar              |
+| ------------------------- | ----------------------------------------- | -------------------------------------------- |
+| Clientes reais            | Não mudam de lugar                        | Migram com janela combinada                  |
+| Risco imediato            | Baixo                                     | Alto: Auth, banco, arquivos e URLs           |
+| Prazo para testar o Gestão | Curto                                    | Depende da migração                          |
+| Nome dos recursos         | `lastro-hml` segue como produção          | Nomes corretos                               |
+| Faturamento               | Conferir a conta de produção atual        | Conta nova, sem depender de avaliação        |
+| Usuários                  | Sem exportação                            | Exige exportar usuários com dados sensíveis  |
 
-## Modelo proposto
+## Recomendação
 
-| Item              | Homologação (mantém)              | Produção (novo)                                   |
-| ----------------- | --------------------------------- | ------------------------------------------------- |
-| Projeto Google    | `lastro-hml`                      | `lastro-prod`, em projeto próprio                 |
-| Firebase Auth     | Base própria                      | Base própria, sem contas de teste                 |
-| Firestore         | `(default)`                       | `(default)`, mesma região, proteção, PITR, backup |
-| Storage           | `lastro-hml.firebasestorage.app`  | Bucket próprio, mesma região                      |
-| API               | `lastro-api-hml`                  | `lastro-api-prod`, mínimo de 1 instância          |
-| Conta de serviço  | `lastro-api-hml@`                 | `lastro-api-prod@`, sem acesso a homologação      |
-| Segredos          | `lastro-invitation-secret`        | Valores novos, nunca copiados                     |
-| Jobs              | `lastro-recurring-hml`            | `lastro-recurring-prod`, `lastro-billing-prod`    |
-| Frontend          | Projeto Vercel `lastro-hml`       | Projeto Vercel próprio, domínio definitivo        |
-| Observabilidade   | Alertas básicos                   | Alertas com canal de plantão                      |
-| Orçamento         | Atual                             | Separado                                          |
-| Dados             | Fictícios                         | Reais, nunca copiados para homologação            |
+**Opção A agora, e B depois se o nome ou o faturamento justificarem.** Ela separa os ambientes sem mover cliente nenhum e libera a homologação do Gestão.
 
-Projetos separados são o único limite que o IAM garante de verdade: uma conta de serviço de homologação não alcança produção por engano, e quotas, custos e auditoria ficam isolados.
+| Item             | Homologação (novo)           | Produção (`lastro-hml`, mantém)                |
+| ---------------- | ---------------------------- | ---------------------------------------------- |
+| Projeto Google   | `lastro-homolog`             | `lastro-hml`                                   |
+| Firebase Auth    | Base própria, contas de teste | Base atual                                    |
+| Firestore        | `(default)`, mesma região    | Atual, com proteção, PITR e backup a ativar    |
+| Storage          | Bucket próprio               | Atual                                          |
+| API              | `lastro-api-homolog`         | `lastro-api-hml`                               |
+| Conta de serviço | Própria, sem acesso à produção | Atual                                        |
+| Segredos         | Valores novos                | Atuais                                         |
+| Frontend         | Projeto Vercel próprio       | Projeto Vercel `lastro-hml`                    |
+| Dados            | Fictícios, nunca copiados    | Reais                                          |
 
-## Fluxo de publicação proposto
+Dados reais nunca são copiados para homologação.
 
-1. `main` publica em homologação, como hoje.
-2. Produção só recebe uma versão marcada, por exemplo `v1.2.0`, com aprovação manual.
-3. A imagem da API é a mesma que passou em homologação, promovida pelo digest. Nada é reconstruído.
-4. O frontend de produção não publica por push em `main`.
-5. Preview ganha variáveis próprias, para não falar com produção.
+## Fluxo de publicação
 
-O deploy automatizado pode usar GitHub Actions com Workload Identity Federation, sem chave de conta de serviço guardada. Ambientes protegidos do GitHub exigem aprovador para produção.
+1. Preview e homologação apontam para o projeto novo. Hoje o Preview da Vercel fala com os dados dos clientes, e isso precisa mudar primeiro.
+2. Homologação publica a branch candidata.
+3. Produção só recebe uma versão aprovada, com a mesma imagem, promovida pelo digest.
+4. **Push em `main` deixa de publicar direto em produção.** Hoje ele publica. Proposta: desligar a publicação automática de Production na Vercel e promover manualmente.
 
-## Aplicativos nativos
-
-Quando houver publicação em lojas, perfis EAS separados apontam para cada ambiente, com identificadores de aplicativo distintos para homologação e produção.
+O deploy automatizado pode usar GitHub Actions com Workload Identity Federation e ambientes protegidos do GitHub, sem chave de conta de serviço guardada.
 
 ## Sequência de implantação
 
-1. Decidir o destino das 2 assinaturas ativas.
-2. Criar o projeto `lastro-prod`, com faturamento e orçamento próprios.
-3. Criar Firestore, Auth, Storage e regras.
-4. Ativar proteção contra exclusão, PITR e backup antes do primeiro dado.
-5. Ensaiar a restauração em banco temporário.
-6. Publicar índices, API e frontend em produção.
-7. Executar a validação remota com contas de teste.
-8. Liberar a primeira empresa.
+1. Proteger a produção atual: backup, PITR, alertas e conferência do faturamento.
+2. Criar `lastro-homolog`, com Auth, Firestore, Storage e regras.
+3. Criar o projeto Vercel de homologação e trocar as variáveis de Preview.
+4. Desligar a publicação automática de Production.
+5. Publicar a branch candidata em homologação, com dados fictícios.
 
-Se houver clientes reais em `lastro-hml`, a migração vira uma etapa própria entre 7 e 8. Exportação de usuários do Auth inclui dados sensíveis, então precisa de plano e autorização separados.
+Se a opção B vier depois, ela é um projeto próprio, com ensaio de migração em cópia e janela combinada com os clientes.
 
 ## Custos
 
-Projeto novo não tem custo em si. Custos novos: instância mínima da API, PITR, backups, armazenamento e alertas. Estime em BRL na calculadora do Google antes de aprovar. Os créditos de teste não valem como orçamento de produção.
+O projeto novo fica barato: sem PITR, sem instância mínima, escala a zero. Os custos novos que importam estão na produção: PITR, backups e alertas. Estime em BRL no console antes de aprovar.
 
-## Enquanto isso
+**Atenção ao faturamento:** o projeto foi criado com faturamento de avaliação. Com clientes reais, o fim dos créditos não pode derrubar o serviço. Confira saldo, validade e o tipo de conta no console.
 
-O Gestão pode ser homologado em `lastro-hml` com uma empresa de teste, sem esperar a separação. O que não deve acontecer é considerar `lastro-hml` produção comercial sem backup restaurável.
+## Aplicativos nativos
+
+Quando houver publicação em lojas, perfis EAS separados apontam para cada ambiente, com identificadores distintos.

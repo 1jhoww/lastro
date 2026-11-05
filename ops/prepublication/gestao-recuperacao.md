@@ -50,7 +50,7 @@ O campo Contato responsável aparece para todos os planos, então pode fechar o 
 | Revisões Cloud Run  | Código com defeito                      | Ativas    | Manter                      |
 | Registros contábeis | Saber o que mudou                       | Ativos    | Manter                      |
 
-**Recomendação:** homologar só com dados fictícios exige ao menos a exportação pontual. Dados financeiros reais exigem backup diário, PITR e um ensaio de restauração concluído.
+**`lastro-hml` já tem dados financeiros reais, sem backup restaurável.** Backup diário, PITR e um ensaio de restauração deixam de ser opcionais e vêm antes de qualquer publicação, independentemente do Gestão.
 
 ### Exportação antes de publicar
 

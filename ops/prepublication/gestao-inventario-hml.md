@@ -4,9 +4,9 @@ Leitura feita em 05/11/2026 com `gcloud`, Firebase CLI e Vercel CLI, sem nenhuma
 
 ## Resumo
 
-`lastro-hml` é o único ambiente do Lastro. Ele atende hoje tanto o papel de homologação quanto o de qualquer uso real. Não há projeto de produção separado: o outro projeto visível na conta, `project-c1c123ae-b3b4-4a3a-b24` ("My First Project"), não está vinculado ao Lastro no Firebase.
+`lastro-hml` é o único ambiente do Lastro. Não existe homologação separada: o outro projeto visível na conta, `project-c1c123ae-b3b4-4a3a-b24` ("My First Project"), não está vinculado ao Lastro no Firebase.
 
-O banco tem 4 empresas e 4 assinaturas, 2 delas ativas. A contagem foi feita sem ler documentos. **Se alguma dessas empresas for real, `lastro-hml` já é produção de fato**, e cada etapa abaixo precisa ser tratada como tal.
+O banco tem 4 empresas e 4 assinaturas, 2 delas ativas. A contagem foi feita sem ler documentos. **O responsável confirmou que as 2 assinaturas ativas são de clientes reais, então `lastro-hml` é produção, apesar do nome.**
 
 ## Firebase e dados
 
@@ -62,8 +62,9 @@ Hoje uma falha da API só é percebida por quem usa.
 
 ## Pontos para corrigir
 
-1. Sem PITR nem backup, um erro de dados não tem recuperação.
-2. Não há nenhum alerta.
+1. **Crítico:** sem PITR nem backup, um erro de dados de clientes reais não tem recuperação.
+2. **Crítico:** não há nenhum alerta, então uma queda só é percebida pelo cliente.
 3. `859974935461-compute@` tem `roles/editor`, papel amplo demais. Ele é usado pelo Cloud Build. Reduzir exige teste próprio.
-4. Preview e Production dividem banco e API.
-5. A restrição registrada em [README.md](README.md) continua valendo: não criar recurso com custo sem aprovação. Saldo e validade dos créditos não foram verificados aqui.
+4. **Crítico:** Preview e Production dividem banco e API, e push em `main` publica direto para os clientes.
+5. O projeto nasceu com faturamento de avaliação. O fim dos créditos não pode derrubar clientes reais: confira saldo, validade e tipo de conta.
+6. A restrição registrada em [README.md](README.md) continua valendo: não criar recurso com custo sem aprovação.

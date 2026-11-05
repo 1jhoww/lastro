@@ -2,70 +2,46 @@
 
 Nada aqui roda sozinho. Cada marca com **[aprovação]** exige autorização específica do responsável, e aprovar uma etapa não aprova a seguinte.
 
+**`lastro-hml` tem clientes reais e é produção, apesar do nome.** Este checklist segue a opção A da [proposta de ambientes](../../ops/prepublication/gestao-ambientes.md): uma homologação nova, com a produção onde está.
+
 Referências em `ops/prepublication/`: [inventário](../../ops/prepublication/gestao-inventario-hml.md), [índices](../../ops/prepublication/gestao-indices-plano.md), [ambientes](../../ops/prepublication/gestao-ambientes.md), [agendamento](../../ops/prepublication/gestao-recorrencias-agendamento.md) e [recuperação](../../ops/prepublication/gestao-recuperacao.md).
 
-## Parte 1: homologação em `lastro-hml`
+## Parte 0: proteger a produção atual
 
-### 1. Antes de começar
+Independe do Gestão e vem primeiro.
 
-- [ ] Responder: as 2 assinaturas ativas são de clientes reais? Se sim, trate cada etapa como produção.
-- [ ] Revisar a branch `feat/lastro-gestao`. Ela não vai para `main` antes da etapa 6.
-- [ ] Confirmar a identidade: configuração `lastro-hml` do `gcloud`, conta do Lastro. Nunca use a configuração padrão da máquina.
-- [ ] Confirmar faturamento e créditos no console. Sem faturamento, o limite de índices cai para 200.
-- [ ] Anotar a revisão atual da API e o deployment atual da Vercel.
-- [ ] Repetir o inventário e parar se algo divergir.
+- [ ] Confirmar no console saldo, validade e tipo do faturamento.
+- [ ] **[aprovação]** Ativar backup diário e PITR.
+- [ ] **[aprovação]** Exportar o Firestore para um bucket próprio.
+- [ ] Ensaiar uma restauração em banco temporário e registrar o tempo real.
+- [ ] **[aprovação]** Criar canal e alertas de erro 5xx e de indisponibilidade da API.
+- [ ] **[aprovação]** Trocar as variáveis de Preview da Vercel, que hoje apontam para a produção.
+- [ ] **[aprovação]** Desligar a publicação automática de Production por push em `main`.
+- [ ] Não usar contas de teste nem validação remota em `lastro-hml` sem autorização.
 
-### 2. Backup **[aprovação]**
+## Parte 1: homologação em `lastro-homolog`
 
-- [ ] Criar o bucket de backup e exportar o Firestore.
-- [ ] Confirmar a exportação concluída.
+### 1. Criar o ambiente **[aprovação]**
 
-### 3. Índices **[aprovação]**
+- [ ] Criar projeto, Auth, Firestore, Storage, segredos e conta de serviço próprios.
+- [ ] Criar a API e o projeto Vercel de homologação.
+- [ ] Aplicar todos os índices e campos do repositório. Ambiente vazio aceita publicação inteira.
+- [ ] Popular com dados fictícios. Nunca copiar dados reais.
 
-- [ ] Aplicar as 32 isenções de campo, uma a uma.
-- [ ] Criar os 34 índices compostos, um a um.
-- [ ] Aguardar 184 `READY`, sem `CREATING` nem `NEEDS_REPAIR`.
-- [ ] Não usar `firebase deploy` em bloco.
+### 2. Publicar a branch candidata
 
-### 4. API sem tráfego **[aprovação]**
+- [ ] Revisar `feat/lastro-gestao`.
+- [ ] Publicar API e frontend em homologação.
+- [ ] Conferir que nenhuma variável aponta para `lastro-hml`.
 
-- [ ] Publicar revisão sem tráfego, a partir da branch:
-
-  ```bash
-  gcloud run deploy lastro-api-hml --source=backend --region=southamerica-east1 --configuration=lastro-hml --no-traffic --tag=gestao --quiet
-  ```
-
-- [ ] Conferir `/health/live` e `/health/ready` na URL com a etiqueta `gestao`.
-- [ ] Nenhuma variável nova. Flags omitidas mantêm ambiente e segredo.
-
-### 5. Tráfego na API **[aprovação]**
-
-- [ ] Mover 100% para a revisão nova:
-
-  ```bash
-  gcloud run services update-traffic lastro-api-hml --to-latest --region=southamerica-east1
-  ```
-
-- [ ] Confirmar que o frontend atual segue funcionando: pedidos, clientes, estoque e financeiro.
-- [ ] Executar o verificador e confirmar `rollbackSafe: true`.
-
-### 6. Frontend **[aprovação]**
-
-- [ ] Só depois da API. Fazer merge em `main`, o que publica na Vercel. Um deploy manual parte da raiz do repositório, depois de apagar `%TEMP%\metro-cache`.
-- [ ] Conferir no pacote que não há `127.0.0.1` nem `demo-lastro`.
-
-### 7. Smoke tests sem o plano Gestão
+### 3. Validar sem o plano Gestão
 
 - [ ] Essencial e Profissional mantêm preço, módulos e acesso.
 - [ ] Empresa fora do plano recebe `FEATURE_NOT_IN_PLAN` em `GET /purchases`.
 - [ ] Pedido, recebimento de cliente, movimentação avulsa e relatório funcionam.
-- [ ] Verificador ainda em `rollbackSafe: true`.
 
-### 8. Empresa de teste no Gestão **[aprovação]**
+### 4. Validar o plano Gestão
 
-**Ponto sem volta:** depois daqui, a API anterior não lê a empresa. A saída passa a ser corrigir para a frente.
-
-- [ ] Criar ou mover só uma empresa de teste, sem dados reais.
 - [ ] Listas de compras, títulos, fornecedores e créditos abrem sem erro de índice.
 - [ ] Compra confirmada gera títulos e não muda o estoque.
 - [ ] Recebimento parcial muda estoque e custo médio.
@@ -76,7 +52,71 @@ Referências em `ops/prepublication/`: [inventário](../../ops/prepublication/ge
 - [ ] Relatórios `purchases-supplier` e `cash-flow` exportam CSV e PDF.
 - [ ] Testar no celular, no navegador. Testar o app nativo se houver build.
 
-### 9. Recorrências em homologação **[aprovação]**
+### 5. Validar operação
+
+- [ ] Criar job, rodar `--dry-run`, depois execução real.
+- [ ] Ativar agendamento e alertas, e conferir a primeira execução automática.
+- [ ] Rodar o verificador de reversão com e sem dados do Gestão.
+- [ ] **Ensaiar a publicação da produção:** partir da versão anterior com dados fictícios, aplicar índices, API sem tráfego, tráfego e frontend, e medir o tempo.
+- [ ] Repetir o caso `return` do teste de capacidade com limite maior.
+- [ ] Observar ao menos 7 dias sem erro inesperado.
+
+## Parte 2: produção em `lastro-hml`
+
+Não autorizada. **Pré-requisitos:** Parte 0 e Parte 1 concluídas.
+
+### 1. Preparar **[aprovação]**
+
+- [ ] Combinar a janela e avisar os clientes.
+- [ ] Anotar a revisão da API e o deployment da Vercel.
+- [ ] Exportar o Firestore na véspera ou no dia.
+- [ ] Repetir o inventário e parar se algo divergir.
+
+### 2. Índices **[aprovação]**
+
+- [ ] Aplicar as 32 isenções de campo, uma a uma.
+- [ ] Criar os 34 índices compostos, um a um.
+- [ ] Aguardar 184 `READY`, sem `CREATING` nem `NEEDS_REPAIR`.
+- [ ] Não usar `firebase deploy` em bloco.
+
+### 3. API **[aprovação]**
+
+- [ ] Promover a imagem validada, sem tráfego. Sem imagem pronta, publicar a partir da versão aprovada:
+
+  ```bash
+  gcloud run deploy lastro-api-hml --source=backend --region=southamerica-east1 --configuration=lastro-hml --no-traffic --tag=gestao --quiet
+  ```
+
+- [ ] Conferir `/health/live` e `/health/ready` na URL com a etiqueta `gestao`.
+- [ ] Mover o tráfego:
+
+  ```bash
+  gcloud run services update-traffic lastro-api-hml --to-latest --region=southamerica-east1
+  ```
+
+- [ ] Confirmar que o frontend atual segue funcionando para os clientes.
+- [ ] Rodar o verificador e confirmar `rollbackSafe: true`.
+
+### 4. Frontend **[aprovação]**
+
+- [ ] Só depois da API. Fazer merge em `main` e promover o deployment.
+- [ ] Em deploy manual, partir da raiz do repositório e apagar `%TEMP%\metro-cache` antes.
+- [ ] Conferir no pacote que não há `127.0.0.1` nem `demo-lastro`.
+
+### 5. Observar sem o Gestão
+
+- [ ] Clientes atuais seguem com preço, módulos e acesso iguais.
+- [ ] Observar 24 horas: erros, latência e custo.
+- [ ] Verificador ainda em `rollbackSafe: true`.
+
+### 6. Primeira empresa no Gestão **[aprovação]**
+
+**Ponto sem volta:** depois daqui, a API anterior não lê essa assinatura. A saída passa a ser corrigir para a frente.
+
+- [ ] Liberar uma empresa por vez, com aviso prévio.
+- [ ] Conferir índices, compras, títulos e painel nessa empresa.
+
+### 7. Recorrências **[aprovação]**
 
 - [ ] Habilitar Cloud Scheduler e criar as duas contas de serviço.
 - [ ] Criar o job e executar `--dry-run`. Critério: `failed: 0`.
@@ -84,48 +124,20 @@ Referências em `ops/prepublication/`: [inventário](../../ops/prepublication/ge
 - [ ] **[aprovação própria]** Ativar o agendamento e o alerta de ausência.
 - [ ] Conferir a primeira execução real.
 
-### 10. Encerramento da homologação
+### 8. Encerrar
 
-- [ ] Observar ao menos 7 dias sem erro inesperado.
-- [ ] Repetir o caso `return` do teste de capacidade com limite maior.
 - [ ] Registrar revisão, deployment, horários e resultados.
-- [ ] Decidir sobre a ida à produção.
-
-## Parte 2: produção
-
-Não autorizada. **Pré-requisito:** ambiente próprio, conforme a [proposta de ambientes](../../ops/prepublication/gestao-ambientes.md). Publicar "em produção" no projeto atual é só repetir a homologação.
-
-### Antes do primeiro dado
-
-- [ ] **[aprovação]** Criar projeto, Firestore, Auth, Storage, segredos e contas de serviço próprios.
-- [ ] Ativar proteção contra exclusão, PITR e backup diário.
-- [ ] Ensaiar uma restauração em banco temporário e registrar o tempo real.
-- [ ] Criar orçamento, canais e alertas de API, job e backup.
-- [ ] Definir responsáveis por plantão e reversão.
-
-### Publicação **[aprovação]**
-
-- [ ] Promover a mesma imagem validada em homologação, pelo digest.
-- [ ] Índices e regras antes da API. API antes do frontend.
-- [ ] Publicar revisão sem tráfego, testar, e só então mover o tráfego.
-- [ ] Executar os smoke tests das etapas 7 e 8 com contas de teste.
-- [ ] Agendamentos desligados até a primeira semana estável.
-
-### Depois de publicar
-
-- [ ] Liberar empresas aos poucos.
-- [ ] Acompanhar erros, latência, custo e o job diário.
-- [ ] Revisar o primeiro backup real.
+- [ ] Revisar o primeiro backup depois da publicação.
 
 ## Reversão
 
-| Componente | Como reverter                                                                                         |
-| ---------- | ----------------------------------------------------------------------------------------------------- |
-| Frontend   | Promover o deployment anterior. Seguro a qualquer momento                                             |
-| API        | Só com `rollbackSafe: true`. Do contrário, corrigir para a frente                                     |
-| Índices    | Manter. Não afetam a versão anterior                                                                  |
-| Job        | Pausar o agendador. Títulos gerados continuam válidos                                                 |
-| Dados      | Restaurar em banco novo e corrigir a partir dele. Nunca sobre o banco em uso                          |
+| Componente | Como reverter                                                                                |
+| ---------- | -------------------------------------------------------------------------------------------- |
+| Frontend   | Promover o deployment anterior. Seguro a qualquer momento                                    |
+| API        | Só com `rollbackSafe: true`. Do contrário, corrigir para a frente                            |
+| Índices    | Manter. Não afetam a versão anterior                                                         |
+| Job        | Pausar o agendador. Títulos gerados continuam válidos                                        |
+| Dados      | Restaurar em banco novo e corrigir a partir dele. Nunca sobre o banco em uso                 |
 
 ```bash
 gcloud run services update-traffic lastro-api-hml --to-revisions=REVISAO_ANTERIOR=100 --region=southamerica-east1

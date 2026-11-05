@@ -1,6 +1,6 @@
 # Lastro Gestão: plano de publicação dos índices
 
-Nada aqui foi executado. Os comandos estão em [gestao-indices-aprovacao.txt](gestao-indices-aprovacao.txt), um por linha. A análise está na [auditoria](../../docs/audits/indices-gestao-2026-11-04.md).
+Nada aqui foi executado. **`lastro-hml` tem clientes reais:** este plano só vale na Parte 2 do checklist, depois da homologação no ambiente novo. Em ambiente novo e vazio, os índices podem ser publicados de uma vez. Os comandos estão em [gestao-indices-aprovacao.txt](gestao-indices-aprovacao.txt), um por linha. A análise está na [auditoria](../../docs/audits/indices-gestao-2026-11-04.md).
 
 ## Escopo
 
