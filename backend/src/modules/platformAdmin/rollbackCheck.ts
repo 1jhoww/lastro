@@ -3,10 +3,7 @@ import { FieldPath, type Firestore, type QueryDocumentSnapshot } from 'firebase-
 const PAGE_SIZE = 200;
 
 export type RollbackBlocker =
-  | 'plan_gestao'
-  | 'supplier_record'
-  | 'customer_contact'
-  | 'purchase_stock_movement';
+  'plan_gestao' | 'supplier_record' | 'customer_contact' | 'purchase_stock_movement';
 
 /**
  * Says whether the API version before Lastro Gestão can still read the database. That version has

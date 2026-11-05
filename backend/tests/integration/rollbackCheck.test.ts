@@ -18,7 +18,10 @@ describe('Compatibilidade com a versão anterior da API', () => {
     expect(created.body.data).toMatchObject({ relationships: ['customer'], contactName: null });
     for (const key of ['relationships', 'isSupplier', 'contactName'])
       expect(await stored(id)).not.toHaveProperty(key);
-    await api(f).patch(`/customers/${id}`, { name: 'Mercado Central Ltda', expectedVersion: version });
+    await api(f).patch(`/customers/${id}`, {
+      name: 'Mercado Central Ltda',
+      expectedVersion: version,
+    });
     for (const key of ['relationships', 'isSupplier', 'contactName'])
       expect(await stored(id)).not.toHaveProperty(key);
     expect(await rollbackBlockers(f.firebase.db)).toMatchObject({ rollbackSafe: true });
