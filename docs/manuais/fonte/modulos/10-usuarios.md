@@ -188,25 +188,29 @@ A carteira continua valendo: o vendedor só vê os próprios clientes e pedidos,
 
 ## Planos do Lastro {nova-pagina}
 
-O plano da empresa aparece no quadro do topo da tela **Usuários**, com os acessos utilizados e os recursos incluídos. Hoje o Lastro oferece dois planos:
+O plano da empresa aparece no quadro do topo da tela **Usuários**, com os acessos utilizados e os recursos incluídos. Hoje o Lastro oferece três planos:
 
-| Recurso | Essencial | Profissional |
-|---|:-:|:-:|
-| Usuários (ativos e convites pendentes) | 1 | 2 |
-| Pedidos, clientes, produtos com fotos e estoque | {sim} | {sim} |
-| Financeiro, devoluções e correção de vencimentos | {sim} | {sim} |
-| Relatórios em tela, CSV e PDF | {sim} | {sim} |
-| Pedido comercial e romaneio em PDF com o nome da empresa | {sim} | {sim} |
-| Convite de usuários adicionais | {nao} | {sim} |
-| Perfil Vendedor e carteiras de clientes | {nao} | {sim} |
-| Visitas e recompra | {nao} | {sim} |
-| Catálogo público com orçamento pelo WhatsApp | {nao} | {sim} |
-| Logotipo nos PDFs e no catálogo, fotos dos produtos nos PDFs | {nao} | {sim} |
+| Recurso | Essencial | Profissional | Gestão |
+|---|:-:|:-:|:-:|
+| Usuários (ativos e convites pendentes) | 1 | 2 | 5 |
+| Pedidos, clientes, produtos com fotos e estoque | {sim} | {sim} | {sim} |
+| Financeiro, devoluções e correção de vencimentos | {sim} | {sim} | {sim} |
+| Relatórios em tela, CSV e PDF | {sim} | {sim} | {sim} |
+| Pedido comercial e romaneio em PDF com o nome da empresa | {sim} | {sim} | {sim} |
+| Convite de usuários adicionais | {nao} | {sim} | {sim} |
+| Perfil Vendedor e carteiras de clientes | {nao} | {sim} | {sim} |
+| Visitas e recompra | {nao} | {sim} | {sim} |
+| Catálogo público com orçamento pelo WhatsApp | {nao} | {sim} | {sim} |
+| Logotipo nos PDFs e no catálogo, fotos dos produtos nos PDFs | {nao} | {sim} | {sim} |
+| Fornecedores, compras e recebimento de mercadorias | {nao} | {nao} | {sim} |
+| Custos de aquisição, margens e rentabilidade | {nao} | {nao} | {sim} |
+| Contas a pagar, despesas e recorrências | {nao} | {nao} | {sim} |
+| Fluxo de caixa, painel e relatórios financeiros | {nao} | {nao} | {sim} |
 
-Não há outros planos disponíveis no momento. Recurso fora do plano não aparece no menu ou aparece com o aviso "Disponível no plano Profissional"; na janela de permissões, aparece como "Fora do plano contratado".
+Recurso fora do plano não aparece no menu ou aparece com o aviso de disponibilidade no plano; na janela de permissões, aparece como "Fora do plano contratado".
 
 :::nota Troca de plano
-A troca de plano é feita pela equipe do Lastro. Para passar ao Essencial, a empresa precisa caber em 1 usuário. Ao sair do Profissional, o catálogo público deixa de abrir e o logotipo e as fotos saem dos documentos; cadastros, logotipo e fotos ficam guardados para uma volta ao Profissional.
+A troca de plano é feita pela equipe do Lastro. Para passar a um plano menor, a empresa precisa caber no limite de usuários dele. Ao sair do Profissional, o catálogo público deixa de abrir e o logotipo e as fotos saem dos documentos. Ao sair do Gestão, compras, contas a pagar e o painel saem do menu. Nada é apagado: cadastros, compras, títulos e custos ficam guardados para uma volta ao plano.
 :::
 
 ## O que só a equipe do Lastro faz

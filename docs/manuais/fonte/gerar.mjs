@@ -294,7 +294,7 @@ function renderManual(source, pages) {
   <div class="rodape">
     <div class="slogan">Uma base sólida para o seu negócio.</div>
     <div class="hepta">by hepta</div>
-    <div class="versao">${escape(meta.versao ?? 'Versão beta · outubro de 2026')}. As telas mostradas usam dados fictícios de demonstração.</div>
+    <div class="versao">${escape(meta.versao ?? `Versão beta · ${meta.mes ?? 'outubro de 2026'}`)}. As telas mostradas usam dados fictícios de demonstração.</div>
   </div>
 </section>
 <section class="indice${state.toc.length > 16 ? ' compacta' : ''}">
@@ -305,7 +305,7 @@ function renderManual(source, pages) {
 </section>
 <main>
 ${content}
-<p class="fim">Este manual descreve o Lastro na versão beta de outubro de 2026. Nomes de botões e mensagens aparecem como na tela; se algo estiver diferente no seu acesso, o seu perfil ou o plano contratado pode não incluir a função. Dúvidas: fale com o administrador da sua empresa ou com o suporte do Lastro.</p>
+<p class="fim">Este manual descreve o Lastro na versão beta de ${meta.mes ?? 'outubro de 2026'}. Nomes de botões e mensagens aparecem como na tela; se algo estiver diferente no seu acesso, o seu perfil ou o plano contratado pode não incluir a função. Dúvidas: fale com o administrador da sua empresa ou com o suporte do Lastro.</p>
 </main>
 </body>
 </html>`;

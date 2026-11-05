@@ -70,6 +70,7 @@ export function CustomerForm({
     if (!form.getValues('number') && !form.getValues('noNumber')) numberRef.current?.focus();
   });
   const noNumber = useWatch({ control, name: 'noNumber' });
+  const customer = useWatch({ control, name: 'isCustomer' });
   const guard = useDiscardGuard(formState.isDirty && !submitting, onCancel);
 
   useEffect(() => {
@@ -272,7 +273,12 @@ export function CustomerForm({
 
       <FormActions>
         <Button label="Cancelar" variant="ghost" onPress={guard.cancel} disabled={submitting} />
-        <Button label="Salvar cliente" variant="strong" loading={submitting} onPress={submit} />
+        <Button
+          label={customer === false ? 'Salvar fornecedor' : 'Salvar cliente'}
+          variant="strong"
+          loading={submitting}
+          onPress={submit}
+        />
       </FormActions>
       {guard.dialog}
     </FormBody>

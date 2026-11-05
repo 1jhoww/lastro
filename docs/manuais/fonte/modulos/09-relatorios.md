@@ -51,6 +51,10 @@ Cada relatório tem um período padrão, mostrado logo abaixo do campo. Por exem
 A data final precisa ser igual ou posterior à inicial. Se a consulta for grande demais, o Lastro avisa ("Consulta grande demais"): reduza o período ou use mais filtros.
 :::
 
+:::nota Plano Gestão
+No plano Gestão aparece a categoria [[Gestão]], com fluxo de caixa, contas a pagar, compras, custos, rentabilidade e despesas. Veja o manual Painel de gestão e relatórios.
+:::
+
 ## Baixar em CSV ou PDF
 
 1. Gere o relatório com os filtros desejados.

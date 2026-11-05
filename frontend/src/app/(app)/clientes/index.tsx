@@ -79,7 +79,7 @@ export default function Customers() {
   const columns: Column<Customer>[] = [
     {
       key: 'name',
-      label: 'Cliente',
+      label: relationship === 'supplier' ? 'Fornecedor' : 'Cliente',
       flex: 3,
       render: (c) => (
         <View>
@@ -128,7 +128,7 @@ export default function Customers() {
         </Text>
       ),
     },
-    ...(admin
+    ...(admin && relationship !== 'supplier'
       ? [
           {
             key: 'owner',
@@ -165,7 +165,11 @@ export default function Customers() {
           ? admin
             ? 'Clientes da empresa.'
             : 'Clientes da sua carteira.'
-          : countLabel(items.length, Boolean(query.hasNextPage), 'cliente', 'clientes')
+          : relationship === 'supplier'
+            ? countLabel(items.length, Boolean(query.hasNextPage), 'fornecedor', 'fornecedores')
+            : relationship === 'all'
+              ? countLabel(items.length, Boolean(query.hasNextPage), 'cadastro', 'cadastros')
+              : countLabel(items.length, Boolean(query.hasNextPage), 'cliente', 'clientes')
       }
       actions={
         <>

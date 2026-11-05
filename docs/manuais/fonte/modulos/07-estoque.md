@@ -50,12 +50,12 @@ O **vendedor** vê apenas "Quanto há disponível para vender agora.", sem físi
 
 ## Registrar uma entrada de mercadoria
 
-Use quando chegar mercadoria do fornecedor.
+Use quando chegar mercadoria do fornecedor. No plano Gestão, mercadoria comprada entra por **Compras**, que gera as contas a pagar e atualiza o custo; a entrada avulsa fica para bonificações, amostras e saldo de abertura, e não muda o custo médio.
 
 1. Em [[Estoque]], clique em [[Registrar entrada]]. Na ficha de um produto, o botão já abre com o produto escolhido.
 2. Clique em [[Escolher produto]] e selecione o produto.
 3. Informe a **Quantidade**, na unidade do produto. KG e L aceitam até 3 casas decimais; as demais unidades, só inteiros.
-4. Escreva o **Motivo** (de 3 a 200 caracteres). Por exemplo: "Nota fiscal 1234 do fornecedor".
+4. Se quiser, escreva o **Motivo**. Por exemplo: "Bonificação do fornecedor".
 5. Se quiser, preencha a **Observação**.
 6. Confira o quadro **Antes e depois**, com o saldo atual e o resultado.
 7. Clique em [[Revisar entrada]] e confira o resumo em "Confirmar entrada?".

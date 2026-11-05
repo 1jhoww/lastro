@@ -17,6 +17,9 @@ wordmark de `frontend/src/brand`).
 | `lastro-manual-relatorios.pdf` | Catálogo de relatórios, filtros, CSV/PDF, exportação de cadastros |
 | `lastro-manual-usuarios-e-permissoes.pdf` | Perfis, Configurações, nome e logotipo da empresa, vagas do plano, convites, edição/desativação, permissões do vendedor, planos Essencial e Profissional, funções da equipe do Lastro (Super Admin) |
 | `lastro-manual-catalogo-publico.pdf` | Disponibilidade por plano, configurar, logotipo e marca do Lastro, publicar e compartilhar, escolher produtos, tirar do ar, visão do cliente |
+| `lastro-manual-compras.pdf` | Plano Gestão: fornecedores, pedidos de compra, confirmação, recebimento parcial, estorno, encerramento de saldo pendente, cancelamento, custos e margem |
+| `lastro-manual-contas-a-pagar.pdf` | Plano Gestão: títulos, despesas, pagamentos, estornos, recorrências, categorias e créditos de fornecedores |
+| `lastro-manual-gestao-financeira.pdf` | Plano Gestão: painel, saldo de caixa, fluxo projetado, resultado estimado e relatórios financeiros |
 | `lastro-apresentacao.pdf` | Apresentação do app em A4 paisagem (18 slides): visão geral, perfis, jornada da venda, um slide por módulo, celular, planos, confiabilidade e manuais |
 
 Cada manual tem capa, índice com páginas, passo a passo numerado, caixas de dica/atenção/"não pode
@@ -26,7 +29,7 @@ ser desfeito", tabela "Quem pode fazer o quê" (administrador × vendedor, confo
 As capturas ficam em `fonte/capturas/` (telas a 1280 px e 390 px, com densidade 2x, e as
 páginas de PDF `pdf-*.png`). Foram feitas no app local com os emuladores e usam só dados
 fictícios: a empresa "Distribuidora Demo Lastro" do seed local (`backend/scripts/seed-local.ts`,
-plano Profissional, com logotipo e fotos de demonstração) e a empresa "Mercearia Demo Essencial"
+plano Profissional nos manuais anteriores e Gestão nos três manuais do plano, com logotipo e fotos de demonstração) e a empresa "Mercearia Demo Essencial"
 (plano Essencial). Não coloque dados reais, senhas ou tokens nos manuais: o repositório é
 público.
 
