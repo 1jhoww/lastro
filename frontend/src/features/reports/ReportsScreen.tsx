@@ -39,6 +39,7 @@ import {
   type ReportEntry,
 } from './catalog';
 import { formatReportValue, periodLabel } from './format';
+import { useExpenseCategories, useSuppliers } from '@/features/management/api';
 
 const PAGE = 25;
 type Preset = 'default' | 'month' | 'last-month' | '30d' | 'year' | 'custom';
@@ -51,6 +52,8 @@ type Filters = {
   product: { id: string; name: string } | null;
   sellerUid: string;
   movement: string;
+  supplierId: string;
+  categoryId: string;
 };
 const emptyFilters: Filters = {
   preset: 'default',
@@ -61,6 +64,8 @@ const emptyFilters: Filters = {
   product: null,
   sellerUid: '',
   movement: '',
+  supplierId: '',
+  categoryId: '',
 };
 
 function presetRange(preset: Preset, today: string): { from: string; to: string } | null {
@@ -94,6 +99,8 @@ function toQuery(entry: ReportEntry, f: Filters): ReportQuery {
   if (entry.filters.includes('seller') && f.sellerUid) q.sellerUid = f.sellerUid;
   if (entry.filters.includes('movement') && f.movement)
     q.movement = f.movement as NonNullable<ReportQuery['movement']>;
+  if (entry.filters.includes('supplier') && f.supplierId) q.supplierId = f.supplierId;
+  if (entry.filters.includes('expenseCategory') && f.categoryId) q.categoryId = f.categoryId;
   return q;
 }
 
@@ -326,6 +333,8 @@ function FilterBar({
   const seller = entry.filters.includes('seller');
   const members = useMembers(seller && permissions.includes('users:manage'));
   const [picking, setPicking] = useState(false);
+  const suppliers = useSuppliers('', entry.filters.includes('supplier'));
+  const expenseCategories = useExpenseCategories(entry.filters.includes('expenseCategory'));
   const set = (patch: Partial<Filters>) => onChange({ ...filters, ...patch });
   const field = compact ? styles.fieldFull : styles.field;
   const usesPeriod = entry.filters.includes('period');
@@ -412,6 +421,32 @@ function FilterBar({
                 ...(members.data ?? []).map((m) => ({ value: m.id, label: memberLabel(m) })),
               ]}
               onChange={(sellerUid) => set({ sellerUid })}
+            />
+          </View>
+        ) : null}
+        {entry.filters.includes('supplier') ? (
+          <View style={field}>
+            <Select
+              label="Fornecedor"
+              value={filters.supplierId}
+              options={[
+                { value: '', label: 'Todos' },
+                ...suppliers.items.map((s) => ({ value: s.id, label: s.name })),
+              ]}
+              onChange={(supplierId) => set({ supplierId })}
+            />
+          </View>
+        ) : null}
+        {entry.filters.includes('expenseCategory') ? (
+          <View style={field}>
+            <Select
+              label="Categoria"
+              value={filters.categoryId}
+              options={[
+                { value: '', label: 'Todas' },
+                ...(expenseCategories.data ?? []).map((c) => ({ value: c.id, label: c.name })),
+              ]}
+              onChange={(categoryId) => set({ categoryId })}
             />
           </View>
         ) : null}
@@ -691,6 +726,10 @@ function hrefFor(link: ReportView['rows'][number]['link']): Href | undefined {
       return `/estoque/${link.id}` as Href;
     case 'title':
       return `/financeiro/${link.id}` as Href;
+    case 'payable':
+      return `/financeiro/pagar/${link.id}` as Href;
+    case 'purchase':
+      return `/compras/${link.id}` as Href;
   }
 }
 

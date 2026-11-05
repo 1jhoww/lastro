@@ -12,6 +12,8 @@ import {
   HandCoins,
   House,
   ListClock,
+  Repeat,
+  TrendingUp,
   Wallet,
   type LucideIcon,
 } from '@/ui/icons';
@@ -19,7 +21,17 @@ import { Touchable } from '@/ui/Touchable';
 import { focusRing, showFocusRing, type InteractionState } from '@/ui/interaction';
 import { canManageFinance } from './FinanceAccess';
 
-type Section = 'overview' | 'receivables' | 'settings' | 'credits' | 'refunds' | 'operations';
+type Section =
+  | 'overview'
+  | 'management'
+  | 'receivables'
+  | 'payables'
+  | 'recurring'
+  | 'supplierCredits'
+  | 'settings'
+  | 'credits'
+  | 'refunds'
+  | 'operations';
 type Item = {
   key: Section;
   label: string;
@@ -28,6 +40,8 @@ type Item = {
   permission: string;
   icon: LucideIcon;
   minor?: boolean;
+  /** Basta a permissão: vale para vendedor autorizado, não só para administrador. */
+  byPermission?: boolean;
 };
 
 const items: Item[] = [
@@ -40,12 +54,49 @@ const items: Item[] = [
     icon: House,
   },
   {
+    key: 'management',
+    label: 'Painel de gestão',
+    description: 'Caixa, previsão e resultado do período',
+    href: '/financeiro/gestao' as Href,
+    permission: 'financial-reports:read',
+    icon: TrendingUp,
+    byPermission: true,
+  },
+  {
     key: 'receivables',
     label: 'Contas a receber',
     description: 'Parcelas dos clientes e registro de pagamentos',
     href: '/financeiro/receber' as Href,
     permission: 'receivables:read',
     icon: CircleDollarSign,
+  },
+  {
+    key: 'payables',
+    label: 'Contas a pagar',
+    description: 'Títulos de compras e despesas e seus pagamentos',
+    href: '/financeiro/pagar' as Href,
+    permission: 'payables:read',
+    icon: Wallet,
+    byPermission: true,
+  },
+  {
+    key: 'recurring',
+    label: 'Despesas recorrentes',
+    description: 'Aluguel, internet e o que se repete',
+    href: '/financeiro/recorrentes' as Href,
+    permission: 'payables:read',
+    icon: Repeat,
+    byPermission: true,
+  },
+  {
+    key: 'supplierCredits',
+    label: 'Créditos de fornecedores',
+    description: 'Valores de compras encerradas, a usar ou a recuperar',
+    href: '/financeiro/creditos-fornecedor' as Href,
+    permission: 'payables:read',
+    icon: Wallet,
+    minor: true,
+    byPermission: true,
   },
   {
     key: 'settings',
@@ -87,6 +138,10 @@ const items: Item[] = [
 export function sectionOf(pathname: string): Section {
   const [, , first] = pathname.split('/');
   if (!first) return 'overview';
+  if (first === 'gestao') return 'management';
+  if (first === 'pagar') return 'payables';
+  if (first === 'recorrentes') return 'recurring';
+  if (first === 'creditos-fornecedor') return 'supplierCredits';
   if (first === 'receber' || first === 'pedidos') return 'receivables';
   if (first === 'configuracoes') return 'settings';
   if (first === 'creditos') return 'credits';
@@ -104,7 +159,11 @@ export function FinanceNav() {
   const session = useSession();
   const compact = useLayoutSize() === 'compact';
   const active = sectionOf(usePathname());
-  const visible = items.filter((i) => canManageFinance(session, i.permission));
+  const visible = items.filter((i) =>
+    i.byPermission
+      ? session.permissions.includes(i.permission as never)
+      : canManageFinance(session, i.permission),
+  );
   return compact ? (
     <CompactNav visible={visible} active={active} />
   ) : (

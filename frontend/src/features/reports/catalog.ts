@@ -1,7 +1,15 @@
 import type { PlanFeature, ReportId, ReportQuery } from '@/api/types';
 
-export type ReportCategory = 'commercial' | 'financial' | 'inventory';
-export type ReportFilter = 'period' | 'status' | 'customer' | 'product' | 'seller' | 'movement';
+export type ReportCategory = 'commercial' | 'financial' | 'inventory' | 'management';
+export type ReportFilter =
+  | 'period'
+  | 'status'
+  | 'customer'
+  | 'product'
+  | 'seller'
+  | 'movement'
+  | 'supplier'
+  | 'expenseCategory';
 
 export type ReportEntry = {
   id: ReportId;
@@ -19,6 +27,7 @@ export const categories: { value: ReportCategory; label: string; permission?: st
   { value: 'commercial', label: 'Comercial' },
   { value: 'financial', label: 'Financeiro', permission: 'receivables:read' },
   { value: 'inventory', label: 'Estoque', permission: 'inventory:manage' },
+  { value: 'management', label: 'Gestão', permission: 'financial-reports:read' },
 ];
 
 const stockStatuses = [
@@ -142,6 +151,82 @@ export const reports: ReportEntry[] = [
     title: 'Movimentações de estoque',
     short: 'Movimentações',
     filters: ['period', 'product', 'movement'],
+  },
+  {
+    id: 'cash-flow',
+    category: 'management',
+    title: 'Fluxo de caixa',
+    short: 'Fluxo de caixa',
+    filters: ['period'],
+  },
+  {
+    id: 'payables-period',
+    category: 'management',
+    title: 'Contas a pagar por período',
+    short: 'A pagar por período',
+    filters: ['period', 'status', 'supplier', 'expenseCategory'],
+    statuses: [
+      { value: 'open', label: 'Em aberto' },
+      { value: 'partially_paid', label: 'Parcialmente pagos' },
+      { value: 'paid', label: 'Pagos' },
+      { value: 'canceled', label: 'Cancelados' },
+    ],
+  },
+  {
+    id: 'payables-supplier',
+    category: 'management',
+    title: 'Contas a pagar por fornecedor',
+    short: 'A pagar por fornecedor',
+    filters: ['period', 'supplier', 'expenseCategory'],
+  },
+  {
+    id: 'payables-overdue',
+    category: 'management',
+    title: 'Títulos a pagar vencidos',
+    short: 'A pagar vencidos',
+    filters: ['period', 'supplier', 'expenseCategory'],
+  },
+  {
+    id: 'payable-payments',
+    category: 'management',
+    title: 'Pagamentos realizados',
+    short: 'Pagamentos',
+    filters: ['period'],
+  },
+  {
+    id: 'purchases-supplier',
+    category: 'management',
+    title: 'Compras por fornecedor',
+    short: 'Compras por fornecedor',
+    filters: ['period', 'supplier'],
+  },
+  {
+    id: 'purchases-product',
+    category: 'management',
+    title: 'Compras por produto',
+    short: 'Compras por produto',
+    filters: ['period', 'supplier', 'product'],
+  },
+  {
+    id: 'cost-evolution',
+    category: 'management',
+    title: 'Evolução dos custos de aquisição',
+    short: 'Evolução dos custos',
+    filters: ['period', 'product'],
+  },
+  {
+    id: 'product-profitability',
+    category: 'management',
+    title: 'Rentabilidade por produto',
+    short: 'Rentabilidade',
+    filters: ['period', 'product'],
+  },
+  {
+    id: 'expenses-category',
+    category: 'management',
+    title: 'Despesas por categoria',
+    short: 'Despesas',
+    filters: ['period', 'expenseCategory'],
   },
 ];
 
