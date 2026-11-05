@@ -4,10 +4,10 @@ import type { Permission } from '../users/permissions.js';
  * Official Lastro plans. Plans are defined by the system, never registered freely by the
  * Super Admin: adding a plan (e.g. a future "Completo") means adding an entry here.
  *
- * Every existing module not listed in `features` stays available to every plan: customers,
- * products, inventory, orders, receivables, payments, reports and documents.
+ * Every module not listed in `features` stays available to every plan: customers, products,
+ * inventory, orders, receivables, payments, the commercial reports and documents.
  */
-export const planCodes = ['essencial', 'profissional'] as const;
+export const planCodes = ['essencial', 'profissional', 'gestao'] as const;
 export type PlanCode = (typeof planCodes)[number];
 
 /**
@@ -27,6 +27,14 @@ export const planFeatures = [
   // Without it documents keep the company name and the Lastro identity, and stored logos and
   // product photos are preserved for a later upgrade.
   'branding.custom',
+  // Suppliers, purchase orders and goods receipts (Lastro Gestão).
+  'purchasing.orders',
+  // Product acquisition costs, margins and profitability.
+  'costing.products',
+  // Accounts payable, one-off and recurring expenses.
+  'finance.payables',
+  // Consolidated cash flow, financial dashboard and management reports.
+  'finance.management',
 ] as const;
 export type PlanFeature = (typeof planFeatures)[number];
 
@@ -44,6 +52,14 @@ export interface PlanDefinition {
   offered: boolean;
 }
 
+const professionalFeatures = [
+  'users.invite',
+  'catalog.public',
+  'commercial.sellers',
+  'commercial.visits',
+  'branding.custom',
+] as const;
+
 export const planCatalog: Readonly<Record<PlanCode, PlanDefinition>> = Object.freeze({
   essencial: Object.freeze({
     code: 'essencial',
@@ -60,12 +76,21 @@ export const planCatalog: Readonly<Record<PlanCode, PlanDefinition>> = Object.fr
     version: 1,
     referencePriceCents: 19_900,
     userLimit: 2,
+    features: Object.freeze([...professionalFeatures]),
+    offered: true,
+  }),
+  gestao: Object.freeze({
+    code: 'gestao',
+    name: 'Gestão',
+    version: 1,
+    referencePriceCents: 29_900,
+    userLimit: 5,
     features: Object.freeze([
-      'users.invite',
-      'catalog.public',
-      'commercial.sellers',
-      'commercial.visits',
-      'branding.custom',
+      ...professionalFeatures,
+      'purchasing.orders',
+      'costing.products',
+      'finance.payables',
+      'finance.management',
     ] as const),
     offered: true,
   }),
@@ -77,6 +102,10 @@ export const featureLabels: Readonly<Record<PlanFeature, string>> = Object.freez
   'commercial.sellers': 'Vendedores e carteiras de clientes',
   'commercial.visits': 'Visitas e recompra',
   'branding.custom': 'Logotipo e fotos nos documentos e no catálogo',
+  'purchasing.orders': 'Fornecedores, compras e recebimento de mercadorias',
+  'costing.products': 'Custos de aquisição, margens e rentabilidade',
+  'finance.payables': 'Contas a pagar, despesas e recorrências',
+  'finance.management': 'Fluxo de caixa, painel e relatórios financeiros',
 });
 
 /** Permissions that only exist while the plan includes the feature. */
@@ -85,6 +114,23 @@ const featurePermissions: Readonly<Partial<Record<PlanFeature, readonly Permissi
     'catalog.public': Object.freeze(['catalog:manage'] as const),
     'commercial.visits': Object.freeze(['visits:own:manage'] as const),
     'branding.custom': Object.freeze(['branding:manage'] as const),
+    'purchasing.orders': Object.freeze([
+      'suppliers:manage',
+      'purchases:read',
+      'purchases:create',
+      'purchases:edit',
+      'purchases:confirm',
+      'purchases:receive',
+      'purchases:close',
+    ] as const),
+    'costing.products': Object.freeze(['costs:read'] as const),
+    'finance.payables': Object.freeze([
+      'payables:read',
+      'payables:manage',
+      'payables:pay',
+      'payables:reverse',
+    ] as const),
+    'finance.management': Object.freeze(['financial-reports:read'] as const),
   });
 
 export function isPlanCode(value: unknown): value is PlanCode {

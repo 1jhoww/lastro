@@ -74,9 +74,16 @@ export const requiredAddress = address.extend({
   state: address.shape.state.unwrap(),
   postalCode: address.shape.postalCode.unwrap(),
 });
+export const relationship = z.enum(['customer', 'supplier']);
+export const relationships = z
+  .array(relationship)
+  .min(1)
+  .max(2)
+  .refine((v) => new Set(v).size === v.length, 'Relacionamento repetido');
 export const customerFields = {
   name,
   tradeName: text(160).nullable().optional(),
+  contactName: text(160).nullable().optional(),
   document: document.nullable().optional(),
   email: z
     .email()
@@ -96,6 +103,8 @@ export const customerCreate = z.strictObject({
   ...customerFields,
   address: requiredAddress,
   assignedTo: opaqueId.nullable().optional(),
+  /** Customer unless stated; the supplier relationship is a plan feature. */
+  relationships: relationships.optional(),
 });
 export const customerUpdate = z.strictObject({
   ...customerFields,
@@ -104,6 +113,7 @@ export const customerUpdate = z.strictObject({
   address: requiredAddress.optional(),
   name: name.optional(),
   status: status.optional(),
+  relationships: relationships.optional(),
   expectedVersion,
 });
 export const assignmentInput = z.strictObject({ assignedTo: opaqueId.nullable(), expectedVersion });
@@ -118,6 +128,9 @@ const metadata = {
 export const customerView = z.object({
   ...customerFields,
   tradeName: text(160).nullable(),
+  /** Absent on records created before suppliers existed. */
+  contactName: text(160).nullable().default(null),
+  relationships: relationships.default(['customer']),
   document: z.string().nullable(),
   email: z.string().nullable(),
   phone: z.string().nullable(),
@@ -128,7 +141,13 @@ export const customerView = z.object({
   ...metadata,
 });
 export const customerSchema = customerView
-  .extend({ tenantId: opaqueId, nameKey: z.string(), schemaVersion: z.literal(1) })
+  .extend({
+    tenantId: opaqueId,
+    nameKey: z.string(),
+    /** Query projection of `relationships`; missing on records that were never suppliers. */
+    isSupplier: z.boolean().default(false),
+    schemaVersion: z.literal(1),
+  })
   .strict();
 export const categoryCreate = z.strictObject({ name, description: text(1000).optional() });
 export const categoryUpdate = z.strictObject({
@@ -211,7 +230,20 @@ export const customerQuery = z.strictObject({
   assignedTo: z.union([opaqueId, z.literal('unassigned')]).optional(),
   /** Exact CPF/CNPJ lookup through the uniqueness reservation; returns at most one customer. */
   document: document.optional(),
+  /** Customers unless stated. `supplier` and `all` require `suppliers:manage`. */
+  relationship: z.enum(['customer', 'supplier', 'all']).optional(),
 });
+export const supplierOptionsQuery = z.strictObject({
+  ...pageQuery.shape,
+  q: z.string().trim().min(1).max(80).optional(),
+});
+export const supplierOption = customerView.pick({
+  id: true,
+  name: true,
+  tradeName: true,
+  document: true,
+});
+export const supplierOptionsPage = pageOf(supplierOption);
 export const productQuery = z.strictObject({
   ...listShape,
   categoryId: opaqueId.optional(),
@@ -226,6 +258,7 @@ export const customersPage = pageOf(customerView);
 export const productsPage = pageOf(productView);
 export const categoriesPage = pageOf(categoryView);
 export type Customer = z.infer<typeof customerSchema>;
+export type Relationship = z.infer<typeof relationship>;
 export type Product = z.infer<typeof productSchema>;
 export type Category = z.infer<typeof categorySchema>;
 export type CommercialQuery = z.infer<typeof customerQuery> & z.infer<typeof productQuery>;

@@ -41,18 +41,31 @@ const legacyDocument = {
 };
 
 describe('Catálogo oficial de planos', () => {
-  it('oferece somente Essencial e Profissional', () => {
-    expect([...planCodes]).toEqual(['essencial', 'profissional']);
-    expect(Object.values(planCatalog).filter((plan) => plan.offered)).toHaveLength(2);
+  it('oferece Essencial, Profissional e Gestão', () => {
+    expect([...planCodes]).toEqual(['essencial', 'profissional', 'gestao']);
+    expect(Object.values(planCatalog).filter((plan) => plan.offered)).toHaveLength(3);
   });
   it('Essencial: R$ 119, 1 usuário, sem convites, vitrine ou vendedores', () => {
     const plan = planCatalog.essencial;
     expect(plan).toMatchObject({ name: 'Essencial', referencePriceCents: 11900, userLimit: 1 });
     expect(plan.features).toEqual([]);
   });
-  it('Profissional: R$ 199, 2 usuários e todos os recursos existentes', () => {
+  it('Profissional: R$ 199, 2 usuários e os recursos comerciais', () => {
     const plan = planCatalog.profissional;
     expect(plan).toMatchObject({ name: 'Profissional', referencePriceCents: 19900, userLimit: 2 });
+    expect([...plan.features].sort()).toEqual(
+      [
+        'branding.custom',
+        'catalog.public',
+        'commercial.sellers',
+        'commercial.visits',
+        'users.invite',
+      ].sort(),
+    );
+  });
+  it('Gestão: R$ 299, 5 usuários e todos os recursos', () => {
+    const plan = planCatalog.gestao;
+    expect(plan).toMatchObject({ name: 'Gestão', referencePriceCents: 29900, userLimit: 5 });
     expect([...plan.features].sort()).toEqual([...planFeatures].sort());
   });
   it('catálogo é imutável em tempo de execução', () => {
@@ -83,11 +96,18 @@ describe('Recursos por assinatura', () => {
     ] as const)
       expect(permissions).toContain(permission);
   });
-  it('Profissional mantém todas as permissões do papel', () => {
-    const profissional = entitlementsFor({ planCode: 'profissional', userLimit: 2 });
-    expect(withinPlan(permissionsFor('administrator'), profissional)).toEqual([
+  it('Gestão mantém todas as permissões do papel', () => {
+    const gestao = entitlementsFor({ planCode: 'gestao', userLimit: 5 });
+    expect(withinPlan(permissionsFor('administrator'), gestao)).toEqual([
       ...permissionsFor('administrator'),
     ]);
+  });
+  it('Profissional mantém as permissões comerciais e não recebe as de gestão', () => {
+    const profissional = entitlementsFor({ planCode: 'profissional', userLimit: 2 });
+    const permissions = withinPlan(permissionsFor('administrator'), profissional);
+    expect(permissions).toContain('catalog:manage');
+    for (const gated of ['purchases:read', 'costs:read', 'payables:read', 'suppliers:manage'] as const)
+      expect(permissions).not.toContain(gated);
     expect(hasFeature(profissional, 'users.invite')).toBe(true);
   });
   it('assinatura sem plano válido mantém o limite contratado e não recebe recursos premium', () => {
@@ -106,7 +126,11 @@ describe('Recursos por assinatura', () => {
   it('downgrade lista os recursos perdidos; upgrade não perde nada', () => {
     const essencial = entitlementsFor({ planCode: 'essencial', userLimit: 1 });
     const profissional = entitlementsFor({ planCode: 'profissional', userLimit: 2 });
-    expect(lostFeatures(profissional, essencial).sort()).toEqual([...planFeatures].sort());
+    const gestao = entitlementsFor({ planCode: 'gestao', userLimit: 5 });
+    expect(lostFeatures(gestao, essencial).sort()).toEqual([...planFeatures].sort());
+    expect(lostFeatures(gestao, profissional).sort()).toEqual(
+      ['costing.products', 'finance.management', 'finance.payables', 'purchasing.orders'].sort(),
+    );
     expect(lostFeatures(essencial, profissional)).toEqual([]);
   });
 });

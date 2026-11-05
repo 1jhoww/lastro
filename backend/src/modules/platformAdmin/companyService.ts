@@ -102,7 +102,7 @@ export class CompanyService {
       ),
     ]);
     const statuses = { active: 0, pending: 0, suspended: 0, canceled: 0 };
-    const plans = { essencial: 0, profissional: 0, legacy: 0 };
+    const plans = { essencial: 0, profissional: 0, gestao: 0, legacy: 0 };
     let mrrCents = 0;
     for (const { subscription } of contracts) {
       // Legacy past_due keeps access and billing: it counts as active.

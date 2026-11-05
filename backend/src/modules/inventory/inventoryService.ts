@@ -273,7 +273,7 @@ export class InventoryService {
         origin: 'administrative' as const,
         originReference: key,
         actorUid: actor.uid,
-        reason: input.reason,
+        reason: input.reason ?? 'Entrada avulsa',
         notes: input.notes ?? null,
         occurredAt: now,
         requestId: actor.requestId,

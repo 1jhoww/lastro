@@ -67,7 +67,22 @@ export type CommercialCollection =
   | 'catalogSettings'
   | 'catalogOperations'
   | 'visits'
-  | 'deliveries';
+  | 'deliveries'
+  | 'productCosts'
+  | 'productCostEvents'
+  | 'orderCostSnapshots'
+  | 'purchases'
+  | 'purchaseCounters'
+  | 'purchaseEvents'
+  | 'purchaseReceipts'
+  | 'purchaseClosures'
+  | 'supplierCredits'
+  | 'supplierCreditMovements'
+  | 'payables'
+  | 'payablePayments'
+  | 'expenseCategories'
+  | 'recurringExpenses'
+  | 'financeSettings';
 export class CommercialRepository {
   constructor(
     readonly foundation: FoundationRepository,
@@ -135,6 +150,7 @@ export class CommercialRepository {
     );
     let query: Query = this.ref(tenantId, collection, 'placeholder').parent;
     if (status !== 'all') query = query.where('status', '==', status);
+    if (input.relationship === 'supplier') query = query.where('isSupplier', '==', true);
     if (collection === 'customers') {
       if (seller) query = query.where('assignedTo', '==', actor.uid);
       else if (input.assignedTo)

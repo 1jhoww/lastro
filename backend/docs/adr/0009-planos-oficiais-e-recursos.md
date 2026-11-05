@@ -18,4 +18,6 @@ Contratos anteriores ao catálogo (`planCode` nulo) mantêm todos os recursos at
 
 Troca de plano: o efeito em limites e recursos é imediato. O valor contratado só muda quando informado explicitamente. O downgrade é recusado (`USER_LIMIT_REACHED`) enquanto a empresa ocupar mais vagas que o plano alvo: nenhum usuário é desativado automaticamente. Os recursos perdidos precisam ser confirmados um a um (`FEATURE_LOSS_UNCONFIRMED`). A vitrine publicada sai do ar no downgrade e volta com a configuração preservada se a empresa voltar ao Profissional.
 
+O plano Gestão e seus recursos estão na [ADR 0011](0011-lastro-gestao.md).
+
 Atualiza a [ADR 0003](0003-planos-versionados.md): os contratos continuam com snapshots próprios, mas a oferta global agora é versionada no código, não em documentos editáveis.

@@ -39,7 +39,7 @@ describe('Visão geral do Super Admin', () => {
       today,
       totalCompanies: 2,
       subscriptions: { active: 1, pending: 0, suspended: 1, canceled: 0 },
-      plans: { essencial: 0, profissional: 2, legacy: 0 },
+      plans: { essencial: 0, profissional: 2, gestao: 0, legacy: 0 },
       mrrCents: 19900,
       openCharges: { count: 1, amountCents: 19900 },
       overdueCharges: { count: 1, amountCents: 19900 },
@@ -57,7 +57,7 @@ describe('Visão geral do Super Admin', () => {
       status: 'canceled',
     });
     const view = (await admin(f, 'get', '/overview').expect(200)).body.data;
-    expect(view.plans).toEqual({ essencial: 0, profissional: 0, legacy: 1 });
+    expect(view.plans).toEqual({ essencial: 0, profissional: 0, gestao: 0, legacy: 1 });
     expect(view.subscriptions).toMatchObject({ active: 1, canceled: 1 });
     expect(view.mrrCents).toBe(19900);
   });

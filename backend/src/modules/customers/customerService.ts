@@ -6,6 +6,8 @@ import type { AccessService } from '../auth/accessService.js';
 import { CommercialRepository } from '../../infrastructure/repositories/commercialRepository.js';
 import * as s from '../../shared/schemas/commercial.js';
 import { identitySchema, membershipSchema } from '../../shared/schemas/models.js';
+import { requirePermission } from '../users/permissions.js';
+import type { TenantContext } from '../../shared/types/context.js';
 import { requireCondition } from '../../shared/errors/appError.js';
 import { digest } from '../../shared/utils/crypto.js';
 import { recordAudit } from '../../shared/audit/audit.js';
@@ -35,14 +37,53 @@ export class CustomerService {
   }
   async list(actor: Actor, tenantId: string, input: z.infer<typeof s.customerQuery>) {
     const ctx = await this.access.tenant(actor, tenantId, 'customers:own:manage');
+    const relationship = input.relationship ?? 'customer';
+    if (relationship !== 'customer')
+      requirePermission(ctx.membership, ctx.entitlements, 'suppliers:manage');
+    // Suppliers belong to the company, not to a seller's portfolio: there is no index for this.
+    requireCondition(
+      relationship !== 'supplier' || input.assignedTo === undefined,
+      422,
+      'VALIDATION_ERROR',
+      'Fornecedores não têm responsável',
+    );
     if (input.document) return this.findByDocument(actor, tenantId, input, ctx.membership.role);
+    const seller = ctx.membership.role === 'seller';
+    if (relationship !== 'customer')
+      return this.repo.list(actor, tenantId, 'customers', s.customerSchema, input, seller);
+    // Supplier-only records live in the same collection and are rare among customers. Old records
+    // have no relationship field to query, so they are filtered here over a bounded page scan and
+    // the underlying cursor is preserved, as the inventory list does for sparse filters.
+    const items: s.Customer[] = [];
+    let cursor = input.cursor;
+    for (let scanned = 0; scanned < 5; scanned++) {
+      const page = await this.repo.list(
+        actor,
+        tenantId,
+        'customers',
+        s.customerSchema,
+        { ...input, ...(cursor ? { cursor } : {}) },
+        seller,
+      );
+      items.push(...page.items.filter((customer) => customer.relationships.includes('customer')));
+      cursor = page.nextCursor ?? undefined;
+      if (items.length > 0 || !cursor) break;
+    }
+    return { items, nextCursor: cursor ?? null };
+  }
+  /**
+   * Picker of the company's active suppliers. Read through `purchases:read` so a purchaser needs
+   * no access to the customer base; only identification fields leave the service.
+   */
+  async suppliers(actor: Actor, tenantId: string, input: z.infer<typeof s.supplierOptionsQuery>) {
+    await this.access.tenant(actor, tenantId, 'purchases:read');
     return this.repo.list(
       actor,
       tenantId,
       'customers',
       s.customerSchema,
-      input,
-      ctx.membership.role === 'seller',
+      { ...input, status: 'active', relationship: 'supplier' },
+      false,
     );
   }
   /** Same visibility as the list: sellers only see their own portfolio, status filter applies. */
@@ -69,7 +110,9 @@ export class CustomerService {
       customer.document === input.document &&
       (role === 'administrator' || customer.assignedTo === actor.uid) &&
       (status === 'all' || customer.status === status) &&
-      (input.assignedTo === undefined || customer.assignedTo === assignedTo);
+      (input.assignedTo === undefined || customer.assignedTo === assignedTo) &&
+      (input.relationship === 'all' ||
+        customer.relationships.includes(input.relationship ?? 'customer'));
     return visible ? { items: [customer], nextCursor: null } : empty;
   }
   private async assignee(tenantId: string, uid: string | null, tx: Transaction) {
@@ -91,6 +134,46 @@ export class CustomerService {
       422,
       'INVALID_ASSIGNEE',
       'Vendedor responsável indisponível nesta empresa',
+    );
+  }
+  /** Changing who a record is, or creating a supplier, depends on the plan and the permission. */
+  private guardRelationships(
+    ctx: TenantContext,
+    previous: readonly s.Relationship[],
+    next: readonly s.Relationship[],
+  ) {
+    const changed =
+      previous.includes('supplier') !== next.includes('supplier') ||
+      previous.includes('customer') !== next.includes('customer');
+    if (changed && (previous.length > 0 || next.includes('supplier')))
+      requirePermission(ctx.membership, ctx.entitlements, 'suppliers:manage');
+  }
+  /** History keeps a relationship alive: orders need a customer, purchases a supplier. */
+  private async guardRemoval(
+    tenantId: string,
+    id: string,
+    previous: readonly s.Relationship[],
+    next: readonly s.Relationship[],
+    tx: Transaction,
+  ) {
+    const lost = (name: s.Relationship) => previous.includes(name) && !next.includes(name);
+    const used = async (collection: 'orders' | 'purchases', field: string) =>
+      !(
+        await tx.get(
+          this.repo.ref(tenantId, collection, 'placeholder').parent.where(field, '==', id).limit(1),
+        )
+      ).empty;
+    requireCondition(
+      !(lost('customer') && (await used('orders', 'customerId'))),
+      409,
+      'RELATIONSHIP_IN_USE',
+      'Este cadastro tem pedidos e continua sendo cliente',
+    );
+    requireCondition(
+      !(lost('supplier') && (await used('purchases', 'supplierId'))),
+      409,
+      'RELATIONSHIP_IN_USE',
+      'Este cadastro tem compras e continua sendo fornecedor',
     );
   }
   private async reserve(
@@ -139,7 +222,15 @@ export class CustomerService {
         'FORBIDDEN',
         'Responsável é definido pelo servidor',
       );
+      const relationships = input.relationships ?? (['customer'] as s.Relationship[]);
+      this.guardRelationships(ctx, [], relationships);
       const assignedTo = seller ? actor.uid : (input.assignedTo ?? null);
+      requireCondition(
+        relationships.includes('customer') || assignedTo === null,
+        422,
+        'VALIDATION_ERROR',
+        'Fornecedor não tem vendedor responsável',
+      );
       await this.assignee(tenantId, assignedTo, tx);
       await this.reserve(tenantId, id, null, input.document ?? null, tx);
       const now = this.clock().toISOString();
@@ -149,6 +240,9 @@ export class CustomerService {
         tenantId,
         nameKey: s.searchKey(input.name),
         tradeName: input.tradeName ?? null,
+        contactName: input.contactName ?? null,
+        relationships,
+        isSupplier: relationships.includes('supplier'),
         document: input.document ?? null,
         email: input.email ?? null,
         phone: input.phone ?? null,
@@ -179,8 +273,17 @@ export class CustomerService {
   ) {
     return this.repo.foundation.db.runTransaction(async (tx) => {
       const customer = await this.read(actor, tenantId, id, tx);
+      const ctx = await this.access.tenant(actor, tenantId, 'customers:own:manage', tx);
       if (Object.hasOwn(input, 'status'))
         await this.access.tenant(actor, tenantId, 'customers:all:manage', tx);
+      const relationships = input.relationships ?? customer.relationships;
+      this.guardRelationships(ctx, customer.relationships, relationships);
+      requireCondition(
+        relationships.includes('customer') || customer.assignedTo === null,
+        409,
+        'RELATIONSHIP_IN_USE',
+        'Retire o vendedor responsável antes de deixar de ser cliente',
+      );
       requireCondition(
         customer.version === input.expectedVersion,
         409,
@@ -188,6 +291,7 @@ export class CustomerService {
         'Versão desatualizada',
       );
       const { expectedVersion: _version, ...changes } = input;
+      await this.guardRemoval(tenantId, id, customer.relationships, relationships, tx);
       await this.reserve(
         tenantId,
         id,
@@ -200,6 +304,8 @@ export class CustomerService {
         ...customer,
         ...changes,
         nameKey: s.searchKey(input.name ?? customer.name),
+        relationships,
+        isSupplier: relationships.includes('supplier'),
         version: customer.version + 1,
         updatedAt: now,
         updatedBy: actor.uid,
@@ -226,6 +332,12 @@ export class CustomerService {
         409,
         'CONFLICT',
         'Versão desatualizada',
+      );
+      requireCondition(
+        customer.relationships.includes('customer') || input.assignedTo === null,
+        422,
+        'VALIDATION_ERROR',
+        'Fornecedor não tem vendedor responsável',
       );
       await this.assignee(tenantId, input.assignedTo, tx);
       const now = this.clock().toISOString();

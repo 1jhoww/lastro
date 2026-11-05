@@ -58,7 +58,7 @@ export const movementSchema = z.strictObject({
   previousReservedScaled: scaled,
   reservedScaled: scaled,
   sequence: z.number().int().positive(),
-  origin: z.enum(['administrative', 'order']),
+  origin: z.enum(['administrative', 'order', 'purchase']),
   originReference: z.string().uuid(),
   actorUid: opaqueId,
   reason: z.string().min(3).max(200),
@@ -73,7 +73,8 @@ export const movementSchema = z.strictObject({
 export const entryInput = z.strictObject({
   productId: opaqueId,
   quantity: quantityText,
-  reason: z.string().trim().min(3).max(200),
+  /** Optional: a stand-alone entry needs no justification, only the automatic audit trail. */
+  reason: z.string().trim().min(3).max(200).optional(),
   notes: z.string().trim().max(1000).optional(),
 });
 export const adjustmentInput = z.strictObject({

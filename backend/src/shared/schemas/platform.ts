@@ -25,7 +25,12 @@ export const overviewView = z.object({
     canceled: z.number(),
   }),
   /** Companies per plan, excluding canceled contracts. Legacy = before the official plans. */
-  plans: z.object({ essencial: z.number(), profissional: z.number(), legacy: z.number() }),
+  plans: z.object({
+    essencial: z.number(),
+    profissional: z.number(),
+    gestao: z.number(),
+    legacy: z.number(),
+  }),
   /** Contracted monthly revenue of active contracts; not money received. */
   mrrCents: z.number(),
   openCharges: money,
@@ -37,7 +42,7 @@ export const overviewView = z.object({
 
 export const companyQuery = z.strictObject({
   q: z.string().trim().max(120).optional(),
-  planCode: z.enum(['essencial', 'profissional', 'legacy']).optional(),
+  planCode: z.enum(['essencial', 'profissional', 'gestao', 'legacy']).optional(),
   status: subscriptionStatus.optional(),
   attention: z.enum(['overdue', 'open']).optional(),
 });

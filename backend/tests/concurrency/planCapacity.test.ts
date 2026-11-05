@@ -33,6 +33,7 @@ describe('Limites do plano sob concorrência', () => {
             'catalog.public',
             'commercial.sellers',
             'commercial.visits',
+            'branding.custom',
           ],
           reason: 'Corrida de teste',
         }),
