@@ -160,6 +160,10 @@ _Avoid_: Custo unitário digitado, despesa operacional.
 Decisão de que o restante de uma compra parcialmente recebida não será entregue, com efeito financeiro escolhido entre abatimento, cobrança integral e crédito do fornecedor; não pode ser desfeita.
 _Avoid_: Cancelamento parcial, baixa de compra.
 
+**Mercadoria cobrada e não entregue**:
+Perda reconhecida ao encerrar uma compra com cobrança integral; linha própria do resultado estimado, fora do custo das mercadorias vendidas e das despesas operacionais.
+_Avoid_: Custo de mercadoria, despesa.
+
 **Crédito de fornecedor**:
 Valor que o fornecedor deve à empresa depois de um encerramento, usado em título de compra do mesmo fornecedor ou devolvido em dinheiro.
 _Avoid_: Crédito de cliente, desconto.

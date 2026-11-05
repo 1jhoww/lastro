@@ -4,6 +4,8 @@ O plano Gestão (referência R$ 299/mês, 5 usuários) soma ao Profissional quat
 
 ## Cadastro único
 
+Valores padrão de `relationships`, `isSupplier` e `contactName` não são gravados. O esquema os devolve na leitura, e um cliente comum continua no formato que a versão anterior da API lê. Assim a publicação não fecha sozinha o caminho de reversão: isso só acontece com o uso real de fornecedores, contato ou do plano Gestão, e `dist/src/jobs/gestaoRollbackCheck.js` diz se já aconteceu.
+
 Fornecedor não é uma coleção nova. O documento de `customers` ganhou `relationships` (`customer`, `supplier`), `contactName` e a projeção `isSupplier`. Registros antigos não têm esses campos e são lidos como cliente, sem migração. A reserva de CPF/CNPJ continua única por empresa, então a mesma empresa nunca é cadastrada duas vezes: quem tenta recebe `DUPLICATE_DOCUMENT` e pode acrescentar o relacionamento ao registro existente. A lista padrão continua trazendo só clientes; como registros antigos não têm campo para consultar, fornecedores puros são filtrados em memória, em varredura limitada que preserva o cursor. Cadastro só de fornecedor não entra em pedido nem tem vendedor responsável, e um relacionamento com histórico (pedidos ou compras) não pode ser removido.
 
 ## Custos
@@ -46,7 +48,7 @@ Compra parcialmente recebida pode ter o saldo encerrado quando o fornecedor não
 O valor não entregue é o que cada item ainda traria para o estoque: `valor apropriado − valor recebido`. Inclui a parte de frete e descontos. Assim, valor recebido e valor não entregue somam exatamente o total da compra.
 
 - **Abatimento**: o valor sai dos títulos em aberto, do último vencimento para o primeiro, sem passar de zero. O título guarda o valor em `canceledCents`; `originalCents` não muda. Título sem pagamento que zera fica cancelado; com pagamento, fica pago. O que os títulos não absorvem já foi pago e vira excesso, que precisa ser classificado como crédito ou valor a recuperar.
-- **Cobrança integral**: nenhum título muda. A empresa paga por mercadoria que não recebeu. Esse valor não entra no custo das mercadorias vendidas nem nas despesas, e o painel o informa em nota separada. Deduzi-lo do resultado é uma decisão ainda em aberto.
+- **Cobrança integral**: nenhum título muda, e a obrigação com o fornecedor fica inteira. A classificação está em "Mercadorias cobradas e não entregues".
 - **Crédito do fornecedor**: nenhum título muda e todo o valor vira crédito.
 
 A compra guarda quantidades não entregues em `undeliveredQuantity`, e `purchaseClosures` guarda itens, títulos alterados, decisão e motivo. O total da compra e as parcelas originais ficam como foram negociados, e relatórios mostram o não entregue em coluna própria.
@@ -54,6 +56,22 @@ A compra guarda quantidades não entregues em `undeliveredQuantity`, e `purchase
 O id do encerramento vem da compra, então ele só pode existir uma vez. O comando exige a versão da compra e os valores mostrados na prévia: se um pagamento mudar os números no meio do caminho, é recusado (`CLOSURE_VALUES_CHANGED`).
 
 **Não há desfazer.** Depois de encerrar, a compra não recebe mercadoria nem aceita estorno de recebimento (`PURCHASE_CLOSED`), porque os valores da decisão dependem do que estava recebido. Estornar um pagamento continua possível: o título volta a ter saldo e o crédito registrado não muda, de modo que o líquido entre os dois se mantém.
+
+## Mercadorias cobradas e não entregues
+
+Na cobrança integral a empresa deve por mercadoria que não recebeu. Esse valor não é custo das mercadorias vendidas: nada foi vendido, e somá-lo ao custo médio encareceria o estoque que chegou de verdade. Também não é despesa operacional, porque não vem de uma despesa lançada.
+
+Fica como **perda com mercadorias não entregues**, linha própria do resultado estimado:
+
+| Linha do resultado                   | Efeito                                            |
+| ------------------------------------ | ------------------------------------------------- |
+| Custo das mercadorias vendidas       | Não muda                                          |
+| Lucro bruto e margem bruta           | Não mudam                                         |
+| Despesas operacionais                | Não mudam                                         |
+| Mercadorias cobradas e não entregues | Valor não entregue da compra encerrada            |
+| Resultado estimado                   | Reduz pelo valor da linha acima                   |
+
+O reconhecimento é na data do encerramento, quando a perda deixa de ser expectativa. O caixa é outra coisa: o dinheiro só sai quando os títulos são pagos, pelo fluxo normal de contas a pagar. Abatimento e crédito do fornecedor não geram essa linha, porque neles a empresa não fica com a perda. Se o fornecedor devolver depois, a devolução não existe nesse tratamento: quem espera receber de volta deve escolher crédito do fornecedor ao encerrar.
 
 ## Crédito de fornecedor
 
@@ -77,7 +95,7 @@ Recorrências geram títulos até 35 dias antes do vencimento, por job diário, 
 
 - **Caixa**: só recebimentos, reembolsos, pagamentos e devoluções de fornecedor registrados. Título em aberto é previsão, e compensação com crédito não é caixa.
 - **Saldo de caixa**: valor informado pela empresa numa data, mais o que se moveu desde então. Sem informação, o painel diz que não há saldo em vez de assumir zero.
-- **Resultado estimado**: faturamento, menos custo das mercadorias vendidas, menos despesas operacionais por competência. Compra de mercadoria não é despesa: seu custo chega ao resultado quando a mercadoria é vendida. Não é lucro líquido contábil, porque não considera tributos, depreciação nem devoluções.
+- **Resultado estimado**: faturamento, menos custo das mercadorias vendidas, menos despesas operacionais por competência, menos mercadorias cobradas e não entregues. Compra de mercadoria não é despesa: seu custo chega ao resultado quando a mercadoria é vendida. Não é lucro líquido contábil, porque não considera tributos, depreciação nem devoluções.
 
 ## Índices
 
