@@ -42,11 +42,23 @@ _Avoid_: Usuário da empresa, administrador da empresa.
 
 **Plano**:
 Oferta comercial oficial definida pelo sistema (Essencial, Profissional, Gestão), com limite de usuários e recursos.
-_Avoid_: Contrato vigente de uma empresa, plano cadastrado livremente.
+_Avoid_: Contrato vigente de uma empresa, plano personalizado.
+
+**Plano personalizado**:
+Oferta negociada pelo Super Admin para empresas específicas, com valor, limite e recursos próprios; fora dos preços públicos e versionada.
+_Avoid_: Plano oficial alterado, contrato de uma empresa.
+
+**Contrato personalizado**:
+Cópia dos termos de um plano personalizado guardada na assinatura de uma empresa; mudar a oferta não o altera, e ele pode ser ajustado individualmente.
+_Avoid_: Referência viva à oferta, permissão de usuário.
 
 **Recurso do plano**:
-Capacidade existente liberada ou não pelo plano (convites adicionais, vitrine, vendedores e carteiras).
+Capacidade existente liberada ou não pelo contrato (convites adicionais, vitrine, vendedores e carteiras).
 _Avoid_: Módulo novo, permissão de perfil.
+
+**Módulo base**:
+Capacidade presente em todo plano (clientes, pedidos, produtos, estoque, contas a receber, relatórios comerciais), que nenhuma oferta retira.
+_Avoid_: Recurso opcional, plano Essencial.
 
 **Assinatura**:
 Condições contratadas (plano, valor, dia de vencimento, início da cobrança) e estado administrativo de acesso de uma empresa.

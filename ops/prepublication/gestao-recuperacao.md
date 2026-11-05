@@ -9,6 +9,8 @@ A API anterior usa esquemas estritos. Se ler um registro com campo ou valor novo
 | Dado                                         | Efeito na API anterior                  |
 | -------------------------------------------- | --------------------------------------- |
 | Assinatura com plano `gestao`                | Acesso daquela empresa falha            |
+| Assinatura com plano `custom`                | Acesso daquela empresa falha            |
+| Cobrança com plano `gestao` ou `custom`      | Lista de cobranças do Super Admin falha |
 | Fornecedor (`relationships`, `isSupplier`)   | Lista de clientes e pedidos falham      |
 | Cliente com **Contato responsável**          | Lista de clientes e pedidos falham      |
 | Movimentação `STOCK_PURCHASE_*`              | Histórico do produto falha              |
@@ -36,6 +38,8 @@ gcloud run jobs execute lastro-rollback-check-hml --project=lastro-hml --region=
 | Tráfego na API nova, sem uso de recursos novos | Sim, se o verificador disser `rollbackSafe: true`  |
 | Alguém preencheu Contato responsável          | Não, sem ponte                                      |
 | Primeira empresa no plano Gestão              | Não: corrija para a frente                          |
+| Primeiro contrato personalizado real          | Não: corrija para a frente                          |
+| Primeira cobrança de plano Gestão ou personalizado | Não, mesmo depois de a empresa sair do plano   |
 
 O campo Contato responsável aparece para todos os planos, então pode fechar o caminho antes do plano Gestão. Por isso o verificador roda antes de qualquer reversão.
 
@@ -109,6 +113,46 @@ Se for preciso voltar depois do uso de Contato responsável, sem Gestão ativo, 
 - Publicação: revisão própria, depois teste de leitura de clientes.
 
 Ela não foi criada. Vale preparar antes de publicar se a janela de reversão importar. Ela **não** cobre empresas no plano Gestão: para essas, só correção para a frente. Limpar os campos direto no banco é destrutivo e fica fora deste plano.
+
+## Primeiro contrato personalizado real
+
+A API anterior ao Gestão não reconhece o valor `custom` em `planCode` nem o campo `customContract`. Por isso, o primeiro contrato personalizado real é um ponto sem volta. O verificador informa `plan_custom` para a assinatura e `charge_custom` para cada empresa com cobrança emitida nesse contrato.
+
+### Liberação do primeiro contrato
+
+Só crie o contrato depois de cumprir estes passos, nesta ordem:
+
+1. Confirme a API nova estável, com tráfego real, e a janela de observação concluída.
+2. Rode o verificador e guarde o resultado com a data.
+3. Faça a exportação pontual e confirme o backup diário e o PITR ativos.
+4. Registre a autorização de quem aceita perder a reversão da API.
+
+### Depois do primeiro contrato
+
+| Situação                            | Ação                                                                                       |
+| ----------------------------------- | ------------------------------------------------------------------------------------------ |
+| Defeito de código na API            | Publique uma correção. Uma revisão anterior da API nova também lê `custom`                 |
+| Defeito na tela                     | Promova o deployment anterior na Vercel, desde que ele conheça as rotas em uso             |
+| Contrato com termos errados         | Corrija no Super Admin, em Alterar contrato ou Trocar plano, para manter o histórico       |
+| Empresa precisa parar de usar       | Suspenda a assinatura. Nenhum dado é apagado, e Reativar devolve o acesso                  |
+| Defeito só em contrato personalizado | Troque a empresa para um plano oficial. Os dados ficam guardados. Corrija e volte          |
+| Dado corrompido em volume           | Pare as escritas afetadas. Restaure em banco novo e corrija a partir dele                  |
+
+Nunca edite `planCode`, `customContract` ou cobranças direto no banco. Isso apaga o rastro do contrato e pode deixar preço, limite e recursos em desacordo.
+
+### Se for indispensável voltar à API anterior
+
+Esta saída exige autorização específica e combina com cada empresa afetada o que muda. Siga a ordem:
+
+1. Rode o verificador e liste as empresas com `plan_custom` e `charge_custom`.
+2. Troque cada empresa com `plan_custom` para Essencial ou Profissional no Super Admin. O Gestão também impede a reversão.
+3. Confirme o preço de cada troca. Contrato gratuito não herda R$ 0,00.
+4. Rode o verificador de novo. Sem cobrança nos planos novos, `rollbackSafe: true` libera a reversão.
+5. Com `charge_custom` ou `charge_gestao`, prepare uma versão ponte. Ela parte da versão anterior e aceita `gestao` e `custom` no plano da cobrança, sem mudar dados.
+
+Sair do plano remove `customContract` da assinatura e devolve o registro ao formato antigo. O histórico continua na auditoria, e a coleção `customPlans` não atrapalha, porque a API anterior não a lê. A ponte da cobrança não foi criada e não cobre uma assinatura que continue em `custom` ou `gestao`.
+
+Restaurar um backup anterior ao contrato não é saída para reverter: perde tudo o que foi registrado depois.
 
 ## Responsabilidades
 

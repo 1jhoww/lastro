@@ -51,20 +51,16 @@ Sem o job, títulos recorrentes só são gerados ao criar, alterar ou retomar a 
 
 Resultado de 05/11/2026, em emulador local:
 
-| Arquivo                      | Resultado                                                                            |
-| ---------------------------- | ------------------------------------------------------------------------------------ |
-| `concurrentPerformance`      | 5 de 5                                                                               |
-| `performance`                | 6 de 6                                                                               |
-| `financialReceiptVolumes`    | 3 de 3                                                                               |
-| `financialExecutionCapacity` | 1 de 2: `cancellation` passou em 58 min; `return` estourou o limite de 1 h por caso  |
+| Arquivo                      | Resultado                                                          |
+| ---------------------------- | ------------------------------------------------------------------ |
+| `concurrentPerformance`      | 5 de 5                                                             |
+| `performance`                | 6 de 6                                                             |
+| `financialReceiptVolumes`    | 3 de 3                                                             |
+| `financialExecutionCapacity` | 2 de 2: `cancellation` passou em 59 min; `return` passou em 56 min |
 
-`return` não falhou em nenhuma asserção. Aplicou as 20.001 fontes e estava na verificação final quando o limite interrompeu o caso, então a conferência final desse caso não foi comprovada nesta máquina. O código de `finance/resolution` não mudou nesta entrega, e o estresse não cobre compras nem contas a pagar.
+A primeira rodada de `financialExecutionCapacity` terminou em 1 de 2, porque `return` atingiu o limite de 1 h por caso na verificação final, sem falhar em nenhuma asserção. A repetição com limite de 2 h por caso concluiu os dois casos, com 20.001 provas conferidas e publicação única em `return`. Cada caso leva perto de 1 h nesta máquina, então o limite padrão ainda pode interromper uma rodada. O estresse não cobre compras nem contas a pagar.
 
-### Risco residual
-
-Fica em aberto a conferência final de uma devolução financeira com 20 mil fontes num mesmo pedido. Em outras palavras, um pedido com esse volume extremo poderia concluir a aplicação e encontrar um problema só na verificação final. O risco é baixo: os mesmos caminhos passaram no caso `cancellation`, e os testes de execução financeira com volumes normais passam. Vale o aceite explícito enquanto a comprovação não for repetida. Compras e contas a pagar não dependem desse cenário.
-
-### Como validar sem o limite de uma hora
+### Como repetir com limite maior
 
 O limite e o caso agora são configuráveis, sem editar o teste:
 
@@ -72,7 +68,7 @@ O limite e o caso agora são configuráveis, sem editar o teste:
 $env:FINANCIAL_CAPACITY_CASE='return'; $env:FINANCIAL_CAPACITY_TIMEOUT_MS='7200000'; npm run test:integration -- tests/integration/financialExecutionCapacity.test.ts
 ```
 
-- Rode em horário sem outros processos, com os emuladores livres. A rodada leva pouco mais de uma hora.
+- Rode em horário sem outros processos, com os emuladores livres. Cada caso leva cerca de uma hora.
 - O critério de aceite é o caso passar inteiro, com a prova fragmentada conferida.
 - Uma rodada periódica pode usar um disparo manual no GitHub Actions, com `timeout-minutes: 180`, separado do CI comum. Máquinas hospedadas limitam cada tarefa a 6 horas.
 - Se o tempo crescer entre versões, o relatório de capacidade do teste mostra leituras e escritas por fase, o que aponta onde investigar.

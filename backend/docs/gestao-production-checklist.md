@@ -6,6 +6,15 @@ Nada aqui roda sozinho. Cada marca com **[aprovação]** exige autorização esp
 
 Referências em `ops/prepublication/`: [inventário](../../ops/prepublication/gestao-inventario-hml.md), [índices](../../ops/prepublication/gestao-indices-plano.md), [ambientes](../../ops/prepublication/gestao-ambientes.md), [agendamento](../../ops/prepublication/gestao-recorrencias-agendamento.md) e [recuperação](../../ops/prepublication/gestao-recuperacao.md).
 
+## Planos personalizados
+
+Entram na mesma publicação do Gestão ([ADR 0012](adr/0012-planos-personalizados.md)). Não exigem índice novo, job novo nem migração de dados.
+
+- [ ] Confirmar antes da publicação que a coleção `customPlans` segue fechada pelas regras do Firestore.
+- [ ] Publicar a API antes do frontend, como no restante do Gestão: a tela nova depende das rotas `/admin/custom-plans`.
+- [ ] Antes de criar o primeiro contrato personalizado real, cumprir a [liberação do primeiro contrato](../../ops/prepublication/gestao-recuperacao.md#primeiro-contrato-personalizado-real): depois dele, `plan_custom` impede reverter a API, e `charge_custom` continua impedindo depois da primeira cobrança.
+- [ ] Depois da publicação, conferir em uma empresa do Gestão: compras, recorrências, painel financeiro e relatórios.
+
 ## Parte 0: proteger a produção atual
 
 Independe do Gestão e vem primeiro.
@@ -58,7 +67,7 @@ Independe do Gestão e vem primeiro.
 - [ ] Ativar agendamento e alertas, e conferir a primeira execução automática.
 - [ ] Rodar o verificador de reversão com e sem dados do Gestão.
 - [ ] **Ensaiar a publicação da produção:** partir da versão anterior com dados fictícios, aplicar índices, API sem tráfego, tráfego e frontend, e medir o tempo.
-- [ ] Repetir o caso `return` do teste de capacidade com limite maior.
+- [x] Repetir o caso `return` do teste de capacidade com limite maior. Passou em 05/11/2026, em emulador local, com limite de 2 h por caso.
 - [ ] Observar ao menos 7 dias sem erro inesperado.
 
 ## Parte 2: produção em `lastro-hml`
