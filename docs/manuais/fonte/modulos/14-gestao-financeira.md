@@ -4,7 +4,7 @@ slug: gestao-financeira
 modulo: Painel de gestão
 titulo: Painel de gestão e relatórios
 subtitulo: Saldo de caixa, previsão, resultado estimado e relatórios financeiros.
-publico: Administrador, Vendedor (se liberado), plano Gestão
+publico: Administrador, Vendedor (se liberado), Se contratado
 resumo: O Painel de gestão junta o que entrou, o que saiu e o que está previsto, a partir dos registros da própria empresa. Título em aberto é sempre previsão, nunca caixa. O resultado mostrado é gerencial e ajuda a acompanhar o negócio, sem substituir a contabilidade.
 administrador: Consulta o painel, informa o saldo de caixa e usa os relatórios financeiros.
 vendedor: Só acessa se o administrador liberar. Os relatórios financeiros valem para a empresa inteira, fora da carteira do vendedor.
@@ -18,7 +18,7 @@ vendedor: Só acessa se o administrador liberar. Os relatórios financeiros vale
 
 ![Painel de gestão.](admin-gestao-painel-1280.png "sem-menu h=150")
 
-Clique em um quadro para abrir a lista que deu origem ao número. O módulo faz parte do plano **Gestão**.
+Clique em um quadro para abrir a lista que deu origem ao número. Disponível quando o contrato da empresa inclui esse recurso.
 
 ## Informar o saldo de caixa
 
@@ -98,7 +98,7 @@ Ele não considera tributos, depreciação nem devoluções. Não substitui o lu
 
 ## No celular
 
-![Painel de gestão no celular.](admin-gestao-painel-390.png "estreita h=170")
+![Painel de gestão no celular.](admin-gestao-painel-390.png "estreita h=118")
 
 No celular, toque em [[Seções]] no topo do Financeiro para trocar de área.
 

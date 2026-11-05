@@ -1,10 +1,11 @@
 ---
+mes: novembro de 2026
 slug: catalogo-publico
 modulo: Catálogo público
 titulo: Catálogo público
 subtitulo: Vitrine on-line com a marca da distribuidora para os clientes montarem orçamentos pelo WhatsApp.
 publico: Administrador
-resumo: O catálogo público é uma página aberta, com endereço próprio, onde seus clientes veem os produtos e montam um orçamento que chega a você pelo WhatsApp. Ele não cria pedidos nem reserva estoque. O catálogo é um recurso do plano Profissional e mostra o logotipo da empresa, as fotos dos produtos e a assinatura do Lastro.
+resumo: O catálogo público é uma página aberta, com endereço próprio, onde seus clientes veem os produtos e montam um orçamento que chega a você pelo WhatsApp. Ele não cria pedidos nem reserva estoque. O catálogo mostra as fotos dos produtos e a assinatura do Lastro, além do logotipo da empresa quando o contrato inclui esse recurso.
 administrador: Configura, publica e tira do ar o catálogo, e escolhe quais produtos aparecem.
 vendedor: Não configura o catálogo. Pode compartilhar o link público com os clientes, como qualquer pessoa.
 ---
@@ -18,16 +19,16 @@ vendedor: Não configura o catálogo. Pode compartilhar o link público com os c
 
 Aparecem no catálogo os produtos **ativos** marcados como visíveis. Falta de estoque não esconde o produto.
 
-### Disponibilidade por plano
+### Disponibilidade por contrato
 
-| Plano | Catálogo público |
+| Contrato | Catálogo público |
 |---|---|
-| Profissional | Disponível: configurar, publicar e compartilhar, com logotipo da empresa. |
-| Essencial | Indisponível. O item **Catálogo público** não aparece no menu, e em **Configurações** aparece apagado com o aviso "Disponível no plano Profissional". |
+| Com **Catálogo / vitrine virtual** | Disponível: configurar, publicar e compartilhar. |
+| Sem o recurso | Indisponível. O item **Catálogo público** não aparece no menu nem em **Configurações**. |
 
-Se a empresa sair do Profissional ou tiver o acesso suspenso, o link deixa de abrir e o cliente vê "Este catálogo não está disponível". Configurações, produtos e escolhas de visibilidade ficam guardados e voltam a valer quando o recurso for liberado de novo.
+Os planos Profissional e Gestão incluem o catálogo, e um plano personalizado pode incluir. Se o contrato deixar de incluir o recurso ou o acesso for suspenso, o link deixa de abrir e o cliente vê "Este catálogo não está disponível". Configurações, produtos e escolhas de visibilidade ficam guardados e voltam a valer quando o recurso for liberado de novo.
 
-![Configurações no plano Essencial: Catálogo público indisponível.](essencial-configuracoes-1280.png "sem-menu h=44")
+![Configurações sem o Catálogo público no contrato.](essencial-configuracoes-1280.png "sem-menu h=44")
 
 ## Configurar o catálogo
 
@@ -110,4 +111,4 @@ Se um preço mudar ou um produto sair do catálogo enquanto o cliente monta o or
 | Escolher produtos visíveis no catálogo | {sim} | {lib:Com Produtos liberado} |
 | Abrir e compartilhar o link público | {sim} | {sim} |
 
-O catálogo só aparece quando o plano contratado inclui **Catálogo / vitrine virtual** (plano Profissional). O logotipo do topo é cadastrado só por administradores, em **Configurações › Empresa**.
+O catálogo só aparece quando o contrato da empresa inclui **Catálogo / vitrine virtual**. O logotipo do topo é cadastrado só por administradores, em **Configurações › Empresa**.

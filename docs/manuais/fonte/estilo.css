@@ -281,7 +281,7 @@ h2 .num {
   font-weight: 700;
   letter-spacing: 0;
 }
-h2.nova-pagina { break-before: page; margin-top: 0; }
+h2.nova-pagina, h3.nova-pagina { break-before: page; margin-top: 0; }
 h3 {
   font-size: 12pt;
   font-weight: 600;

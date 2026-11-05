@@ -1,4 +1,5 @@
 ---
+mes: novembro de 2026
 slug: primeiros-passos
 modulo: Primeiros passos
 titulo: Primeiros passos
@@ -77,7 +78,7 @@ Por segurança, o Lastro pede login de novo depois de algum tempo. Entre novamen
 
 ### No computador
 
-O menu lateral escuro fica à esquerda, com o botão amarelo [[Novo pedido]] no topo e os módulos logo abaixo. No fim do menu ficam [[Configurações]], o nome da empresa (com o logotipo, no plano Profissional), o seu nome e perfil, e os botões [[Meu Perfil]] e [[Sair]]. Em telas médias, o menu fica estreito e mostra só os ícones.
+O menu lateral escuro fica à esquerda, com o botão amarelo [[Novo pedido]] no topo e os módulos logo abaixo. No fim do menu ficam [[Configurações]], o nome da empresa (com o logotipo, se o contrato incluir esse recurso), o seu nome e perfil, e os botões [[Meu Perfil]] e [[Sair]]. Em telas médias, o menu fica estreito e mostra só os ícones.
 
 ### No celular
 
@@ -104,7 +105,7 @@ No celular, a mesma tela aparece em uma coluna, com a barra inferior para trocar
 
 Abra [[Meu Perfil]] no fim do menu lateral (no celular, em **Mais**).
 
-![Meu Perfil: nome, e-mail, acesso atual e segurança.](admin-meu-perfil-1280.png "h=84")
+![Meu Perfil: nome, e-mail, acesso atual e segurança.](admin-meu-perfil-1280.png "h=68")
 
 ### Alterar seu nome
 

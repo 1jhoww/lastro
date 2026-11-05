@@ -1,4 +1,5 @@
 ---
+mes: novembro de 2026
 slug: produtos
 modulo: Produtos
 titulo: Produtos
@@ -84,7 +85,7 @@ A ficha mostra o **Preço de tabela**, a categoria, a unidade (com as casas deci
 
 ## Fotos dos produtos
 
-Cada produto pode ter uma foto. Ela aparece na lista de produtos, na ficha, no catálogo público e, no plano Profissional, no pedido comercial e no romaneio em PDF.
+Cada produto pode ter uma foto. Ela aparece na lista de produtos, na ficha, no catálogo público e, quando o contrato inclui esse recurso, no pedido comercial e no romaneio em PDF.
 
 ### Arquivos aceitos
 

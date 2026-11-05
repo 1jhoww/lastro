@@ -1,4 +1,5 @@
 ---
+mes: novembro de 2026
 slug: pedidos
 modulo: Pedidos
 titulo: Pedidos
@@ -177,9 +178,9 @@ O PDF é gerado na hora, com os dados atuais do pedido, e recebe o número do pe
 
 ### Identidade visual dos PDFs
 
-Todo documento traz o **nome da empresa** em destaque e a **marca do Lastro**, pequena, no canto superior direito. O que mais aparece depende do plano:
+Todo documento traz o **nome da empresa** em destaque e a **marca do Lastro**, pequena, no canto superior direito. O que mais aparece depende de o contrato incluir **Logotipo e fotos nos documentos e no catálogo**:
 
-| Elemento | Essencial | Profissional |
+| Elemento | Sem o recurso | Com o recurso |
 |---|:-:|:-:|
 | Nome da empresa | {sim} | {sim} |
 | Marca do Lastro | {sim} | {sim} |
@@ -187,25 +188,25 @@ Todo documento traz o **nome da empresa** em destaque e a **marca do Lastro**, p
 | Foto de cada produto, ao lado do nome do item | {nao} | {sim} |
 
 :::lado
-#### Plano Profissional
+#### Com logotipo e fotos no contrato
 
 - O **logotipo da empresa** fica à esquerda do nome, no topo da primeira página. Ele é cadastrado em **Configurações › Empresa** (veja o manual Usuários e permissões).
 - Cada item mostra a **foto do produto** em um quadro de 15 mm, ao lado do nome. Produto sem foto aparece só com o nome, sem quadro vazio.
 - O **romaneio de entrega** segue o mesmo padrão, com fotos e os campos de nome, data e assinatura de quem recebe.
 - A marca do Lastro continua no canto superior direito, menor que a marca da empresa.
 
-![Pedido comercial no Profissional.](pdf-pedido-profissional.png)
+![Pedido comercial com logotipo e fotos.](pdf-pedido-profissional.png)
 :::
 
 :::lado
-#### Plano Essencial
+#### Sem logotipo e fotos no contrato
 
 - O topo mostra o **nome da empresa** em texto e a marca do Lastro.
 - Os itens aparecem com nome, SKU, quantidade e valores, sem fotos.
-- Um logotipo ou fotos já cadastrados ficam **guardados** e voltam aos documentos se a empresa passar para o Profissional.
-- O conteúdo do pedido (itens, valores, parcelas e observações) é o mesmo nos dois planos.
+- Um logotipo ou fotos já cadastrados ficam **guardados** e voltam aos documentos se a empresa contratar esse recurso.
+- O conteúdo do pedido (itens, valores, parcelas e observações) é o mesmo nos dois casos.
 
-![Pedido comercial no Essencial.](pdf-pedido-essencial.png)
+![Pedido comercial sem logotipo e fotos.](pdf-pedido-essencial.png)
 :::
 
 :::nota

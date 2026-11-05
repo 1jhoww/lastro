@@ -1,4 +1,5 @@
 ---
+mes: novembro de 2026
 slug: estoque
 modulo: Estoque
 titulo: Estoque
@@ -50,7 +51,7 @@ O **vendedor** vê apenas "Quanto há disponível para vender agora.", sem físi
 
 ## Registrar uma entrada de mercadoria
 
-Use quando chegar mercadoria do fornecedor. No plano Gestão, mercadoria comprada entra por **Compras**, que gera as contas a pagar e atualiza o custo; a entrada avulsa fica para bonificações, amostras e saldo de abertura, e não muda o custo médio.
+Use quando chegar mercadoria do fornecedor. Quando o contrato inclui compras, mercadoria comprada entra por **Compras**, que gera as contas a pagar e atualiza o custo; a entrada avulsa fica para bonificações, amostras e saldo de abertura, e não muda o custo médio.
 
 1. Em [[Estoque]], clique em [[Registrar entrada]]. Na ficha de um produto, o botão já abre com o produto escolhido.
 2. Clique em [[Escolher produto]] e selecione o produto.

@@ -15,11 +15,12 @@ wordmark de `frontend/src/brand`).
 | `lastro-manual-estoque.pdf` | Físico/reservado/disponível, entradas, ajustes, movimentações, reposição |
 | `lastro-manual-devolucoes.pdf` | Registro, recebimento físico (vendável/danificado), cancelamento de pendências, acerto financeiro |
 | `lastro-manual-relatorios.pdf` | Catálogo de relatórios, filtros, CSV/PDF, exportação de cadastros |
-| `lastro-manual-usuarios-e-permissoes.pdf` | Perfis, Configurações, nome e logotipo da empresa, vagas do plano, convites, edição/desativação, permissões do vendedor, planos Essencial e Profissional, funções da equipe do Lastro (Super Admin) |
+| `lastro-manual-usuarios-e-permissoes.pdf` | Perfis, Configurações, nome e logotipo da empresa, vagas do plano, convites, edição/desativação, permissões do vendedor, planos oficiais e personalizados, funções da equipe do Lastro (Super Admin) |
 | `lastro-manual-catalogo-publico.pdf` | Disponibilidade por plano, configurar, logotipo e marca do Lastro, publicar e compartilhar, escolher produtos, tirar do ar, visão do cliente |
-| `lastro-manual-compras.pdf` | Plano Gestão: fornecedores, pedidos de compra, confirmação, recebimento parcial, estorno, encerramento de saldo pendente, cancelamento, custos e margem |
-| `lastro-manual-contas-a-pagar.pdf` | Plano Gestão: títulos, despesas, pagamentos, estornos, recorrências, categorias e créditos de fornecedores |
-| `lastro-manual-gestao-financeira.pdf` | Plano Gestão: painel, saldo de caixa, fluxo projetado, resultado estimado e relatórios financeiros |
+| `lastro-manual-compras.pdf` | Fornecedores, pedidos de compra, confirmação, recebimento parcial, estorno, encerramento de saldo pendente, cancelamento, custos e margem |
+| `lastro-manual-contas-a-pagar.pdf` | Títulos, despesas, pagamentos, estornos, recorrências, categorias e créditos de fornecedores |
+| `lastro-manual-gestao-financeira.pdf` | Painel, saldo de caixa, fluxo projetado, resultado estimado e relatórios financeiros |
+| `lastro-manual-super-admin.pdf` | Equipe do Lastro: planos personalizados, módulos base, dependências, plano gratuito, vínculo de empresas, alteração de contrato, histórico |
 | `lastro-apresentacao.pdf` | Apresentação do app em A4 paisagem (18 slides): visão geral, perfis, jornada da venda, um slide por módulo, celular, planos, confiabilidade e manuais |
 
 Cada manual tem capa, índice com páginas, passo a passo numerado, caixas de dica/atenção/"não pode

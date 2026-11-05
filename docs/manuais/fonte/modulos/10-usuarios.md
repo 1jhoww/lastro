@@ -1,4 +1,5 @@
 ---
+mes: novembro de 2026
 slug: usuarios-e-permissoes
 modulo: Usuários e permissões
 titulo: Usuários e permissões
@@ -17,7 +18,7 @@ vendedor: Não acessa a tela de Usuários. Em Configurações, só consulta os d
 | **Vendedor** | Atende a própria carteira: seus clientes, pedidos e documentos. |
 
 - A empresa precisa ter **pelo menos um administrador ativo**.
-- O perfil **Vendedor** e os convites adicionais fazem parte do plano **Profissional**. No plano Essencial, só o perfil Administrador está disponível.
+- O perfil **Vendedor** e os convites adicionais dependem do contrato da empresa. Sem esses recursos, só o perfil Administrador fica disponível, e a tela não mostra o botão de convite.
 - Cada usuário ativo e cada convite pendente ocupam **uma vaga** do plano. O acesso de suporte do Lastro (selo ((Suporte Lastro|destaque))) não ocupa vaga.
 
 ## Configurações
@@ -27,17 +28,17 @@ Clique em [[Configurações]] no fim do menu lateral (no celular, em **Mais**). 
 - **Empresa**: nome, logotipo, fuso horário e data de início no Lastro (seção a seguir).
 - **Usuários e convites**: a equipe e as vagas do plano.
 - **Condições de pagamento**: atalho para **Financeiro › Condições e formas** (veja o manual do Financeiro).
-- **Catálogo público**: vitrine para clientes (veja o manual do Catálogo público). No plano Essencial, o item aparece apagado com o aviso "Disponível no plano Profissional".
+- **Catálogo público**: vitrine para clientes (veja o manual do Catálogo público). Só aparece quando o plano inclui o catálogo.
 
 O vendedor vê só **Empresa**, para consulta.
 
-![Configurações do administrador no plano Profissional.](admin-configuracoes-1280.png "sem-menu h=56")
+![Configurações do administrador com o catálogo no contrato.](admin-configuracoes-1280.png "sem-menu h=56")
 
 ## Dados e identidade da empresa
 
 Abra [[Configurações]] › **Empresa**. O quadro **Identidade da empresa** tem o logotipo à esquerda e o nome à direita. Abaixo ficam o **Fuso horário**, usado para validar as datas de vencimento, e a data **No Lastro desde**.
 
-![Configurações › Empresa no plano Profissional, com logotipo cadastrado.](admin-empresa-1280.png "sem-menu h=62")
+![Configurações › Empresa com logotipo cadastrado.](admin-empresa-1280.png "sem-menu h=62")
 
 ### Alterar o nome da empresa
 
@@ -47,7 +48,7 @@ Abra [[Configurações]] › **Empresa**. O quadro **Identidade da empresa** tem
 
 O nome aparece no app, nos pedidos comerciais, nos romaneios, nos relatórios em PDF e no menu lateral. Documentos gerados depois da troca já saem com o novo nome. Para mudar o fuso horário, fale com o suporte do Lastro.
 
-### Cadastrar o logotipo (plano Profissional)
+### Cadastrar o logotipo (quando contratado)
 
 1. No quadro **Logotipo**, clique em [[Adicionar logotipo]].
 2. Escolha o arquivo: JPEG, PNG ou WebP, com até 5 MB. PNG com fundo transparente fica melhor nos documentos.
@@ -70,18 +71,18 @@ As proporções do arquivo são mantidas: logotipos quadrados e horizontais func
 O aviso explica o motivo (arquivo grande, formato não aceito, conexão). Quando a falha é passageira, aparece [[Tentar de novo]], que reenvia o mesmo arquivo. Nos outros casos, ajuste o arquivo e clique em [[Adicionar logotipo]] ou [[Substituir]] de novo. As mensagens são as mesmas das fotos de produtos (veja o manual de Produtos).
 :::
 
-### Diferenças entre os planos
+### Com e sem logotipo no contrato
 
-| Ação | Essencial | Profissional |
+| Ação | Sem o recurso | Com o recurso |
 |---|:-:|:-:|
 | Alterar o nome da empresa | {sim} | {sim} |
 | Enviar ou substituir o logotipo | {nao} | {sim} |
 | Remover um logotipo guardado | {sim} | {sim} |
 | Logotipo nos PDFs, no catálogo e no menu | {nao} | {sim} |
 
-No Essencial, o quadro do logotipo mostra o aviso "Logotipo nos pedidos, romaneios e no catálogo: disponível no plano Profissional." Se a empresa já tinha logotipo, ele fica **guardado** e volta a aparecer quando a empresa passar para o Profissional.
+Sem o recurso, a área do logotipo não aparece. Se a empresa já tinha logotipo, ele fica **guardado** e volta a aparecer quando a empresa contratar esse recurso.
 
-![Configurações › Empresa no plano Essencial: nome editável e aviso sobre o logotipo.](essencial-empresa-1280.png "sem-menu h=56")
+![Configurações › Empresa no plano Essencial: nome editável, sem a área do logotipo.](essencial-empresa-1280.png "sem-menu h=56")
 
 :::perfil Quem pode alterar
 Só administradores alteram o nome e o logotipo. O vendedor vê o nome da empresa, sem botões de edição. Essas permissões não podem ser liberadas para vendedores.
@@ -91,7 +92,7 @@ Só administradores alteram o nome e o logotipo. O vendedor vê o nome da empres
 
 1. Abra [[Configurações]] › **Usuários e convites**.
 2. No topo, veja quantos usuários estão ativos e quantos convites estão pendentes.
-3. O quadro do plano mostra **Acessos utilizados** e as vagas livres.
+3. O quadro do plano mostra **Acessos utilizados**, as vagas livres e os recursos do contrato.
 4. Em **Pessoas com acesso**, filtre por [[Todos]], [[Ativos]] ou [[Inativos]].
 
 ![Tela de Usuários com o plano, as pessoas com acesso e os convites pendentes.](admin-usuarios-1280.png "sem-menu h=88")
@@ -127,7 +128,7 @@ No quadro **Convites pendentes**, cada convite mostra o e-mail, a data e o venci
 |---|---|
 | Já existe convite pendente ou acesso ativo para este e-mail. | A pessoa já foi convidada ou já tem acesso. |
 | O plano não tem vaga para mais um usuário. | Libere uma vaga antes de convidar. |
-| Este convite não faz parte do plano contratado. | Convites adicionais ou o perfil Vendedor exigem o plano Profissional. |
+| Este convite não faz parte do plano contratado. | O contrato da empresa não inclui convites adicionais ou o perfil Vendedor. |
 
 ## Mudar perfil ou desativar um acesso
 
@@ -184,11 +185,11 @@ A carteira continua valendo: o vendedor só vê os próprios clientes e pedidos,
 | Configurações | Identidade visual (logotipo) | {nao} |
 | Usuários | Gerenciar usuários | {nao} |
 
-**Sempre**: incluída para todo vendedor. **Padrão**: ligada ao convidar, pode ser retirada. **Se liberado**: desligada ao convidar, pode ser ligada. **Não**: somente administradores. Recursos fora do plano contratado aparecem como "Fora do plano contratado".
+**Sempre**: incluída para todo vendedor. **Padrão**: ligada ao convidar, pode ser retirada. **Se liberado**: desligada ao convidar, pode ser ligada. **Não**: somente administradores. Recursos fora do plano contratado não aparecem na lista.
 
 ## Planos do Lastro {nova-pagina}
 
-O plano da empresa aparece no quadro do topo da tela **Usuários**, com os acessos utilizados e os recursos incluídos. Hoje o Lastro oferece três planos:
+O plano da empresa aparece no quadro do topo da tela **Usuários**, com os acessos utilizados. O quadro lista só os recursos que o contrato da empresa inclui. O Lastro oferece três planos oficiais:
 
 | Recurso | Essencial | Profissional | Gestão |
 |---|:-:|:-:|:-:|
@@ -202,15 +203,19 @@ O plano da empresa aparece no quadro do topo da tela **Usuários**, com os acess
 | Visitas e recompra | {nao} | {sim} | {sim} |
 | Catálogo público com orçamento pelo WhatsApp | {nao} | {sim} | {sim} |
 | Logotipo nos PDFs e no catálogo, fotos dos produtos nos PDFs | {nao} | {sim} | {sim} |
-| Fornecedores, compras e recebimento de mercadorias | {nao} | {nao} | {sim} |
+| Fornecedores | {nao} | {nao} | {sim} |
+| Compras e recebimento de mercadorias | {nao} | {nao} | {sim} |
 | Custos de aquisição, margens e rentabilidade | {nao} | {nao} | {sim} |
 | Contas a pagar, despesas e recorrências | {nao} | {nao} | {sim} |
-| Fluxo de caixa, painel e relatórios financeiros | {nao} | {nao} | {sim} |
+| Dashboard financeiro e fluxo de caixa | {nao} | {nao} | {sim} |
+| Relatórios financeiros | {nao} | {nao} | {sim} |
 
-Recurso fora do plano não aparece no menu ou aparece com o aviso de disponibilidade no plano; na janela de permissões, aparece como "Fora do plano contratado".
+Uma empresa também pode ter um **plano personalizado**, negociado com o Lastro, com outra combinação de recursos e outro limite de usuários. Nesse caso, a tabela acima não se aplica: vale o que aparece no quadro do plano. O perfil Vendedor, por exemplo, só aparece se o contrato incluir esse recurso.
+
+Recurso fora do contrato não aparece no menu, nas configurações nem na janela de permissões. Os dados continuam guardados e voltam a aparecer quando o recurso é contratado.
 
 :::nota Troca de plano
-A troca de plano é feita pela equipe do Lastro. Para passar a um plano menor, a empresa precisa caber no limite de usuários dele. Ao sair do Profissional, o catálogo público deixa de abrir e o logotipo e as fotos saem dos documentos. Ao sair do Gestão, compras, contas a pagar e o painel saem do menu. Nada é apagado: cadastros, compras, títulos e custos ficam guardados para uma volta ao plano.
+A troca de plano é feita pela equipe do Lastro. Para passar a um plano menor, a empresa precisa caber no limite de usuários dele. Quando o contrato deixa de incluir um recurso, ele sai do menu: sem o catálogo, o link público deixa de abrir; sem logotipo e fotos, eles saem dos documentos; sem compras, contas a pagar ou o painel, esses itens somem. Nada é apagado: cadastros, compras, títulos e custos ficam guardados para uma volta ao plano. Créditos de fornecedores já registrados continuam disponíveis para consulta, mesmo com saldo zerado, sem novas operações (veja o manual de Contas a pagar).
 :::
 
 ## O que só a equipe do Lastro faz
@@ -218,7 +223,7 @@ A troca de plano é feita pela equipe do Lastro. Para passar a um plano menor, a
 Algumas operações ficam com a equipe do Lastro (perfil **Super Admin**), em uma área própria que os usuários da empresa não acessam:
 
 - criar a empresa no Lastro e enviar o convite do primeiro administrador;
-- definir e trocar o plano, o valor mensal e o dia de vencimento da assinatura;
+- definir e trocar o plano, o valor mensal e o dia de vencimento da assinatura, inclusive planos personalizados (veja o manual do Super Admin);
 - gerar e acompanhar as cobranças da assinatura;
 - suspender e reativar o acesso da empresa;
 - solicitar a troca do e-mail de uma conta e desbloquear contas.
@@ -231,7 +236,7 @@ O acesso de suporte do Lastro aparece na lista de usuários com o selo ((Suporte
 |---|:-:|:-:|
 | Ver dados da empresa | {sim} | {sim} |
 | Alterar o nome da empresa | {sim} | {nao} |
-| Enviar e trocar o logotipo | {sim:Sim, no Profissional} | {nao} |
+| Enviar e trocar o logotipo | {sim:Sim, se contratado} | {nao} |
 | Remover o logotipo | {sim} | {nao} |
 | Convidar, editar e desativar usuários | {sim} | {nao} |
 | Ajustar permissões de vendedores | {sim} | {nao} |

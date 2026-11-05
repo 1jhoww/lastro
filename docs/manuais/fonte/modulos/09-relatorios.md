@@ -1,4 +1,5 @@
 ---
+mes: novembro de 2026
 slug: relatorios
 modulo: Relatórios
 titulo: Relatórios
@@ -51,8 +52,8 @@ Cada relatório tem um período padrão, mostrado logo abaixo do campo. Por exem
 A data final precisa ser igual ou posterior à inicial. Se a consulta for grande demais, o Lastro avisa ("Consulta grande demais"): reduza o período ou use mais filtros.
 :::
 
-:::nota Plano Gestão
-No plano Gestão aparece a categoria [[Gestão]], com fluxo de caixa, contas a pagar, compras, custos, rentabilidade e despesas. Veja o manual Painel de gestão e relatórios.
+:::nota Relatórios financeiros
+Quando o contrato inclui esse recurso, aparece a categoria [[Gestão]], com os relatórios que o contrato libera: fluxo de caixa, contas a pagar, compras, custos, rentabilidade e despesas. Veja o manual Painel de gestão e relatórios.
 :::
 
 ## Baixar em CSV ou PDF
@@ -61,7 +62,7 @@ No plano Gestão aparece a categoria [[Gestão]], com fluxo de caixa, contas a p
 2. No topo do relatório, clique em [[CSV]] para abrir em planilha ou em [[PDF]] para imprimir ou enviar.
 3. O arquivo traz o resultado completo dos filtros, não só a página mostrada na tela.
 
-O PDF traz o nome da empresa e a marca do Lastro. No plano Profissional, o logotipo da empresa também aparece no topo (veja o manual Usuários e permissões).
+O PDF traz o nome da empresa e a marca do Lastro. Quando o contrato inclui esse recurso, o logotipo da empresa também aparece no topo (veja o manual Usuários e permissões).
 
 Os botões ficam desativados enquanto o relatório não carregou ou se o período estiver inválido.
 

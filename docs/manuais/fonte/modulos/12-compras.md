@@ -4,7 +4,7 @@ slug: compras
 modulo: Compras
 titulo: Compras e fornecedores
 subtitulo: Fornecedores, pedidos de compra, recebimento de mercadorias, encerramento de saldo e custos.
-publico: Administrador, Vendedor (se liberado), plano Gestão
+publico: Administrador, Vendedor (se liberado), Se contratado
 resumo: O módulo Compras registra o que a empresa compra dos fornecedores. Confirmar a compra gera as contas a pagar; receber a mercadoria movimenta o estoque e atualiza o custo. As duas coisas são separadas, porque a mercadoria e o dinheiro raramente acontecem no mesmo dia.
 administrador: Cadastra fornecedores, cria e confirma compras, recebe mercadorias, encerra saldos pendentes e consulta custos e margens.
 vendedor: Só usa compras e custos se o administrador liberar. Nunca cadastra fornecedores.
@@ -12,7 +12,7 @@ vendedor: Só usa compras e custos se o administrador liberar. Nunca cadastra fo
 
 ## Antes de começar
 
-Compras faz parte do plano **Gestão**. Em outros planos o item não aparece no menu.
+Disponível quando o contrato da empresa inclui esse recurso. Sem ele, o item não aparece no menu.
 
 Três ideias explicam quase todo o módulo:
 

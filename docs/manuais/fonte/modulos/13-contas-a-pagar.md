@@ -4,7 +4,7 @@ slug: contas-a-pagar
 modulo: Contas a pagar
 titulo: Contas a pagar e despesas
 subtitulo: Títulos, pagamentos, despesas avulsas e recorrentes, categorias e créditos de fornecedores.
-publico: Administrador, Vendedor (se liberado), plano Gestão
+publico: Administrador, Vendedor (se liberado), Se contratado
 resumo: Contas a pagar reúne tudo que a empresa deve, venha de compras, de despesas ou de recorrências. Cada título tem saldo próprio, aceita pagamento parcial e guarda o histórico. Nada é apagado: um estorno fica registrado junto do pagamento original.
 administrador: Lança despesas e recorrências, registra pagamentos e estornos e usa os créditos de fornecedores.
 vendedor: Só acessa se o administrador liberar. Estornos e créditos seguem a mesma liberação.
@@ -12,7 +12,7 @@ vendedor: Só acessa se o administrador liberar. Estornos e créditos seguem a m
 
 ## Onde fica
 
-Em [[Financeiro]], escolha [[Contas a pagar]]. No celular, toque em [[Seções]] para trocar de área. O módulo faz parte do plano **Gestão**.
+Em [[Financeiro]], escolha [[Contas a pagar]]. No celular, toque em [[Seções]] para trocar de área. Disponível quando o contrato da empresa inclui esse recurso.
 
 Um título pode nascer de quatro formas:
 
@@ -102,12 +102,16 @@ Quando uma compra é encerrada com saldo, o valor pode virar crédito ou valor a
 3. Clique em [[Usar em um título]] para compensar um título de compra do mesmo fornecedor. Não há saída de dinheiro.
 4. Ou clique em [[Registrar devolução]] quando o fornecedor devolver o dinheiro. O valor entra no caixa.
 
-![Crédito do fornecedor com saldo.](admin-credito-fornecedor-1280.png "sem-menu h=125")
+![Crédito do fornecedor com saldo.](admin-credito-fornecedor-1280.png "sem-menu h=98")
 
 Cada movimentação pode ser desfeita com [[Estornar]], informando o motivo. Ela fica no histórico como estornada e o saldo do crédito volta.
 
 :::atencao Crédito só compensa título de compra
 O crédito veio de mercadoria, então não reduz despesas como aluguel ou energia. Também não existe baixa por perda: um crédito que não será recebido continua aparecendo com saldo.
+:::
+
+:::nota Depois de uma troca de plano
+Se o contrato deixar de incluir compras, os créditos já registrados continuam em **Créditos de fornecedores**, mesmo com saldo zerado, para quem tem permissão de consultar o financeiro. A consulta mostra os créditos e o histórico de cada um. [[Usar em um título]] e [[Registrar devolução]] só aparecem se o contrato incluir contas a pagar. Nada disso permite criar compras ou novos créditos.
 :::
 
 ## Mensagens comuns

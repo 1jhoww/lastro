@@ -1,4 +1,5 @@
 ---
+mes: novembro de 2026
 slug: clientes
 modulo: Clientes
 titulo: Clientes
@@ -118,7 +119,7 @@ O Lastro não exclui clientes: desativar é o caminho para tirar um cadastro de 
 
 O vendedor vê a lista "Clientes da sua carteira." e pode cadastrar e editar esses clientes. Ele não vê os botões de desativar nem o painel de transferência; na ficha aparece apenas "Na sua carteira.".
 
-![Lista de clientes na visão do vendedor: somente a própria carteira.](seller-clientes-1280.png "sem-menu h=62")
+![Lista de clientes na visão do vendedor: somente a própria carteira.](seller-clientes-1280.png "sem-menu h=52")
 
 ## Quem pode fazer o quê
 
@@ -130,4 +131,4 @@ O vendedor vê a lista "Clientes da sua carteira." e pode cadastrar e editar ess
 | Desativar e reativar | {sim} | {nao} |
 | Ver histórico e recompra | {sim} | {pad:Da carteira} |
 
-**Padrão**: liberado ao vendedor por padrão; o administrador pode retirar em **Configurações › Usuários e convites**. O histórico e a recompra dependem do plano incluir Visitas (plano Profissional). Vendedores e carteiras também são recursos do Profissional.
+**Padrão**: liberado ao vendedor por padrão; o administrador pode retirar em **Configurações › Usuários e convites**. O histórico e a recompra dependem de o contrato da empresa incluir Visitas. Vendedores e carteiras dependem de o contrato da empresa incluir esse recurso.

@@ -1,10 +1,11 @@
 ---
+mes: novembro de 2026
 slug: visitas
 modulo: Visitas
 titulo: Visitas e recompra
 subtitulo: Registro de visitas e contatos com clientes, histórico de atendimento e estimativa de recompra.
 publico: Administrador, Vendedor
-resumo: O módulo Visitas guarda o relacionamento com cada cliente: visitas presenciais, contatos remotos e entregas confirmadas. A partir dos pedidos confirmados, o Lastro também estima quando cada cliente deve voltar a comprar. Visitas é um recurso do plano Profissional; se o menu não aparecer, o plano contratado não inclui o módulo.
+resumo: O módulo Visitas guarda o relacionamento com cada cliente: visitas presenciais, contatos remotos e entregas confirmadas. A partir dos pedidos confirmados, o Lastro também estima quando cada cliente deve voltar a comprar. Se o menu não aparecer, o contrato da empresa não inclui esse recurso.
 administrador: Vê os atendimentos de toda a empresa, filtra por responsável e registra visitas em nome de qualquer usuário ativo.
 vendedor: Registra e consulta visitas dos clientes da própria carteira. O atendimento fica registrado em nome dele.
 ---
@@ -99,4 +100,4 @@ Quando um cliente muda de vendedor, as visitas e entregas já registradas contin
 | Escolher outro responsável | {sim} | {nao} |
 | Ver recompra | {sim:Todos} | {pad:Da carteira} |
 
-O módulo só aparece quando o plano contratado inclui **Visitas e recompra** (plano Profissional). Para o vendedor, a permissão também exige acesso à carteira de clientes.
+O módulo só aparece quando o contrato da empresa inclui **Visitas e recompra**. Para o vendedor, a permissão também exige acesso à carteira de clientes.
