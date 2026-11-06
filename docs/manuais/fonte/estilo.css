@@ -49,7 +49,7 @@
     padding-bottom: 3.4mm;
   }
   @bottom-left {
-    content: 'Manual do usuário · __MODULO__';
+    content: '__ROTULO__ · __MODULO__';
     font: 400 8pt 'Inter';
     color: var(--text-2);
     vertical-align: top;

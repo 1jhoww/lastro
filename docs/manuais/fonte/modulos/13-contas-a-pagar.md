@@ -63,7 +63,7 @@ Em **Mais ações**, use [[Corrigir vencimento]] ou [[Cancelar título]]. Títul
 
 ## Despesas recorrentes
 
-Aluguel, internet e tudo que se repete. Os títulos nascem até 35 dias antes do vencimento.
+Aluguel, internet e tudo que se repete. Os títulos são gerados para os próximos 35 dias.
 
 1. Em [[Financeiro]], escolha [[Despesas recorrentes]].
 2. Clique em [[Nova recorrência]].
@@ -80,8 +80,8 @@ Aluguel, internet e tudo que se repete. Os títulos nascem até 35 dias antes do
 | Retomar | Volta a gerar a partir de hoje. |
 | Encerrar | Para definitivamente. Títulos já gerados continuam valendo. |
 
-:::dica Gerar títulos agora
-O botão gera na hora o que estiver dentro dos 35 dias. Repetir não duplica: cada título é único por recorrência e data.
+:::atencao Confira as recorrências todo mês
+Abra [[Despesas recorrentes]] e clique em [[Gerar títulos agora]]. O botão gera na hora o que estiver dentro dos 35 dias. Repetir não duplica: cada título é único por recorrência e data.
 :::
 
 ### Categorias

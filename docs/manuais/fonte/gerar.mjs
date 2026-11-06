@@ -250,6 +250,7 @@ function renderManual(source, pages) {
   const content = renderBody(body, state);
   const css = readFileSync(join(here, 'estilo.css'), 'utf8')
     .replaceAll('__FONTS__', pathToFileURL(fontsDir).href)
+    .replaceAll('__ROTULO__', meta.rotulo ?? 'Manual do usuário')
     .replaceAll('__MODULO__', meta.modulo.replaceAll("'", "\\'"));
 
   const publico = (meta.publico ?? '')
@@ -278,7 +279,7 @@ function renderManual(source, pages) {
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>Lastro · Manual do usuário · ${escape(meta.titulo)}</title>
+<title>Lastro · ${escape(meta.rotulo ?? 'Manual do usuário')} · ${escape(meta.titulo)}</title>
 <meta name="author" content="Hepta Studios">
 <meta name="description" content="${escape(meta.subtitulo ?? '')}">
 <style>${css}</style>
@@ -286,7 +287,7 @@ function renderManual(source, pages) {
 <body>
 <section class="capa">
   <div class="marca">${symbol('#F6F3ED', '#F3B800')}<span class="wordmark">lastro<span class="ponto"></span></span></div>
-  <div class="rotulo">Manual do usuário</div>
+  <div class="rotulo">${escape(meta.rotulo ?? 'Manual do usuário')}</div>
   <h1>${inline(meta.titulo)}</h1>
   <div class="subtitulo">${inline(meta.subtitulo ?? '')}</div>
   ${publico ? `<div class="publico">${publico}</div>` : ''}

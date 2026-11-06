@@ -21,7 +21,8 @@ wordmark de `frontend/src/brand`).
 | `lastro-manual-contas-a-pagar.pdf` | Títulos, despesas, pagamentos, estornos, recorrências, categorias e créditos de fornecedores |
 | `lastro-manual-gestao-financeira.pdf` | Painel, saldo de caixa, fluxo projetado, resultado estimado e relatórios financeiros |
 | `lastro-manual-super-admin.pdf` | Equipe do Lastro: planos personalizados, módulos base, dependências, plano gratuito, vínculo de empresas, alteração de contrato, histórico |
-| `lastro-apresentacao.pdf` | Apresentação do app em A4 paisagem (18 slides): visão geral, perfis, jornada da venda, um slide por módulo, celular, planos, confiabilidade e manuais |
+| `lastro-manual-atualizacao-0-2.pdf` | Manual de atualização da versão 0.2: só o que entrou em 5 e 6 de novembro de 2026 e como usar |
+| `lastro-apresentacao.pdf` | Apresentação do app em A4 paisagem (19 slides): visão geral, perfis, jornada da venda, um slide por módulo, Gestão, celular, planos, confiabilidade e manuais |
 
 Cada manual tem capa, índice com páginas, passo a passo numerado, caixas de dica/atenção/"não pode
 ser desfeito", tabela "Quem pode fazer o quê" (administrador × vendedor, conforme
@@ -73,3 +74,18 @@ node docs/manuais/fonte/gerar-apresentacao.mjs
 
 Ao mudar uma tela do app, atualize o manual do módulo, refaça a captura com o mesmo nome em
 `fonte/capturas/` e rode o gerador de novo.
+
+## Manuais de atualização
+
+Toda entrega publicada para usuários tem dois registros: o manual de cada módulo afetado, que
+continua sendo a referência completa, e um manual de atualização, só com o que é novo e como
+começar a usar.
+
+1. Dê à entrega a próxima versão. Novidades somam na casa do meio (0.2, 0.3); correções, na
+   última (0.2.1).
+2. Crie `fonte/modulos/90-atualizacao-<versao>.md` a partir do manual anterior. No cabeçalho, use
+   `rotulo: Manual de atualização`, `versao` com a data e `slug: atualizacao-<versao>`, trocando
+   os pontos por hífens.
+3. Liste as novidades, quem recebe cada uma e o caminho para usar. Aponte para os manuais de
+   módulo em vez de repetir o passo a passo inteiro.
+4. Atualize a tabela no início deste arquivo, gere os PDFs e revise as páginas.
