@@ -176,7 +176,8 @@ export const orderBonusView = z.object({
   reason: bonusReason.nullable(),
   reasonDetail: z.string().nullable(),
 });
-export const orderDetailView = orderView.extend({ bonus: orderBonusView.nullable() });
+/** Commands omit `bonus` when there is none, so older orders answer exactly as they always did. */
+export const orderDetailView = orderView.extend({ bonus: orderBonusView.nullable().optional() });
 export const orderEvent = z.object({
   id: opaqueId,
   orderId: opaqueId,

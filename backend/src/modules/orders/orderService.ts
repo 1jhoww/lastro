@@ -669,7 +669,10 @@ export class OrderService {
           'CONFLICT',
           'Resultado indisponível',
         );
-        return s.orderDetailView.parse({ ...previous, bonus: orderBonusFor(bonus) });
+        return s.orderDetailView.parse({
+          ...previous,
+          ...(bonus ? { bonus: orderBonusFor(bonus) } : {}),
+        });
       }
       await this.financialLocks.assertOrderAvailable(
         tx,
@@ -857,7 +860,10 @@ export class OrderService {
         operationId,
       );
       tx.create(operationRef, operation);
-      return s.orderDetailView.parse({ ...validated, bonus: orderBonusFor(bonus) });
+      return s.orderDetailView.parse({
+        ...validated,
+        ...(bonus ? { bonus: orderBonusFor(bonus) } : {}),
+      });
     });
   }
   async list(

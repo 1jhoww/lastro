@@ -106319,8 +106319,7 @@
                         "dispatchedBy",
                         "canceledAt",
                         "canceledBy",
-                        "dispatchReference",
-                        "bonus"
+                        "dispatchReference"
                       ],
                       "additionalProperties": false
                     },
@@ -107753,8 +107752,7 @@
                         "dispatchedBy",
                         "canceledAt",
                         "canceledBy",
-                        "dispatchReference",
-                        "bonus"
+                        "dispatchReference"
                       ],
                       "additionalProperties": false
                     },
@@ -108967,8 +108965,7 @@
                         "dispatchedBy",
                         "canceledAt",
                         "canceledBy",
-                        "dispatchReference",
-                        "bonus"
+                        "dispatchReference"
                       ],
                       "additionalProperties": false
                     },
@@ -110425,8 +110422,7 @@
                         "dispatchedBy",
                         "canceledAt",
                         "canceledBy",
-                        "dispatchReference",
-                        "bonus"
+                        "dispatchReference"
                       ],
                       "additionalProperties": false
                     },
@@ -111672,8 +111668,7 @@
                         "dispatchedBy",
                         "canceledAt",
                         "canceledBy",
-                        "dispatchReference",
-                        "bonus"
+                        "dispatchReference"
                       ],
                       "additionalProperties": false
                     },
@@ -112919,8 +112914,7 @@
                         "dispatchedBy",
                         "canceledAt",
                         "canceledBy",
-                        "dispatchReference",
-                        "bonus"
+                        "dispatchReference"
                       ],
                       "additionalProperties": false
                     },

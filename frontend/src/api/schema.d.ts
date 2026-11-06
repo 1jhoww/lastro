@@ -38501,7 +38501,7 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
-                            bonus: {
+                            bonus?: {
                                 id: string;
                                 commercialId: string;
                                 /** @enum {string} */
@@ -38838,7 +38838,7 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
-                            bonus: {
+                            bonus?: {
                                 id: string;
                                 commercialId: string;
                                 /** @enum {string} */
@@ -39213,7 +39213,7 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
-                            bonus: {
+                            bonus?: {
                                 id: string;
                                 commercialId: string;
                                 /** @enum {string} */
@@ -39557,7 +39557,7 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
-                            bonus: {
+                            bonus?: {
                                 id: string;
                                 commercialId: string;
                                 /** @enum {string} */
@@ -39901,7 +39901,7 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
-                            bonus: {
+                            bonus?: {
                                 id: string;
                                 commercialId: string;
                                 /** @enum {string} */
@@ -40246,7 +40246,7 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
-                            bonus: {
+                            bonus?: {
                                 id: string;
                                 commercialId: string;
                                 /** @enum {string} */

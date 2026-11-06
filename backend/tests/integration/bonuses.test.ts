@@ -105,6 +105,8 @@ describe('Bonificação vinculada ao pedido', () => {
     expect(receivables.docs.reduce((a, d) => a + d.get('originalCents'), 0)).toBe(4100);
     expect((await orderDocs(f, 'stockReservations').get()).size).toBe(2);
 
+    const replay = await command(f, order, 'confirm', f.ownerA, randomUUID());
+    expect(replay.status).toBe(409);
     await command(f, confirmed, 'dispatch').expect(200);
     expect(await stock(productId)).toMatchObject({ physical: '5', reserved: '0' });
     expect((await orderOf(order.id)).bonus.status).toBe('dispatched');
