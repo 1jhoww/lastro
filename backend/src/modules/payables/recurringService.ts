@@ -66,7 +66,7 @@ export class RecurringService {
   async categories(actor: Actor, tenantId: string, input: z.infer<typeof s.expenseCategoryQuery>) {
     return this.repo.foundation.db.runTransaction(
       async (tx) => {
-        await this.commands.access.tenant(actor, tenantId, 'recurring:read', tx);
+        await this.commands.access.tenant(actor, tenantId, 'payables:read', tx);
         const status = input.status ?? 'active';
         const base = this.repo.ref(tenantId, 'expenseCategories', 'placeholder').parent;
         const query = status === 'all' ? base : base.where('status', '==', status);
@@ -112,7 +112,7 @@ export class RecurringService {
       'expense-category.create',
       'new',
       input,
-      'recurring:manage',
+      'payables:manage',
       s.expenseCategoryView,
       false,
       async (tx, _ctx, _operationId, now) => {
@@ -167,7 +167,7 @@ export class RecurringService {
       'expense-category.update',
       id,
       input,
-      'recurring:manage',
+      'payables:manage',
       s.expenseCategoryView,
       false,
       async (tx, _ctx, _operationId, now) => {
@@ -223,7 +223,7 @@ export class RecurringService {
       'expense-category.seed',
       'new',
       {},
-      'recurring:manage',
+      'payables:manage',
       s.seededCategories,
       false,
       async (tx, _ctx, _operationId, now) => {

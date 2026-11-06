@@ -456,6 +456,19 @@ export function withinPlan(
   return permissions.filter((permission) => !blocked.has(permission));
 }
 
+/**
+ * Whether an operation is offered to a company. One operation can span related features, and
+ * `withinPlan` already removes what the contract lacks, so any included feature keeps it offered.
+ */
+export function operationInPlan(
+  permissions: readonly Permission[],
+  entitlements: Entitlements,
+): boolean {
+  const gated = new Set(Object.values(featurePermissions).flatMap((list) => list ?? []));
+  const owned = permissions.filter((permission) => gated.has(permission));
+  return !owned.length || withinPlan(owned, entitlements).length > 0;
+}
+
 /** Features present in `from` and missing in `to`; used to confirm downgrades explicitly. */
 export function lostFeatures(from: Entitlements, to: Entitlements): PlanFeature[] {
   return from.features.filter((feature) => !to.features.includes(feature));

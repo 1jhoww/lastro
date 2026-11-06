@@ -315,6 +315,22 @@ describe('Contratos de plano personalizado', () => {
       }),
     ]);
   });
+  it('desativar o plano não marca as empresas como desatualizadas', async () => {
+    const plan = await createPlan(f);
+    await expectStatus(assign(f, plan), 200);
+    await expectStatus(
+      admin(f, `/custom-plans/${plan.id}/deactivate`).post({
+        expectedVersion: 1,
+        reason: 'Fim da campanha',
+      }),
+      200,
+    );
+    const detail = (await admin(f, `/custom-plans/${plan.id}`).get().expect(200)).body.data;
+    expect(detail.plan).toMatchObject({ status: 'inactive', version: 2 });
+    expect(detail.companies).toEqual([
+      expect.objectContaining({ planVersion: 1, outdated: false, adjusted: false }),
+    ]);
+  });
   it('oferta alterada depois da revisão exige nova revisão', async () => {
     const plan = await createPlan(f);
     await admin(f, `/custom-plans/${plan.id}`)
@@ -971,6 +987,14 @@ describe('Consulta de créditos de fornecedores depois de uma troca de plano', (
       expect.arrayContaining(['supplier-credits:read', 'payables:manage']),
     );
     await api(f).get('/supplier-credits').expect(200);
+  });
+  it('contas a pagar sem recorrências mantém as categorias de despesa', async () => {
+    const plan = await createPlan(f, { features: ['finance.payables'] });
+    await expectStatus(assign(f, plan), 200);
+    await api(f).get('/expense-categories').expect(200);
+    await api(f).post('/expense-categories', { name: 'Frota' }).expect(201);
+    await api(f).post('/expense-categories/seed').expect(200);
+    await denied(api(f).get('/recurring-expenses'), 'FEATURE_NOT_IN_PLAN');
   });
   it('crédito de outra empresa não abre a consulta nem é alcançável', async () => {
     await credit(f.tenantB.tenant.id, 'de-outra-empresa');

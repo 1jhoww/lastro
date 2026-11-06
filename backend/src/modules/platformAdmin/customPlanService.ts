@@ -48,6 +48,18 @@ export function contractAdjusted(subscription: Subscription): boolean {
   );
 }
 
+/** Whether the offer moved on from what this contract copied. A change of status does not count. */
+function offerChanged(subscription: Subscription, plan: CustomPlan): boolean {
+  const contract = subscription.customContract;
+  if (!contract) return false;
+  return (
+    contract.planName !== plan.name ||
+    contract.origin.monthlyPriceCents !== plan.monthlyPriceCents ||
+    contract.origin.userLimit !== plan.userLimit ||
+    !sameList(contract.origin.features, plan.features)
+  );
+}
+
 /** Copies the offer into a contract: later edits of the plan never reach this snapshot. */
 export function customContractFrom(plan: CustomPlan, monthlyPriceCents: number, now: string) {
   return {
@@ -193,7 +205,7 @@ export class CustomPlanService {
           monthlyPriceCents: contract.monthlyPriceCents,
           userLimit: contract.userLimit,
           planVersion: contract.planVersion,
-          outdated: contract.planVersion !== plan.version,
+          outdated: offerChanged(contract, plan),
           adjusted: contractAdjusted(contract),
         }))
         .sort((a, b) => a.tenantName.localeCompare(b.tenantName, 'pt-BR')),
@@ -356,7 +368,7 @@ export class CustomPlanService {
       const plan = await this.load(tx, id);
       this.requireVersion(plan, input.expectedVersion);
       requireCondition(plan.status !== status, 409, 'CONFLICT', 'O plano já está nesta situação');
-      // The version counts terms: contracts on this one are not outdated by a change of status.
+      // The version guards concurrent edits. Contracts compare terms, so status never outdates them.
       const next = {
         ...plan,
         status,

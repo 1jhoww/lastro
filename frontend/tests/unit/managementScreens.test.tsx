@@ -263,6 +263,20 @@ describe('telas do Gestão', () => {
       createdBy: 'u1',
       updatedBy: 'u1',
     };
+    it('quem só consulta abre a lista com todos os créditos, inclusive quitados', async () => {
+      const { gateway, server } = world(['tenant:read', 'supplier-credits:read']);
+      server.on('GET', '/api/v1/supplier-credits', () => ok({ items: [], nextCursor: null }));
+      await renderApp({
+        gateway,
+        fetch: server.fetch,
+        initialUrl: '/financeiro/creditos-fornecedor',
+        overrides,
+      });
+      expect(await screen.findByText('Nenhum crédito nesta visão')).toBeTruthy();
+      const call = server.calls.find((c) => c.path.endsWith('/supplier-credits'));
+      expect(call?.query.status).toBe('all');
+      expect(screen.queryByText(/use em outro título/)).toBeNull();
+    });
     it('mostra o crédito só para consulta, sem ações nem link para compras', async () => {
       const { gateway, server } = world(['tenant:read', 'supplier-credits:read']);
       server

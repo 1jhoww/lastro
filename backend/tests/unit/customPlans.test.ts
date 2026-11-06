@@ -11,6 +11,7 @@ import {
   recognizedFeatures,
   requireValidComposition,
   withDependencies,
+  operationInPlan,
   withinPlan,
   type PlanFeature,
 } from '../../src/modules/plans/catalog.js';
@@ -193,6 +194,18 @@ describe('Registro de recursos', () => {
           }
       }
     }
+  });
+  it('operação continua oferecida quando o contrato inclui parte dos recursos dela', () => {
+    const permissions = (id: string) =>
+      permissionMatrix.find((operation) => operation.id === id)!.permissions;
+    const payables = custom(['finance.payables']);
+    expect(operationInPlan(permissions('payables.view'), payables)).toBe(true);
+    expect(operationInPlan(permissions('payables.edit'), payables)).toBe(true);
+    expect(operationInPlan(permissions('payables.view'), custom([]))).toBe(false);
+    const management = custom(['finance.management']);
+    expect(operationInPlan(permissions('reports.financial'), management)).toBe(true);
+    expect(operationInPlan(permissions('reports.financial'), custom([]))).toBe(false);
+    expect(operationInPlan(permissions('orders.view'), custom([]))).toBe(true);
   });
   it('dependências existem no catálogo e não exigem o próprio recurso', () => {
     for (const code of planFeatures)

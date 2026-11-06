@@ -42,7 +42,7 @@ import {
   entitlementsFor,
   hasFeature,
   planSummary,
-  withinPlan,
+  operationInPlan,
   type Entitlements,
 } from '../plans/catalog.js';
 import { supplierCreditsAvailable } from '../payables/supplierCreditAccess.js';
@@ -271,9 +271,7 @@ export class UserService {
         description: operation.description,
         seller: operation.seller,
         requires: [...operation.requires],
-        inPlan:
-          withinPlan(operation.permissions, ctx.entitlements).length ===
-          operation.permissions.length,
+        inPlan: operationInPlan(operation.permissions, ctx.entitlements),
       })),
       nextCursor:
         members.size > limit && last

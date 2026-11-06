@@ -51,7 +51,10 @@ const views: { value: SupplierCreditFilter; label: string }[] = [
 /** Créditos e valores a recuperar que vieram de compras encerradas com saldo. */
 export function SupplierCreditsScreen() {
   const compact = useLayoutSize() === 'compact';
-  const [view, setView] = useState<SupplierCreditFilter>('open');
+  const { permissions } = useSession();
+  const manages = permissions.includes('payables:manage');
+  // Who only consults starts on the whole history: there may be no balance left to show.
+  const [view, setView] = useState<SupplierCreditFilter>(manages ? 'open' : 'all');
   const { query, items } = useSupplierCredits(view);
   const columns: Column<SupplierCredit>[] = [
     {
@@ -92,7 +95,11 @@ export function SupplierCreditsScreen() {
   return (
     <Screen
       title="Créditos de fornecedores"
-      description="Valores de compras encerradas: use em outro título ou registre a devolução."
+      description={
+        manages
+          ? 'Valores de compras encerradas: use em outro título ou registre a devolução.'
+          : 'Valores de compras encerradas e o histórico de cada crédito.'
+      }
     >
       <FinanceNav />
       <FilterTabs label="Situação" options={views} value={view} onChange={setView} />
