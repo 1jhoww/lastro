@@ -30,6 +30,8 @@ Independe do Gestão e vem primeiro.
 
 ## Parte 1: homologação em `lastro-homolog`
 
+Plano, custos e aprovações em [homolog-plano.md](../../ops/prepublication/homolog-plano.md). Publicação em [homolog-publicacao.md](../../ops/prepublication/homolog-publicacao.md).
+
 ### 1. Criar o ambiente **[aprovação]**
 
 - [ ] Criar projeto, Auth, Firestore, Storage, segredos e conta de serviço próprios.

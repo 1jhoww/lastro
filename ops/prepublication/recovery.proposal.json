@@ -4,7 +4,7 @@
   "database": "(default)",
   "current": {
     "pointInTimeRecoveryEnablement": "POINT_IN_TIME_RECOVERY_DISABLED",
-    "deleteProtectionState": "DELETE_PROTECTION_DISABLED",
+    "deleteProtectionState": "DELETE_PROTECTION_ENABLED",
     "versionRetentionPeriod": "3600s",
     "backupSchedules": []
   },

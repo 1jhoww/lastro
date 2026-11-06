@@ -1,0 +1,138 @@
+{
+  "status": "DRAFT_NOT_CREATED_APPROVAL_REQUIRED",
+  "project": "lastro-homolog",
+  "region": "southamerica-east1",
+  "guard": "Documento de revisão, não é script. Nada aqui foi criado. Nenhum valor pode apontar para lastro-hml. Segredos e e-mails nunca entram neste arquivo.",
+  "firestore": {
+    "database": "(default)",
+    "edition": "STANDARD",
+    "type": "FIRESTORE_NATIVE",
+    "deleteProtection": true,
+    "pitr": false,
+    "backupSchedules": [],
+    "rulesSource": "backend/firestore.rules",
+    "indexesSource": "backend/firestore.indexes.json",
+    "expected": {
+      "compositeIndexes": 184,
+      "fieldOverrides": 119,
+      "ttlFields": ["rateLimits.expiresAt"],
+      "newIndexesForCustomPlans": 0
+    },
+    "applyWith": "firebase deploy --only firestore,storage --project lastro-homolog",
+    "scope": "Só neste ambiente vazio. Em lastro-hml continua proibido publicar em bloco."
+  },
+  "storage": {
+    "bucket": "lastro-homolog.firebasestorage.app",
+    "location": "southamerica-east1",
+    "rulesSource": "backend/storage.rules"
+  },
+  "api": {
+    "service": "lastro-api-homolog",
+    "serviceAccount": "lastro-api-homolog@lastro-homolog.iam.gserviceaccount.com",
+    "minInstances": 0,
+    "maxInstances": 2,
+    "cpu": "1",
+    "memory": "1Gi",
+    "concurrency": 40,
+    "timeoutSeconds": 60,
+    "env": {
+      "NODE_ENV": "production",
+      "FIREBASE_MODE": "production",
+      "FIREBASE_PROJECT_ID": "lastro-homolog",
+      "STORAGE_BUCKET": "lastro-homolog.firebasestorage.app",
+      "CORS_ORIGINS": "https://lastro-homolog.vercel.app",
+      "PUBLIC_ORIGIN": "URL_DA_API_DEPOIS_DA_PRIMEIRA_PUBLICACAO",
+      "RATE_LIMIT_MAX": "180",
+      "TRUST_PROXY_HOPS": "0",
+      "TRUST_PROXY_ADDRESSES": "169.254.169.126/32"
+    },
+    "secrets": {
+      "INVITATION_SECRET": "lastro-invitation-secret:latest, valor novo com 43 caracteres ou mais"
+    },
+    "iam": [
+      { "role": "roles/datastore.user", "scope": "project" },
+      { "role": "roles/firebaseauth.viewer", "scope": "project" },
+      { "role": "custom: firebaseauth.users.update", "scope": "project" },
+      { "role": "roles/storage.objectUser", "scope": "bucket" },
+      { "role": "roles/secretmanager.secretAccessor", "scope": "secret" }
+    ]
+  },
+  "frontend": {
+    "vercelProject": "lastro-homolog",
+    "rootDirectory": "frontend",
+    "env": {
+      "EXPO_PUBLIC_API_URL": "URL_DA_API_HOMOLOG",
+      "EXPO_PUBLIC_FIREBASE_API_KEY": "chave web pública do projeto lastro-homolog",
+      "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "lastro-homolog",
+      "EXPO_PUBLIC_WEB_BASE_URL": "https://lastro-homolog.vercel.app"
+    },
+    "notSet": ["EXPO_PUBLIC_FIREBASE_AUTH_EMULATOR_URL"],
+    "authorizedDomains": ["lastro-homolog.vercel.app"],
+    "depende": "Decisão sobre o plano Vercel. Se a URL final for outra, atualizar CORS_ORIGINS e os domínios autorizados."
+  },
+  "jobs": {
+    "enabledBySchedule": false,
+    "serviceAccounts": {
+      "job": "lastro-job-homolog: roles/datastore.user e acesso ao segredo",
+      "scheduler": "lastro-scheduler-homolog: apenas roles/run.invoker no job de recorrências"
+    },
+    "items": [
+      {
+        "name": "lastro-recurring-homolog",
+        "args": "dist/src/jobs/recurringExpenses.js",
+        "maxRetries": 1,
+        "dryRunFirst": true,
+        "schedule": { "cron": "30 6 * * *", "timeZone": "America/Sao_Paulo", "activate": "aprovação própria" }
+      },
+      {
+        "name": "lastro-billing-homolog",
+        "args": "dist/src/jobs/billingCycle.js",
+        "maxRetries": 0,
+        "schedule": null,
+        "note": "Execução manual. Também não existe na produção: decidir à parte."
+      },
+      {
+        "name": "lastro-rollback-check-homolog",
+        "args": "dist/src/jobs/gestaoRollbackCheck.js",
+        "maxRetries": 0,
+        "schedule": null,
+        "note": "Só leitura. Código de saída 2 indica bloqueio de reversão, não falha."
+      }
+    ]
+  },
+  "observability": {
+    "budget": {
+      "displayName": "Lastro homologação",
+      "amountBRL": 50,
+      "thresholdPercent": [50, 90, 100],
+      "creditTypesTreatment": "EXCLUDE_ALL_CREDITS",
+      "note": "Avisa e não bloqueia gasto."
+    },
+    "notificationChannel": {
+      "type": "email",
+      "addressSource": "arquivo privado, fora do repositório"
+    },
+    "uptimeCheck": { "path": "/health/live", "periodSeconds": 300 },
+    "logMetrics": [
+      {
+        "name": "recurring_generation_failures",
+        "filter": "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"lastro-recurring-homolog\" AND severity>=ERROR AND jsonPayload.event=~\"^recurring\\.generation\\.\""
+      },
+      {
+        "name": "recurring_generation_completed",
+        "filter": "resource.type=\"cloud_run_job\" AND resource.labels.job_name=\"lastro-recurring-homolog\" AND jsonPayload.event=\"recurring.generation.completed\" AND jsonPayload.dryRun=false"
+      }
+    ],
+    "alertPolicies": [
+      { "id": "api-indisponivel", "source": "verificação de uptime", "condition": "falha por 10 minutos" },
+      { "id": "api-5xx", "metric": "run.googleapis.com/request_count", "condition": "resposta 5xx acima de 5 em 5 minutos" },
+      { "id": "api-latencia", "metric": "run.googleapis.com/request_latencies", "condition": "p95 acima de 5 s por 10 minutos" },
+      { "id": "recorrencia-falhou", "metric": "logging.googleapis.com/user/recurring_generation_failures", "condition": "soma maior que 0 em 5 minutos" },
+      { "id": "recorrencia-ausente", "metric": "logging.googleapis.com/user/recurring_generation_completed", "condition": "ausência por 26 horas", "activateWith": "agendamento" }
+    ]
+  },
+  "artifactRegistry": {
+    "repository": "cloud-run-source-deploy",
+    "cleanupPolicy": "manter as 5 imagens mais recentes"
+  }
+}

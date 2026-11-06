@@ -1,6 +1,6 @@
 # Lastro: separação entre homologação e produção
 
-Proposta. Nenhum recurso foi criado ou alterado.
+Proposta. Nenhum recurso foi criado ou alterado. O plano detalhado da opção A está em [homolog-plano.md](homolog-plano.md).
 
 ## Situação atual
 
