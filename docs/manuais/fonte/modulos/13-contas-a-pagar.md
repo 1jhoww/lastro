@@ -12,7 +12,7 @@ vendedor: Só acessa se o administrador liberar. Estornos e créditos seguem a m
 
 ## Onde fica
 
-Em [[Financeiro]], escolha [[Contas a pagar]]. No celular, toque em [[Seções]] para trocar de área. Disponível quando o contrato da empresa inclui esse recurso.
+Em [[Financeiro]], escolha [[Contas a pagar]] na coluna de seções. No celular, no tablet e em janelas estreitas, toque em [[Seções]] para trocar de área. Disponível quando o contrato da empresa inclui esse recurso.
 
 Um título pode nascer de quatro formas:
 
@@ -23,7 +23,7 @@ Um título pode nascer de quatro formas:
 | Despesa recorrente | Gerada pela recorrência | Sim |
 | Lançamento manual | Em [[Nova despesa]], tipo [[Outro lançamento]] | Não: fica no caixa, como parcela de empréstimo |
 
-![Títulos a pagar por vencimento.](admin-pagar-1280.png "sem-menu h=120")
+![Títulos a pagar por vencimento.](admin-pagar-1440.png "sem-menu larga h=120")
 
 Use as visões [[A pagar]], [[Vencidos]], [[Pagos]], [[Cancelados]] e [[Todos]]. Um título aparece como ((Vencido|perigo)) sozinho, quando passa do vencimento com saldo em aberto.
 
@@ -35,7 +35,7 @@ Use as visões [[A pagar]], [[Vencidos]], [[Pagos]], [[Cancelados]] e [[Todos]].
 4. Informe **Valor**, **Emissão**, **Vencimento** e **Categoria**.
 5. Clique em [[Lançar título]].
 
-![Nova despesa.](admin-pagar-nova-1280.png "sem-menu h=125")
+![Nova despesa.](admin-pagar-nova-1440.png "sem-menu larga h=125")
 
 :::atencao Compra de mercadoria não é despesa
 Para mercadoria, use **Compras**: o título nasce na confirmação e o valor entra no custo dos produtos. Lançar aqui faz a compra aparecer como despesa e deixa o estoque sem custo.
@@ -49,9 +49,9 @@ Para mercadoria, use **Compras**: o título nasce na confirmação e o valor ent
 4. Se houver, preencha **Juros**, **Multa** e **Desconto**. O quadro **Sai do caixa** mostra o total.
 5. Clique em [[Registrar pagamento]].
 
-![Pagamento com juros, multa e desconto separados.](admin-pagar-pagamento-1280.png "sem-menu estreita")
+![Pagamento com juros, multa e desconto separados.](admin-pagar-pagamento-1440.png "sem-menu larga estreita")
 
-![Título parcialmente pago, com o histórico de pagamentos.](admin-pagar-titulo-1280.png "sem-menu h=85")
+![Título parcialmente pago, com o histórico de pagamentos.](admin-pagar-titulo-1440.png "sem-menu larga h=85")
 
 ### Estornar um pagamento
 
@@ -71,7 +71,7 @@ Aluguel, internet e tudo que se repete. Os títulos nascem até 35 dias antes do
 4. Escolha o dia do vencimento e a data de início. Em mês sem esse dia, o vencimento cai no último dia do mês.
 5. Clique em [[Criar recorrência]]. Os títulos próximos já são gerados.
 
-![Despesas recorrentes e categorias.](admin-recorrentes-1280.png "sem-menu h=120")
+![Despesas recorrentes e categorias.](admin-recorrentes-1440.png "sem-menu larga h=120")
 
 | Ação | O que acontece |
 |---|---|
@@ -102,7 +102,7 @@ Quando uma compra é encerrada com saldo, o valor pode virar crédito ou valor a
 3. Clique em [[Usar em um título]] para compensar um título de compra do mesmo fornecedor. Não há saída de dinheiro.
 4. Ou clique em [[Registrar devolução]] quando o fornecedor devolver o dinheiro. O valor entra no caixa.
 
-![Crédito do fornecedor com saldo.](admin-credito-fornecedor-1280.png "sem-menu h=98")
+![Crédito do fornecedor com saldo.](admin-credito-fornecedor-1440.png "sem-menu larga h=98")
 
 Cada movimentação pode ser desfeita com [[Estornar]], informando o motivo. Ela fica no histórico como estornada e o saldo do crédito volta.
 

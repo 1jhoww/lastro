@@ -1,4 +1,5 @@
 ---
+mes: novembro de 2026
 slug: devolucoes
 modulo: Devoluções
 titulo: Devoluções
@@ -84,7 +85,7 @@ O recebimento físico **não** gera crédito nem reembolso. O acerto é feito no
 8. Confirme sua senha e clique em [[Confirmar]].
 9. A mensagem "Acerto confirmado" mostra o total acertado. Saldos, créditos e reembolsos já foram atualizados.
 
-![Devoluções de mercadoria no Financeiro (lista vazia na demonstração).](admin-financeiro-devolucoes-1280.png "sem-menu h=58")
+![Devoluções de mercadoria no Financeiro (lista vazia na demonstração).](admin-financeiro-devolucoes-1440.png "sem-menu larga h=58")
 
 O Lastro calcula os valores pelo preço registrado no pedido: primeiro abate o que está em aberto nas parcelas; o que já tinha sido pago vai para o destino escolhido.
 

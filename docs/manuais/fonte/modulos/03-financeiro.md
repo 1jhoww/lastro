@@ -1,4 +1,5 @@
 ---
+mes: novembro de 2026
 slug: financeiro
 modulo: Financeiro
 titulo: Financeiro
@@ -34,6 +35,7 @@ Clique em [[Financeiro]] no menu lateral. Em telas largas, as seções ficam em 
 - [[Visão geral]]: quanto falta receber e o que vence em breve.
 - [[Contas a receber]]: parcelas dos clientes e registro de pagamentos.
 - [[Relatórios]]: relatórios do financeiro, com filtros e exportação.
+- [[Painel de gestão]], [[Contas a pagar]] e [[Despesas recorrentes]]: aparecem quando o contrato da empresa inclui esses recursos.
 - Em **Mais opções**: [[Créditos]], [[Reembolsos]], [[Histórico e operações]] e [[Condições e formas]].
 
 No celular, no tablet e em janelas estreitas, toque no nome da seção atual para trocar de seção. Só aparecem as seções incluídas no contrato da empresa e nas suas permissões.
@@ -42,7 +44,7 @@ No celular, no tablet e em janelas estreitas, toque no nome da seção atual par
 
 A Visão geral mostra os indicadores **Total a receber**, os títulos vencidos, **Vence em 7 dias** e o **Recebido** no mês atual, já descontados os estornos. Abaixo ficam **Próximos vencimentos** (vencidos primeiro), **Recebimentos recentes** e o quadro **Precisa de atenção**, com reembolsos a registrar e operações em andamento.
 
-![Visão geral do Financeiro, com indicadores e próximos vencimentos.](admin-financeiro-1280.png "sem-menu h=84")
+![Visão geral do Financeiro, com indicadores e próximos vencimentos.](admin-financeiro-1440.png "sem-menu larga h=84")
 
 ## Cadastrar condições e formas de pagamento
 
@@ -80,7 +82,7 @@ Para tirar uma condição ou forma de uso, abra o cadastro e desmarque **Dispon�
 3. Para filtrar, use [[Cliente]] ou [[Período]] (**Vencimento de** e **Vencimento até**). Para tirar o período, clique em [[Limpar período]].
 4. Clique em uma parcela para abrir a ficha e registrar o pagamento.
 
-![Contas a receber: cada linha é uma parcela, com vencimento, situação, valor, recebido e saldo.](admin-financeiro-receber-1280.png "sem-menu h=84")
+![Contas a receber: cada linha é uma parcela, com vencimento, situação, valor, recebido e saldo.](admin-financeiro-receber-1440.png "sem-menu larga h=84")
 
 As situações mais comuns são ((Vencido|perigo)), ((Vence hoje|alerta)), ((A vencer)), ((Parcial|destaque)) e ((Quitado|sucesso)). O pagamento parcial mantém a parcela em aberto com o saldo restante.
 
@@ -113,7 +115,7 @@ Se aparecer "Nenhuma forma de pagamento ativa", cadastre ao menos uma em [[Condi
 
 Use quando a data de uma parcela precisa mudar depois da confirmação do pedido: um novo prazo combinado com o cliente, uma data digitada errado ou uma parcela vencida que será paga em outra data. Não é preciso cancelar e recriar o pedido.
 
-![Ficha da parcela, com o vencimento atual e o botão Alterar vencimento.](admin-parcela-1280.png "sem-menu h=66")
+![Ficha da parcela, com o vencimento atual e o botão Alterar vencimento.](admin-parcela-1440.png "sem-menu larga h=66")
 
 1. Abra [[Financeiro]] › [[Contas a receber]] e clique na parcela.
 2. Abaixo do **Saldo a receber** e do vencimento atual, clique em [[Alterar vencimento]].

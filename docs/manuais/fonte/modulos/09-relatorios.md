@@ -12,6 +12,8 @@ vendedor: Só acessa se o administrador liberar. Vê relatórios comerciais dos 
 
 ## Relatórios disponíveis
 
+Os relatórios financeiros e de gestão também abrem em [[Financeiro]] › [[Relatórios]], com as mesmas regras de acesso.
+
 | Categoria | Relatório | Filtros |
 |---|---|---|
 | Comercial | Vendas por período | Período, cliente, produto, vendedor |

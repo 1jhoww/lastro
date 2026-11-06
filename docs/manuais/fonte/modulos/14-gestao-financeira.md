@@ -16,7 +16,7 @@ vendedor: Só acessa se o administrador liberar. Os relatórios financeiros vale
 2. Escolha [[Painel de gestão]].
 3. Escolha o período: [[Este mês]], [[Mês passado]] ou [[Últimos 90 dias]].
 
-![Painel de gestão.](admin-gestao-painel-1280.png "sem-menu h=150")
+![Painel de gestão.](admin-gestao-painel-1440.png "sem-menu larga h=150")
 
 Clique em um quadro para abrir a lista que deu origem ao número. Disponível quando o contrato da empresa inclui esse recurso.
 
@@ -100,7 +100,7 @@ Ele não considera tributos, depreciação nem devoluções. Não substitui o lu
 
 ![Painel de gestão no celular.](admin-gestao-painel-390.png "estreita h=118")
 
-No celular, toque em [[Seções]] no topo do Financeiro para trocar de área.
+No celular, no tablet e em janelas estreitas, toque em [[Seções]] no topo do Financeiro para trocar de área.
 
 ## Quem pode fazer o quê
 

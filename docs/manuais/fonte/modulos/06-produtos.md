@@ -44,7 +44,7 @@ Todo produto novo começa com estoque zerado. As quantidades entram pelo módulo
 6. Escolha a **Unidade de venda**:
    - **Unidade (UN)**, **Caixa (CX)** e **Pacote (PCT)** aceitam só quantidades inteiras;
    - **Quilo (KG)** e **Litro (L)** aceitam até 3 casas decimais.
-7. Informe o **Preço** por unidade (até R$ 1.000.000,00). Quando o contrato inclui custos e você tem acesso a eles, o grupo **Custo e margem** aceita o custo de referência e mostra a margem estimada enquanto você digita.
+7. Informe o **Preço** por unidade (até R$ 1.000.000,00). Se o grupo **Custo e margem** aparecer, informe também quanto você paga (veja **Custo e margem**).
 8. Se quiser alerta de reposição, informe o **Estoque mínimo** na mesma unidade.
 9. Deixe marcado **Produto ativo** para que ele apareça nos pedidos.
 10. Marque **Visível no catálogo público** se o produto deve aparecer na vitrine.
@@ -81,7 +81,38 @@ O novo preço vale para os próximos pedidos. Pedidos já registrados mantêm o 
 
 A ficha mostra o **Preço de tabela**, a categoria, a unidade (com as casas decimais aceitas), a descrição, a foto no quadro **Imagem** e o resumo do **Estoque** (disponível, reservado e físico), com atalhos para [[Abrir estoque]], [[Registrar entrada]] e [[Movimentações]].
 
-![Ficha do produto com a foto e o resumo do estoque.](admin-produto-detalhe-1280.png "sem-menu h=80")
+![Ficha do produto com a foto e o resumo do estoque. O quadro Custos e margem depende do contrato.](admin-produto-detalhe-1280.png "sem-menu h=120")
+
+## Custo e margem
+
+Quando o contrato inclui custos e você tem acesso a eles, o cadastro e a edição mostram o grupo **Custo e margem**. Informe quanto paga pelo produto, sem precisar lançar uma compra. A margem é recalculada enquanto você digita.
+
+| Custo | O que é |
+|---|---|
+| **Custo de referência** | Valor informado por você. É opcional e pode ser alterado a qualquer momento. |
+| **Custo médio do estoque** | Custo real, calculado a cada compra recebida. Não pode ser editado. Antes do primeiro recebimento aparece **Ainda não calculado**. |
+
+![Novo produto: custo de referência, margem estimada e custo médio ainda não calculado.](admin-produto-custo-novo-1280.png)
+
+Depois de receber compras, o quadro mostra as duas margens: a estimada pelo custo de referência e a calculada pelo custo médio. Na ficha do produto, a margem usa o custo médio quando ele existe; sem ele, usa o custo de referência.
+
+![Edição de um produto que já tem custo médio.](admin-produto-custo-editar-1280.png)
+
+:::nota O que o custo de referência não muda
+Editar o custo de referência não movimenta o estoque, não altera o custo médio já apurado e não muda a margem de pedidos já confirmados. O custo de referência é sugerido nas próximas compras.
+:::
+
+### Quando o custo não é salvo
+
+O produto e o custo são gravados em duas etapas. Se o produto for salvo e o custo não, o cadastro **continua valendo** e nada precisa ser digitado de novo.
+
+![Produto cadastrado com o custo pendente e as opções para continuar.](admin-produto-custo-falha-1280.png "sem-menu h=78")
+
+1. No cadastro, a tela mostra "Custo não salvo", com o motivo e o valor informado.
+2. Clique em [[Tentar novamente]] para reenviar o custo, ou em [[Continuar sem custo]] para informá-lo depois, na ficha. A foto escolhida é enviada em seguida.
+3. Na edição, o aviso aparece acima de [[Salvar produto]] e o formulário continua preenchido. Clique em [[Tentar novamente]] no aviso.
+
+Não cadastre o mesmo produto de novo: ele já existe.
 
 ## Fotos dos produtos
 

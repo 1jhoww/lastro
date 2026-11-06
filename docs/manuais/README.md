@@ -11,7 +11,7 @@ wordmark de `frontend/src/brand`).
 | `lastro-manual-financeiro.pdf` | Termos, navegação, condições e formas, contas a receber, registrar pagamento, correção de vencimento (regras, restrições e histórico), estorno, crédito do cliente, reembolsos, créditos, cancelamento financeiro, financeiro do pedido |
 | `lastro-manual-clientes.pdf` | Carteira, busca, cadastro (CEP), ficha, edição, transferência de carteira, desativação, visão do vendedor |
 | `lastro-manual-visitas.pdf` | Visitas e contatos, registro de visita, recompra, histórico do cliente |
-| `lastro-manual-produtos.pdf` | Cadastro, SKU, unidade, preço, edição, fotos (formatos, limites, adicionar depois, falha e nova tentativa), desativação, categorias |
+| `lastro-manual-produtos.pdf` | Cadastro, SKU, unidade, preço, edição, custo e margem, fotos (formatos, limites, adicionar depois, falha e nova tentativa), desativação, categorias |
 | `lastro-manual-estoque.pdf` | Físico/reservado/disponível, entradas, ajustes, movimentações, reposição |
 | `lastro-manual-devolucoes.pdf` | Registro, recebimento físico (vendável/danificado), cancelamento de pendências, acerto financeiro |
 | `lastro-manual-relatorios.pdf` | Catálogo de relatórios, filtros, CSV/PDF, exportação de cadastros |
@@ -27,7 +27,7 @@ Cada manual tem capa, índice com páginas, passo a passo numerado, caixas de di
 ser desfeito", tabela "Quem pode fazer o quê" (administrador × vendedor, conforme
 `backend/src/modules/users/permissions.ts`) e rodapé com paginação.
 
-As capturas ficam em `fonte/capturas/` (telas a 1280 px e 390 px, com densidade 2x, e as
+As capturas ficam em `fonte/capturas/` (telas a 1280 px e 390 px, com densidade 2x; as do Financeiro a 1440 px, para mostrar a coluna de seções; e as
 páginas de PDF `pdf-*.png`). Foram feitas no app local com os emuladores e usam só dados
 fictícios: a empresa "Distribuidora Demo Lastro" do seed local (`backend/scripts/seed-local.ts`,
 plano Profissional nos manuais anteriores e Gestão nos três manuais do plano, com logotipo e fotos de demonstração) e a empresa "Mercearia Demo Essencial"

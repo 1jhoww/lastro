@@ -394,6 +394,8 @@ figure .moldura {
 figure img { display: block; width: 100%; object-fit: cover; object-position: top left; }
 /* Captura de 1280 px sem o menu lateral (248 px): mostra só a área de trabalho, maior. */
 figure.sem-menu img { width: 124.03%; max-width: none; margin-left: -24.03%; }
+/* Captura de 1440 px, necessária para a coluna de seções do Financeiro aparecer. */
+figure.sem-menu.larga img { width: 120.81%; margin-left: -20.81%; }
 figure.estreita { width: 62%; }
 /* Bloco lado a lado: texto e captura de celular. */
 .lado { display: flex; gap: 7mm; align-items: flex-start; break-inside: avoid; margin: 0 0 3mm; }
