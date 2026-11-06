@@ -213,6 +213,9 @@ export const appendChain = (previous: string, entry: SourceProof) =>
 export function ensure(condition: unknown): asserts condition {
   requireCondition(condition, 409, 'FINANCIAL_INTEGRITY', 'Plano financeiro inconsistente');
 }
+/** Reservations a cancellation releases: the sold lines, then the bonus lines. */
+export const stockLines = (e: FinancialExecution) =>
+  e.baseline.lineCount + (e.baseline.bonusLineCount ?? 0);
 export function move(
   e: FinancialExecution,
   status: FinancialExecution['status'],

@@ -24,11 +24,12 @@ import { reportCsv, reportFilename, reportPdf } from './reportFiles.js';
 import type { TenantLogoService } from '../tenants/logoService.js';
 import { hasFeature } from '../plans/catalog.js';
 import { addDays, daysBetween } from './dates.js';
-import { featureNotInPlan, requirePermission } from '../users/permissions.js';
+import { featureNotInPlan, holds, requirePermission } from '../users/permissions.js';
 import { formatQuantity, parseQuantity } from '../inventory/quantities.js';
 import { brl, orderNumber } from '../documents/pdfLayout.js';
 import { expenseCategorySchema } from '../../shared/schemas/management.js';
 import { managementReport, type ManagementReportId } from './managementReports.js';
+import { bonusKindLabel, bonusReport, isBonusReport, type BonusReportId } from './bonusReports.js';
 
 export const REPORT_CAPS = {
   orders: 2500,
@@ -115,6 +116,45 @@ const managementDefinitions: Record<ManagementReportId, Definition> = {
     title: 'Despesas por categoria',
     description: 'Despesas operacionais por competência.',
     filters: ['from', 'to', 'categoryId'],
+  },
+};
+const bonusFilters: Filter[] = ['from', 'to', 'customerId', 'productId', 'sellerUid', 'bonusKind'];
+const bonusDefinitions: Record<BonusReportId, Definition> = {
+  'bonuses-period': {
+    category: 'commercial',
+    title: 'Bonificações por período',
+    description: 'Cada bonificação concedida, avulsa ou vinculada a pedido.',
+    filters: bonusFilters,
+  },
+  'bonuses-customers': {
+    category: 'commercial',
+    title: 'Bonificações por cliente',
+    description: 'Quanto cada cliente recebeu em bonificações.',
+    filters: ['from', 'to', 'productId', 'sellerUid', 'bonusKind'],
+  },
+  'bonuses-sellers': {
+    category: 'commercial',
+    title: 'Bonificações por responsável',
+    description: 'Bonificações concedidas por vendedor ou responsável.',
+    filters: ['from', 'to', 'customerId', 'productId', 'bonusKind'],
+  },
+  'bonuses-products': {
+    category: 'commercial',
+    title: 'Bonificações por produto',
+    description: 'Produtos mais bonificados, com unidades que não retornaram.',
+    filters: bonusFilters,
+  },
+  'bonuses-orders': {
+    category: 'commercial',
+    title: 'Bonificações por pedido',
+    description: 'Bonificações vinculadas e o pedido de cada uma.',
+    filters: ['from', 'to', 'customerId', 'productId', 'sellerUid'],
+  },
+  'bonuses-reasons': {
+    category: 'commercial',
+    title: 'Motivos das bonificações avulsas',
+    description: 'Por que as bonificações avulsas foram concedidas.',
+    filters: ['from', 'to', 'customerId', 'productId', 'sellerUid'],
   },
 };
 export const reportDefinitions: Record<ReportId, Definition> = {
@@ -208,6 +248,7 @@ export const reportDefinitions: Record<ReportId, Definition> = {
     filters: ['from', 'to', 'productId', 'movement'],
   },
   ...managementDefinitions,
+  ...bonusDefinitions,
 };
 
 const orderStatusLabel: Record<Order['status'], string> = {
@@ -233,10 +274,12 @@ const movementLabel: Record<Movement['type'], string> = {
   STOCK_RETURN: 'Devolução recebida',
   STOCK_PURCHASE_ENTRY: 'Recebimento de compra',
   STOCK_PURCHASE_REVERSAL: 'Estorno de recebimento',
+  STOCK_BONUS_OUT: 'Saída por bonificação',
+  STOCK_BONUS_RETURN: 'Retorno de bonificação',
 };
 const movementGroup: Record<NonNullable<ReportQuery['movement']>, Movement['type'][]> = {
-  entries: ['STOCK_ENTRY', 'STOCK_RETURN', 'STOCK_PURCHASE_ENTRY'],
-  exits: ['STOCK_DISPATCH', 'STOCK_PURCHASE_REVERSAL'],
+  entries: ['STOCK_ENTRY', 'STOCK_RETURN', 'STOCK_PURCHASE_ENTRY', 'STOCK_BONUS_RETURN'],
+  exits: ['STOCK_DISPATCH', 'STOCK_PURCHASE_REVERSAL', 'STOCK_BONUS_OUT'],
   adjustments: ['STOCK_ADJUSTMENT_IN', 'STOCK_ADJUSTMENT_OUT'],
   reservations: ['STOCK_RESERVATION', 'STOCK_RESERVATION_RELEASE'],
 };
@@ -417,7 +460,10 @@ export class ReportService {
           requirePermission(ctx.membership, ctx.entitlements, 'inventory:manage');
         if (definition.category === 'management')
           requirePermission(ctx.membership, ctx.entitlements, 'financial-reports:read');
-        if (id === 'sales-sellers' && !hasFeature(ctx.entitlements, 'commercial.sellers'))
+        if (
+          (id === 'sales-sellers' || id === 'bonuses-sellers') &&
+          !hasFeature(ctx.entitlements, 'commercial.sellers')
+        )
           throw featureNotInPlan();
         // Management reports are company-wide by nature; holding them is an explicit grant.
         const portfolio =
@@ -505,6 +551,22 @@ export class ReportService {
       case 'stock-movements':
         return this.movements(env, query);
       default:
+        if (isBonusReport(id))
+          return bonusReport(
+            {
+              repo: this.repo,
+              tx: env.tx,
+              tenantId: env.tenantId,
+              timezone: env.timezone,
+              scope: env.portfolio ? { uid: env.ctx.actor.uid, portfolio: env.portfolio } : null,
+              showCosts: holds(env.ctx, 'costs:read'),
+              period: this.period(query, this.monthToDate(env)),
+              zonedStart,
+              people: (uids) => this.people(uids),
+            },
+            id,
+            query,
+          );
         return managementReport(
           {
             repo: this.repo,
@@ -1266,7 +1328,9 @@ export class ReportService {
                 ? m.type === 'STOCK_ENTRY'
                   ? 'Entrada manual'
                   : 'Ajuste manual'
-                : 'Automática (pedido)',
+                : m.origin === 'bonus'
+                  ? 'Bonificação'
+                  : 'Automática (pedido)',
             reason: m.reason === m.type ? '' : m.reason,
           },
           { kind: 'product', id: m.productId },
@@ -1320,6 +1384,8 @@ export class ReportService {
   /** Human-readable filters for screens and exported files. */
   private async filterLabels(env: Env, query: ReportQuery) {
     const labels: ReportView['filters'] = [];
+    if (query.bonusKind)
+      labels.push({ label: 'Tipo', value: bonusKindLabel[query.bonusKind] });
     if (query.status) labels.push({ label: 'Situação', value: statusFilterLabel[query.status] });
     if (query.customerId) {
       const customer = await this.repo.foundation.read(

@@ -46,6 +46,8 @@ export const movementTypes = [
   'STOCK_RETURN',
   'STOCK_PURCHASE_ENTRY',
   'STOCK_PURCHASE_REVERSAL',
+  'STOCK_BONUS_OUT',
+  'STOCK_BONUS_RETURN',
 ] as const;
 export type MovementType = (typeof movementTypes)[number];
 export function transition(
@@ -73,10 +75,12 @@ export function transition(
     case 'STOCK_ADJUSTMENT_IN':
     case 'STOCK_RETURN':
     case 'STOCK_PURCHASE_ENTRY':
+    case 'STOCK_BONUS_RETURN':
       nextPhysical += quantity;
       break;
     case 'STOCK_ADJUSTMENT_OUT':
     case 'STOCK_PURCHASE_REVERSAL':
+    case 'STOCK_BONUS_OUT':
       nextPhysical -= quantity;
       break;
     case 'STOCK_RESERVATION':

@@ -5,12 +5,13 @@ import type { FinancialExecution } from '../../../shared/schemas/financialExecut
 import * as s from '../../../shared/schemas/finance.js';
 import * as r from '../../../shared/schemas/returns.js';
 import { orderEventSchema } from '../../../shared/schemas/orders.js';
+import { followOrder, readOrderBonus } from '../../bonuses/orderBonus.js';
 import { financialGuardSchema } from '../../receivables/orderReceivables.js';
 import { financialEventHash } from '../financialBook.js';
 import { returnEventHash } from '../../returns/returnService.js';
 import { returnState } from '../../returns/calculation.js';
 import type { ResolutionPhases } from './executionPhases.js';
-import { sourcePlanSchema, ensure, type ResolutionPlan } from './executionModel.js';
+import { sourcePlanSchema, ensure, stockLines, type ResolutionPlan } from './executionModel.js';
 import { generationSchema, activeGenerationId } from './sourceIndex.js';
 import {
   orderLifecycleSchema,
@@ -157,7 +158,7 @@ export class ExecutionPublication {
         p.finalChain === p.sealedChain &&
         e.progress.applied === e.proofEntryCount &&
         e.progress.validated === e.proofEntryCount &&
-        (e.kind !== 'cancellation' || e.progress.releasedReservations === e.baseline.lineCount),
+        (e.kind !== 'cancellation' || e.progress.releasedReservations === stockLines(e)),
     );
     const finance = this.phases.finance,
       repo = finance.repo;
@@ -168,6 +169,9 @@ export class ExecutionPublication {
         stableJson(book.titles) === stableJson(e.baseline.titles) &&
         digest(stableJson(book.order)) === e.baseline.orderHash,
     );
+    const bonus = e.baseline.bonusLineCount
+      ? await readOrderBonus(repo, tx, e.tenantId, e.orderId)
+      : null;
     if (returned) {
       const raw = (await tx.get(repo.ref(e.tenantId, 'returns', e.returnId!))).data();
       ensure(
@@ -314,6 +318,16 @@ export class ExecutionPublication {
     if (lifecycle) {
       tx.update(repo.ref(e.tenantId, 'orders', e.orderId), { status: 'canceled' });
       tx.create(repo.ref(e.tenantId, 'orderLifecycleStates', e.orderId), lifecycle);
+      if (bonus)
+        followOrder(
+          repo,
+          tx,
+          actor,
+          bonus,
+          { status: 'canceled', updatedAt: now },
+          e.reason,
+          digest(`orders:${e.id}`),
+        );
       const id = digest(`order-finance-event:${e.id}`);
       tx.create(
         repo.ref(e.tenantId, 'orderEvents', id),

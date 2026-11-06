@@ -250,6 +250,7 @@ export const baseResources: readonly {
       'orders:all:manage',
       'orders:dispatch',
       'discounts:apply',
+      'bonuses:grant',
       'documents:own:read',
       'returns:manage',
     ],

@@ -35,6 +35,8 @@ import { CatalogService } from '../modules/catalog/catalogService.js';
 import { publicCatalogRoutes } from './catalogRoutes.js';
 import { publicCatalogMemoryLimit } from '../middlewares/rateLimit.js';
 import { DocumentService } from '../modules/documents/documentService.js';
+import { BonusService } from '../modules/bonuses/bonusService.js';
+import { zonedStart } from '../modules/reports/reportService.js';
 import { ExportService } from '../modules/documents/exportService.js';
 import { ingressLimit } from '../middlewares/ingressLimit.js';
 import { readiness } from './readiness.js';
@@ -81,8 +83,9 @@ export function createApp(
     clock,
     paymentSettings,
   );
+  const bonuses = new BonusService(commercial, access, inventory, clock, zonedStart, firebase.auth);
   const downloadBudget = new ReadGate();
-  const documents = new DocumentService(orders, undefined, downloadBudget, logos, images);
+  const documents = new DocumentService(orders, undefined, downloadBudget, logos, images, bonuses);
   const exports = new ExportService(
     customers,
     products,
@@ -175,6 +178,7 @@ export function createApp(
       images,
       inventory,
       orders,
+      bonuses,
       paymentSettings,
       finance,
       financialReads,

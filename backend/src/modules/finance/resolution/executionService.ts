@@ -53,6 +53,7 @@ import {
   view,
   type ResolutionPlan,
 } from './executionModel.js';
+import { readOrderBonus } from '../../bonuses/orderBonus.js';
 
 const terminal = (e: FinancialExecution) => ['COMPLETED', 'ABORTED'].includes(e.status);
 const uuidFor = (value: string) => {
@@ -285,6 +286,9 @@ export class FinancialExecutions {
             seenDecisions: 0,
           };
         }
+        const bonus = returnId
+          ? null
+          : await readOrderBonus(this.repo, tx, tenantId, book.order.id);
         const chain = chainStart({ tenantId, id }),
           snapshot = this.finance.book.snapshot(book.state, book.titles);
         const e = executionSchema.parse({
@@ -337,6 +341,7 @@ export class FinancialExecutions {
             orderVersion: book.order.version,
             orderHash: digest(stableJson(book.order)),
             lineCount: book.order.lines.length,
+            ...(bonus ? { bonusLineCount: bonus.lines.length } : {}),
             customerId: book.order.customerId,
             guard: book.guard,
             state: book.state,

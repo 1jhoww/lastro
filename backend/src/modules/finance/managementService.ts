@@ -209,6 +209,14 @@ export class ManagementService {
             notes.push(
               'Mercadorias cobradas e não entregues aparecem em linha própria: reduzem o resultado estimado, mas não o custo das mercadorias vendidas nem a margem bruta.',
             );
+          if (profit.bonusesGrantedCents > 0)
+            notes.push(
+              'Bonificações concedidas aparecem em linha própria: reduzem o resultado estimado, mas não o faturamento, o custo das mercadorias vendidas nem a margem bruta.',
+            );
+          if (profit.bonusesWithoutCost > 0)
+            notes.push(
+              `${profit.bonusesWithoutCost} bonificação(ões) do período não têm custo registrado e ficam fora do resultado estimado.`,
+            );
           return s.managementOverview.parse({
             period,
             today,

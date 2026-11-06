@@ -27,6 +27,9 @@ import { inventoryRoutes } from './inventoryRoutes.js';
 import type { InventoryService } from '../modules/inventory/inventoryService.js';
 import * as inventorySchemas from '../shared/schemas/inventory.js';
 import { orderRoutes } from './orderRoutes.js';
+import { bonusRoutes } from './bonusRoutes.js';
+import * as bonusSchemas from '../shared/schemas/bonuses.js';
+import type { BonusService } from '../modules/bonuses/bonusService.js';
 import * as orderSchemas from '../shared/schemas/orders.js';
 import type { OrderService } from '../modules/orders/orderService.js';
 import { paymentSettingsRoutes } from './paymentSettingsRoutes.js';
@@ -105,6 +108,7 @@ export const routeDefinitions: Route[] = [
   ...financeRoutes,
   ...returnRoutes,
   ...paymentSettingsRoutes,
+  ...bonusRoutes,
   ...orderRoutes,
   ...inventoryRoutes,
   ...commercialRoutes,
@@ -340,6 +344,7 @@ export function createRoutes(
   images: ImageService,
   inventory: InventoryService,
   orders: OrderService,
+  bonuses: BonusService,
   paymentSettings: PaymentSettingsService,
   finance: FinancialService,
   financialReads: FinancialReads,
@@ -737,6 +742,26 @@ export function createRoutes(
         limitFor(req),
         cursorFor(req),
       ),
+    listBonuses: (req) =>
+      bonuses.list(actorFor(req), selectedTenant(req), bonusSchemas.bonusQuery.parse(req.query)),
+    createBonus: (req) =>
+      bonuses.create(
+        actorFor(req),
+        selectedTenant(req),
+        bonusSchemas.bonusCreate.parse(req.body),
+        idempotencyKey(req),
+      ),
+    getBonus: (req) => bonuses.get(actorFor(req), selectedTenant(req), idFor(req)),
+    returnBonus: (req) =>
+      bonuses.registerReturn(
+        actorFor(req),
+        selectedTenant(req),
+        idFor(req),
+        bonusSchemas.bonusReturnInput.parse(req.body),
+        idempotencyKey(req),
+      ),
+    downloadBonusReceipt: (req) =>
+      documents.bonusReceipt(actorFor(req), selectedTenant(req), idFor(req)),
     downloadCommercialOrder: (req) =>
       documents.download(actorFor(req), selectedTenant(req), idFor(req), 'commercial'),
     downloadPackingOrder: (req) =>

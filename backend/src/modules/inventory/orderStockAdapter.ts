@@ -1,14 +1,12 @@
 import type { Transaction } from 'firebase-admin/firestore';
 import type { OrderStockPort, ValidatedOrderStockOperation } from './orderStockContract.js';
 import type { InventoryService } from './inventoryService.js';
-import { movementHash } from './inventoryService.js';
-import { productSchema } from '../../shared/schemas/commercial.js';
 import { orderSchema, stockReservationSchema } from '../../shared/schemas/orders.js';
-import { movementSchema } from '../../shared/schemas/inventory.js';
-import { parseQuantity, transition } from './quantities.js';
-import { projectStock } from './stockProjection.js';
+import { parseQuantity } from './quantities.js';
 import { digest } from '../../shared/utils/crypto.js';
 import { requireCondition } from '../../shared/errors/appError.js';
+import { readOrderBonus } from '../bonuses/orderBonus.js';
+import { StockLedger } from './stockLedger.js';
 export const reservationIdFor = (
   tenantId: string,
   orderId: string,
@@ -26,6 +24,11 @@ export class FirestoreOrderStockAdapter implements OrderStockPort {
     );
     return this.prepare(tx, op, true);
   }
+  /**
+   * Stock effect of an order transition. The bonus of the order moves with it: callers list only
+   * the sold lines and this adapter adds the bonus lines, so no path can dispatch or release an
+   * order without its bonus. Partial batches come from a plan that already lists both.
+   */
   async prepare(tx: Transaction, op: ValidatedOrderStockOperation, partialRelease = false) {
     const repo = this.inventory.repo,
       tenantId = op.context.tenant.id;
@@ -44,20 +47,37 @@ export class FirestoreOrderStockAdapter implements OrderStockPort {
       'Pedido indisponível ou alterado',
     );
     const reserving = op.type === 'STOCK_RESERVATION';
+    const bonus = await readOrderBonus(repo, tx, tenantId, order.id);
     const linesById = new Map(order.lines.map((line) => [line.id, line]));
+    const bonusById = new Map(bonus?.lines.map((line) => [line.id, line]));
+    const total = order.lines.length + bonusById.size;
     requireCondition(
       (reserving ? order.status === 'draft' : order.status === 'confirmed') &&
+        (!bonus || bonus.status === (reserving ? 'draft' : 'confirmed')) &&
         (partialRelease
-          ? op.items.length > 0 && op.items.length <= order.lines.length
-          : op.items.length === order.lines.length) &&
-        new Set(op.items.map((i) => i.productId)).size === op.items.length,
+          ? op.items.length > 0 && op.items.length <= total
+          : op.items.length === order.lines.length &&
+            new Set(op.items.map((i) => i.productId)).size === op.items.length) &&
+        new Set(op.items.map((i) => i.lineId)).size === op.items.length,
       409,
       'INVALID_RESERVATION',
       'Operação de reserva inválida',
     );
-    const staged = await Promise.all(
-      op.items.map(async (item) => {
-        const line = linesById.get(item.lineId);
+    const items = partialRelease
+      ? op.items
+      : [
+          ...op.items,
+          ...(bonus?.lines ?? []).map((line) => ({
+            lineId: line.id,
+            productId: line.productId,
+            quantityScaled: parseQuantity(line.quantity, line.unit),
+            reservationId: reservationIdFor(tenantId, order.id, line.id, line.productId),
+          })),
+        ];
+    const ledger = new StockLedger(this.inventory, tx, tenantId);
+    const loaded = await Promise.all(
+      items.map(async (item) => {
+        const line = linesById.get(item.lineId) ?? bonusById.get(item.lineId);
         const id = reservationIdFor(tenantId, order.id, item.lineId, item.productId);
         requireCondition(
           line &&
@@ -86,11 +106,7 @@ export class FirestoreOrderStockAdapter implements OrderStockPort {
           'INVALID_RESERVATION',
           'Reserva indisponível ou de outro pedido',
         );
-        const product = await repo.foundation.read(
-          repo.ref(tenantId, 'products', item.productId),
-          productSchema,
-          tx,
-        );
+        const product = await ledger.product(item.productId);
         requireCondition(
           product?.id === item.productId &&
             product.tenantId === tenantId &&
@@ -100,73 +116,49 @@ export class FirestoreOrderStockAdapter implements OrderStockPort {
           'PRODUCT_UNAVAILABLE',
           'Produto indisponível ou unidade alterada',
         );
-        const stock = await this.inventory.stockFor(product, tx);
-        const balances = transition(
-          stock.physicalScaled,
-          stock.reservedScaled,
-          op.type,
-          item.quantityScaled,
-        );
-        const operationId = digest(`orders:${op.operationKey}`);
-        const movementId = digest(`${operationId}:${id}`);
-        const content = {
-          id: movementId,
-          tenantId,
-          productId: product.id,
-          type: op.type,
-          unit: line.unit,
-          quantityScaled: item.quantityScaled,
-          previousPhysicalScaled: stock.physicalScaled,
-          previousReservedScaled: stock.reservedScaled,
-          ...balances,
-          sequence: stock.movementCount + 1,
-          origin: 'order' as const,
-          originReference: order.id,
-          actorUid: op.context.actor.uid,
-          reason: op.type,
-          notes: null,
-          occurredAt: op.occurredAt,
-          requestId: op.context.actor.requestId,
-          operationId,
-          previousHash: stock.lastMovementHash,
-          schemaVersion: 1 as const,
-        };
-        const movement = movementSchema.parse({ ...content, hash: movementHash(content) });
-        const next = projectStock(
-          product,
-          {
-            ...stock,
-            ...balances,
-            version: stock.version + 1,
-            movementCount: movement.sequence,
-            lastMovementId: movementId,
-            lastMovementHash: movement.hash,
-            lastMovementAt: op.occurredAt,
-          },
-          op.occurredAt,
-        );
-        const nextReservation = stockReservationSchema.parse({
-          id,
-          tenantId,
-          orderId: order.id,
-          lineId: line.id,
-          productId: line.productId,
-          unit: line.unit,
-          quantityScaled: item.quantityScaled,
-          status: reserving ? 'reserved' : op.type === 'STOCK_DISPATCH' ? 'dispatched' : 'released',
-          createdAt: reservation?.createdAt ?? op.occurredAt,
-          updatedAt: op.occurredAt,
-          operationId,
-          schemaVersion: 1,
-        });
-        return () => {
-          tx.set(repo.ref(tenantId, 'inventory', product.id), next);
-          tx.create(repo.ref(tenantId, 'inventoryMovements', movementId), movement);
-          if (reserving) tx.create(ref, nextReservation);
-          else tx.set(ref, nextReservation);
-        };
+        return { item, line, id, ref, reservation, product };
       }),
     );
-    return { apply: () => staged.forEach((write) => write()) };
+    const operationId = digest(`orders:${op.operationKey}`);
+    const writes = loaded.map(({ item, line, id, ref, reservation, product }) => {
+      const bonified = bonusById.has(item.lineId);
+      ledger.stage(product, {
+        id: digest(`${operationId}:${id}`),
+        type: op.type,
+        quantityScaled: item.quantityScaled,
+        origin: bonified ? 'bonus' : 'order',
+        originReference: order.id,
+        actorUid: op.context.actor.uid,
+        reason: bonified ? 'Bonificação vinculada ao pedido' : op.type,
+        notes: null,
+        occurredAt: op.occurredAt,
+        requestId: op.context.actor.requestId,
+        operationId,
+      });
+      const nextReservation = stockReservationSchema.parse({
+        id,
+        tenantId,
+        orderId: order.id,
+        lineId: line.id,
+        productId: line.productId,
+        unit: line.unit,
+        quantityScaled: item.quantityScaled,
+        status: reserving ? 'reserved' : op.type === 'STOCK_DISPATCH' ? 'dispatched' : 'released',
+        createdAt: reservation?.createdAt ?? op.occurredAt,
+        updatedAt: op.occurredAt,
+        operationId,
+        schemaVersion: 1,
+      });
+      return () => {
+        if (reserving) tx.create(ref, nextReservation);
+        else tx.set(ref, nextReservation);
+      };
+    });
+    return {
+      apply: () => {
+        ledger.apply();
+        writes.forEach((write) => write());
+      },
+    };
   }
 }

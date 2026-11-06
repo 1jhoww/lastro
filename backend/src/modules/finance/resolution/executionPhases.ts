@@ -4,6 +4,7 @@ import type { TenantContext } from '../../../shared/types/context.js';
 import type { FinancialExecution } from '../../../shared/schemas/financialExecutions.js';
 import { executionLockSchema } from '../../../shared/schemas/financialExecutions.js';
 import { orderSchema, stockReservationSchema } from '../../../shared/schemas/orders.js';
+import { readOrderBonus } from '../../bonuses/orderBonus.js';
 import * as s from '../../../shared/schemas/finance.js';
 import * as r from '../../../shared/schemas/returns.js';
 import { financialOperationSchema } from '../financialCommands.js';
@@ -20,6 +21,7 @@ import {
   lotPlanSchema,
   stockPlanSchema,
   ensure,
+  stockLines,
   move,
   allocateIntent,
   appendChain,
@@ -80,7 +82,15 @@ export class ResolutionPhases {
   ) {
     if (e.phase === 'stock') {
       const order = await this.order(tx, e);
-      const items = order.lines.slice(p.stockPlanned, p.stockPlanned + limit);
+      // Bonus lines hold reservations too; they are released after the sold lines.
+      const bonus = e.baseline.bonusLineCount
+        ? await readOrderBonus(this.repo, tx, e.tenantId, e.orderId)
+        : null;
+      ensure((bonus?.lines.length ?? 0) === (e.baseline.bonusLineCount ?? 0));
+      const items = [...order.lines, ...(bonus?.lines ?? [])].slice(
+        p.stockPlanned,
+        p.stockPlanned + limit,
+      );
       const plans = [];
       for (const line of items) {
         const reservationId = reservationIdFor(e.tenantId, e.orderId, line.id, line.productId);
@@ -113,7 +123,7 @@ export class ResolutionPhases {
         );
       }
       p.stockPlanned += plans.length;
-      if (p.stockPlanned === e.baseline.lineCount) move(e, 'PLANNING', 'credits');
+      if (p.stockPlanned === stockLines(e)) move(e, 'PLANNING', 'credits');
       for (const record of plans)
         tx.create(this.repo.ref(e.tenantId, 'financialExecutionStockPlans', record.id), record);
       return;
@@ -1045,7 +1055,7 @@ export class ResolutionPhases {
     if (records.length) e.applicationStartedAt ??= now;
     e.progress.releasedReservations += records.length;
     if (page.size <= limit) {
-      ensure(e.progress.releasedReservations === e.baseline.lineCount);
+      ensure(e.progress.releasedReservations === stockLines(e));
       e.phase = 'final-check';
       e.checkpoint.phase = e.phase;
     }

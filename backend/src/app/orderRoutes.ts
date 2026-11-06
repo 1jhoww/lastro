@@ -18,7 +18,7 @@ export const orderRoutes: Route[] = [
     scope: 'tenant',
     permission: 'orders:own:create',
     body: s.orderCreate,
-    output: s.orderView,
+    output: s.orderDetailView,
     status: 201,
   },
   {
@@ -28,7 +28,7 @@ export const orderRoutes: Route[] = [
     scope: 'tenant',
     permission: 'orders:own:read',
     params: idParams,
-    output: s.orderView,
+    output: s.orderDetailView,
   },
   {
     method: 'patch',
@@ -38,7 +38,7 @@ export const orderRoutes: Route[] = [
     permission: 'orders:own:create',
     params: idParams,
     body: s.orderUpdate,
-    output: s.orderView,
+    output: s.orderDetailView,
   },
   {
     method: 'post',
@@ -48,7 +48,7 @@ export const orderRoutes: Route[] = [
     permission: 'orders:own:confirm',
     params: idParams,
     body: s.orderCommand,
-    output: s.orderView,
+    output: s.orderDetailView,
     idempotent: true,
   },
   {
@@ -59,7 +59,7 @@ export const orderRoutes: Route[] = [
     permission: 'orders:own:dispatch',
     params: idParams,
     body: s.orderCommand,
-    output: s.orderView,
+    output: s.orderDetailView,
     idempotent: true,
   },
   {
@@ -70,7 +70,7 @@ export const orderRoutes: Route[] = [
     permission: 'orders:all:manage',
     params: idParams,
     body: s.cancelCommand,
-    output: s.orderView,
+    output: s.orderDetailView,
     idempotent: true,
   },
   {

@@ -4,6 +4,13 @@ import { contractPlanCodes, planCodes } from '../../modules/plans/catalog.js';
 
 export const opaqueId = z.string().regex(/^[A-Za-z0-9_-]{1,128}$/);
 export const instant = z.iso.datetime();
+export const businessDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine((v) => {
+    const d = new Date(`${v}T12:00:00Z`);
+    return !Number.isNaN(d.valueOf()) && d.toISOString().slice(0, 10) === v;
+  }, 'Data de calendário inválida');
 export const email = z
   .email()
   .max(254)

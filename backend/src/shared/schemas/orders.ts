@@ -1,19 +1,14 @@
 import { z } from 'zod';
-import { opaqueId, instant } from './models.js';
+import { opaqueId, instant, businessDate as calendarDate } from './models.js';
 import { expectedVersion, unit, priceCents } from './commercial.js';
 import { quantityText } from './inventory.js';
 import { pageQuery, pageOf } from './http.js';
 import { termsSnapshot, methodSnapshot } from './paymentSettings.js';
+import { bonusLineSnapshot, bonusReason, bonusStatus, orderBonusInput } from './bonuses.js';
+export { calendarDate };
 export const MAX_ORDER_CENTS = 100_000_000;
 export const cents = z.number().int().min(0).max(MAX_ORDER_CENTS);
 export const orderStatus = z.enum(['draft', 'confirmed', 'dispatched', 'canceled']);
-export const calendarDate = z
-  .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/)
-  .refine((v) => {
-    const d = new Date(`${v}T12:00:00Z`);
-    return !Number.isNaN(d.valueOf()) && d.toISOString().slice(0, 10) === v;
-  }, 'Data de calendário inválida');
 export const paymentInput = z
   .strictObject({
     type: z.enum(['cash', 'installments']),
@@ -61,6 +56,7 @@ export const orderCreate = z
     payment: paymentInput.nullable().optional(),
     notes: z.string().trim().max(1000).optional(),
     discount: discountInput.optional(),
+    bonus: orderBonusInput.nullable().optional(),
     paymentConditionId: opaqueId.nullable().optional(),
     paymentConditionVersion: expectedVersion.optional(),
     intendedPaymentMethodId: opaqueId.nullable().optional(),
@@ -76,6 +72,7 @@ export const orderUpdate = z
     payment: paymentInput.nullable().optional(),
     notes: z.string().trim().max(1000).optional(),
     discount: discountInput.nullable().optional(),
+    bonus: orderBonusInput.nullable().optional(),
     paymentConditionId: opaqueId.nullable().optional(),
     paymentConditionVersion: expectedVersion.optional(),
     intendedPaymentMethodId: opaqueId.nullable().optional(),
@@ -170,6 +167,16 @@ export const orderSchema = orderView
       new Set(v.lines.map((l) => l.productId)).size === v.lines.length,
     'Pedido inconsistente',
   );
+/** Bonus of an order: no value, no cost; printed and shown apart from the sold lines. */
+export const orderBonusView = z.object({
+  id: opaqueId,
+  commercialId: z.string(),
+  status: bonusStatus,
+  lines: z.array(bonusLineSnapshot),
+  reason: bonusReason.nullable(),
+  reasonDetail: z.string().nullable(),
+});
+export const orderDetailView = orderView.extend({ bonus: orderBonusView.nullable() });
 export const orderEvent = z.object({
   id: opaqueId,
   orderId: opaqueId,

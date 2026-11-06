@@ -103,6 +103,8 @@ export const executionSchema = z
     baseline: z.strictObject({
       orderVersion: expectedVersion,
       orderHash: hash,
+      /** Bonus lines released with the order. Absent when the order has no bonus. */
+      bonusLineCount: counter.positive().optional(),
       lineCount: counter,
       customerId: opaqueId,
       guard: financialGuardSchema,

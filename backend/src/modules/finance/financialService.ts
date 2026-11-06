@@ -11,6 +11,7 @@ import type { OrderStockPort } from '../inventory/orderStockContract.js';
 import { assertDocumentFits } from '../orders/technicalSize.js';
 import { FieldPath } from 'firebase-admin/firestore';
 import { orderSchema, orderEventSchema } from '../../shared/schemas/orders.js';
+import { followOrder, readOrderBonus } from '../bonuses/orderBonus.js';
 import { digest } from '../../shared/utils/crypto.js';
 import { reservationIdFor } from '../inventory/orderStockAdapter.js';
 import { parseQuantity } from '../inventory/quantities.js';
@@ -1066,6 +1067,7 @@ export class FinancialService {
         await this.assertAtomicResolutionFits(tx, book);
         const { credits, lots } = await this.settlementSources(tx, book),
           payments = await this.cashSources(tx, book);
+        const bonus = await readOrderBonus(this.repo, tx, tenantId, orderId);
         const prepared = await this.stock.prepare(tx, {
           context: ctx,
           orderId,
@@ -1142,6 +1144,7 @@ export class FinancialService {
           );
         this.createDestinations(tx, destinations);
         prepared.apply();
+        if (bonus) followOrder(this.repo, tx, actor, bonus, nextOrder, input.reason, op);
         tx.set(this.repo.ref(tenantId, 'orders', orderId), nextOrder);
         tx.create(
           this.repo.ref(tenantId, 'orderEvents', digest(`order-finance-event:${op}`)),

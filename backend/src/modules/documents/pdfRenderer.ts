@@ -1,5 +1,6 @@
 import { AppError } from '../../shared/errors/appError.js';
 import type { Order } from '../../shared/schemas/orders.js';
+import type { Bonus } from '../../shared/schemas/bonuses.js';
 import type { Tenant } from '../../shared/schemas/models.js';
 import {
   BrandedPdf,
@@ -41,8 +42,26 @@ export interface DocumentSource {
   /** Current photo of each product in the order, by product id (branded documents only). */
   productImages?: Record<string, { id: string; sizeBytes: number }>;
   order: Order;
+  /** Bonus of the order, printed apart from the sold lines and never added to its total. */
+  bonus?: Pick<Bonus, 'commercialId' | 'lines'> | null;
   customer: CustomerContact | null;
 }
+/** Standalone or linked bonus: products and quantities only, never a value. */
+export interface BonusDocumentSource {
+  tenant: DocumentSource['tenant'];
+  bonus: Omit<Bonus, 'linePrices' | 'tenantId' | 'schemaVersion'>;
+  customer: CustomerContact | null;
+  responsibleName: string | null;
+}
+export const NO_CHARGE = 'Sem cobrança';
+export const BONUS_FOOTER = 'Comprovante gerado pelo Lastro. Não é documento fiscal.';
+const bonusReasons: Record<NonNullable<Bonus['reason']>, string> = {
+  sample: 'Amostra',
+  campaign: 'Campanha comercial',
+  relationship: 'Relacionamento',
+  damage_replacement: 'Reposição de avaria',
+  other: 'Outro',
+};
 
 export const COMMERCIAL_FOOTER = 'Documento comercial gerado pelo Lastro. Não possui valor fiscal.';
 export const PACKING_FOOTER = 'Gerado pelo Lastro — Documento não fiscal.';
@@ -75,10 +94,11 @@ export function addressLines(address: CustomerContact['address']): string[] {
     : '';
   return [street, [place, postal].filter(Boolean).join(' — ')].filter(Boolean);
 }
-const quantity = (line: Order['lines'][number]) => `${brQuantity(line.quantity)} ${line.unit}`;
+const quantity = (line: Pick<Order['lines'][number], 'quantity' | 'unit'>) =>
+  `${brQuantity(line.quantity)} ${line.unit}`;
 /** Full product name and SKU from the order line; the photo is looked up by product id. */
 const productCell = (
-  line: Order['lines'][number],
+  line: Pick<Order['lines'][number], 'name' | 'sku' | 'productId'>,
   thumbnails: ReadonlyMap<string, Buffer>,
 ): Cell => {
   const image = thumbnails.get(line.productId);
@@ -136,15 +156,164 @@ export class PdfRenderer {
     }
   }
 
+  /** Receipt of a bonus. It proves goods left without charge; it is not a fiscal document. */
+  async renderBonus(
+    source: BonusDocumentSource,
+    emittedAt: Date,
+    logo: PdfImage | null = null,
+    thumbnails: ReadonlyMap<string, Buffer> = new Map(),
+  ): Promise<Buffer> {
+    const { bonus, customer, responsibleName } = source;
+    if (bonus.status === 'draft')
+      throw new AppError(
+        409,
+        'DOCUMENT_UNAVAILABLE',
+        'Comprovante disponível depois da confirmação',
+      );
+    const number = orderNumber(bonus.commercialId);
+    const pdf = new BrandedPdf(
+      {
+        company: source.tenant.name,
+        logo,
+        title: 'COMPROVANTE DE BONIFICAÇÃO',
+        subtitle: 'Sem cobrança — Documento não fiscal',
+        reference: number,
+      },
+      BONUS_FOOTER,
+      { title: `Comprovante de bonificação ${number}`, createdAt: emittedAt },
+    );
+    try {
+      pdf.newPage();
+      const pairs: [string, string, boolean?][] = [
+        ['Número', number, true],
+        ['Data', localDate(bonus.occurredAt ?? bonus.createdAt, source.tenant.timezone)],
+        ['Tipo', bonus.kind === 'order' ? 'Vinculada a pedido' : 'Avulsa'],
+        ...(bonus.orderCommercialId
+          ? ([['Pedido', orderNumber(bonus.orderCommercialId)]] as [string, string][])
+          : []),
+        ...(responsibleName
+          ? ([['Responsável', oneLine(responsibleName)]] as [string, string][])
+          : []),
+        ...(bonus.reason
+          ? ([
+              [
+                'Motivo',
+                oneLine(bonus.reasonDetail ? bonus.reasonDetail : bonusReasons[bonus.reason]),
+              ],
+            ] as [string, string][])
+          : []),
+        ...(bonus.status === 'canceled' ? ([['Situação', 'Cancelada']] as [string, string][]) : []),
+      ];
+      this.identification(pdf, bonus.customerName, customer, 'CLIENTE', 'BONIFICAÇÃO', pairs);
+      await this.bonusLines(pdf, bonus.lines, thumbnails, 260);
+      const returned = bonus.lines.filter(
+        (l) => l.returnedSellable !== '0' || l.returnedDamaged !== '0',
+      );
+      if (returned.length) {
+        pdf.y += 10;
+        pdf.ensure(30 + returned.length * 12);
+        pdf.y += pdf.label('RETORNOS REGISTRADOS');
+        for (const line of returned)
+          pdf.paragraph(
+            `${oneLine(line.name)}: ${brQuantity(line.returnedSellable)} ${line.unit} vendável, ${brQuantity(line.returnedDamaged)} ${line.unit} danificado`,
+            { size: 8.5, color: '#333333' },
+          );
+      }
+      if (bonus.notes.trim()) {
+        pdf.y += 10;
+        pdf.ensure(40);
+        pdf.y += pdf.label('OBSERVAÇÕES');
+        pdf.paragraph(bonus.notes.trim(), { size: 8.5, color: '#333333' });
+      }
+      pdf.ensure(250);
+      this.receipt(pdf);
+      return await pdf.finish();
+    } catch (error) {
+      pdf.destroy();
+      throw error;
+    }
+  }
+
+  /** Bonus table: products and quantities. The value column never carries an amount. */
+  private async bonusLines(
+    pdf: BrandedPdf,
+    lines: Pick<Bonus, 'lines'>['lines'],
+    thumbnails: ReadonlyMap<string, Buffer>,
+    reserve = 40,
+  ) {
+    await pdf.table(
+      [
+        { label: 'Produto', width: 315 },
+        { label: 'Quantidade', width: 95, align: 'right' },
+        { label: 'Valor', width: 105, align: 'right' },
+      ],
+      lines.map((line) => [
+        productCell(line, thumbnails),
+        { text: quantity(line) },
+        { text: NO_CHARGE },
+      ]),
+      reserve,
+    );
+  }
+
+  /** Goods that go with the order, after its totals so nobody reads them as part of the sale. */
+  private async orderBonus(
+    pdf: BrandedPdf,
+    source: DocumentSource,
+    thumbnails: ReadonlyMap<string, Buffer>,
+  ) {
+    if (!source.bonus) return;
+    pdf.y += 14;
+    pdf.ensure(70);
+    pdf.y += pdf.label(`BONIFICAÇÃO ${orderNumber(source.bonus.commercialId)} — SEM COBRANÇA`);
+    pdf.y += 4;
+    await this.bonusLines(pdf, source.bonus.lines, thumbnails);
+    pdf.y += 2;
+    pdf.paragraph('Itens bonificados não entram no total do pedido.', {
+      size: 7.5,
+      color: '#8A8A8A',
+    });
+  }
+
   /** Customer on the left, order reference on the right. Only data that exists is printed. */
   private parties(pdf: BrandedPdf, source: DocumentSource, kind: 'commercial' | 'packing') {
     const { order, customer } = source;
+    const pairs: [string, string, boolean?][] = [
+      ['Número do pedido', orderNumber(order.commercialId), true],
+      ['Data do pedido', localDate(order.createdAt, source.tenant.timezone)],
+      ...(kind === 'commercial' && order.status === 'draft'
+        ? ([['Situação', 'Rascunho']] as [string, string][])
+        : []),
+      ...(kind === 'commercial' && order.status === 'canceled'
+        ? ([['Situação', 'Cancelado']] as [string, string][])
+        : []),
+    ];
+    this.identification(
+      pdf,
+      order.customerName,
+      customer,
+      kind === 'commercial' ? 'CLIENTE' : 'DESTINATÁRIO',
+      kind === 'commercial' ? 'PEDIDO' : 'PEDIDO DE REFERÊNCIA',
+      pairs,
+      kind === 'packing' ? 'ENDEREÇO DE ENTREGA' : 'ENDEREÇO',
+    );
+  }
+
+  private identification(
+    pdf: BrandedPdf,
+    customerName: string | null,
+    customer: CustomerContact | null,
+    leftLabel: string,
+    rightLabel: string,
+    pairs: [string, string, boolean?][],
+    addressLabel = 'ENDEREÇO',
+  ) {
     const leftWidth = 320,
       rightX = LEFT + 345,
       rightWidth = RIGHT - rightX;
     const top = pdf.y;
-    let left = top + pdf.label(kind === 'commercial' ? 'CLIENTE' : 'DESTINATÁRIO', LEFT, top);
-    const name = order.customerName ? oneLine(order.customerName) : 'Cliente não informado';
+    let left = top + pdf.label(leftLabel, LEFT, top);
+    const name = customerName ? oneLine(customerName) : 'Cliente não informado';
     left += pdf.write(name, LEFT, left, leftWidth, { size: 10.5, bold: true }) + 3;
     const details: string[] = [];
     if (customer?.tradeName && oneLine(customer.tradeName) !== name)
@@ -163,13 +332,12 @@ export class PdfRenderer {
     const address = addressLines(customer?.address ?? null);
     if (address.length) {
       left += 6;
-      left += pdf.label(kind === 'packing' ? 'ENDEREÇO DE ENTREGA' : 'ENDEREÇO', LEFT, left);
+      left += pdf.label(addressLabel, LEFT, left);
       for (const line of address)
         left += pdf.write(line, LEFT, left, leftWidth, { size: 8.5, color: '#333333' }) + 1.5;
     }
 
-    let right =
-      top + pdf.label(kind === 'commercial' ? 'PEDIDO' : 'PEDIDO DE REFERÊNCIA', rightX, top);
+    let right = top + pdf.label(rightLabel, rightX, top);
     const pair = (label: string, value: string, strong = false) => {
       pdf.write(label, rightX, right + (strong ? 2 : 0), 82, { size: 8.5, color: '#5E5E5E' });
       right +=
@@ -182,10 +350,7 @@ export class PdfRenderer {
           11,
         ) + 5;
     };
-    pair('Número do pedido', orderNumber(order.commercialId), true);
-    pair('Data do pedido', localDate(order.createdAt, source.tenant.timezone));
-    if (kind === 'commercial' && order.status === 'draft') pair('Situação', 'Rascunho');
-    if (kind === 'commercial' && order.status === 'canceled') pair('Situação', 'Cancelado');
+    for (const [label, value, strong] of pairs) pair(label, value, strong);
     pdf.y = Math.max(left, right) + 14;
   }
 
@@ -234,6 +399,7 @@ export class PdfRenderer {
         color: '#5E5E5E',
       });
     }
+    await this.orderBonus(pdf, source, thumbnails);
     this.payment(pdf, order);
     if (order.notes.trim()) {
       pdf.y += 10;
@@ -320,6 +486,10 @@ export class PdfRenderer {
         size: 7.5,
         color: '#8A8A8A',
       });
+    if (source.bonus) {
+      await this.orderBonus(pdf, source, thumbnails);
+      pdf.ensure(receiptHeight - 34);
+    }
     this.receipt(pdf);
   }
 

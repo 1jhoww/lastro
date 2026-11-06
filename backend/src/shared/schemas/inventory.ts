@@ -58,7 +58,7 @@ export const movementSchema = z.strictObject({
   previousReservedScaled: scaled,
   reservedScaled: scaled,
   sequence: z.number().int().positive(),
-  origin: z.enum(['administrative', 'order', 'purchase']),
+  origin: z.enum(['administrative', 'order', 'purchase', 'bonus']),
   originReference: z.string().uuid(),
   actorUid: opaqueId,
   reason: z.string().min(3).max(200),

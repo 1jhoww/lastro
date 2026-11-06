@@ -24,6 +24,7 @@ const administrator = [
   'products:manage',
   'prices:manage',
   'discounts:apply',
+  'bonuses:grant',
   'inventory:manage',
   'orders:all:manage',
   'orders:dispatch',
@@ -169,6 +170,15 @@ export const permissionMatrix: readonly PermissionOperation[] = Object.freeze([
     'Aprovar descontos acima do permitido.',
     ['discounts:apply'],
     'never',
+  ),
+  op(
+    'orders.bonuses',
+    'Pedidos',
+    'Conceder bonificações',
+    'Adicionar bonificação ao pedido, lançar bonificação avulsa e consultar as próprias.',
+    ['bonuses:grant'],
+    'grantable',
+    ['orders.view', 'customers.manage', 'products.view'],
   ),
   op(
     'customers.manage',

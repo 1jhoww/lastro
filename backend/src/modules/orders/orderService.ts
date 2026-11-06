@@ -29,8 +29,24 @@ import { termsSnapshot, methodSnapshot } from '../../shared/schemas/paymentSetti
 import { FinancialLocks } from '../finance/resolution/locks.js';
 import { checkReadBudget } from '../../shared/operations/readBudget.js';
 import { brandingAllowed, hasFeature } from '../plans/catalog.js';
-import { orderCostSnapshot } from '../costing/orderCosts.js';
+import { bonusCostSnapshot, orderCostSnapshot } from '../costing/orderCosts.js';
 import type { OrderCostSnapshot } from '../../shared/schemas/management.js';
+import {
+  bonusSchema,
+  type Bonus,
+  type BonusCostSnapshot,
+  type OrderBonusInput,
+} from '../../shared/schemas/bonuses.js';
+import {
+  bonusLine,
+  bonusNumber,
+  followOrder,
+  linePrices,
+  orderBonusFor,
+  readOrderBonus,
+  recordBonusEvent,
+} from '../bonuses/orderBonus.js';
+import { holds } from '../users/permissions.js';
 export class OrderService {
   readonly financialLocks: FinancialLocks;
   constructor(
@@ -158,6 +174,74 @@ export class OrderService {
       );
       return snapshotLine(line.id, product, line.quantity);
     });
+  }
+  /**
+   * Bonus of a draft. Only reads, and returns what the caller writes with the order. `undefined`
+   * keeps the lines and only follows the customer and seller of the draft; an empty list removes
+   * the bonus, because a draft with no goods to give has nothing to record.
+   */
+  private async draftBonus(
+    tx: Transaction,
+    ctx: TenantContext,
+    actor: Actor,
+    order: s.Order,
+    input: OrderBonusInput | null | undefined,
+    previous: Bonus | null,
+    now: string,
+  ) {
+    if (input !== undefined)
+      requireCondition(holds(ctx, 'bonuses:grant'), 403, 'FORBIDDEN', 'Operação não permitida');
+    const ref = this.repo.ref(order.tenantId, 'bonuses', order.id);
+    const identity = {
+      customerId: order.customerId,
+      customerName: order.customerName,
+      responsibleUid: order.sellerUid,
+    };
+    if (input === undefined) {
+      if (!previous) return { bonus: null, write: () => undefined };
+      const bonus = bonusSchema.parse({ ...previous, ...identity });
+      return { bonus, write: () => tx.set(ref, bonus) };
+    }
+    if (!input?.lines.length)
+      return { bonus: null, write: () => (previous ? void tx.delete(ref) : undefined) };
+    const lines = await this.snapshots(
+      tx,
+      order.tenantId,
+      input.lines.map((l) => ({ ...l, id: randomUUID() })),
+    );
+    const bonus = bonusSchema.parse({
+      id: order.id,
+      tenantId: order.tenantId,
+      commercialId: bonusNumber(order.id),
+      kind: 'order',
+      orderId: order.id,
+      orderCommercialId: order.commercialId,
+      ...identity,
+      status: 'draft',
+      lines: lines.map(bonusLine),
+      linePrices: linePrices(lines),
+      reason: input.reason ?? null,
+      reasonDetail: input.reasonDetail ?? null,
+      notes: '',
+      occurredAt: null,
+      dispatchedAt: null,
+      canceledAt: null,
+      canceledBy: null,
+      version: (previous?.version ?? 0) + 1,
+      createdAt: previous?.createdAt ?? now,
+      createdBy: previous?.createdBy ?? actor.uid,
+      updatedAt: now,
+      updatedBy: actor.uid,
+      schemaVersion: 1,
+    });
+    assertDocumentFits(ref.path, bonus);
+    return {
+      bonus,
+      write: () => {
+        tx.set(ref, bonus);
+        recordBonusEvent(this.repo, tx, actor, bonus, previous ? 'edited' : 'created', null, null);
+      },
+    };
   }
   private async amounts(
     tx: Transaction,
@@ -412,9 +496,11 @@ export class OrderService {
         schemaVersion: 1,
       });
       assertDocumentFits(this.repo.ref(tenantId, 'orders', id).path, order);
+      const bonus = await this.draftBonus(tx, ctx, actor, order, input.bonus, null, now);
       tx.create(this.repo.ref(tenantId, 'orders', id), order);
+      bonus.write();
       this.event(tx, actor, order, null, 'created', null, null);
-      return s.orderView.parse(order);
+      return s.orderDetailView.parse({ ...order, bonus: orderBonusFor(bonus.bonus) });
     });
   }
   async update(actor: Actor, tenantId: string, id: string, input: z.infer<typeof s.orderUpdate>) {
@@ -489,9 +575,19 @@ export class OrderService {
         updatedBy: actor.uid,
       });
       assertDocumentFits(this.repo.ref(tenantId, 'orders', id).path, next);
+      const bonus = await this.draftBonus(
+        tx,
+        ctx,
+        actor,
+        next,
+        input.bonus,
+        await readOrderBonus(this.repo, tx, tenantId, id),
+        now,
+      );
       tx.set(this.repo.ref(tenantId, 'orders', id), next);
+      bonus.write();
       this.event(tx, actor, next, order.status, 'edited', input.discount?.reason ?? null, null);
-      return s.orderView.parse(next);
+      return s.orderDetailView.parse({ ...next, bonus: orderBonusFor(bonus.bonus) });
     });
   }
   async read(actor: Actor, tenantId: string, id: string) {
@@ -500,7 +596,8 @@ export class OrderService {
         const ctx = await this.access.tenant(actor, tenantId, 'orders:own:read', tx);
         const order = await this.load(tx, tenantId, id);
         await this.customer(tx, ctx, order.customerId, false, order.sellerUid);
-        return s.orderView.parse(order);
+        const bonus = await readOrderBonus(this.repo, tx, tenantId, id);
+        return s.orderDetailView.parse({ ...order, bonus: orderBonusFor(bonus) });
       },
       { readOnly: true },
     );
@@ -520,6 +617,7 @@ export class OrderService {
     const branded = brandingAllowed(ctx.entitlements);
     return {
       order,
+      bonus: await readOrderBonus(this.repo, tx, tenantId, id),
       customer,
       branded,
       tenant: {
@@ -556,6 +654,7 @@ export class OrderService {
       const customer = await this.customer(tx, ctx, order.customerId, false, order.sellerUid);
       const operationRef = this.repo.ref(tenantId, 'orderOperations', operationId);
       const data = await this.repo.foundation.read(operationRef, s.orderOperationSchema, tx);
+      let bonus = await readOrderBonus(this.repo, tx, tenantId, id);
       if (data) {
         requireCondition(
           data.actorUid === actor.uid && data.payloadHash === payloadHash && data.orderId === id,
@@ -570,7 +669,7 @@ export class OrderService {
           'CONFLICT',
           'Resultado indisponível',
         );
-        return s.orderView.parse(previous);
+        return s.orderDetailView.parse({ ...previous, bonus: orderBonusFor(bonus) });
       }
       await this.financialLocks.assertOrderAvailable(
         tx,
@@ -597,6 +696,7 @@ export class OrderService {
       let next = { ...order, version: order.version + 1, updatedAt: now, updatedBy: actor.uid };
       let finance: { apply(): void } | undefined;
       let costs: OrderCostSnapshot | undefined;
+      let bonusCosts: BonusCostSnapshot | undefined;
       if (action === 'confirm') {
         requireCondition(
           customer && order.payment && order.lines.length > 0,
@@ -672,6 +772,19 @@ export class OrderService {
         // Sold cost is frozen with the sale: later receipts never restate past margins.
         if (hasFeature(ctx.entitlements, 'costing.products'))
           costs = await orderCostSnapshot(this.repo, tx, tenantId, id, next.lines, now);
+        if (bonus) {
+          const refreshed = await this.snapshots(tx, tenantId, bonus.lines);
+          bonus = {
+            ...bonus,
+            customerId: customer.id,
+            customerName: customer.name,
+            responsibleUid: order.sellerUid,
+            lines: refreshed.map(bonusLine),
+            linePrices: linePrices(refreshed),
+          };
+          if (hasFeature(ctx.entitlements, 'costing.products'))
+            bonusCosts = await bonusCostSnapshot(this.repo, tx, tenantId, id, bonus.lines, now);
+        }
       } else if (action === 'dispatch')
         next = {
           ...next,
@@ -722,6 +835,17 @@ export class OrderService {
       prepared?.apply();
       finance?.apply();
       if (costs) tx.set(this.repo.ref(tenantId, 'orderCostSnapshots', id), costs);
+      if (bonusCosts) tx.set(this.repo.ref(tenantId, 'bonusCostSnapshots', id), bonusCosts);
+      if (bonus)
+        bonus = followOrder(
+          this.repo,
+          tx,
+          actor,
+          bonus,
+          validated,
+          'reason' in input ? input.reason : null,
+          operationId,
+        );
       tx.set(this.repo.ref(tenantId, 'orders', id), validated);
       this.event(
         tx,
@@ -733,7 +857,7 @@ export class OrderService {
         operationId,
       );
       tx.create(operationRef, operation);
-      return s.orderView.parse(validated);
+      return s.orderDetailView.parse({ ...validated, bonus: orderBonusFor(bonus) });
     });
   }
   async list(

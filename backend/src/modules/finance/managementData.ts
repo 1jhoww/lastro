@@ -16,11 +16,23 @@ import {
 } from '../../shared/schemas/management.js';
 import { requireCondition } from '../../shared/errors/appError.js';
 import { checkReadBudget } from '../../shared/operations/readBudget.js';
+import { netCost } from '../bonuses/calculation.js';
+import {
+  bonusCostSnapshotSchema,
+  bonusSchema,
+  type BonusCostSnapshot,
+} from '../../shared/schemas/bonuses.js';
 import { addDays, daysBetween } from '../reports/dates.js';
 import { dueDatesThrough } from '../payables/recurrence.js';
 import { marginBp } from '../costing/calculation.js';
 
-export const MANAGEMENT_CAPS = { orders: 2500, payables: 3000, payments: 3000, purchases: 2000 };
+export const MANAGEMENT_CAPS = {
+  orders: 2500,
+  payables: 3000,
+  payments: 3000,
+  purchases: 2000,
+  bonuses: 2500,
+};
 
 /** Reads every document of a bounded query, refusing rather than truncating a total. */
 export async function scanAll<T>(
@@ -115,6 +127,51 @@ export function soldLines(orders: readonly Order[], snapshots: Map<string, Order
   });
 }
 
+/**
+ * Cost of the goods given away in the period, by confirmation or registration date. Sellable
+ * returns bring the cost back; bonuses without a frozen cost are counted apart, never as zero.
+ */
+export async function bonusesGranted(
+  env: ManagementEnv,
+  range: Range,
+  zonedStart: (date: string, timezone: string) => string,
+) {
+  const bonuses = (
+    await scanAll(
+      env.repo,
+      env.tx,
+      env.repo
+        .ref(env.tenantId, 'bonuses', 'placeholder')
+        .parent.where('occurredAt', '>=', zonedStart(range.from, env.timezone))
+        .where('occurredAt', '<', zonedStart(addDays(range.to, 1), env.timezone))
+        .orderBy('occurredAt'),
+      bonusSchema,
+      MANAGEMENT_CAPS.bonuses,
+      'bonificações',
+    )
+  ).filter(
+    (b) => b.tenantId === env.tenantId && (b.status === 'confirmed' || b.status === 'dispatched'),
+  );
+  const found = new Map<string, BonusCostSnapshot>();
+  for (let i = 0; i < bonuses.length; i += 100) {
+    checkReadBudget();
+    const page = await env.repo.foundation.readMany(
+      bonuses.slice(i, i + 100).map((b) => env.repo.ref(env.tenantId, 'bonusCostSnapshots', b.id)),
+      bonusCostSnapshotSchema,
+      env.tx,
+    );
+    for (const snapshot of page) if (snapshot) found.set(snapshot.bonusId, snapshot);
+  }
+  let costCents = 0,
+    withoutCost = 0;
+  for (const bonus of bonuses) {
+    const snapshot = found.get(bonus.id);
+    if (snapshot) costCents += netCost(bonus, snapshot).netCents;
+    if (!snapshot || snapshot.missingLines > 0) withoutCost++;
+  }
+  return { costCents, withoutCost };
+}
+
 /** Accrual view of operating expenses. Purchases are excluded: they reach results as COGS. */
 export async function operatingExpenses(env: ManagementEnv, range: Range) {
   const titles = await scanAll(
@@ -155,6 +212,7 @@ export async function profitability(
     0,
   );
   const undeliveredLossCents = await chargedUndelivered(env, range);
+  const bonuses = await bonusesGranted(env, range, zonedStart);
   const missing = new Set(lines.filter((l) => l.costCents === null).map((l) => l.orderId));
   return {
     revenueCents,
@@ -164,8 +222,11 @@ export async function profitability(
     grossMarginBp: costedRevenueCents > 0 ? marginBp(grossProfitCents, costedRevenueCents) : null,
     operatingExpensesCents,
     undeliveredLossCents,
-    estimatedResultCents: grossProfitCents - operatingExpensesCents - undeliveredLossCents,
+    bonusesGrantedCents: bonuses.costCents,
+    estimatedResultCents:
+      grossProfitCents - operatingExpensesCents - undeliveredLossCents - bonuses.costCents,
     ordersWithoutCost: missing.size,
+    bonusesWithoutCost: bonuses.withoutCost,
   };
 }
 

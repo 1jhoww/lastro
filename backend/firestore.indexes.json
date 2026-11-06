@@ -3111,6 +3111,98 @@
           "order": "DESCENDING"
         }
       ]
+    },
+    {
+      "collectionGroup": "bonuses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "kind",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "bonuses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "bonuses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "responsibleUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "bonuses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "responsibleUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "kind",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "bonuses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "responsibleUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "customerId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "bonusEvents",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "bonusId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "occurredAt",
+          "order": "ASCENDING"
+        }
+      ]
     }
   ],
   "fieldOverrides": [
@@ -3708,6 +3800,56 @@
     {
       "collectionGroup": "supplierCreditMovements",
       "fieldPath": "reversalReason",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonuses",
+      "fieldPath": "lines",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonuses",
+      "fieldPath": "linePrices",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonuses",
+      "fieldPath": "notes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonuses",
+      "fieldPath": "reasonDetail",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonuses",
+      "fieldPath": "customerName",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonusEvents",
+      "fieldPath": "lines",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonusEvents",
+      "fieldPath": "reason",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonusOperations",
+      "fieldPath": "result",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonusOperations",
+      "fieldPath": "payloadHash",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "bonusCostSnapshots",
+      "fieldPath": "lines",
       "indexes": []
     }
   ]

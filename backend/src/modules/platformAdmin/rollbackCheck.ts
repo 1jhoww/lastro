@@ -9,7 +9,8 @@ export type RollbackBlocker =
   | 'charge_custom'
   | 'supplier_record'
   | 'customer_contact'
-  | 'purchase_stock_movement';
+  | 'purchase_stock_movement'
+  | 'bonus_record';
 
 /**
  * Says whether the API version before Lastro Gestão can still read the database. That version has
@@ -54,7 +55,7 @@ export async function rollbackBlockers(db: Firestore) {
     for (const tenant of page.docs) {
       examined++;
       const customers = tenant.ref.collection('customers');
-      const [suppliers, contacts, movements] = await Promise.all([
+      const [suppliers, contacts, movements, bonuses] = await Promise.all([
         customers.where('isSupplier', '==', true).select().limit(1).get(),
         customers.where('contactName', '>', '').select().limit(1).get(),
         tenant.ref
@@ -63,11 +64,14 @@ export async function rollbackBlockers(db: Firestore) {
           .select()
           .limit(1)
           .get(),
+        // Any bonus brings stock movements with a type and origin older versions refuse.
+        tenant.ref.collection('bonuses').select().limit(1).get(),
       ]);
       if (!suppliers.empty) blockers.push({ tenantId: tenant.id, reason: 'supplier_record' });
       if (!contacts.empty) blockers.push({ tenantId: tenant.id, reason: 'customer_contact' });
       if (!movements.empty)
         blockers.push({ tenantId: tenant.id, reason: 'purchase_stock_movement' });
+      if (!bonuses.empty) blockers.push({ tenantId: tenant.id, reason: 'bonus_record' });
     }
     if (page.size < PAGE_SIZE) break;
     last = page.docs[page.docs.length - 1];

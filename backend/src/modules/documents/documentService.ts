@@ -6,6 +6,8 @@ import { PdfRenderer, type DocumentSource } from './pdfRenderer.js';
 import type { Download } from './download.js';
 import { ReadGate, checkReadBudget, documentPolicy } from '../../shared/operations/readBudget.js';
 import type { TenantLogoService } from '../tenants/logoService.js';
+import type { BonusService } from '../bonuses/bonusService.js';
+import { bonusView } from '../../shared/schemas/bonuses.js';
 import type { ImageService } from '../products/imageService.js';
 import { productSchema } from '../../shared/schemas/commercial.js';
 
@@ -17,6 +19,7 @@ export class DocumentService {
     readonly budget = new ReadGate(),
     readonly logos?: Pick<TenantLogoService, 'pdfLogo'>,
     readonly images?: Pick<ImageService, 'pdfThumbnails'>,
+    readonly bonuses?: BonusService,
   ) {}
   async source(actor: Actor, tenantId: string, id: string): Promise<DocumentSource> {
     return this.orders.repo.foundation.db.runTransaction(
@@ -25,11 +28,16 @@ export class DocumentService {
         const customer = source.customer;
         // Photos are found by product id (never by name), in the same authorized read. Their ids
         // are part of the fingerprint below, so a photo swapped mid-render is caught too.
+        const productIds = [
+          ...new Set(
+            [...source.order.lines, ...(source.bonus?.lines ?? [])].map((l) => l.productId),
+          ),
+        ];
         const products =
-          source.branded && source.order.lines.length
+          source.branded && productIds.length
             ? await this.orders.repo.foundation.readMany(
-                source.order.lines.map((l) =>
-                  this.orders.repo.ref(tenantId, 'products', l.productId),
+                productIds.map((productId) =>
+                  this.orders.repo.ref(tenantId, 'products', productId),
                 ),
                 productSchema,
                 tx,
@@ -47,6 +55,9 @@ export class DocumentService {
           branded: source.branded,
           productImages,
           order: source.order,
+          bonus: source.bonus
+            ? { commercialId: source.bonus.commercialId, lines: source.bonus.lines }
+            : null,
           // Registration data, read under the same authorization as the order.
           customer: customer
             ? {
@@ -73,6 +84,67 @@ export class DocumentService {
       undefined,
       documentPolicy,
     );
+  }
+  /** Same budget, limits and revalidation as the order documents. */
+  async bonusReceipt(actor: Actor, tenantId: string, id: string): Promise<Download> {
+    return this.budget.run(
+      () => this.generateBonus(actor, tenantId, id),
+      undefined,
+      documentPolicy,
+    );
+  }
+  private async bonusSource(actor: Actor, tenantId: string, id: string) {
+    const service = this.bonuses!;
+    const source = await this.orders.repo.foundation.db.runTransaction(
+      (tx) => service.receipt(tx, actor, tenantId, id),
+      { readOnly: true },
+    );
+    return {
+      tenant: source.tenant,
+      branded: source.branded,
+      bonus: bonusView.parse(source.bonus),
+      customer: source.customer
+        ? {
+            tradeName: source.customer.tradeName,
+            document: source.customer.document,
+            email: source.customer.email,
+            phone: source.customer.phone,
+            address: source.customer.address,
+          }
+        : null,
+    };
+  }
+  private async generateBonus(actor: Actor, tenantId: string, id: string): Promise<Download> {
+    requireCondition(this.inFlight < 2, 429, 'DOCUMENT_BUSY', 'Geração ocupada; tente novamente');
+    this.inFlight++;
+    try {
+      const source = await this.bonusSource(actor, tenantId, id);
+      checkReadBudget();
+      const fingerprint = digest(stableJson(source));
+      const { id: companyId, logo: companyLogo } = source.tenant;
+      const logo =
+        this.logos && companyId && companyLogo
+          ? await this.logos.pdfLogo({ id: companyId, logo: companyLogo }, source.branded)
+          : null;
+      const names = await this.bonuses!.people([source.bonus.responsibleUid]);
+      checkReadBudget();
+      const bytes = await this.renderer.renderBonus(
+        { ...source, responsibleName: names.get(source.bonus.responsibleUid) ?? null },
+        this.orders.clock(),
+        logo,
+      );
+      checkReadBudget();
+      const current = await this.bonusSource(actor, tenantId, id);
+      requireCondition(
+        digest(stableJson(current)) === fingerprint,
+        409,
+        'DOCUMENT_CHANGED',
+        'Bonificação alterada durante geração; recarregue',
+      );
+      return { bytes, filename: `bonificacao-${id}.pdf` };
+    } finally {
+      this.inFlight--;
+    }
   }
   private async generate(
     actor: Actor,
