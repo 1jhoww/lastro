@@ -60,6 +60,7 @@ export { default as MapPinOff } from 'lucide-react-native/icons/map-pin-off';
 export { default as MessageCircle } from 'lucide-react-native/icons/message-circle';
 export { default as Minus } from 'lucide-react-native/icons/minus';
 export { default as Package } from 'lucide-react-native/icons/package';
+export { default as Gift } from 'lucide-react-native/icons/gift';
 export { default as PackageOpen } from 'lucide-react-native/icons/package-open';
 export { default as Palette } from 'lucide-react-native/icons/palette';
 export { default as Pencil } from 'lucide-react-native/icons/pencil';

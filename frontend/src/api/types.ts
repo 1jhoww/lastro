@@ -143,7 +143,17 @@ export type StockAdjustmentBody = BodyOf<'/api/v1/inventory/adjustments', 'post'
 
 /* Pedidos */
 export type OrdersPage = DataOf<'/api/v1/orders', 'get'>;
-export type Order = DataOf<'/api/v1/orders/{id}', 'get'>;
+type OrderDetail = DataOf<'/api/v1/orders/{id}', 'get'>;
+export type OrderBonus = NonNullable<OrderDetail['bonus']>;
+/** Listas não trazem a bonificação; a ficha e as respostas de comando trazem. */
+export type Order = Omit<OrderDetail, 'bonus'> & { bonus?: OrderBonus | null };
+export type BonusDetail = DataOf<'/api/v1/bonuses/{id}', 'get'>;
+export type Bonus = DataOf<'/api/v1/bonuses', 'get'>['items'][number];
+export type BonusCreate = BodyOf<'/api/v1/bonuses', 'post'>;
+export type BonusReturnInput = BodyOf<'/api/v1/bonuses/{id}/returns', 'post'>;
+export type BonusKind = Bonus['kind'];
+export type BonusStatus = Bonus['status'];
+export type BonusReason = NonNullable<Bonus['reason']>;
 export type OrderLine = Order['lines'][number];
 export type OrderStatus = Order['status'];
 export type OrderCreate = BodyOf<'/api/v1/orders', 'post'>;

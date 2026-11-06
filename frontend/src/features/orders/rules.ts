@@ -83,6 +83,44 @@ export function cartFromOrder(order: Order): CartLine[] {
   }));
 }
 
+/** Bonificação de um rascunho salvo, para continuar a edição. */
+export function bonusFromOrder(order: Order | undefined) {
+  return (order?.bonus?.lines ?? []).map((l) => ({
+    productId: l.productId,
+    name: l.name,
+    sku: l.sku,
+    unit: l.unit,
+    quantityMilli: quantityToMilli(l.quantity),
+  }));
+}
+
+/**
+ * Parte da bonificação no corpo do pedido. Sem mudança, nada é enviado: quem só edita a venda
+ * não regrava a bonificação. Lista vazia remove o que estava salvo.
+ */
+export function bonusInput(
+  order: Order | undefined,
+  lines: readonly { productId: string; quantityMilli: number }[],
+  reason: NonNullable<Order['bonus']>['reason'],
+  detail: string | null,
+) {
+  const reasonDetail = reason === 'other' ? detail : null;
+  const body = lines.map((l) => ({
+    productId: l.productId,
+    quantity: toApiQuantity(l.quantityMilli),
+  }));
+  const saved = order?.bonus;
+  const unchanged =
+    (saved?.reason ?? null) === reason &&
+    (saved?.reasonDetail ?? null) === reasonDetail &&
+    JSON.stringify(
+      (saved?.lines ?? []).map((l) => ({ productId: l.productId, quantity: l.quantity })),
+    ) === JSON.stringify(body);
+  if (unchanged) return {};
+  if (!body.length) return saved ? { bonus: null } : {};
+  return { bonus: { lines: body, reason, reasonDetail } };
+}
+
 function quantityToMilli(text: string): number {
   const [int = '0', frac = ''] = text.split('.');
   return Number(int) * 1000 + Number(frac.padEnd(3, '0'));

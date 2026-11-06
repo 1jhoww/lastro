@@ -22,13 +22,13 @@ import {
   Share2,
   type LucideIcon,
 } from '@/ui/icons';
-import type { OrderStatus } from '@/api/types';
+import type { BonusStatus, OrderStatus } from '@/api/types';
 import { orderDocument } from './api';
 import { downloadMessage, type FilePresentation } from './contracts';
 import { fileLease } from './fileEpoch';
 import { reserveViewer, stageFile } from './presentation';
 
-type Kind = 'commercial' | 'packing';
+type Kind = 'commercial' | 'packing' | 'bonus';
 type Intent = 'open' | 'save' | 'share';
 
 const documents: { kind: Kind; title: string; description: string; prefix: string }[] = [
@@ -45,6 +45,13 @@ const documents: { kind: Kind; title: string; description: string; prefix: strin
     prefix: 'romaneio',
   },
 ];
+
+const bonusDocument = {
+  kind: 'bonus' as const,
+  title: 'Comprovante de bonificação',
+  description: 'Produtos e quantidades, sem cobrança',
+  prefix: 'bonificacao',
+};
 
 const intentLabel: Record<Intent, string> = {
   open: 'Visualizar',
@@ -90,8 +97,36 @@ export function OrderDocuments({
           ))}
         </View>
         <Text variant="caption" color={color.textSecondary} style={styles.note}>
-          Documentos não fiscais. O romaneio é assinado no recebimento; gerar ou assinar não altera a
-          situação do pedido. Para WhatsApp, compartilhe e escolha o contato.
+          Documentos não fiscais. O romaneio é assinado no recebimento; gerar ou assinar não altera
+          a situação do pedido. Para WhatsApp, compartilhe e escolha o contato.
+        </Text>
+      </Panel>
+    </Fragment>
+  );
+}
+
+/** Comprovante gerado pelo servidor; rascunho não tem comprovante. */
+export function BonusDocuments({
+  id,
+  number,
+  version,
+  status,
+}: {
+  id: string;
+  number: string;
+  version: number;
+  status: BonusStatus;
+}) {
+  const session = useSession();
+  if (session.isPlatformAdmin || status === 'draft') return null;
+  return (
+    <Fragment key={`${session.user?.uid}:${session.tenantId}:${id}:${version}`}>
+      <Panel title="Documentos">
+        <View accessibilityRole="list">
+          <DocumentRow id={id} number={number} doc={bonusDocument} last />
+        </View>
+        <Text variant="caption" color={color.textSecondary} style={styles.note}>
+          O comprovante não é documento fiscal.
         </Text>
       </Panel>
     </Fragment>
@@ -106,7 +141,7 @@ function DocumentRow({
 }: {
   id: string;
   number: string;
-  doc: (typeof documents)[number];
+  doc: (typeof documents)[number] | typeof bonusDocument;
   last: boolean;
 }) {
   const { api, tenantId } = useTenantApi();

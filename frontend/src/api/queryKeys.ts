@@ -61,6 +61,10 @@ export const queryKeys = {
   orderDelivery: (tenantId: string, id: string) =>
     ['tenant', tenantId, 'orders', 'delivery', id] as const,
   /** Visitas, histórico do cliente e recompra: tudo sob o mesmo prefixo para invalidar junto. */
+  bonuses: (tenantId: string) => ['tenant', tenantId, 'bonuses'] as const,
+  bonusList: (tenantId: string, filters: object) =>
+    ['tenant', tenantId, 'bonuses', 'list', filters] as const,
+  bonus: (tenantId: string, id: string) => ['tenant', tenantId, 'bonuses', 'detail', id] as const,
   visits: (tenantId: string) => ['tenant', tenantId, 'visits'] as const,
   visitList: (tenantId: string, filters: object) =>
     ['tenant', tenantId, 'visits', 'list', filters] as const,

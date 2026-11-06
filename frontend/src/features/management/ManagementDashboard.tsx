@@ -401,6 +401,12 @@ function Results({ data }: { data: ManagementOverview }) {
               value={formatCents(-p.undeliveredLossCents)}
             />
           ) : null}
+          {p.bonusesGrantedCents ? (
+            <SummaryRow
+              label="Bonificações concedidas"
+              value={formatCents(-p.bonusesGrantedCents)}
+            />
+          ) : null}
           <SummaryRow
             label="Resultado estimado"
             value={formatCents(p.estimatedResultCents)}

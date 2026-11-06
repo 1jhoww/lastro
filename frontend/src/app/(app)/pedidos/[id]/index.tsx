@@ -25,6 +25,7 @@ import { Alert, Badge, Button, DataTable, Disclosure, Panel, Text, type Column }
 import { canReadFinance } from '@/features/finance/FinanceAccess';
 import { OrderDocuments } from '@/features/files/OrderDocuments';
 import { OrderDelivery } from '@/features/visits/OrderDelivery';
+import { OrderBonusPanel } from '@/features/bonuses/OrderBonusPanel';
 
 export default function OrderDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -150,6 +151,7 @@ function OrderView({ order: o, onRefresh }: { order: Order; onRefresh: () => voi
                 <Total label="Total" cents={o.totalCents} strong />
               </View>
             </Panel>
+            {o.bonus ? <OrderBonusPanel bonus={o.bonus} /> : null}
             <Panel title="Pagamento">
               <View style={styles.facts}>
                 <Fact label="Condição" value={paymentSummary(o)} />

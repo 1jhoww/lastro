@@ -54,6 +54,7 @@ type Filters = {
   movement: string;
   supplierId: string;
   categoryId: string;
+  bonusKind: string;
 };
 const emptyFilters: Filters = {
   preset: 'default',
@@ -66,6 +67,7 @@ const emptyFilters: Filters = {
   movement: '',
   supplierId: '',
   categoryId: '',
+  bonusKind: '',
 };
 
 function presetRange(preset: Preset, today: string): { from: string; to: string } | null {
@@ -101,6 +103,8 @@ function toQuery(entry: ReportEntry, f: Filters): ReportQuery {
     q.movement = f.movement as NonNullable<ReportQuery['movement']>;
   if (entry.filters.includes('supplier') && f.supplierId) q.supplierId = f.supplierId;
   if (entry.filters.includes('expenseCategory') && f.categoryId) q.categoryId = f.categoryId;
+  if (entry.filters.includes('bonusKind') && f.bonusKind)
+    q.bonusKind = f.bonusKind as NonNullable<ReportQuery['bonusKind']>;
   return q;
 }
 
@@ -438,6 +442,20 @@ function FilterBar({
             />
           </View>
         ) : null}
+        {entry.filters.includes('bonusKind') ? (
+          <View style={field}>
+            <Select
+              label="Tipo"
+              value={filters.bonusKind}
+              options={[
+                { value: '', label: 'Avulsas e vinculadas' },
+                { value: 'standalone', label: 'Avulsas' },
+                { value: 'order', label: 'Vinculadas' },
+              ]}
+              onChange={(bonusKind) => set({ bonusKind })}
+            />
+          </View>
+        ) : null}
         {entry.filters.includes('supplier') ? (
           <View style={field}>
             <Select
@@ -744,6 +762,8 @@ function hrefFor(link: ReportView['rows'][number]['link']): Href | undefined {
       return `/financeiro/pagar/${link.id}` as Href;
     case 'purchase':
       return `/compras/${link.id}` as Href;
+    case 'bonus':
+      return `/bonificacoes/${link.id}` as Href;
   }
 }
 

@@ -6,24 +6,17 @@ export async function orderDocument(
   api: ApiClient,
   tenantId: string,
   id: string,
-  kind: 'commercial' | 'packing',
+  kind: 'commercial' | 'packing' | 'bonus',
   signal?: AbortSignal,
 ) {
   const params = { header: { 'X-Tenant-Id': tenantId }, path: { id } };
+  const options = { params, parseAs: 'stream' as const, cache: 'no-store' as const, signal };
   const result =
-    kind === 'commercial'
-      ? await api.GET('/api/v1/orders/{id}/documents/commercial.pdf', {
-          params,
-          parseAs: 'stream',
-          cache: 'no-store',
-          signal,
-        })
-      : await api.GET('/api/v1/orders/{id}/documents/packing.pdf', {
-          params,
-          parseAs: 'stream',
-          cache: 'no-store',
-          signal,
-        });
+    kind === 'bonus'
+      ? await api.GET('/api/v1/bonuses/{id}/receipt.pdf', options)
+      : kind === 'commercial'
+        ? await api.GET('/api/v1/orders/{id}/documents/commercial.pdf', options)
+        : await api.GET('/api/v1/orders/{id}/documents/packing.pdf', options);
   // openapi-fetch já consome o JSON de erro; usa o envelope original quando presente.
   if (!result.response.ok && result.error) {
     const body = result.error as { error?: { code: string; message: string; requestId?: string } };

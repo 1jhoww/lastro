@@ -2,17 +2,20 @@ import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Link, router, type Href } from 'expo-router';
 import { Platform, ScrollView, StyleSheet, View, type ViewStyle } from 'react-native';
 import { toApiError, type ApiError } from '@/api/errors';
-import type { Order, OrderCreate, OrderUpdate, Product } from '@/api/types';
+import type { BonusReason, Order, OrderCreate, OrderUpdate, Product } from '@/api/types';
+import { BonusLines } from '@/features/bonuses/BonusLines';
+import { reasonOptions, type BonusLineDraft } from '@/features/bonuses/presentation';
 import { FieldRow } from '@/features/catalog/FormParts';
 import { useAvailability } from '@/features/inventory/api';
 import { useTenant } from '@/features/session/useTenant';
 import { memberLabel, shortId, useMembers } from '@/features/users/api';
 import { Screen } from '@/layout/Screen';
 import { formatCents } from '@/lib/money';
+import { formatQuantity } from '@/lib/quantity';
 import { useSession } from '@/session/SessionContext';
 import { color, space, useLayoutSize } from '@/theme';
 import { Alert, Button, Dialog, EmptyState, Select, Text, TextField, useToast } from '@/ui';
-import { Package } from '@/ui/icons';
+import { Gift, Package } from '@/ui/icons';
 import { useConditionOptions, useCreateOrder, useMethodOptions, useUpdateOrder } from './api';
 import { CartList } from './CartList';
 import { CustomerCombobox, type PickedCustomer } from './CustomerCombobox';
@@ -20,6 +23,8 @@ import { PaymentFields } from './PaymentFields';
 import { paymentPreview } from './paymentPreview';
 import { ProductSearch } from './ProductSearch';
 import {
+  bonusFromOrder,
+  bonusInput,
   cartFromOrder,
   cartTotalPreview,
   paymentBody,
@@ -120,6 +125,12 @@ export function OrderEditor({
   const [notes, setNotes] = useState(order?.notes ?? '');
   const [paymentError, setPaymentError] = useState<string>();
   const [summaryOpen, setSummaryOpen] = useState(false);
+  // Bonificação é opcional e fica fechada: a venda normal não passa por ela.
+  const canGrant = permissions.includes('bonuses:grant');
+  const [bonusLines, setBonusLines] = useState<BonusLineDraft[]>(() => bonusFromOrder(order));
+  const [bonusReason, setBonusReason] = useState<BonusReason | ''>(order?.bonus?.reason ?? '');
+  const [bonusDetail, setBonusDetail] = useState(order?.bonus?.reasonDetail ?? '');
+  const [bonusOpen, setBonusOpen] = useState(Boolean(order?.bonus));
 
   const conditions = useConditionOptions();
   const methods = useMethodOptions();
@@ -136,6 +147,7 @@ export function OrderEditor({
     [lines],
   );
   const total = cartTotalPreview(lines);
+  const bonusDetailMissing = bonusReason === 'other' && bonusDetail.trim().length < 3;
   const preview = paymentPreview(total, payment, conditions.data ?? [], today);
 
   /** Catálogo: zero retira do carrinho; acima de zero inclui ou ajusta. */
@@ -183,6 +195,9 @@ export function OrderEditor({
       lines: toLinesInput(lines),
       notes: notes.trim(),
       ...pay.body,
+      ...(canGrant
+        ? bonusInput(order, bonusLines, bonusReason || null, bonusDetail.trim() || null)
+        : {}),
       // Só administrador escolhe o responsável; o vendedor nunca envia este campo.
       ...(admin && sellerUid && sellerUid !== (order?.sellerUid ?? user?.uid) ? { sellerUid } : {}),
     };
@@ -210,7 +225,7 @@ export function OrderEditor({
   const createUnknown =
     !order && create.isError && ['network', 'server'].includes(toApiError(create.error).kind);
   const incomplete = !customer || lines.length === 0;
-  const blocked = incomplete || createUnknown;
+  const blocked = incomplete || createUnknown || (bonusOpen && bonusDetailMissing);
 
   const responsibleOptions =
     admin && members.data
@@ -391,9 +406,69 @@ export function OrderEditor({
                 placeholder="Instruções de entrega, combinados com o cliente…"
                 style={styles.notes}
               />
+              {bonusOpen ? (
+                <View style={styles.bonus} accessibilityLabel="Bonificação do pedido">
+                  <View style={styles.bonusHead}>
+                    <Text variant="smallStrong">Bonificação · sem cobrança</Text>
+                    <Text variant="caption" color={color.textSecondary}>
+                      Não entra no total do pedido. Sai do estoque na expedição.
+                    </Text>
+                  </View>
+                  {canGrant ? (
+                    <>
+                      <BonusLines
+                        lines={bonusLines}
+                        onChange={setBonusLines}
+                        reserved={quantities}
+                        disabled={saving}
+                      />
+                      <Select
+                        label="Motivo"
+                        optional
+                        value={bonusReason}
+                        options={[{ value: '', label: 'Não informar' }, ...reasonOptions]}
+                        onChange={(v) => setBonusReason(v as BonusReason | '')}
+                        disabled={saving}
+                      />
+                      {bonusReason === 'other' ? (
+                        <TextField
+                          label="Descrição do motivo"
+                          value={bonusDetail}
+                          maxLength={200}
+                          onChangeText={setBonusDetail}
+                          error={
+                            bonusDetailMissing ? 'Descreva com pelo menos 3 caracteres.' : undefined
+                          }
+                        />
+                      ) : null}
+                    </>
+                  ) : (
+                    bonusLines.map((l) => (
+                      <SummaryLine
+                        key={l.productId}
+                        label={l.name}
+                        value={formatQuantity(l.quantityMilli, l.unit)}
+                      />
+                    ))
+                  )}
+                </View>
+              ) : canGrant ? (
+                <View style={styles.bonusOffer}>
+                  <Button
+                    label="Adicionar bonificação"
+                    variant="ghost"
+                    size="sm"
+                    icon={Gift}
+                    onPress={() => setBonusOpen(true)}
+                  />
+                </View>
+              ) : null}
               <View style={styles.summary} accessibilityLabel="Resumo financeiro">
                 <SummaryLine label="Cliente" value={customer?.name ?? 'Não escolhido'} />
                 <SummaryLine label="Itens" value={itemsLabel(lines.length)} />
+                {bonusLines.length ? (
+                  <SummaryLine label="Bonificados" value={itemsLabel(bonusLines.length)} />
+                ) : null}
                 <SummaryLine
                   label="Pagamento"
                   value={preview.length > 1 ? `${paymentLabel} · ${preview.length}x` : paymentLabel}
@@ -548,6 +623,16 @@ const styles = StyleSheet.create({
   },
   notes: { minHeight: 56, textAlignVertical: 'top' },
   summary: { gap: space[1] },
+  bonus: {
+    gap: space[3],
+    padding: space[3],
+    borderWidth: 1,
+    borderColor: color.border,
+    borderRadius: 14,
+    backgroundColor: color.surface,
+  },
+  bonusHead: { gap: 2 },
+  bonusOffer: { alignItems: 'flex-start' },
   summaryLine: { flexDirection: 'row', justifyContent: 'space-between', gap: space[3] },
   summaryValue: { flexShrink: 1, textAlign: 'right' },
   footer: {

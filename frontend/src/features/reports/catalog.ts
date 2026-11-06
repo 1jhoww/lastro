@@ -9,7 +9,8 @@ export type ReportFilter =
   | 'seller'
   | 'movement'
   | 'supplier'
-  | 'expenseCategory';
+  | 'expenseCategory'
+  | 'bonusKind';
 
 export type ReportEntry = {
   id: ReportId;
@@ -79,6 +80,49 @@ export const reports: ReportEntry[] = [
     short: 'Por vendedor',
     filters: ['period'],
     feature: 'commercial.sellers',
+  },
+  {
+    id: 'bonuses-period',
+    category: 'commercial',
+    title: 'Bonificações por período',
+    short: 'Bonificações',
+    filters: ['period', 'customer', 'product', 'seller', 'bonusKind'],
+  },
+  {
+    id: 'bonuses-customers',
+    category: 'commercial',
+    title: 'Bonificações por cliente',
+    short: 'Bonificações por cliente',
+    filters: ['period', 'product', 'seller', 'bonusKind'],
+  },
+  {
+    id: 'bonuses-sellers',
+    category: 'commercial',
+    title: 'Bonificações por responsável',
+    short: 'Bonificações por responsável',
+    filters: ['period', 'customer', 'product', 'bonusKind'],
+    feature: 'commercial.sellers',
+  },
+  {
+    id: 'bonuses-products',
+    category: 'commercial',
+    title: 'Bonificações por produto',
+    short: 'Bonificações por produto',
+    filters: ['period', 'customer', 'product', 'seller', 'bonusKind'],
+  },
+  {
+    id: 'bonuses-orders',
+    category: 'commercial',
+    title: 'Bonificações por pedido',
+    short: 'Bonificações por pedido',
+    filters: ['period', 'customer', 'product', 'seller'],
+  },
+  {
+    id: 'bonuses-reasons',
+    category: 'commercial',
+    title: 'Motivos das bonificações avulsas',
+    short: 'Motivos das bonificações',
+    filters: ['period', 'customer', 'product', 'seller'],
   },
   {
     id: 'receivables',

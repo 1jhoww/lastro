@@ -1727,6 +1727,75 @@ export interface paths {
         patch: operations["updatePaymentMethod"];
         trace?: never;
     };
+    "/api/v1/bonuses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Histórico de bonificações vinculadas e avulsas, pela data de confirmação ou de registro, mais recentes primeiro. Rascunhos não aparecem. Administrador vê a empresa inteira; vendedor com bonuses:grant vê só as bonificações sob sua responsabilidade, de clientes da carteira atual. Uma página pode vir com menos itens que o limite e ainda ter cursor. */
+        get: operations["listBonuses"];
+        put?: never;
+        /** @description Registra bonificação avulsa: a saída de estoque acontece nesta chamada, no mesmo commit. Não cria pedido, recebível nem faturamento. Estoque insuficiente recusa o lançamento inteiro. Vendedor registra só para si e para clientes da própria carteira. */
+        post: operations["createBonus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bonuses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Detalhe, histórico e, somente com costs:read, custo congelado na origem e líquido de retornos vendáveis. Administrador vê a empresa inteira; vendedor com bonuses:grant vê só as bonificações sob sua responsabilidade, de clientes da carteira atual. */
+        get: operations["getBonus"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bonuses/{id}/returns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** @description Retorno parcial ou total de bonificação que já saiu do estoque. Vendável volta ao físico sem alterar o custo médio; danificado fica registrado e não movimenta estoque. Sem efeito financeiro. Somente administrador. */
+        post: operations["returnBonus"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bonuses/{id}/receipt.pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Comprovante não fiscal com produtos, quantidades e "Sem cobrança", sem valores. Mesmos limites dos PDFs de pedido; rascunho retorna 409 DOCUMENT_UNAVAILABLE. Administrador vê a empresa inteira; vendedor com bonuses:grant vê só as bonificações sob sua responsabilidade, de clientes da carteira atual. */
+        get: operations["downloadBonusReceipt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/orders": {
         parameters: {
             query?: never;
@@ -15788,8 +15857,10 @@ export interface operations {
                                 grossMarginBp: number | null;
                                 operatingExpensesCents: number;
                                 undeliveredLossCents: number;
+                                bonusesGrantedCents: number;
                                 estimatedResultCents: number;
                                 ordersWithoutCost: number;
+                                bonusesWithoutCost: number;
                             };
                             notes: string[];
                         };
@@ -20540,13 +20611,14 @@ export interface operations {
                 movement?: "entries" | "exits" | "adjustments" | "reservations";
                 supplierId?: string;
                 categoryId?: string;
+                bonusKind?: "order" | "standalone";
             };
             header: {
                 /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
                 "X-Tenant-Id": string;
             };
             path: {
-                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category";
+                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons";
             };
             cookie?: never;
         };
@@ -20561,7 +20633,7 @@ export interface operations {
                     "application/json": {
                         data: {
                             /** @enum {string} */
-                            report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category";
+                            report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons";
                             /** @enum {string} */
                             category: "commercial" | "financial" | "inventory" | "management";
                             title: string;
@@ -20605,7 +20677,7 @@ export interface operations {
                                 };
                                 link: {
                                     /** @enum {string} */
-                                    kind: "order" | "customer" | "product" | "title" | "payable" | "purchase";
+                                    kind: "order" | "customer" | "product" | "title" | "payable" | "purchase" | "bonus";
                                     id: string;
                                 } | null;
                             }[];
@@ -20844,13 +20916,14 @@ export interface operations {
                 movement?: "entries" | "exits" | "adjustments" | "reservations";
                 supplierId?: string;
                 categoryId?: string;
+                bonusKind?: "order" | "standalone";
             };
             header: {
                 /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
                 "X-Tenant-Id": string;
             };
             path: {
-                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category";
+                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons";
             };
             cookie?: never;
         };
@@ -21090,13 +21163,14 @@ export interface operations {
                 movement?: "entries" | "exits" | "adjustments" | "reservations";
                 supplierId?: string;
                 categoryId?: string;
+                bonusKind?: "order" | "standalone";
             };
             header: {
                 /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
                 "X-Tenant-Id": string;
             };
             path: {
-                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category";
+                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons";
             };
             cookie?: never;
         };
@@ -36583,6 +36657,1384 @@ export interface operations {
             };
         };
     };
+    listBonuses: {
+        parameters: {
+            query?: {
+                limit?: string;
+                cursor?: string;
+                kind?: "order" | "standalone";
+                customerId?: string;
+                from?: string;
+                to?: string;
+            };
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            items: {
+                                id: string;
+                                commercialId: string;
+                                /** @enum {string} */
+                                kind: "order" | "standalone";
+                                orderId: string | null;
+                                orderCommercialId: string | null;
+                                customerId: string | null;
+                                customerName: string | null;
+                                responsibleUid: string;
+                                /** @enum {string} */
+                                status: "draft" | "confirmed" | "dispatched" | "canceled";
+                                lines: {
+                                    id: string;
+                                    productId: string;
+                                    name: string;
+                                    sku: string;
+                                    /** @enum {string} */
+                                    unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                    quantity: string;
+                                    returnedSellable: string;
+                                    returnedDamaged: string;
+                                }[];
+                                reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                                reasonDetail: string | null;
+                                notes: string;
+                                occurredAt: string | null;
+                                dispatchedAt: string | null;
+                                canceledAt: string | null;
+                                canceledBy: string | null;
+                                version: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                                createdBy: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                                updatedBy: string;
+                                responsibleName: string | null;
+                            }[];
+                            nextCursor: string | null;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    createBonus: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    customerId: string;
+                    responsibleUid?: string;
+                    lines: {
+                        productId: string;
+                        quantity: string;
+                    }[];
+                    /** @enum {string} */
+                    reason: "sample" | "campaign" | "relationship" | "damage_replacement" | "other";
+                    reasonDetail?: string;
+                    notes?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Operação concluída */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            commercialId: string;
+                            /** @enum {string} */
+                            kind: "order" | "standalone";
+                            orderId: string | null;
+                            orderCommercialId: string | null;
+                            customerId: string | null;
+                            customerName: string | null;
+                            responsibleUid: string;
+                            /** @enum {string} */
+                            status: "draft" | "confirmed" | "dispatched" | "canceled";
+                            lines: {
+                                id: string;
+                                productId: string;
+                                name: string;
+                                sku: string;
+                                /** @enum {string} */
+                                unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                quantity: string;
+                                returnedSellable: string;
+                                returnedDamaged: string;
+                            }[];
+                            reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                            reasonDetail: string | null;
+                            notes: string;
+                            occurredAt: string | null;
+                            dispatchedAt: string | null;
+                            canceledAt: string | null;
+                            canceledBy: string | null;
+                            version: number;
+                            /** Format: date-time */
+                            createdAt: string;
+                            createdBy: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            updatedBy: string;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getBonus: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            commercialId: string;
+                            /** @enum {string} */
+                            kind: "order" | "standalone";
+                            orderId: string | null;
+                            orderCommercialId: string | null;
+                            customerId: string | null;
+                            customerName: string | null;
+                            responsibleUid: string;
+                            /** @enum {string} */
+                            status: "draft" | "confirmed" | "dispatched" | "canceled";
+                            lines: {
+                                id: string;
+                                productId: string;
+                                name: string;
+                                sku: string;
+                                /** @enum {string} */
+                                unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                quantity: string;
+                                returnedSellable: string;
+                                returnedDamaged: string;
+                            }[];
+                            reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                            reasonDetail: string | null;
+                            notes: string;
+                            occurredAt: string | null;
+                            dispatchedAt: string | null;
+                            canceledAt: string | null;
+                            canceledBy: string | null;
+                            version: number;
+                            /** Format: date-time */
+                            createdAt: string;
+                            createdBy: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            updatedBy: string;
+                            responsibleName: string | null;
+                            cost: {
+                                grossCents: number;
+                                netCents: number;
+                                missingLines: number;
+                                lines: {
+                                    lineId: string;
+                                    costCents: number | null;
+                                }[];
+                            } | null;
+                            history: {
+                                id: string;
+                                bonusId: string;
+                                version: number;
+                                /** @enum {string} */
+                                type: "created" | "edited" | "confirmed" | "dispatched" | "canceled" | "returned";
+                                /** @enum {string} */
+                                status: "draft" | "confirmed" | "dispatched" | "canceled";
+                                /** Format: date-time */
+                                occurredAt: string;
+                                actorUid: string;
+                                reason: string | null;
+                                lines: {
+                                    lineId: string;
+                                    sellable: string;
+                                    damaged: string;
+                                }[];
+                            }[];
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    returnBonus: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+                "Idempotency-Key": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    expectedVersion: number;
+                    reason: string;
+                    lines: {
+                        lineId: string;
+                        /** @default 0 */
+                        sellable?: string;
+                        /** @default 0 */
+                        damaged?: string;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        data: {
+                            id: string;
+                            commercialId: string;
+                            /** @enum {string} */
+                            kind: "order" | "standalone";
+                            orderId: string | null;
+                            orderCommercialId: string | null;
+                            customerId: string | null;
+                            customerName: string | null;
+                            responsibleUid: string;
+                            /** @enum {string} */
+                            status: "draft" | "confirmed" | "dispatched" | "canceled";
+                            lines: {
+                                id: string;
+                                productId: string;
+                                name: string;
+                                sku: string;
+                                /** @enum {string} */
+                                unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                quantity: string;
+                                returnedSellable: string;
+                                returnedDamaged: string;
+                            }[];
+                            reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                            reasonDetail: string | null;
+                            notes: string;
+                            occurredAt: string | null;
+                            dispatchedAt: string | null;
+                            canceledAt: string | null;
+                            canceledBy: string | null;
+                            version: number;
+                            /** Format: date-time */
+                            createdAt: string;
+                            createdBy: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            updatedBy: string;
+                        };
+                        /** Format: uuid */
+                        requestId: string;
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    downloadBonusReceipt: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description Empresa candidata, validada pelo vínculo ativo no servidor. */
+                "X-Tenant-Id": string;
+            };
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Operação concluída */
+            200: {
+                headers: {
+                    /** @description attachment com nome ASCII seguro */
+                    "Content-Disposition"?: string;
+                    "Cache-Control"?: "private, no-store";
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": string;
+                };
+            };
+            /** @description Erro seguro com código estável */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            415: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+            /** @description Erro seguro com código estável */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: {
+                            code: string;
+                            message: string;
+                            status: number;
+                            /** Format: uuid */
+                            requestId: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     listOrders: {
         parameters: {
             query?: {
@@ -36941,6 +38393,14 @@ export interface operations {
                         value: number;
                         reason: string;
                     };
+                    bonus?: {
+                        lines: {
+                            productId: string;
+                            quantity: string;
+                        }[];
+                        reason?: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                        reasonDetail?: string | null;
+                    } | null;
                     paymentConditionId?: string | null;
                     paymentConditionVersion?: number;
                     intendedPaymentMethodId?: string | null;
@@ -37041,6 +38501,25 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
+                            bonus: {
+                                id: string;
+                                commercialId: string;
+                                /** @enum {string} */
+                                status: "draft" | "confirmed" | "dispatched" | "canceled";
+                                lines: {
+                                    id: string;
+                                    productId: string;
+                                    name: string;
+                                    sku: string;
+                                    /** @enum {string} */
+                                    unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                    quantity: string;
+                                    returnedSellable: string;
+                                    returnedDamaged: string;
+                                }[];
+                                reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                                reasonDetail: string | null;
+                            } | null;
                         };
                         /** Format: uuid */
                         requestId: string;
@@ -37359,6 +38838,25 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
+                            bonus: {
+                                id: string;
+                                commercialId: string;
+                                /** @enum {string} */
+                                status: "draft" | "confirmed" | "dispatched" | "canceled";
+                                lines: {
+                                    id: string;
+                                    productId: string;
+                                    name: string;
+                                    sku: string;
+                                    /** @enum {string} */
+                                    unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                    quantity: string;
+                                    returnedSellable: string;
+                                    returnedDamaged: string;
+                                }[];
+                                reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                                reasonDetail: string | null;
+                            } | null;
                         };
                         /** Format: uuid */
                         requestId: string;
@@ -37607,6 +39105,14 @@ export interface operations {
                         value: number;
                         reason: string;
                     } | null;
+                    bonus?: {
+                        lines: {
+                            productId: string;
+                            quantity: string;
+                        }[];
+                        reason?: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                        reasonDetail?: string | null;
+                    } | null;
                     paymentConditionId?: string | null;
                     paymentConditionVersion?: number;
                     intendedPaymentMethodId?: string | null;
@@ -37707,6 +39213,25 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
+                            bonus: {
+                                id: string;
+                                commercialId: string;
+                                /** @enum {string} */
+                                status: "draft" | "confirmed" | "dispatched" | "canceled";
+                                lines: {
+                                    id: string;
+                                    productId: string;
+                                    name: string;
+                                    sku: string;
+                                    /** @enum {string} */
+                                    unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                    quantity: string;
+                                    returnedSellable: string;
+                                    returnedDamaged: string;
+                                }[];
+                                reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                                reasonDetail: string | null;
+                            } | null;
                         };
                         /** Format: uuid */
                         requestId: string;
@@ -38032,6 +39557,25 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
+                            bonus: {
+                                id: string;
+                                commercialId: string;
+                                /** @enum {string} */
+                                status: "draft" | "confirmed" | "dispatched" | "canceled";
+                                lines: {
+                                    id: string;
+                                    productId: string;
+                                    name: string;
+                                    sku: string;
+                                    /** @enum {string} */
+                                    unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                    quantity: string;
+                                    returnedSellable: string;
+                                    returnedDamaged: string;
+                                }[];
+                                reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                                reasonDetail: string | null;
+                            } | null;
                         };
                         /** Format: uuid */
                         requestId: string;
@@ -38357,6 +39901,25 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
+                            bonus: {
+                                id: string;
+                                commercialId: string;
+                                /** @enum {string} */
+                                status: "draft" | "confirmed" | "dispatched" | "canceled";
+                                lines: {
+                                    id: string;
+                                    productId: string;
+                                    name: string;
+                                    sku: string;
+                                    /** @enum {string} */
+                                    unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                    quantity: string;
+                                    returnedSellable: string;
+                                    returnedDamaged: string;
+                                }[];
+                                reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                                reasonDetail: string | null;
+                            } | null;
                         };
                         /** Format: uuid */
                         requestId: string;
@@ -38683,6 +40246,25 @@ export interface operations {
                             canceledAt: string | null;
                             canceledBy: string | null;
                             dispatchReference: string | null;
+                            bonus: {
+                                id: string;
+                                commercialId: string;
+                                /** @enum {string} */
+                                status: "draft" | "confirmed" | "dispatched" | "canceled";
+                                lines: {
+                                    id: string;
+                                    productId: string;
+                                    name: string;
+                                    sku: string;
+                                    /** @enum {string} */
+                                    unit: "UN" | "CX" | "PCT" | "KG" | "L";
+                                    quantity: string;
+                                    returnedSellable: string;
+                                    returnedDamaged: string;
+                                }[];
+                                reason: ("sample" | "campaign" | "relationship" | "damage_replacement" | "other") | null;
+                                reasonDetail: string | null;
+                            } | null;
                         };
                         /** Format: uuid */
                         requestId: string;
@@ -39658,7 +41240,7 @@ export interface operations {
                 limit?: string;
                 cursor?: string;
                 productId?: string;
-                type?: "STOCK_ENTRY" | "STOCK_ADJUSTMENT_IN" | "STOCK_ADJUSTMENT_OUT" | "STOCK_RESERVATION" | "STOCK_RESERVATION_RELEASE" | "STOCK_DISPATCH" | "STOCK_RETURN" | "STOCK_PURCHASE_ENTRY" | "STOCK_PURCHASE_REVERSAL";
+                type?: "STOCK_ENTRY" | "STOCK_ADJUSTMENT_IN" | "STOCK_ADJUSTMENT_OUT" | "STOCK_RESERVATION" | "STOCK_RESERVATION_RELEASE" | "STOCK_DISPATCH" | "STOCK_RETURN" | "STOCK_PURCHASE_ENTRY" | "STOCK_PURCHASE_REVERSAL" | "STOCK_BONUS_OUT" | "STOCK_BONUS_RETURN";
                 from?: string & (unknown & unknown);
                 to?: string & (unknown & unknown);
                 direction?: "asc" | "desc";
@@ -39684,12 +41266,12 @@ export interface operations {
                                 id: string;
                                 productId: string;
                                 /** @enum {string} */
-                                type: "STOCK_ENTRY" | "STOCK_ADJUSTMENT_IN" | "STOCK_ADJUSTMENT_OUT" | "STOCK_RESERVATION" | "STOCK_RESERVATION_RELEASE" | "STOCK_DISPATCH" | "STOCK_RETURN" | "STOCK_PURCHASE_ENTRY" | "STOCK_PURCHASE_REVERSAL";
+                                type: "STOCK_ENTRY" | "STOCK_ADJUSTMENT_IN" | "STOCK_ADJUSTMENT_OUT" | "STOCK_RESERVATION" | "STOCK_RESERVATION_RELEASE" | "STOCK_DISPATCH" | "STOCK_RETURN" | "STOCK_PURCHASE_ENTRY" | "STOCK_PURCHASE_REVERSAL" | "STOCK_BONUS_OUT" | "STOCK_BONUS_RETURN";
                                 /** @enum {string} */
                                 unit: "UN" | "CX" | "PCT" | "KG" | "L";
                                 sequence: number;
                                 /** @enum {string} */
-                                origin: "administrative" | "order" | "purchase";
+                                origin: "administrative" | "order" | "purchase" | "bonus";
                                 /** Format: uuid */
                                 originReference: string;
                                 actorUid: string;
@@ -40210,12 +41792,12 @@ export interface operations {
                                 id: string;
                                 productId: string;
                                 /** @enum {string} */
-                                type: "STOCK_ENTRY" | "STOCK_ADJUSTMENT_IN" | "STOCK_ADJUSTMENT_OUT" | "STOCK_RESERVATION" | "STOCK_RESERVATION_RELEASE" | "STOCK_DISPATCH" | "STOCK_RETURN" | "STOCK_PURCHASE_ENTRY" | "STOCK_PURCHASE_REVERSAL";
+                                type: "STOCK_ENTRY" | "STOCK_ADJUSTMENT_IN" | "STOCK_ADJUSTMENT_OUT" | "STOCK_RESERVATION" | "STOCK_RESERVATION_RELEASE" | "STOCK_DISPATCH" | "STOCK_RETURN" | "STOCK_PURCHASE_ENTRY" | "STOCK_PURCHASE_REVERSAL" | "STOCK_BONUS_OUT" | "STOCK_BONUS_RETURN";
                                 /** @enum {string} */
                                 unit: "UN" | "CX" | "PCT" | "KG" | "L";
                                 sequence: number;
                                 /** @enum {string} */
-                                origin: "administrative" | "order" | "purchase";
+                                origin: "administrative" | "order" | "purchase" | "bonus";
                                 /** Format: uuid */
                                 originReference: string;
                                 actorUid: string;
@@ -40495,12 +42077,12 @@ export interface operations {
                                 id: string;
                                 productId: string;
                                 /** @enum {string} */
-                                type: "STOCK_ENTRY" | "STOCK_ADJUSTMENT_IN" | "STOCK_ADJUSTMENT_OUT" | "STOCK_RESERVATION" | "STOCK_RESERVATION_RELEASE" | "STOCK_DISPATCH" | "STOCK_RETURN" | "STOCK_PURCHASE_ENTRY" | "STOCK_PURCHASE_REVERSAL";
+                                type: "STOCK_ENTRY" | "STOCK_ADJUSTMENT_IN" | "STOCK_ADJUSTMENT_OUT" | "STOCK_RESERVATION" | "STOCK_RESERVATION_RELEASE" | "STOCK_DISPATCH" | "STOCK_RETURN" | "STOCK_PURCHASE_ENTRY" | "STOCK_PURCHASE_REVERSAL" | "STOCK_BONUS_OUT" | "STOCK_BONUS_RETURN";
                                 /** @enum {string} */
                                 unit: "UN" | "CX" | "PCT" | "KG" | "L";
                                 sequence: number;
                                 /** @enum {string} */
-                                origin: "administrative" | "order" | "purchase";
+                                origin: "administrative" | "order" | "purchase" | "bonus";
                                 /** Format: uuid */
                                 originReference: string;
                                 actorUid: string;

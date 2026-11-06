@@ -43,6 +43,8 @@ export const movementTypeLabel: Record<MovementType, string> = {
   STOCK_RETURN: 'Devolução recebida',
   STOCK_PURCHASE_ENTRY: 'Recebimento de compra',
   STOCK_PURCHASE_REVERSAL: 'Estorno de recebimento',
+  STOCK_BONUS_OUT: 'Saída por bonificação',
+  STOCK_BONUS_RETURN: 'Retorno de bonificação',
 };
 
 export const movementTypes = Object.keys(movementTypeLabel) as MovementType[];
@@ -51,6 +53,7 @@ export const movementTypes = Object.keys(movementTypeLabel) as MovementType[];
 export function originLabel(m: Pick<Movement, 'origin' | 'type'>): string {
   if (m.origin === 'administrative')
     return m.type === 'STOCK_ENTRY' ? 'Entrada manual' : 'Ajuste manual';
+  if (m.origin === 'bonus') return 'Automática (bonificação)';
   return m.origin === 'purchase' ? 'Automática (compra)' : 'Automática (pedido)';
 }
 

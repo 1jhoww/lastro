@@ -4,6 +4,7 @@ import {
   CalendarCheck,
   CircleDollarSign,
   ClipboardList,
+  Gift,
   ShoppingCart,
   Wallet,
   House,
@@ -39,6 +40,7 @@ export type Permission =
   | 'orders:all:manage'
   | 'orders:dispatch'
   | 'discounts:apply'
+  | 'bonuses:grant'
   | 'receivables:read'
   | 'payments:manage'
   | 'payments:reverse'
@@ -96,6 +98,14 @@ export const destinations: Destination[] = [
     icon: ClipboardList,
     anyOf: ['orders:all:manage', 'orders:own:read'],
     primaryOnMobile: true,
+  },
+  {
+    // Lançamento avulso e histórico. Bonificar em uma venda é a etapa final do Novo pedido.
+    key: 'bonificacoes',
+    label: 'Bonificações',
+    href: '/bonificacoes' as Href,
+    icon: Gift,
+    anyOf: ['bonuses:grant'],
   },
   {
     key: 'clientes',

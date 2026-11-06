@@ -20,6 +20,8 @@ const tone: Record<Movement['type'], BadgeTone> = {
   STOCK_RETURN: 'success',
   STOCK_PURCHASE_ENTRY: 'success',
   STOCK_PURCHASE_REVERSAL: 'warning',
+  STOCK_BONUS_OUT: 'strong',
+  STOCK_BONUS_RETURN: 'success',
 };
 
 const signed = (milli: number, unit: Movement['unit']) =>
@@ -127,55 +129,79 @@ export function MovementTable({
 
   return (
     <>
-    <DataTable
-      label="Movimentações de estoque"
-      rows={rows}
-      keyOf={(m) => m.id}
-      stacked={stacked || layoutSize !== 'expanded'}
-      actionsWidth={72}
-      actions={(m) => <Button label="Detalhes" variant="ghost" size="sm" onPress={() => setSelected(m)} />}
-      columns={columns}
-      renderCompact={(m) => (
-        <View style={styles.compact}>
-          <View style={styles.compactTop}>
-            <View style={styles.flex}>
-              {showProduct ? (
-                <Text variant="bodyStrong" numberOfLines={1}>
-                  {productName(m.productId)}
+      <DataTable
+        label="Movimentações de estoque"
+        rows={rows}
+        keyOf={(m) => m.id}
+        stacked={stacked || layoutSize !== 'expanded'}
+        actionsWidth={72}
+        actions={(m) => (
+          <Button label="Detalhes" variant="ghost" size="sm" onPress={() => setSelected(m)} />
+        )}
+        columns={columns}
+        renderCompact={(m) => (
+          <View style={styles.compact}>
+            <View style={styles.compactTop}>
+              <View style={styles.flex}>
+                {showProduct ? (
+                  <Text variant="bodyStrong" numberOfLines={1}>
+                    {productName(m.productId)}
+                  </Text>
+                ) : null}
+                <Text variant="small" color={color.textSecondary}>
+                  {`${movementTypeLabel[m.type]} · ${formatDateTime(m.occurredAt)}`}
                 </Text>
-              ) : null}
-              <Text variant="small" color={color.textSecondary}>
-                {`${movementTypeLabel[m.type]} · ${formatDateTime(m.occurredAt)}`}
-              </Text>
+              </View>
+              <Text variant="figure">{effectText(m)}</Text>
             </View>
-            <Text variant="figure">{effectText(m)}</Text>
+            <Text variant="small" numberOfLines={2}>
+              {reasonText(m) ?? 'Movimentação automática do pedido'}
+            </Text>
+            <Text variant="caption" color={color.textSecondary}>
+              {`${originLabel(m)} · ${who(m.actorUid)}`}
+            </Text>
           </View>
-          <Text variant="small" numberOfLines={2}>
-            {reasonText(m) ?? 'Movimentação automática do pedido'}
-          </Text>
-          <Text variant="caption" color={color.textSecondary}>
-            {`${originLabel(m)} · ${who(m.actorUid)}`}
-          </Text>
-        </View>
-      )}
-    />
-    <Dialog visible={selected !== null} title="Detalhes da movimentação"
-      onClose={() => setSelected(null)}
-      actions={<Button label="Fechar" variant="ghost" onPress={() => setSelected(null)} />}>
-      {selected ? <View style={styles.detail}>
-        <Text variant="bodyStrong">{showProduct ? productName(selected.productId) : movementTypeLabel[selected.type]}</Text>
-        <Badge label={movementTypeLabel[selected.type]} tone={tone[selected.type]} />
-        <Text variant="small">{formatDateTime(selected.occurredAt)} · {who(selected.actorUid)}</Text>
-        <Text variant="bodyStrong">{effectText(selected)}</Text>
-        <Text variant="small">{`Físico: ${formatQuantity(fromApiQuantity(selected.previousPhysical), selected.unit)} → ${formatQuantity(fromApiQuantity(selected.physical), selected.unit)}`}</Text>
-        <Text variant="small">{`Reservado: ${formatQuantity(fromApiQuantity(selected.previousReserved), selected.unit)} → ${formatQuantity(fromApiQuantity(selected.reserved), selected.unit)}`}</Text>
-        <Text variant="small">{reasonText(selected) ?? 'Movimentação automática do pedido'}</Text>
-        {selected.notes ? <Text variant="small" selectable>{selected.notes}</Text> : null}
-        <Text variant="caption" color={color.textSecondary}>{originLabel(selected)}</Text>
-        {selected.origin === 'order' ? <Text variant="caption" selectable>{`Referência de origem: ${selected.originReference}`}</Text> : null}
-        <Text variant="caption" selectable>{`Responsável: ${selected.actorUid}`}</Text>
-      </View> : null}
-    </Dialog>
+        )}
+      />
+      <Dialog
+        visible={selected !== null}
+        title="Detalhes da movimentação"
+        onClose={() => setSelected(null)}
+        actions={<Button label="Fechar" variant="ghost" onPress={() => setSelected(null)} />}
+      >
+        {selected ? (
+          <View style={styles.detail}>
+            <Text variant="bodyStrong">
+              {showProduct ? productName(selected.productId) : movementTypeLabel[selected.type]}
+            </Text>
+            <Badge label={movementTypeLabel[selected.type]} tone={tone[selected.type]} />
+            <Text variant="small">
+              {formatDateTime(selected.occurredAt)} · {who(selected.actorUid)}
+            </Text>
+            <Text variant="bodyStrong">{effectText(selected)}</Text>
+            <Text variant="small">{`Físico: ${formatQuantity(fromApiQuantity(selected.previousPhysical), selected.unit)} → ${formatQuantity(fromApiQuantity(selected.physical), selected.unit)}`}</Text>
+            <Text variant="small">{`Reservado: ${formatQuantity(fromApiQuantity(selected.previousReserved), selected.unit)} → ${formatQuantity(fromApiQuantity(selected.reserved), selected.unit)}`}</Text>
+            <Text variant="small">
+              {reasonText(selected) ?? 'Movimentação automática do pedido'}
+            </Text>
+            {selected.notes ? (
+              <Text variant="small" selectable>
+                {selected.notes}
+              </Text>
+            ) : null}
+            <Text variant="caption" color={color.textSecondary}>
+              {originLabel(selected)}
+            </Text>
+            {selected.origin === 'order' ? (
+              <Text
+                variant="caption"
+                selectable
+              >{`Referência de origem: ${selected.originReference}`}</Text>
+            ) : null}
+            <Text variant="caption" selectable>{`Responsável: ${selected.actorUid}`}</Text>
+          </View>
+        ) : null}
+      </Dialog>
     </>
   );
 }
