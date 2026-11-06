@@ -150,11 +150,14 @@ export const breakpoint = {
   medium: 768,
   /** a partir daqui: barra lateral completa */
   expanded: 1100,
+  /** a partir daqui: coluna de seções do Financeiro ao lado da barra lateral */
+  financeRail: 1360,
 } as const;
 
 export const layout = {
   sidebarWidth: 248,
   railWidth: 76,
+  financeRailWidth: 244,
   contentMaxWidth: 1240,
   tabBarHeight: 64,
   /** área mínima de toque */

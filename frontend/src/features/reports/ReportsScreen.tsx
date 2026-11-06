@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, router, useLocalSearchParams, type Href } from 'expo-router';
 import { Platform, StyleSheet, View } from 'react-native';
 import { toApiError } from '@/api/errors';
@@ -108,12 +108,24 @@ function toQuery(entry: ReportEntry, f: Filters): ReportQuery {
  * Relatórios: análise aprofundada por categoria, sempre calculada no servidor para a empresa
  * ativa. Filtros mudam a consulta; exportações levam todas as linhas com os mesmos filtros.
  */
-export function ReportsScreen() {
+export function ReportsScreen({
+  only,
+  description = 'Análise detalhada de vendas, financeiro e estoque, com filtros e exportação.',
+  nav,
+}: {
+  /** Restringe a tela às categorias de uma área. Nunca amplia o que a pessoa pode ver. */
+  only?: ReportCategory[];
+  description?: string;
+  /** Navegação da área que hospeda a tela. */
+  nav?: ReactNode;
+} = {}) {
   const session = useSession();
   const params = useLocalSearchParams<{ relatorio?: string }>();
   const plan = session.membership?.plan.features ?? [];
   const allowedCategories = categories.filter(
-    (c) => !c.permission || session.permissions.includes(c.permission),
+    (c) =>
+      (!only || only.includes(c.value)) &&
+      (!c.permission || session.permissions.includes(c.permission)),
   );
   const available = reports.filter(
     (r) =>
@@ -140,10 +152,8 @@ export function ReportsScreen() {
   const inCategory = available.filter((r) => r.category === category);
 
   return (
-    <Screen
-      title="Relatórios"
-      description="Análise detalhada de vendas, financeiro e estoque, com filtros e exportação."
-    >
+    <Screen title="Relatórios" description={description}>
+      {nav}
       <View style={styles.nav}>
         {allowedCategories.length > 1 ? (
           <Segmented
@@ -183,11 +193,13 @@ export function ReportsScreen() {
         view={result.data?.report === entry.id ? result.data : undefined}
       />
 
-      <View style={styles.footerLinks}>
-        <Link href={'/relatorios/exportacoes' as Href} asChild>
-          <Button label="Exportar cadastros em CSV" variant="ghost" size="sm" />
-        </Link>
-      </View>
+      {only ? null : (
+        <View style={styles.footerLinks}>
+          <Link href={'/relatorios/exportacoes' as Href} asChild>
+            <Button label="Exportar cadastros em CSV" variant="ghost" size="sm" />
+          </Link>
+        </View>
+      )}
     </Screen>
   );
 }

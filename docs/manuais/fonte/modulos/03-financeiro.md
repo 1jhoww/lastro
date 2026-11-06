@@ -29,14 +29,14 @@ Registrar pagamento, estorno ou reembolso não faz Pix, transferência nem cobra
 
 ## Navegar pelo Financeiro
 
-Clique em [[Financeiro]] no menu lateral. As abas no topo levam às seções:
+Clique em [[Financeiro]] no menu lateral. Em telas largas, as seções ficam em uma coluna ao lado do conteúdo:
 
 - [[Visão geral]]: quanto falta receber e o que vence em breve.
 - [[Contas a receber]]: parcelas dos clientes e registro de pagamentos.
-- [[Condições e formas]]: prazos de pagamento e formas aceitas.
-- [[Créditos]], [[Reembolsos]] e [[Histórico e operações]]: consultas e operações ocasionais.
+- [[Relatórios]]: relatórios do financeiro, com filtros e exportação.
+- Em **Mais opções**: [[Créditos]], [[Reembolsos]], [[Histórico e operações]] e [[Condições e formas]].
 
-No celular, toque no nome da seção atual para trocar de seção.
+No celular, no tablet e em janelas estreitas, toque no nome da seção atual para trocar de seção. Só aparecem as seções incluídas no contrato da empresa e nas suas permissões.
 
 ### Visão geral
 

@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link, router, usePathname, type Href } from 'expo-router';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSession } from '@/session/SessionContext';
-import { color, fontFamily, layout, radius, space, useLayoutSize } from '@/theme';
+import { breakpoint, color, fontFamily, layout, radius, space } from '@/theme';
 import { Button, Dialog, Text } from '@/ui';
 import {
   CalendarClock,
   Check,
   ChevronDown,
   CircleDollarSign,
+  FileText,
   HandCoins,
   House,
   ListClock,
@@ -27,6 +28,7 @@ type Section =
   | 'receivables'
   | 'payables'
   | 'recurring'
+  | 'reports'
   | 'supplierCredits'
   | 'settings'
   | 'credits'
@@ -42,6 +44,8 @@ type Item = {
   minor?: boolean;
   /** Basta a permissão: vale para vendedor autorizado, não só para administrador. */
   byPermission?: boolean;
+  /** Além de `permission`, exige ao menos uma destas. */
+  anyOf?: string[];
 };
 
 const items: Item[] = [
@@ -89,6 +93,15 @@ const items: Item[] = [
     byPermission: true,
   },
   {
+    key: 'reports',
+    label: 'Relatórios',
+    description: 'Títulos, resultado e despesas, com filtros e exportação',
+    href: '/financeiro/relatorios' as Href,
+    permission: 'reports:read',
+    icon: FileText,
+    anyOf: ['receivables:read', 'financial-reports:read'],
+  },
+  {
     key: 'supplierCredits',
     label: 'Créditos de fornecedores',
     description: 'Valores de compras encerradas, a usar ou a recuperar',
@@ -97,14 +110,6 @@ const items: Item[] = [
     icon: Wallet,
     minor: true,
     byPermission: true,
-  },
-  {
-    key: 'settings',
-    label: 'Condições e formas',
-    description: 'Prazos de pagamento e formas aceitas',
-    href: '/financeiro/configuracoes' as Href,
-    permission: 'payment-settings:manage',
-    icon: CalendarClock,
   },
   {
     key: 'credits',
@@ -133,7 +138,42 @@ const items: Item[] = [
     icon: ListClock,
     minor: true,
   },
+  {
+    key: 'settings',
+    label: 'Condições e formas',
+    description: 'Prazos de pagamento e formas aceitas',
+    href: '/financeiro/configuracoes' as Href,
+    permission: 'payment-settings:manage',
+    icon: CalendarClock,
+    minor: true,
+  },
 ];
+
+type FinanceSession = Parameters<typeof canManageFinance>[0];
+
+/** Só o que o plano e as permissões da pessoa alcançam; o servidor continua autorizando tudo. */
+export function financeSections(session: FinanceSession): Item[] {
+  return items.filter((i) => {
+    if (i.anyOf && !i.anyOf.some((p) => session.permissions.includes(p))) return false;
+    return i.byPermission
+      ? session.permissions.includes(i.permission)
+      : canManageFinance(session, i.permission);
+  });
+}
+
+const groupsOf = (visible: Item[]) =>
+  [
+    { title: 'Principal', rows: visible.filter((i) => !i.minor) },
+    { title: 'Mais opções', rows: visible.filter((i) => i.minor) },
+  ].filter((g) => g.rows.length);
+
+/**
+ * A coluna só cabe ao lado da barra lateral do app com folga para tabelas; abaixo disso, a mesma
+ * lista abre pelo seletor.
+ */
+export function useFinanceRail() {
+  return useWindowDimensions().width >= breakpoint.financeRail;
+}
 
 export function sectionOf(pathname: string): Section {
   const [, , first] = pathname.split('/');
@@ -141,6 +181,7 @@ export function sectionOf(pathname: string): Section {
   if (first === 'gestao') return 'management';
   if (first === 'pagar') return 'payables';
   if (first === 'recorrentes') return 'recurring';
+  if (first === 'relatorios') return 'reports';
   if (first === 'creditos-fornecedor') return 'supplierCredits';
   if (first === 'receber' || first === 'pedidos') return 'receivables';
   if (first === 'configuracoes') return 'settings';
@@ -151,59 +192,80 @@ export function sectionOf(pathname: string): Section {
 }
 
 /**
- * Navegação do Financeiro. Desktop/tablet: três abas principais com destaque e, separadas, as
- * complementares. Celular: seletor compacto que abre a lista completa de seções, para nenhuma
- * opção ficar cortada fora da tela.
+ * Seletor do Financeiro dentro de cada tela, para quando a coluna lateral não cabe: abre a lista
+ * completa de seções, para nenhuma opção ficar cortada fora da tela.
  */
 export function FinanceNav() {
   const session = useSession();
-  const compact = useLayoutSize() === 'compact';
+  const rail = useFinanceRail();
   const active = sectionOf(usePathname());
-  const visible = items.filter((i) =>
-    i.byPermission
-      ? session.permissions.includes(i.permission as never)
-      : canManageFinance(session, i.permission),
+  if (rail) return null;
+  return <CompactNav visible={financeSections(session)} active={active} />;
+}
+
+/** Área do Financeiro: a coluna fica fora da rolagem e não muda entre as seções. */
+export function FinanceFrame({ children }: { children: ReactNode }) {
+  const rail = useFinanceRail();
+  return (
+    <View style={styles.frame}>
+      {rail ? <FinanceSideNav /> : null}
+      <View style={styles.flex}>{children}</View>
+    </View>
   );
-  return compact ? (
-    <CompactNav visible={visible} active={active} />
-  ) : (
-    <View style={styles.bar} accessibilityRole="tablist" accessibilityLabel="Seções do financeiro">
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.row}
-      >
-        {visible.map((item, i) => {
-          const selected = item.key === active;
-          const divider = item.minor && !visible[i - 1]?.minor;
-          return (
-            <View key={item.key} style={styles.row}>
-              {divider ? <View style={styles.divider} /> : null}
-              <Link href={item.href} asChild>
-                <Touchable
-                  accessibilityRole="tab"
-                  accessibilityState={{ selected }}
-                  accessibilityLabel={item.label}
-                  pressStyle={(s: InteractionState) => [
-                    styles.tab,
-                    selected && styles.tabActive,
-                    (s.hovered || s.pressed) && !selected && styles.hover,
-                    showFocusRing(s) && focusRing(),
-                  ]}
-                >
-                  <Text
-                    variant={item.minor ? 'small' : 'body'}
-                    color={selected ? color.text : color.textSecondary}
-                    style={{ fontFamily: selected ? fontFamily.semibold : fontFamily.medium }}
-                    numberOfLines={1}
+}
+
+function FinanceSideNav() {
+  const session = useSession();
+  const active = sectionOf(usePathname());
+  const groups = groupsOf(financeSections(session));
+  if (!groups.length) return null;
+  return (
+    <View style={styles.rail} role="navigation" aria-label="Seções do financeiro">
+      <ScrollView contentContainerStyle={styles.railList}>
+        {groups.map((g) => (
+          <View key={g.title} style={styles.railGroup}>
+            <Text variant="caption" color={color.textSecondary} style={styles.railTitle}>
+              {g.title}
+            </Text>
+            {g.rows.map((item) => {
+              const selected = item.key === active;
+              const Icon = item.icon;
+              return (
+                <Link key={item.key} href={item.href} asChild>
+                  <Touchable
+                    accessibilityRole="link"
+                    accessibilityState={{ selected }}
+                    accessibilityLabel={item.label}
+                    aria-current={selected ? 'page' : undefined}
+                    pressStyle={(s: InteractionState) => [
+                      styles.railItem,
+                      selected && styles.optionActive,
+                      (s.hovered || s.pressed) && !selected && styles.hover,
+                      showFocusRing(s) && focusRing(),
+                    ]}
                   >
-                    {item.label}
-                  </Text>
-                </Touchable>
-              </Link>
-            </View>
-          );
-        })}
+                    <Icon
+                      size={18}
+                      color={selected ? color.text : color.textSecondary}
+                      strokeWidth={1.75}
+                    />
+                    <Text
+                      variant="small"
+                      color={selected ? color.text : color.textSecondary}
+                      style={[
+                        styles.flex,
+                        { fontFamily: selected ? fontFamily.semibold : fontFamily.medium },
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {item.label}
+                    </Text>
+                  </Touchable>
+                </Link>
+              );
+            })}
+          </View>
+        ))}
       </ScrollView>
     </View>
   );
@@ -214,10 +276,7 @@ function CompactNav({ visible, active }: { visible: Item[]; active: Section }) {
   const current = visible.find((i) => i.key === active) ?? visible[0];
   if (!current) return null;
   const Icon = current.icon;
-  const groups = [
-    { title: 'Principal', rows: visible.filter((i) => !i.minor) },
-    { title: 'Mais opções', rows: visible.filter((i) => i.minor) },
-  ].filter((g) => g.rows.length);
+  const groups = groupsOf(visible);
   return (
     <>
       <Touchable
@@ -294,24 +353,30 @@ function CompactNav({ visible, active }: { visible: Item[]; active: Section }) {
 }
 
 const styles = StyleSheet.create({
-  bar: { borderBottomWidth: 1, borderBottomColor: color.border, marginTop: -space[2] },
-  row: { flexDirection: 'row', alignItems: 'center' },
-  tab: {
-    minHeight: 44,
-    justifyContent: 'center',
+  frame: { flex: 1, flexDirection: 'row', backgroundColor: color.canvas },
+  rail: {
+    width: layout.financeRailWidth,
+    backgroundColor: color.surface,
+    borderRightWidth: 1,
+    borderRightColor: color.border,
+  },
+  railList: {
+    paddingTop: space[8],
+    paddingBottom: space[6],
     paddingHorizontal: space[3],
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-    marginBottom: -1,
+    gap: space[6],
   },
-  tabActive: { borderBottomColor: color.structure },
+  railGroup: { gap: 2 },
+  railTitle: { paddingHorizontal: space[3], paddingBottom: space[1] },
+  railItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: space[3],
+    minHeight: layout.hitTarget - 4,
+    paddingHorizontal: space[3],
+    borderRadius: radius.md,
+  },
   hover: { backgroundColor: 'rgba(17,17,17,0.04)' },
-  divider: {
-    width: 1,
-    height: 20,
-    backgroundColor: color.borderStrong,
-    marginHorizontal: space[2],
-  },
   picker: {
     flexDirection: 'row',
     alignItems: 'center',
