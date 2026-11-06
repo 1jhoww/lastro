@@ -154,11 +154,11 @@ Abra um produto em [[Produtos]] para ver o quadro **Custos e margem**.
 
 | Custo | De onde vem |
 |---|---|
-| **Custo de referência** | Informado por você em [[Alterar custo]]. Um recebimento só o preenche quando está vazio. |
-| **Custo médio ponderado** | Calculado a cada recebimento, com frete e descontos rateados. |
+| **Custo de referência** | Informado por você no cadastro do produto ou em [[Alterar custo]], sem precisar lançar uma compra. Um recebimento só o preenche quando está vazio. |
+| **Custo médio do estoque** | Custo médio ponderado real, calculado a cada recebimento, com frete e descontos rateados. |
 | **Último custo de compra** | O do recebimento mais recente. |
 
-Saídas de estoque e entradas avulsas não mudam o custo médio. O preço de venda nunca muda por causa do custo: isso continua sendo decisão sua.
+Saídas de estoque e entradas avulsas não mudam o custo médio. Editar o custo de referência não movimenta o estoque e não altera o custo médio já apurado. A margem usa o custo médio quando ele existe; sem ele, usa o custo de referência. O preço de venda nunca muda por causa do custo: isso continua sendo decisão sua.
 
 :::nota Vendas passadas não mudam
 O custo fica gravado na confirmação do pedido. Quando o custo médio muda depois, as margens das vendas já feitas continuam iguais.

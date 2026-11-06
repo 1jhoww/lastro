@@ -45,6 +45,13 @@ export const productFormSchema = z
     status: z.enum(['active', 'inactive']),
     /** Texto como o usuário digita ("1,5"); validado contra a unidade abaixo. */
     minimumStock: z.string().trim(),
+    /** Não faz parte do produto: é salvo em `productCosts`, para quem tem acesso a custos. */
+    referenceCostCents: z
+      .number()
+      .int()
+      .min(0, 'Custo não pode ser negativo.')
+      .max(100_000_000, 'Custo acima do limite (R$ 1.000.000,00).')
+      .nullable(),
   })
   .superRefine((v, ctx) => {
     if (v.minimumStock && parseQuantityInput(v.minimumStock, v.unit as Unit) === null)
@@ -70,9 +77,13 @@ export const emptyProductForm: ProductFormValues = {
   catalogVisible: false,
   status: 'active',
   minimumStock: '',
+  referenceCostCents: null,
 };
 
-export function productToForm(p: Product): ProductFormValues {
+export function productToForm(
+  p: Product,
+  referenceCostCents: number | null = null,
+): ProductFormValues {
   const min = fromApiQuantity(p.minimumStock);
   return {
     name: p.name,
@@ -84,6 +95,7 @@ export function productToForm(p: Product): ProductFormValues {
     catalogVisible: p.catalogVisible,
     status: p.status,
     minimumStock: min ? formatQuantity(min).replace(/\./g, '') : '',
+    referenceCostCents,
   };
 }
 

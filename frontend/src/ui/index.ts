@@ -5,6 +5,7 @@ export { TextField, type TextFieldProps } from './TextField';
 export { SearchField } from './SearchField';
 export { QuantityInput } from './QuantityInput';
 export { CurrencyInput } from './CurrencyInput';
+export { OptionalCurrencyInput } from './OptionalCurrencyInput';
 export { Checkbox } from './Checkbox';
 export { Switch } from './Switch';
 export { Badge, type BadgeTone } from './Badge';

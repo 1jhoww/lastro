@@ -87,6 +87,18 @@ export function formatMargin(bp: number | null): string {
   if (bp === null) return '—';
   return `${(bp / 100).toFixed(2).replace('.', ',')}%`;
 }
+/** Mesma conta de `grossMargin` no backend. Sem custo não há margem, nunca um zero enganoso. */
+export function estimatedMargin(priceCents: number, costCents: number | null) {
+  if (costCents === null) return { unitGrossProfitCents: null, grossMarginBp: null };
+  const profit = priceCents - costCents;
+  return {
+    unitGrossProfitCents: profit,
+    grossMarginBp: priceCents > 0 ? Math.round((profit * 10_000) / priceCents) : null,
+  };
+}
+/** Salvar exige as duas: ver custos, que vem do plano, e gerir produtos. */
+export const canEditProductCost = (permissions: readonly string[]) =>
+  permissions.includes('costs:read') && permissions.includes('products:manage');
 export const lineUnit = (line: Pick<PurchaseLine, 'unit'>) => line.unit as Unit;
 export const pendingMilli = (line: Pick<PurchaseLine, 'pendingQuantity'>) =>
   fromApiQuantity(line.pendingQuantity);

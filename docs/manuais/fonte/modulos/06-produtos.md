@@ -44,7 +44,7 @@ Todo produto novo começa com estoque zerado. As quantidades entram pelo módulo
 6. Escolha a **Unidade de venda**:
    - **Unidade (UN)**, **Caixa (CX)** e **Pacote (PCT)** aceitam só quantidades inteiras;
    - **Quilo (KG)** e **Litro (L)** aceitam até 3 casas decimais.
-7. Informe o **Preço** por unidade (até R$ 1.000.000,00).
+7. Informe o **Preço** por unidade (até R$ 1.000.000,00). Quando o contrato inclui custos e você tem acesso a eles, o grupo **Custo e margem** aceita o custo de referência e mostra a margem estimada enquanto você digita.
 8. Se quiser alerta de reposição, informe o **Estoque mínimo** na mesma unidade.
 9. Deixe marcado **Produto ativo** para que ele apareça nos pedidos.
 10. Marque **Visível no catálogo público** se o produto deve aparecer na vitrine.

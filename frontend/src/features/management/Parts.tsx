@@ -91,19 +91,29 @@ export function SummaryRow({
   label,
   value,
   strong,
+  hint,
 }: {
   label: string;
   value: string;
   strong?: boolean;
+  /** Linha curta sob o rótulo, para dizer de onde o valor vem. */
+  hint?: string;
 }) {
   return (
     <View style={styles.row}>
-      <Text
-        variant={strong ? 'bodyStrong' : 'body'}
-        color={strong ? color.text : color.textSecondary}
-      >
-        {label}
-      </Text>
+      <View style={styles.label}>
+        <Text
+          variant={strong ? 'bodyStrong' : 'body'}
+          color={strong ? color.text : color.textSecondary}
+        >
+          {label}
+        </Text>
+        {hint ? (
+          <Text variant="small" color={color.textSecondary}>
+            {hint}
+          </Text>
+        ) : null}
+      </View>
       <Text variant={strong ? 'figure' : 'body'}>{value}</Text>
     </View>
   );
@@ -114,5 +124,6 @@ export function Stack({ children }: { children: ReactNode }) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', justifyContent: 'space-between', gap: space[3] },
+  label: { flex: 1, minWidth: 0 },
   stack: { gap: space[3] },
 });

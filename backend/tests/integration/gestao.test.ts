@@ -206,6 +206,85 @@ describe('Custos dos produtos', () => {
       margin: 80,
     });
   });
+  it('editar a referência não mexe em estoque, custo médio nem venda confirmada', async () => {
+    const productId = await product(f, 5000);
+    const purchase = await confirmed(f, [{ productId, quantity: '10', unitCostCents: 1000 }]);
+    await receive(f, purchase, [{ lineId: purchase.lines[0]!.id, quantity: '10' }]).expect(201);
+    const customer = await api(f).post('/customers', customerInput).expect(201);
+    const created = await api(f)
+      .post('/orders', {
+        customerId: customer.body.data.id,
+        lines: [{ productId, quantity: '2' }],
+        payment: { type: 'cash', dueDates: [companyDay()] },
+      })
+      .expect(201);
+    await api(f)
+      .post(`/orders/${created.body.data.id}/confirm`, {
+        expectedVersion: created.body.data.version,
+      })
+      .expect(200);
+    const tenant = f.firebase.db.doc(`tenants/${f.tenantA.tenant.id}`);
+    const snapshot = tenant.collection('orderCostSnapshots').doc(created.body.data.id);
+    const movements = async () =>
+      (await tenant.collection('inventoryMovements').where('productId', '==', productId).get())
+        .docs.length;
+    const [before, snapshotBefore, movementsBefore] = await Promise.all([
+      api(f).get(`/products/${productId}/costs`).expect(200),
+      snapshot.get(),
+      movements(),
+    ]);
+
+    const edited = await api(f)
+      .patch(`/products/${productId}/costs`, {
+        expectedVersion: before.body.data.version,
+        referenceCostCents: 7777,
+      })
+      .expect(200);
+
+    expect(edited.body.data).toMatchObject({
+      referenceCostCents: 7777,
+      averageCostCents: before.body.data.averageCostCents,
+      lastPurchaseCostCents: before.body.data.lastPurchaseCostCents,
+      // A margem da ficha continua vindo do custo real.
+      costBasis: 'average',
+      grossMarginBp: before.body.data.grossMarginBp,
+    });
+    expect(await movements()).toBe(movementsBefore);
+    expect((await snapshot.get()).data()).toEqual(snapshotBefore.data());
+    const report = await api(f).get(`/reports/product-profitability`).expect(200);
+    expect(report.body.data.rows[0].cells).toMatchObject({ cost: 2000, gross: 8000, margin: 80 });
+  });
+  it('referência pode ser limpa, e sem custo não há margem', async () => {
+    const productId = await product(f, 5000);
+    await api(f)
+      .patch(`/products/${productId}/costs`, { expectedVersion: 0, referenceCostCents: 1000 })
+      .expect(200);
+    const cleared = await api(f)
+      .patch(`/products/${productId}/costs`, { expectedVersion: 1, referenceCostCents: null })
+      .expect(200);
+    expect(cleared.body.data).toMatchObject({
+      referenceCostCents: null,
+      costBasis: null,
+      unitGrossProfitCents: null,
+      grossMarginBp: null,
+    });
+  });
+  it('vendedor não lê nem altera custo; plano sem custos também não', async () => {
+    const productId = await product(f, 5000);
+    const user = await seller(f);
+    const seen = api(f, f.tenantA.tenant.id, user);
+    await seen.get(`/products/${productId}/costs`).expect(403);
+    await seen
+      .patch(`/products/${productId}/costs`, { expectedVersion: 0, referenceCostCents: 100 })
+      .expect(403);
+    await f.firebase.db
+      .doc(`subscriptions/${f.tenantA.tenant.id}`)
+      .update({ planCode: 'profissional', userLimit: 5 });
+    const blocked = await api(f)
+      .patch(`/products/${productId}/costs`, { expectedVersion: 0, referenceCostCents: 100 })
+      .expect(403);
+    expect(blocked.body.error.code).toBe('FEATURE_NOT_IN_PLAN');
+  });
   it('histórico registra custo de referência e recebimento', async () => {
     const productId = await product(f);
     await api(f)

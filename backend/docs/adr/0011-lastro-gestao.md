@@ -15,7 +15,7 @@ Custos nunca ficam no documento do produto, que vendedores leem. Cada produto te
 - **Custo médio ponderado móvel**: a cada recebimento, `(saldo físico × médio + valor recebido) / (saldo físico + quantidade)`. Estoque sem custo conhecido não entra na conta: sem médio vale o custo de referência; sem nenhum dos dois, o custo recebido vira o médio. Quando o saldo é zero, o custo recebido também vira o médio.
 - **Saídas não mudam o médio**: expedição, ajuste e devolução movimentam quantidade, não custo.
 - **Entrada avulsa**: é valorizada pelo custo médio vigente, ou seja, não altera o médio, nem gera título. Bonificação não dilui o custo, de propósito: sem custo informado, qualquer valor seria inventado.
-- **Custo de referência**: é manual. Um recebimento só o preenche quando está vazio. É o custo sugerido nas compras (sem ele, o último custo).
+- **Custo de referência**: é manual, informado no cadastro do produto ou na ficha, pelo mesmo `PATCH /products/{id}/costs`. O produto continua sem campo de custo, porque vendedores leem esse documento. Um recebimento só o preenche quando está vazio. É o custo sugerido nas compras (sem ele, o último custo). Editá-lo não cria movimentação, não altera um custo médio já apurado nem os registros de pedidos confirmados.
 - **Preço de venda**: nunca muda por causa de custo.
 - **Precisão**: custo unitário em milésimos de centavo, para a média não acumular arredondamento.
 

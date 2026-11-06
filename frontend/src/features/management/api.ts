@@ -102,11 +102,18 @@ export function useCostHistory(productId: string, enabled = true) {
     enabled,
   );
 }
-export function useUpdateReferenceCost(productId: string) {
+export function useSaveReferenceCost() {
   const { api, tenantId, header } = useTenantApi();
   const cache = useQueryClient();
   return useMutation({
-    mutationFn: (body: { expectedVersion: number; referenceCostCents: number | null }) =>
+    mutationFn: ({
+      productId,
+      ...body
+    }: {
+      productId: string;
+      expectedVersion: number;
+      referenceCostCents: number | null;
+    }) =>
       unwrap(
         api.PATCH('/api/v1/products/{id}/costs', {
           params: { header, path: { id: productId } },

@@ -4,12 +4,25 @@ import { formatDateTime } from '@/lib/dates';
 import { formatCents } from '@/lib/money';
 import { useSession } from '@/session/SessionContext';
 import { color, space } from '@/theme';
-import { Button, CurrencyInput, Dialog, Panel, Skeleton, Text, useToast } from '@/ui';
-import { useCostHistory, useProductCosts, useUpdateReferenceCost } from './api';
+import {
+  Button,
+  Dialog,
+  Disclosure,
+  OptionalCurrencyInput,
+  Panel,
+  Skeleton,
+  Text,
+  useToast,
+} from '@/ui';
+import { useCostHistory, useProductCosts, useSaveReferenceCost } from './api';
 import { CommandError, Stack, SummaryRow } from './Parts';
-import { costEventCopy, formatMargin } from './presentation';
+import { canEditProductCost, costEventCopy, formatMargin } from './presentation';
 
 const money = (cents: number | null) => (cents === null ? 'Sem registro' : formatCents(cents));
+const marginBasis = {
+  average: 'Sobre o custo médio do estoque',
+  reference: 'Sobre o custo de referência',
+};
 
 /** Custos e margem do produto. Só existe para quem tem permissão; preço de venda nunca muda aqui. */
 export function ProductCostPanel({ productId }: { productId: string }) {
@@ -23,7 +36,7 @@ export function ProductCostPanel({ productId }: { productId: string }) {
       title="Custos e margem"
       description="Estimativa com o custo atual. Vendas passadas mantêm o custo da época."
       action={
-        permissions.includes('products:manage') && data ? (
+        canEditProductCost(permissions) && data ? (
           <Button
             label="Alterar custo"
             size="sm"
@@ -37,20 +50,35 @@ export function ProductCostPanel({ productId }: { productId: string }) {
         <Skeleton width="70%" height={64} />
       ) : data ? (
         <Stack>
-          <SummaryRow label="Custo de referência" value={money(data.referenceCostCents)} />
-          <SummaryRow label="Custo médio ponderado" value={money(data.averageCostCents)} />
-          <SummaryRow label="Último custo de compra" value={money(data.lastPurchaseCostCents)} />
           <SummaryRow label="Preço de venda" value={formatCents(data.priceCents)} />
+          <SummaryRow
+            label="Custo médio do estoque"
+            hint="Real, das compras recebidas"
+            value={money(data.averageCostCents)}
+          />
+          <SummaryRow
+            label="Custo de referência"
+            hint="Informado manualmente"
+            value={money(data.referenceCostCents)}
+          />
           <SummaryRow
             label="Lucro bruto por unidade"
             value={
               data.unitGrossProfitCents === null ? '—' : formatCents(data.unitGrossProfitCents)
             }
           />
-          <SummaryRow label="Margem bruta" value={formatMargin(data.grossMarginBp)} strong />
+          <SummaryRow
+            label="Margem bruta"
+            hint={data.costBasis ? marginBasis[data.costBasis] : 'Informe um custo para calcular'}
+            value={formatMargin(data.grossMarginBp)}
+            strong
+          />
           {history.items.length ? (
-            <View style={styles.history}>
-              <Text variant="smallStrong">Histórico de custos</Text>
+            <Disclosure label="Histórico de custos">
+              <SummaryRow
+                label="Último custo de compra"
+                value={money(data.lastPurchaseCostCents)}
+              />
               {history.items.map((event) => (
                 <View key={event.id} style={styles.event}>
                   <Text variant="small" style={styles.flex} numberOfLines={1}>
@@ -70,8 +98,10 @@ export function ProductCostPanel({ productId }: { productId: string }) {
                   onPress={() => history.query.fetchNextPage()}
                 />
               ) : null}
-            </View>
-          ) : null}
+            </Disclosure>
+          ) : (
+            <SummaryRow label="Último custo de compra" value={money(data.lastPurchaseCostCents)} />
+          )}
         </Stack>
       ) : null}
       {editing && data ? (
@@ -98,13 +128,13 @@ function ReferenceDialog({
   onClose: () => void;
 }) {
   const toast = useToast();
-  const update = useUpdateReferenceCost(productId);
-  const [cents, setCents] = useState(initial ?? 0);
+  const update = useSaveReferenceCost();
+  const [cents, setCents] = useState(initial);
   return (
     <Dialog
       visible
       title="Custo de referência"
-      description="É o custo sugerido nas próximas compras. Não altera o preço de venda nem o custo médio."
+      description="É o custo sugerido nas próximas compras. Não altera o preço de venda, o estoque nem o custo médio já apurado."
       onClose={update.isPending ? () => {} : onClose}
       actions={
         <>
@@ -115,7 +145,7 @@ function ReferenceDialog({
             loading={update.isPending}
             onPress={() =>
               update.mutate(
-                { expectedVersion: version, referenceCostCents: cents },
+                { productId, expectedVersion: version, referenceCostCents: cents },
                 {
                   onSuccess: () => {
                     toast.show('Custo salvo');
@@ -130,7 +160,7 @@ function ReferenceDialog({
     >
       <Stack>
         <CommandError error={update.error} title="Custo não salvo" />
-        <CurrencyInput label="Custo de referência" value={cents} onChange={setCents} />
+        <OptionalCurrencyInput label="Custo de referência" value={cents} onChange={setCents} />
       </Stack>
     </Dialog>
   );
@@ -138,6 +168,5 @@ function ReferenceDialog({
 
 const styles = StyleSheet.create({
   flex: { flex: 1, minWidth: 0 },
-  history: { gap: space[2], paddingTop: space[2] },
   event: { flexDirection: 'row', gap: space[3] },
 });

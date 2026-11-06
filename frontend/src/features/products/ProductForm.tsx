@@ -12,9 +12,18 @@ import {
   SubmitError,
 } from '@/features/catalog/FormParts';
 import { useDiscardGuard } from '@/features/catalog/useDiscardGuard';
+import { MarginEstimate } from '@/features/management/MarginEstimate';
 import { unitLabel, type Unit } from '@/lib/quantity';
 import { space, useLayoutSize } from '@/theme';
-import { Button, ConfirmDialog, CurrencyInput, Select, Switch, TextField } from '@/ui';
+import {
+  Button,
+  ConfirmDialog,
+  CurrencyInput,
+  OptionalCurrencyInput,
+  Select,
+  Switch,
+  TextField,
+} from '@/ui';
 import { productFormSchema, units, type ProductFormValues } from './form';
 
 type Props = {
@@ -24,6 +33,10 @@ type Props = {
   editing: boolean;
   /** Bloco "Imagem": editor imediato (edição) ou escolha pendente (cadastro). */
   image: ReactNode;
+  /** Mostra o custo de referência e a margem; só para quem pode ver e salvar custos. */
+  showCost?: boolean;
+  /** Custo médio real do estoque, só para leitura. */
+  averageCostCents?: number | null;
   submitting: boolean;
   error: unknown;
   onSubmit: (values: ProductFormValues) => void;
@@ -58,6 +71,8 @@ export function ProductForm({
   categories,
   editing,
   image,
+  showCost = false,
+  averageCostCents = null,
   submitting,
   error,
   onSubmit,
@@ -72,6 +87,8 @@ export function ProductForm({
     reValidateMode: 'onChange',
   });
   const unit = useWatch({ control, name: 'unit' }) as Unit;
+  const priceCents = useWatch({ control, name: 'priceCents' });
+  const referenceCostCents = useWatch({ control, name: 'referenceCostCents' });
   const fieldError = error ? fieldErrors[toApiError(error).code] : undefined;
   const guard = useDiscardGuard(formState.isDirty && !submitting, onCancel);
   const [confirmInactive, setConfirmInactive] = useState<ProductFormValues | null>(null);
@@ -252,6 +269,35 @@ export function ProductForm({
           />
         </FieldRow>
       </FormGroup>
+
+      {showCost ? (
+        <FormGroup
+          title="Custo e margem"
+          description="Estimativa para decidir o preço. Pedidos já confirmados mantêm o custo da época."
+        >
+          <FieldRow weights={[2, 3]}>
+            <Controller
+              control={control}
+              name="referenceCostCents"
+              render={({ field, fieldState }) => (
+                <OptionalCurrencyInput
+                  label={`Custo de referência por ${unitLabel[unit]}`}
+                  hint="Quanto você paga, sem precisar lançar uma compra. Não altera o estoque nem o custo médio já apurado."
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  error={fieldState.error?.message}
+                />
+              )}
+            />
+            <MarginEstimate
+              priceCents={priceCents}
+              referenceCostCents={referenceCostCents}
+              averageCostCents={averageCostCents}
+            />
+          </FieldRow>
+        </FormGroup>
+      ) : null}
     </>
   );
 

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter, type Href } from 'expo-router';
 import { useCategoryLookup } from '@/features/categories/api';
+import { useSaveReferenceCost } from '@/features/management/api';
+import { canEditProductCost } from '@/features/management/presentation';
 import { RequirePermission } from '@/features/session/RequirePermission';
 import { ProductForm } from '@/features/products/ProductForm';
 import {
@@ -17,7 +19,7 @@ import {
 import { emptyProductForm, formToCreate } from '@/features/products/form';
 import type { Product } from '@/api/types';
 import { Screen } from '@/layout/Screen';
-import { useTenantApi } from '@/session/SessionContext';
+import { useSession, useTenantApi } from '@/session/SessionContext';
 import { Alert, Panel, useToast } from '@/ui';
 
 export default function NewProductRoute() {
@@ -32,9 +34,14 @@ function NewProduct() {
   const router = useRouter();
   const toast = useToast();
   const { api, tenantId } = useTenantApi();
+  const { permissions } = useSession();
+  const showCost = canEditProductCost(permissions);
   const categories = useCategoryLookup();
   const create = useCreateProduct();
   const store = useStoreProduct();
+  const saveCost = useSaveReferenceCost();
+  // O produto já existe quando o custo é enviado: a falha não desfaz o cadastro nem o repete.
+  const costFailed = useRef(false);
   const [pendingImage, setPendingImage] = useState<PickedImage | null>(null);
   const [uploading, setUploading] = useState(false);
   // Set once the product exists and its image failed: the form is not offered again, so a
@@ -43,13 +50,29 @@ function NewProduct() {
   const [pickError, setPickError] = useState<string | null>(null);
 
   const open = (product: Product) => router.replace(`/produtos/${product.id}` as Href);
+  const finish = (message: string) =>
+    costFailed.current
+      ? toast.show('Produto cadastrado, mas o custo não foi salvo. Informe-o na ficha.', 'danger')
+      : toast.show(message);
+  const sendCost = async (product: Product, cents: number | null) => {
+    if (!showCost || cents === null) return;
+    try {
+      await saveCost.mutateAsync({
+        productId: product.id,
+        expectedVersion: 0,
+        referenceCostCents: cents,
+      });
+    } catch {
+      costFailed.current = true;
+    }
+  };
   const send = async (product: Product, image: PickedImage) => {
     setUploading(true);
     setPickError(null);
     try {
       const next = await uploadProductImage(api, tenantId, product.id, image, product.version);
       store(next);
-      toast.show('Produto cadastrado com imagem');
+      finish('Produto cadastrado com imagem');
       open(next);
     } catch (error) {
       // O produto já existe: a falha na imagem não desfaz o cadastro e fica visível aqui.
@@ -82,7 +105,7 @@ function NewProduct() {
               await send(saved.product, picked);
             }}
             onSkip={() => {
-              toast.show('Produto cadastrado sem imagem');
+              finish('Produto cadastrado sem imagem');
               open(saved.product);
             }}
           />
@@ -104,6 +127,7 @@ function NewProduct() {
         defaultValues={emptyProductForm}
         categories={categories.data ?? []}
         editing={false}
+        showCost={showCost}
         image={
           <PendingImagePicker
             value={pendingImage}
@@ -111,15 +135,16 @@ function NewProduct() {
             disabled={create.isPending || uploading}
           />
         }
-        submitting={create.isPending || uploading}
+        submitting={create.isPending || saveCost.isPending || uploading}
         error={create.error}
         onCancel={() => router.back()}
         onSubmit={(values) => {
-          if (create.isPending || uploading) return;
+          if (create.isPending || saveCost.isPending || uploading) return;
           create.mutate(formToCreate(values), {
             onSuccess: async (product) => {
+              await sendCost(product, values.referenceCostCents);
               if (!pendingImage) {
-                toast.show('Produto cadastrado');
+                finish('Produto cadastrado');
                 return open(product);
               }
               await send(product, pendingImage);
