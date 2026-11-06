@@ -9,7 +9,8 @@ if (!isDeepStrictEqual(saved, openApiDocument())) throw new Error('OpenAPI fora 
 const generated = astToString(
   await openapiTS(new URL('../docs/api/openapi.json', import.meta.url)),
 );
-const savedTypes = readFileSync('docs/api/generated-types.ts', 'utf8');
+// Windows checkouts may hold CRLF here, while the generator always emits LF.
+const savedTypes = readFileSync('docs/api/generated-types.ts', 'utf8').replaceAll('\r\n', '\n');
 // CLI adds a standard banner; compare the declarations, preserving all field semantics.
 if (
   savedTypes.slice(savedTypes.indexOf('export interface paths')) !==
