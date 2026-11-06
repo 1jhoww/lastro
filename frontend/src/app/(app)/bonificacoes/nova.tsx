@@ -184,6 +184,10 @@ function NewBonus() {
             {bonusErrorMessage(error.code ?? '') ?? error.userMessage}
           </Alert>
         ) : null}
+        <Hint>
+          Depois de confirmada, a bonificação não pode ser cancelada nem editada. Para corrigir, o
+          administrador registra um retorno total.
+        </Hint>
         <FormActions>
           <Button
             label="Revisar bonificação"
@@ -199,7 +203,7 @@ function NewBonus() {
       <ConfirmDialog
         visible={reviewing}
         title="Confirmar bonificação?"
-        description="Ao confirmar, os produtos saem do estoque agora. Não gera pedido nem conta a receber."
+        description="Ao confirmar, os produtos saem do estoque agora. Depois do registro não há cancelamento nem edição: para corrigir, registre um retorno total. Não gera pedido nem conta a receber."
         confirmLabel="Confirmar e dar saída"
         tone="strong"
         loading={create.isPending}

@@ -29,6 +29,15 @@ config.indexes.push({
     { fieldPath: 'occurredAt', order: 'ASCENDING' },
   ],
 });
+// Returns report: each return by its own date, whatever the period of the bonus.
+config.indexes.push({
+  collectionGroup: 'bonusEvents',
+  queryScope: 'COLLECTION',
+  fields: [
+    { fieldPath: 'type', order: 'ASCENDING' },
+    { fieldPath: 'occurredAt', order: 'ASCENDING' },
+  ],
+});
 for (const [collectionGroup, fields] of Object.entries({
   bonuses: ['lines', 'linePrices', 'notes', 'reasonDetail', 'customerName'],
   bonusEvents: ['lines', 'reason'],

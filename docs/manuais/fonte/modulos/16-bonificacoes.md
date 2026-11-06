@@ -72,7 +72,7 @@ A ficha do pedido mostra a bonificação em um painel próprio, com o número `B
 ![Lançamento avulso de bonificação.](admin-bonificacao-nova-1280.png "sem-menu h=88")
 
 :::irreversivel
-A confirmação dá saída do estoque na hora. Para corrigir um lançamento errado, registre um retorno total: o histórico guarda a saída e o retorno.
+A confirmação dá saída do estoque na hora. Depois do registro, a bonificação avulsa não pode ser cancelada nem editada. Para corrigir um lançamento errado, o administrador registra um retorno total: o histórico guarda a saída e o retorno.
 :::
 
 A avulsa usa só o **disponível**. O que está reservado para pedidos não pode ser bonificado.
@@ -115,6 +115,8 @@ Depois da saída do estoque, o cliente pode devolver parte ou tudo.
 
 O retorno não mexe no financeiro nem no custo médio do produto. Antes da expedição, não há retorno: cancele o pedido.
 
+O ajuste de unidades e custo fica no período da bonificação, mesmo que o retorno aconteça em outro mês. Para ver quando cada retorno aconteceu, use o relatório **Retornos de bonificações** ou o **Histórico** da bonificação.
+
 ## Custos
 
 Com contrato que inclui custos e a permissão **Visualizar custos**, a ficha mostra **Custo na origem** e **Custo após retornos**. O custo fica congelado na confirmação do pedido ou no registro do lançamento, então compras posteriores não mudam bonificações passadas.
@@ -133,8 +135,17 @@ Em [[Relatórios]] › **Comercial**:
 | Bonificações por produto | Produtos mais bonificados |
 | Bonificações por pedido | Vinculadas e o pedido de cada uma |
 | Motivos das bonificações avulsas | Por que as avulsas foram concedidas |
+| Retornos de bonificações | Cada retorno na data em que aconteceu, com a data da bonificação |
 
 Os relatórios mostram avulsas e vinculadas, unidades e, com acesso a custos, o custo total. Vendedores só veem a própria carteira. Exportam em CSV e PDF como os demais.
+
+## Rascunho com bonificação e permissões
+
+Sem a permissão **Conceder bonificações**, o vendedor não adiciona, altera nem remove itens bonificados.
+
+Se o rascunho já tem uma bonificação autorizada, esse vendedor pode mudar pagamento e observações e confirmar o pedido. Cliente e produtos ficam bloqueados, porque a bonificação foi autorizada para aquela venda.
+
+Se a permissão de quem autorizou for retirada, o pedido não é confirmado até alguém com a permissão rever a bonificação.
 
 ## Quem pode fazer o quê
 

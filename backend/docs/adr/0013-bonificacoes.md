@@ -45,15 +45,17 @@ Bonificação não altera o custo médio: saída e retorno movimentam quantidade
 
 ## Resultado estimado
 
-O resultado ganhou a linha **Bonificações concedidas**, fora do faturamento, do CMV, da margem e das despesas operacionais, com o custo líquido de retornos. O reconhecimento é na data de confirmação ou registro, a mesma das vendas. Retorno posterior corrige o período da bonificação, não o período do retorno. Bonificação sem custo registrado fica de fora, e o painel avisa em nota.
+O resultado ganhou a linha **Bonificações concedidas**, fora do faturamento, do CMV, da margem e das despesas operacionais, com o custo líquido de retornos. O reconhecimento é na data de confirmação ou registro, a mesma das vendas. Retorno posterior corrige o período da bonificação, não o período do retorno. Para o ajuste não ficar invisível, o relatório `bonuses-returns` lista cada retorno na data em que aconteceu, a partir de `bonusEvents`, com a data da bonificação e o custo revertido. Bonificação sem custo registrado fica de fora, e o painel avisa em nota.
 
 ## Retornos
 
-Retorno é parcial ou total, por linha, somente com `returns:manage`, que vendedores nunca recebem. Exige que a mercadoria tenha saído. Vendável volta ao físico; danificado é registrado e não gera movimento. Não há efeito financeiro. Lançamento avulso feito por engano é corrigido com retorno total vendável. Não existe cancelamento de avulsa, para que o histórico sempre mostre a saída e o retorno.
+Retorno é parcial ou total, por linha, somente com `returns:manage`, que vendedores nunca recebem. Exige que a mercadoria tenha saído. Vendável volta ao físico; danificado é registrado e não gera movimento. Não há efeito financeiro. Lançamento avulso feito por engano é corrigido com retorno total vendável. Não existe cancelamento nem edição de avulsa, para que o histórico sempre mostre a saída e o retorno. O lançamento, o resumo de confirmação e a ficha dizem isso ao usuário.
 
 ## Permissões e planos
 
-`bonuses:grant` é parte do módulo base `customers-orders`: disponível em todo plano, sem novo recurso pago nem limite novo. Administradores têm a permissão. Para vendedores, a operação **Conceder bonificações** é `grantable`, desligada por padrão, sem fluxo de aprovação. Ela cobre a bonificação no pedido, o lançamento avulso e a consulta do que é seu. Um rascunho já com bonificação pode ser confirmado por quem não a tem: a permissão vale para quem concede, não para quem confirma.
+`bonuses:grant` é parte do módulo base `customers-orders`: disponível em todo plano, sem novo recurso pago nem limite novo. Administradores têm a permissão. Para vendedores, a operação **Conceder bonificações** é `grantable`, desligada por padrão, sem fluxo de aprovação. Ela cobre a bonificação no pedido, o lançamento avulso e a consulta do que é seu.
+
+Um rascunho com bonificação autorizada pode ser confirmado por quem não tem a permissão, com duas travas. Sem ela, a edição recusa mudar cliente ou produtos vendidos (`BONUS_GRANT_REQUIRED`), porque a bonificação foi autorizada para aquela venda; pagamento e observações seguem livres. Na confirmação, quem alterou a bonificação por último precisa continuar ativo e com a permissão (`BONUS_AUTHORIZATION_REQUIRED`), a mesma lógica do aprovador de desconto. Retirar a permissão de alguém trava o que essa pessoa deixou pendente até nova revisão.
 
 Quem vê o pedido vê a bonificação dele, sem custo. Custos só chegam com `costs:read`, conferido no servidor: relatórios omitem colunas e totais, e os arquivos saem da mesma visão. O relatório por responsável segue `commercial.sellers`, como o de vendedores.
 

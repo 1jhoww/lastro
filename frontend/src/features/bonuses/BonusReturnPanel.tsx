@@ -68,7 +68,11 @@ export function BonusReturnPanel({ bonus, onDone }: { bonus: BonusDetail; onDone
   return (
     <Panel
       title="Registrar retorno"
-      description="Informe só o que voltou. Vendável retorna ao estoque; danificado fica registrado e não entra no estoque."
+      description={
+        bonus.kind === 'standalone'
+          ? 'Avulsa não tem cancelamento. Para corrigir um lançamento, registre o retorno total. Vendável retorna ao estoque; danificado fica registrado e não entra no estoque.'
+          : 'Informe só o que voltou. Vendável retorna ao estoque; danificado fica registrado e não entra no estoque.'
+      }
     >
       <View style={styles.body}>
         {open.map((line) => (

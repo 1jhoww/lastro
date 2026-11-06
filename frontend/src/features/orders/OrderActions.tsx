@@ -55,6 +55,8 @@ export function commandMessage(kind: OrderCommandKind, e: ApiError): string {
         : 'O estoque reservado não comporta a operação. Nada foi alterado.';
     case 'PRODUCT_UNAVAILABLE':
       return 'Um produto foi desativado ou mudou de unidade. Edite o rascunho e remova-o.';
+    case 'BONUS_AUTHORIZATION_REQUIRED':
+      return 'A bonificação deste rascunho precisa ser revista por quem pode conceder bonificações. Nada foi reservado.';
     case 'INVALID_RESERVATION':
       return 'A reserva de estoque deste pedido está inconsistente. Nada foi alterado; fale com o administrador.';
     case 'INVALID_ORDER_STATE':

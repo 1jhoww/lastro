@@ -20618,7 +20618,7 @@ export interface operations {
                 "X-Tenant-Id": string;
             };
             path: {
-                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons";
+                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons" | "bonuses-returns";
             };
             cookie?: never;
         };
@@ -20633,7 +20633,7 @@ export interface operations {
                     "application/json": {
                         data: {
                             /** @enum {string} */
-                            report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons";
+                            report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons" | "bonuses-returns";
                             /** @enum {string} */
                             category: "commercial" | "financial" | "inventory" | "management";
                             title: string;
@@ -20923,7 +20923,7 @@ export interface operations {
                 "X-Tenant-Id": string;
             };
             path: {
-                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons";
+                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons" | "bonuses-returns";
             };
             cookie?: never;
         };
@@ -21170,7 +21170,7 @@ export interface operations {
                 "X-Tenant-Id": string;
             };
             path: {
-                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons";
+                report: "sales-period" | "orders-status" | "sales-customers" | "sales-products" | "sales-sellers" | "receivables" | "overdue" | "upcoming" | "receipts" | "delinquency" | "stock-position" | "stock-low" | "stock-empty" | "stock-movements" | "payables-period" | "payables-supplier" | "payables-overdue" | "payable-payments" | "purchases-supplier" | "purchases-product" | "cost-evolution" | "product-profitability" | "cash-flow" | "expenses-category" | "bonuses-period" | "bonuses-customers" | "bonuses-sellers" | "bonuses-products" | "bonuses-orders" | "bonuses-reasons" | "bonuses-returns";
             };
             cookie?: never;
         };

@@ -53,6 +53,22 @@ function BonusRecord() {
 const quantity = (text: string, unit: string) =>
   formatQuantity(fromApiQuantity(text), unit as Unit);
 
+/** Data vem no rótulo; retorno mostra quanto voltou de cada produto. */
+function eventText(event: BonusDetail['history'][number], lines: BonusDetail['lines']) {
+  const title = event.reason
+    ? `${eventLabel[event.type]}: ${event.reason}`
+    : eventLabel[event.type];
+  const returned = event.lines.flatMap((item) => {
+    const line = lines.find((l) => l.id === item.lineId);
+    return line
+      ? [
+          `${line.name}: ${quantity(item.sellable, line.unit)} vendável, ${quantity(item.damaged, line.unit)} danificado`,
+        ]
+      : [];
+  });
+  return [title, ...returned].join(' · ');
+}
+
 function BonusView({ bonus: b, onRefresh }: { bonus: BonusDetail; onRefresh: () => void }) {
   const { permissions } = useSession();
   const costs = new Map(b.cost?.lines.map((l) => [l.lineId, l.costCents]));
@@ -67,6 +83,12 @@ function BonusView({ bonus: b, onRefresh }: { bonus: BonusDetail; onRefresh: () 
       {b.status === 'confirmed' ? (
         <Alert tone="info" title="Estoque reservado">
           Os itens saem do estoque na expedição do pedido. Cancelar o pedido libera a reserva.
+        </Alert>
+      ) : null}
+      {b.kind === 'standalone' && !permissions.includes('returns:manage') ? (
+        <Alert tone="info" title="Sem cancelamento">
+          Bonificação registrada não pode ser cancelada nem editada. Para corrigir, peça ao
+          administrador um retorno total.
         </Alert>
       ) : null}
       {b.orderId ? (
@@ -161,11 +183,7 @@ function BonusView({ bonus: b, onRefresh }: { bonus: BonusDetail; onRefresh: () 
                   <Fragment key={event.id}>
                     <Fact
                       label={formatDateTime(event.occurredAt)}
-                      value={
-                        event.reason
-                          ? `${eventLabel[event.type]}: ${event.reason}`
-                          : eventLabel[event.type]
-                      }
+                      value={eventText(event, b.lines)}
                     />
                   </Fragment>
                 ))}

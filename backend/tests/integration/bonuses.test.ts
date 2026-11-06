@@ -505,6 +505,92 @@ describe('Retornos', () => {
 });
 
 describe('Permissões, planos e isolamento', () => {
+  const patch = (id: string, body: object, user: TestUser) =>
+    request(f.app).patch(`/api/v1/orders/${id}`).set(orderHeaders(f, user)).send(body);
+
+  it('sem a permissão, vendedor confirma rascunho autorizado, mas não muda a bonificação', async () => {
+    await extraSeats(f);
+    const user = await seller(f, 'sem-permissao');
+    const productId = await stocked('20');
+    const other = await stocked('20');
+    const customerId = await ownCustomer(user);
+    const created = await request(f.app)
+      .post('/api/v1/orders')
+      .set(orderHeaders(f))
+      .send({
+        customerId,
+        sellerUid: user.uid,
+        lines: [{ productId, quantity: '2' }],
+        payment: { type: 'cash', dueDates: ['2090-01-01'] },
+        bonus: { lines: [{ productId: other, quantity: '1' }] },
+      })
+      .expect(201);
+    const id = created.body.data.id as string;
+    const expectedVersion = created.body.data.version as number;
+    const code = async (body: object) => {
+      const result = await patch(id, { expectedVersion, ...body }, user).expect(403);
+      return result.body.error.code as string;
+    };
+    expect(await code({ bonus: { lines: [{ productId: other, quantity: '9' }] } })).toBe(
+      'FORBIDDEN',
+    );
+    expect(await code({ bonus: { lines: [{ productId, quantity: '1' }] } })).toBe('FORBIDDEN');
+    expect(await code({ bonus: null })).toBe('FORBIDDEN');
+    expect(await code({ bonus: { lines: [] } })).toBe('FORBIDDEN');
+    expect(await code({ lines: [{ productId, quantity: '1' }] })).toBe('BONUS_GRANT_REQUIRED');
+    expect(await code({ lines: [{ productId: other, quantity: '2' }] })).toBe(
+      'BONUS_GRANT_REQUIRED',
+    );
+    expect(await code({ customerId: await ownCustomer(user) })).toBe('BONUS_GRANT_REQUIRED');
+    expect(await code({ customerId: null })).toBe('BONUS_GRANT_REQUIRED');
+
+    const notes = await patch(
+      id,
+      {
+        expectedVersion,
+        customerId,
+        lines: [{ productId, quantity: '2' }],
+        notes: 'Entregar pela manhã',
+      },
+      user,
+    ).expect(200);
+    expect(notes.body.data.bonus.lines).toMatchObject([{ productId: other, quantity: '1' }]);
+
+    await command(f, notes.body.data, 'confirm', user).expect(200);
+    expect(await stock(other)).toMatchObject({ reserved: '1' });
+  });
+
+  it('retirar a permissão bloqueia a bonificação pendente até nova autorização', async () => {
+    await extraSeats(f);
+    const user = await seller(f, 'permissao-retirada');
+    await grant(user, [...sellerOperations, 'orders.bonuses']);
+    const productId = await stocked('20');
+    const order = await draft(f, user, {
+      productId,
+      customerId: await ownCustomer(user),
+      extra: { bonus: { lines: [{ productId, quantity: '1' }] } },
+    });
+    await request(f.app)
+      .patch(`/api/v1/users/${user.uid}/permissions`)
+      .set(orderHeaders(f))
+      .send({ operations: sellerOperations, expectedVersion: 2 })
+      .expect(200);
+    const refused = await command(f, order, 'confirm', user).expect(403);
+    expect(refused.body.error.code).toBe('BONUS_AUTHORIZATION_REQUIRED');
+    expect(await stock(productId)).toMatchObject({ reserved: '0' });
+
+    const reviewed = await patch(
+      order.id,
+      {
+        expectedVersion: order.version,
+        bonus: { lines: [{ productId, quantity: '1' }] },
+      },
+      f.ownerA,
+    ).expect(200);
+    await command(f, reviewed.body.data, 'confirm', user).expect(200);
+    expect(await stock(productId)).toMatchObject({ reserved: '2' });
+  });
+
   it('vendedor sem a permissão não concede; com ela, só na própria carteira e sem custos', async () => {
     await extraSeats(f);
     const user = await seller(f, 'vendedor-bonus');
@@ -708,6 +794,49 @@ describe('Custos, relatórios e Resultado estimado', () => {
     expect(view.columns.map((c: { key: string }) => c.key)).not.toContain('cost');
     const admin = await report('bonuses-period');
     expect(admin.rows).toHaveLength(2);
+  });
+
+  it('retorno aparece na própria data, e o ajuste fica no período da bonificação', async () => {
+    await gestao(f);
+    const productId = await stocked('10');
+    await referenceCost(productId, 500);
+    const bonus = (
+      await standalone({
+        customerId: await orderCustomer(f),
+        lines: [{ productId, quantity: '4' }],
+        reason: 'campaign',
+      }).expect(201)
+    ).body.data;
+    // A bonificação é de outro mês; o retorno acontece hoje.
+    const october = '2026-10-15T15:00:00.000Z';
+    await orderDocs(f, 'bonuses').doc(bonus.id).update({ occurredAt: october });
+    await giveBack(bonus.id, {
+      expectedVersion: 1,
+      reason: 'Cliente devolveu',
+      lines: [{ lineId: bonus.lines[0].id, sellable: '1', damaged: '1' }],
+    }).expect(200);
+
+    const returns = await report('bonuses-returns');
+    expect(returns.period.basis).toBe('Data do retorno');
+    expect(returns.rows).toHaveLength(1);
+    expect(returns.rows[0].cells).toMatchObject({
+      granted: '2026-10-15',
+      sellable: '1',
+      damaged: '1',
+      cost: 500,
+    });
+    expect(returns.rows[0].cells.date).not.toBe('2026-10-15');
+    expect(returns.rows[0].link).toEqual({ kind: 'bonus', id: bonus.id });
+
+    const current = await report('bonuses-period');
+    expect(current.rows).toHaveLength(0);
+    const original = await report('bonuses-period', f.ownerA, {
+      from: '2026-10-01',
+      to: '2026-10-31',
+    });
+    expect(original.rows[0].cells).toMatchObject({ units: '3', returned: '2', cost: 1500 });
+    const old = await report('bonuses-returns', f.ownerA, { from: '2026-10-01', to: '2026-10-31' });
+    expect(old.rows).toHaveLength(0);
   });
 
   it('movimentação de estoque identifica a origem bonificação', async () => {

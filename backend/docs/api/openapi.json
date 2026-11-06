@@ -55122,7 +55122,8 @@
                 "bonuses-sellers",
                 "bonuses-products",
                 "bonuses-orders",
-                "bonuses-reasons"
+                "bonuses-reasons",
+                "bonuses-returns"
               ]
             }
           },
@@ -55282,7 +55283,8 @@
                             "bonuses-sellers",
                             "bonuses-products",
                             "bonuses-orders",
-                            "bonuses-reasons"
+                            "bonuses-reasons",
+                            "bonuses-returns"
                           ]
                         },
                         "category": {
@@ -56186,7 +56188,8 @@
                 "bonuses-sellers",
                 "bonuses-products",
                 "bonuses-orders",
-                "bonuses-reasons"
+                "bonuses-reasons",
+                "bonuses-returns"
               ]
             }
           },
@@ -56922,7 +56925,8 @@
                 "bonuses-sellers",
                 "bonuses-products",
                 "bonuses-orders",
-                "bonuses-reasons"
+                "bonuses-reasons",
+                "bonuses-returns"
               ]
             }
           },

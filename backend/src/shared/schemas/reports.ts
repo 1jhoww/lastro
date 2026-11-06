@@ -33,6 +33,7 @@ export const reportIds = [
   'bonuses-products',
   'bonuses-orders',
   'bonuses-reasons',
+  'bonuses-returns',
 ] as const;
 export type ReportId = (typeof reportIds)[number];
 export const reportId = z.enum(reportIds);

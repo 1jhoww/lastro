@@ -156,6 +156,12 @@ const bonusDefinitions: Record<BonusReportId, Definition> = {
     description: 'Por que as bonificações avulsas foram concedidas.',
     filters: ['from', 'to', 'customerId', 'productId', 'sellerUid'],
   },
+  'bonuses-returns': {
+    category: 'commercial',
+    title: 'Retornos de bonificações',
+    description: 'Cada retorno na data em que aconteceu, vendável e danificado.',
+    filters: ['from', 'to', 'customerId', 'productId', 'sellerUid'],
+  },
 };
 export const reportDefinitions: Record<ReportId, Definition> = {
   'sales-period': {

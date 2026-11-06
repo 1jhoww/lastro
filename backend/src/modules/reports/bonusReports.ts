@@ -2,6 +2,7 @@ import type { Transaction } from 'firebase-admin/firestore';
 import type { CommercialRepository } from '../../infrastructure/repositories/commercialRepository.js';
 import {
   bonusCostSnapshotSchema,
+  bonusEventSchema,
   bonusSchema,
   type Bonus,
   type BonusCostSnapshot,
@@ -37,7 +38,8 @@ export type BonusReportId =
   | 'bonuses-sellers'
   | 'bonuses-products'
   | 'bonuses-orders'
-  | 'bonuses-reasons';
+  | 'bonuses-reasons'
+  | 'bonuses-returns';
 export const isBonusReport = (id: string): id is BonusReportId => id.startsWith('bonuses-');
 
 export interface BonusReportEnv {
@@ -177,6 +179,7 @@ function notes(env: BonusReportEnv, rows: readonly Fact[], extra: string[] = [])
   return [
     'Bonificações não geram faturamento nem contas a receber. Vinculadas contam pela confirmação do pedido; avulsas, pelo registro. Canceladas não entram.',
     'Unidades somam as quantidades de todas as medidas e descontam só os retornos vendáveis.',
+    'Retorno ajusta unidades e custo no período da bonificação. A data de cada retorno está em "Retornos de bonificações".',
     ...(env.showCosts && missing
       ? [`${missing} bonificação(ões) sem custo registrado ficam fora do custo total.`]
       : []),
@@ -231,11 +234,114 @@ const groupColumns = (env: BonusReportEnv) => [
   ...costColumn(env),
 ];
 
+/**
+ * Each return on the date it happened, whatever the period of the bonus. Cost stays adjusted in
+ * the period of the bonus; here it only shows how much each return took back.
+ */
+async function bonusReturns(env: BonusReportEnv, query: ReportQuery): Promise<Body> {
+  const events = await scanAll(
+    env.repo,
+    env.tx,
+    env.repo
+      .ref(env.tenantId, 'bonusEvents', 'placeholder')
+      .parent.where('type', '==', 'returned')
+      .where('occurredAt', '>=', env.zonedStart(env.period.from, env.timezone))
+      .where('occurredAt', '<', env.zonedStart(addDays(env.period.to, 1), env.timezone))
+      .orderBy('occurredAt'),
+    bonusEventSchema,
+    BONUS_REPORT_CAP,
+    'retornos',
+  );
+  const ids = [...new Set(events.map((e) => e.bonusId))];
+  const bonuses = new Map<string, Bonus>();
+  for (let i = 0; i < ids.length; i += 100) {
+    checkReadBudget();
+    const page = await env.repo.foundation.readMany(
+      ids.slice(i, i + 100).map((id) => env.repo.ref(env.tenantId, 'bonuses', id)),
+      bonusSchema,
+      env.tx,
+    );
+    for (const bonus of page) if (bonus) bonuses.set(bonus.id, bonus);
+  }
+  const visible = [...bonuses.values()].filter(
+    (b) =>
+      (!env.scope ||
+        (b.responsibleUid === env.scope.uid &&
+          b.customerId !== null &&
+          env.scope.portfolio.has(b.customerId))) &&
+      (!query.customerId || b.customerId === query.customerId) &&
+      (!query.sellerUid || b.responsibleUid === query.sellerUid),
+  );
+  const snapshots = await costSnapshots(env, visible);
+  const shown = new Map(visible.map((b) => [b.id, b]));
+  const items = [...events].reverse().flatMap((event) => {
+    const bonus = shown.get(event.bonusId);
+    if (!bonus) return [];
+    return event.lines.flatMap((returned) => {
+      const line = bonus.lines.find((l) => l.id === returned.lineId);
+      if (!line || (query.productId && line.productId !== query.productId)) return [];
+      const sellable = parseQuantity(returned.sellable, line.unit);
+      const damaged = parseQuantity(returned.damaged, line.unit);
+      const cost = snapshots.get(bonus.id)?.lines.find((l) => l.lineId === line.id);
+      const costCents =
+        cost?.costCents == null
+          ? null
+          : Math.round((cost.costCents * sellable) / cost.quantityScaled);
+      return [{ event, bonus, line, sellable, damaged, costCents }];
+    });
+  });
+  const names = await env.people([...new Set(items.map((i) => i.event.actorUid))]);
+  return {
+    period: { ...env.period, basis: 'Data do retorno' },
+    summary: [
+      metric('returns', 'Retornos', 'count', new Set(items.map((i) => i.event.id)).size),
+      metric('sellable', 'Vendável', 'quantity', sum(items, (i) => i.sellable) / 1000),
+      metric('damaged', 'Danificado', 'quantity', sum(items, (i) => i.damaged) / 1000),
+      ...(env.showCosts
+        ? [metric('cost', 'Custo revertido', 'money', sum(items, (i) => i.costCents ?? 0))]
+        : []),
+    ],
+    columns: [
+      column('date', 'Retorno', 'date'),
+      column('number', 'Bonificação', 'text'),
+      column('granted', 'Concedida em', 'date'),
+      column('customer', 'Cliente', 'text'),
+      column('product', 'Produto', 'text'),
+      column('sellable', 'Vendável', 'quantity'),
+      column('damaged', 'Danificado', 'quantity'),
+      column('reason', 'Motivo', 'text'),
+      ...(env.showCosts ? [column('cost', 'Custo revertido', 'money')] : []),
+    ],
+    rows: items.map((i) =>
+      row(
+        {
+          date: day(i.event.occurredAt, env.timezone),
+          number: orderNumber(i.bonus.commercialId),
+          granted: day(i.bonus.occurredAt, env.timezone),
+          customer: i.bonus.customerName ?? 'Cliente',
+          product: i.line.name,
+          sellable: formatQuantity(i.sellable),
+          damaged: formatQuantity(i.damaged),
+          reason: `${i.event.reason ?? ''} (${names.get(i.event.actorUid) ?? 'Usuário sem nome'})`,
+          ...(env.showCosts ? { cost: i.costCents } : {}),
+        },
+        { kind: 'bonus', id: i.bonus.id },
+      ),
+    ),
+    chart: null,
+    notes: [
+      'Mostra cada retorno na data em que aconteceu, mesmo quando a bonificação é de outro período.',
+      'O custo revertido ajusta o período da bonificação, não o período do retorno. Danificado não reverte custo.',
+    ],
+  };
+}
+
 export async function bonusReport(
   env: BonusReportEnv,
   id: BonusReportId,
   query: ReportQuery,
 ): Promise<Body> {
+  if (id === 'bonuses-returns') return bonusReturns(env, query);
   const scoped = await grantedBonuses(env, query);
   const bonuses =
     id === 'bonuses-orders'
@@ -364,7 +470,7 @@ export async function bonusReport(
         }),
         notes: notes(env, rows),
       };
-    case 'bonuses-reasons': {
+    default: {
       const total = sum(rows, (r) => r.units);
       return {
         ...base,

@@ -211,7 +211,7 @@ export class ManagementService {
             );
           if (profit.bonusesGrantedCents > 0)
             notes.push(
-              'Bonificações concedidas aparecem em linha própria: reduzem o resultado estimado, mas não o faturamento, o custo das mercadorias vendidas nem a margem bruta.',
+              'Bonificações concedidas aparecem em linha própria: reduzem o resultado estimado, mas não o faturamento, o custo das mercadorias vendidas nem a margem bruta. Retornos ajustam o período da bonificação.',
             );
           if (profit.bonusesWithoutCost > 0)
             notes.push(

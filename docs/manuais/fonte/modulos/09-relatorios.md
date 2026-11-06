@@ -35,7 +35,7 @@ Os relatórios financeiros e de gestão também abrem em [[Financeiro]] › [[Re
 As categorias **Financeiro** e **Estoque** só aparecem para quem tem acesso a esses módulos (na prática, o administrador). O vendedor com relatórios liberados vê a categoria **Comercial**, com os clientes da própria carteira.
 :::
 
-Os relatórios de bonificações ficam em **Comercial**: por período, por cliente, por responsável, por produto, por pedido e motivos das avulsas. Eles nunca entram nos relatórios de vendas. O custo só aparece para quem tem acesso a custos.
+Os relatórios de bonificações ficam em **Comercial**: por período, por cliente, por responsável, por produto, por pedido, motivos das avulsas e retornos. Eles nunca entram nos relatórios de vendas. O custo só aparece para quem tem acesso a custos.
 
 ## Gerar um relatório
 

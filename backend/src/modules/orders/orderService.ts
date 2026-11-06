@@ -47,6 +47,17 @@ import {
   recordBonusEvent,
 } from '../bonuses/orderBonus.js';
 import { holds } from '../users/permissions.js';
+const saleKey = (lines: readonly { productId: string; quantity: string }[]) =>
+  JSON.stringify(
+    lines
+      .map((l) => [l.productId, Number(l.quantity)] as const)
+      .sort((a, b) => a[0].localeCompare(b[0])),
+  );
+/** Whether an edit keeps the sold products and quantities; prices are not the seller's to edit. */
+const sameSale = (
+  saved: readonly { productId: string; quantity: string }[],
+  sent: readonly { productId: string; quantity: string }[] | undefined,
+) => !sent || saleKey(saved) === saleKey(sent);
 export class OrderService {
   readonly financialLocks: FinancialLocks;
   constructor(
@@ -242,6 +253,32 @@ export class OrderService {
         recordBonusEvent(this.repo, tx, actor, bonus, previous ? 'edited' : 'created', null, null);
       },
     };
+  }
+  /**
+   * Who confirms a bonus without the grant relies on someone else's authorization, and that person
+   * must still hold it, as a discount needs its approver. Revoking the grant stops pending bonuses.
+   */
+  private async bonusAuthorized(tx: Transaction, ctx: TenantContext, bonus: Bonus) {
+    if (holds(ctx, 'bonuses:grant')) return;
+    const uid = bonus.updatedBy;
+    const [member, identity] = await Promise.all([
+      this.repo.foundation.read(
+        this.repo.foundation.tenant(ctx.tenant.id, 'memberships', uid),
+        membershipSchema,
+        tx,
+      ),
+      this.repo.foundation.read(this.repo.foundation.global('identities', uid), identitySchema, tx),
+    ]);
+    requireCondition(
+      member?.uid === uid &&
+        member.tenantId === ctx.tenant.id &&
+        member.status === 'active' &&
+        identity?.status === 'active' &&
+        holds({ membership: member, entitlements: ctx.entitlements }, 'bonuses:grant'),
+      403,
+      'BONUS_AUTHORIZATION_REQUIRED',
+      'Bonificação exige nova autorização de quem pode conceder',
+    );
   }
   private async amounts(
     tx: Transaction,
@@ -535,6 +572,17 @@ export class OrderService {
       const lines = input.lines
         ? input.lines.map((l) => ({ ...l, id: randomUUID() }))
         : order.lines;
+      const savedBonus = await readOrderBonus(this.repo, tx, tenantId, id);
+      // The bonus was authorized for this customer and this sale. Without the grant, changing
+      // either would hand an authorized bonus to a different deal.
+      requireCondition(
+        !savedBonus ||
+          holds(ctx, 'bonuses:grant') ||
+          (customerId === order.customerId && sameSale(order.lines, input.lines)),
+        403,
+        'BONUS_GRANT_REQUIRED',
+        'Alterar cliente ou produtos de rascunho com bonificação exige "Conceder bonificações"',
+      );
       // Every edit invalidates prior approval. Only an explicit administrator command reapproves.
       const { terms, method } = await this.selection(tx, ctx, input, now, order);
       const amounts = await this.amounts(
@@ -575,15 +623,7 @@ export class OrderService {
         updatedBy: actor.uid,
       });
       assertDocumentFits(this.repo.ref(tenantId, 'orders', id).path, next);
-      const bonus = await this.draftBonus(
-        tx,
-        ctx,
-        actor,
-        next,
-        input.bonus,
-        await readOrderBonus(this.repo, tx, tenantId, id),
-        now,
-      );
+      const bonus = await this.draftBonus(tx, ctx, actor, next, input.bonus, savedBonus, now);
       tx.set(this.repo.ref(tenantId, 'orders', id), next);
       bonus.write();
       this.event(tx, actor, next, order.status, 'edited', input.discount?.reason ?? null, null);
@@ -776,6 +816,7 @@ export class OrderService {
         if (hasFeature(ctx.entitlements, 'costing.products'))
           costs = await orderCostSnapshot(this.repo, tx, tenantId, id, next.lines, now);
         if (bonus) {
+          await this.bonusAuthorized(tx, ctx, bonus);
           const refreshed = await this.snapshots(tx, tenantId, bonus.lines);
           bonus = {
             ...bonus,

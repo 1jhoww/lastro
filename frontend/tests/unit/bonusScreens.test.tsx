@@ -2,6 +2,7 @@ import { fireEvent, screen, waitFor } from 'expo-router/testing-library';
 import Bonuses from '@/app/(app)/bonificacoes/index';
 import NewBonus from '@/app/(app)/bonificacoes/nova';
 import BonusDetail from '@/app/(app)/bonificacoes/[id]';
+import EditOrder from '@/app/(app)/pedidos/[id]/editar';
 import OrderDetail from '@/app/(app)/pedidos/[id]/index';
 import NewOrder from '@/app/(app)/pedidos/novo';
 import {
@@ -31,6 +32,7 @@ const overrides = {
   '(app)/bonificacoes/[id]': BonusDetail,
   '(app)/pedidos/novo': NewOrder,
   '(app)/pedidos/[id]/index': OrderDetail,
+  '(app)/pedidos/[id]/editar': EditOrder,
 };
 
 const line = {
@@ -227,6 +229,58 @@ describe('Bonificações', () => {
     await screen.findByText('Registro');
     expect(screen.queryByText('Registrar retorno')).toBeNull();
     expect(screen.queryByText('Custo das unidades')).toBeNull();
+  });
+
+  it('vendedor sem permissão edita rascunho com cliente e produtos travados e não reenvia a bonificação', async () => {
+    const { gateway, server } = world('seller', false);
+    let sent: Record<string, unknown> | undefined;
+    const o1 = order('o1', {
+      lines: [orderLine('p1', '2', 1000)],
+      bonus: {
+        id: 'o1',
+        commercialId: 'BON-O1-0000-4000-8000-000000000000',
+        status: 'draft',
+        lines: [line],
+        reason: null,
+        reasonDetail: null,
+      },
+    });
+    server
+      .on('GET', '/api/v1/orders/o1', () => ok(o1))
+      .on('GET', '/api/v1/orders/o1/history', () => ok(page([])))
+      .on('PATCH', '/api/v1/orders/o1', (c) => {
+        sent = c.body as Record<string, unknown>;
+        return ok(o1);
+      });
+    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/pedidos/o1/editar', overrides });
+    expect(await screen.findByText('Cliente e produtos bloqueados')).toBeTruthy();
+    expect(screen.queryByPlaceholderText('Buscar produto pelo início do nome')).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Remover/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Adicionar bonificação' })).toBeNull();
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar rascunho' }));
+    await waitFor(() => expect(sent).toBeTruthy());
+    expect(sent).not.toHaveProperty('bonus');
+  });
+
+  it('avulsa avisa que não existe cancelamento depois do registro', async () => {
+    const { gateway, server } = world('seller');
+    server.on('GET', '/api/v1/bonuses/b1', () => ok(bonus()));
+    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/bonificacoes/b1', overrides });
+    expect(await screen.findByText('Sem cancelamento')).toBeTruthy();
+    expect(screen.getByText(/peça ao administrador um retorno total/)).toBeTruthy();
+  });
+
+  it('formulário da avulsa antecipa que o registro não pode ser cancelado', async () => {
+    const { gateway, server } = world('administrator');
+    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/bonificacoes/nova', overrides });
+    expect(await screen.findByText(/não pode ser cancelada nem editada/)).toBeTruthy();
+  });
+
+  it('administrador vê no retorno da avulsa que a correção é o retorno total', async () => {
+    const { gateway, server } = world('administrator');
+    server.on('GET', '/api/v1/bonuses/b1', () => ok(bonus()));
+    await renderApp({ gateway, fetch: server.fetch, initialUrl: '/bonificacoes/b1', overrides });
+    expect(await screen.findByText(/Avulsa não tem cancelamento/)).toBeTruthy();
   });
 
   it('histórico lista bonificações e leva à nova, separada do Novo pedido', async () => {

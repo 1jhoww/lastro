@@ -38,6 +38,8 @@ Pedidos antigos, estoque, custos e contas a receber não mudam. Quem não usar b
 
 - Bonificação não entra no total, não gera conta a receber e não conta como faturamento.
 - Na vinculada, o estoque fica reservado na confirmação e sai na expedição. Cancelar o pedido cancela a bonificação.
-- Na avulsa, o estoque sai quando você confirma o resumo.
+- Na avulsa, o estoque sai quando você confirma o resumo. Depois disso não há cancelamento: para corrigir, registre um retorno total.
 - Retorno vendável volta ao estoque. Danificado fica registrado e não volta.
+- O ajuste do retorno fica no período da bonificação. O relatório **Retornos de bonificações** mostra a data de cada retorno.
+- Sem **Conceder bonificações**, o vendedor pode confirmar um rascunho autorizado, mas não muda cliente, produtos nem itens bonificados.
 - O comprovante não é documento fiscal. Confirme com seu contador a nota de remessa em bonificação.

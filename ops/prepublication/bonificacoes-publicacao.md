@@ -20,7 +20,10 @@ Coleção `bonuses`, todos com `occurredAt` decrescente no fim:
 - `responsibleUid`, `kind`
 - `responsibleUid`, `customerId`
 
-Coleção `bonusEvents`: `bonusId` crescente, `occurredAt` crescente.
+Coleção `bonusEvents`, ambos com `occurredAt` crescente no fim:
+
+- `bonusId`
+- `type`
 
 ## Campos sem índice
 
@@ -41,6 +44,6 @@ As definições estão em `backend/firestore.indexes.json`, geradas por `backend
 
 ## Riscos de produção
 
-- `lastro-hml` segue sem backup, PITR e alertas.
+- `lastro-hml` segue sem backup, PITR e alertas. A proposta está em `firestore-backup-pitr.md` e deve ser aplicada antes desta publicação.
 - A correção do BUG-001 continua fora desta entrega, sem commit na worktree `gestao-ux`.
 - O Lastro não emite nota fiscal. A empresa confirma com o contador a nota de remessa em bonificação.

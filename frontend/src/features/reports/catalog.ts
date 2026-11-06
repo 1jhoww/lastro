@@ -125,6 +125,13 @@ export const reports: ReportEntry[] = [
     filters: ['period', 'customer', 'product', 'seller'],
   },
   {
+    id: 'bonuses-returns',
+    category: 'commercial',
+    title: 'Retornos de bonificações',
+    short: 'Retornos de bonificações',
+    filters: ['period', 'customer', 'product', 'seller'],
+  },
+  {
     id: 'receivables',
     category: 'financial',
     title: 'Contas a receber',

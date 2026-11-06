@@ -42,6 +42,8 @@ export function saveErrorMessage(e: ApiError): string {
       return 'O rascunho foi alterado por outra pessoa ou não é mais um rascunho. Nada foi salvo: carregue a versão atual e refaça a alteração.';
     case 'PRODUCT_UNAVAILABLE':
       return 'Um dos produtos foi desativado ou mudou de unidade. Remova-o do carrinho e salve de novo.';
+    case 'BONUS_GRANT_REQUIRED':
+      return 'Este rascunho tem bonificação. Cliente e produtos só mudam com a permissão Conceder bonificações.';
     case 'CUSTOMER_INACTIVE':
       return 'O cliente foi desativado. Escolha outro cliente.';
     case 'INVALID_DUE_DATE':
@@ -131,6 +133,8 @@ export function OrderEditor({
   const [bonusReason, setBonusReason] = useState<BonusReason | ''>(order?.bonus?.reason ?? '');
   const [bonusDetail, setBonusDetail] = useState(order?.bonus?.reasonDetail ?? '');
   const [bonusOpen, setBonusOpen] = useState(Boolean(order?.bonus));
+  // Sem a permissão, a bonificação autorizada prende cliente e produtos; o servidor confere.
+  const bonusLocked = !canGrant && Boolean(order?.bonus);
 
   const conditions = useConditionOptions();
   const methods = useMethodOptions();
@@ -242,24 +246,33 @@ export function OrderEditor({
           },
         ];
 
-  const cart =
-    lines.length === 0 ? (
-      <EmptyState
-        size="compact"
-        icon={Package}
-        title="Carrinho vazio"
-        description="Ajuste a quantidade de um produto para incluí-lo."
-      />
-    ) : (
-      <CartList
-        lines={lines}
-        available={available}
-        onQuantity={setQuantity}
-        onRemove={remove}
-        disabled={saving}
-        dense={wide}
-      />
-    );
+  const cart = bonusLocked ? (
+    <View style={styles.summary} accessibilityLabel="Itens do pedido">
+      {lines.map((l) => (
+        <SummaryLine
+          key={l.productId}
+          label={l.name}
+          value={formatQuantity(l.quantityMilli, l.unit)}
+        />
+      ))}
+    </View>
+  ) : lines.length === 0 ? (
+    <EmptyState
+      size="compact"
+      icon={Package}
+      title="Carrinho vazio"
+      description="Ajuste a quantidade de um produto para incluí-lo."
+    />
+  ) : (
+    <CartList
+      lines={lines}
+      available={available}
+      onQuantity={setQuantity}
+      onRemove={remove}
+      disabled={saving}
+      dense={wide}
+    />
+  );
 
   const totalLine = (
     <View style={styles.totalLine}>
@@ -339,7 +352,7 @@ export function OrderEditor({
                 key="customer"
                 value={customer}
                 onChange={setCustomer}
-                disabled={saving}
+                disabled={saving || bonusLocked}
               />,
               <Select
                 key="seller"
@@ -356,7 +369,14 @@ export function OrderEditor({
         <View style={[styles.columns, wide && styles.columnsWide]}>
           <View style={[styles.main, wide && styles.grow]}>
             <Section title="Produtos">
-              <ProductSearch quantities={quantities} onQuantity={setProductQuantity} />
+              {bonusLocked ? (
+                <Alert tone="info" title="Cliente e produtos bloqueados">
+                  Este rascunho tem bonificação autorizada. Só quem pode conceder bonificações muda
+                  cliente, produtos ou itens bonificados. Pagamento e observações seguem liberados.
+                </Alert>
+              ) : (
+                <ProductSearch quantities={quantities} onQuantity={setProductQuantity} />
+              )}
               {wide ? null : (
                 <View style={styles.inlineCart}>
                   <Text variant="smallStrong">{`Carrinho · ${itemsLabel(lines.length)}`}</Text>
