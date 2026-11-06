@@ -256,7 +256,6 @@ function FinanceSideNav() {
                         styles.flex,
                         { fontFamily: selected ? fontFamily.semibold : fontFamily.medium },
                       ]}
-                      numberOfLines={1}
                     >
                       {item.label}
                     </Text>
@@ -374,6 +373,7 @@ const styles = StyleSheet.create({
     gap: space[3],
     minHeight: layout.hitTarget - 4,
     paddingHorizontal: space[3],
+    paddingVertical: space[2],
     borderRadius: radius.md,
   },
   hover: { backgroundColor: 'rgba(17,17,17,0.04)' },

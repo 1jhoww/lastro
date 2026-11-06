@@ -13,9 +13,11 @@ import {
 } from '@/features/catalog/FormParts';
 import { useDiscardGuard } from '@/features/catalog/useDiscardGuard';
 import { MarginEstimate } from '@/features/management/MarginEstimate';
+import { messageOf } from '@/features/management/Parts';
 import { unitLabel, type Unit } from '@/lib/quantity';
 import { space, useLayoutSize } from '@/theme';
 import {
+  Alert,
   Button,
   ConfirmDialog,
   CurrencyInput,
@@ -37,6 +39,8 @@ type Props = {
   showCost?: boolean;
   /** Custo médio real do estoque, só para leitura. */
   averageCostCents?: number | null;
+  /** Falha só no custo: o formulário continua preenchido, pronto para tentar de novo. */
+  costFailure?: { error: unknown; productSaved: boolean } | null;
   submitting: boolean;
   error: unknown;
   onSubmit: (values: ProductFormValues) => void;
@@ -73,6 +77,7 @@ export function ProductForm({
   image,
   showCost = false,
   averageCostCents = null,
+  costFailure = null,
   submitting,
   error,
   onSubmit,
@@ -321,6 +326,23 @@ export function ProductForm({
           {imageGroup}
         </>
       )}
+      {costFailure ? (
+        <Alert
+          tone="danger"
+          title={costFailure.productSaved ? 'Produto salvo, mas o custo não' : 'Custo não salvo'}
+          action={
+            <Button
+              label="Tentar novamente"
+              size="sm"
+              variant="outline"
+              loading={submitting}
+              onPress={submit}
+            />
+          }
+        >
+          {`${messageOf(costFailure.error)} O valor digitado continua no formulário.`}
+        </Alert>
+      ) : null}
       <FormActions>
         <Button label="Cancelar" variant="ghost" onPress={guard.cancel} disabled={submitting} />
         <Button label="Salvar produto" variant="strong" loading={submitting} onPress={submit} />

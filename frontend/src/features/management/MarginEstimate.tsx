@@ -31,6 +31,7 @@ export function MarginEstimate({
         <SummaryRow label="Lucro bruto estimado" value={money(estimate.unitGrossProfitCents)} />
         <SummaryRow
           label="Margem bruta estimada"
+          hint="Sobre o custo de referência"
           value={formatMargin(estimate.grossMarginBp)}
           strong
         />
@@ -39,19 +40,27 @@ export function MarginEstimate({
             O preço está abaixo do custo de referência.
           </Text>
         ) : null}
-        {averageCostCents !== null ? (
-          <View style={styles.real}>
+        <View style={styles.real}>
+          {averageCostCents === null ? (
             <SummaryRow
               label="Custo médio do estoque"
-              hint="Real: vem das compras recebidas e não muda aqui."
-              value={formatCents(averageCostCents)}
+              hint="Calculado ao receber compras. Até lá, a margem usa o custo de referência."
+              value="Ainda não calculado"
             />
-            <SummaryRow
-              label="Margem sobre o custo médio"
-              value={formatMargin(real.grossMarginBp)}
-            />
-          </View>
-        ) : null}
+          ) : (
+            <>
+              <SummaryRow
+                label="Custo médio do estoque"
+                hint="Real: vem das compras recebidas e não muda aqui."
+                value={formatCents(averageCostCents)}
+              />
+              <SummaryRow
+                label="Margem sobre o custo médio"
+                value={formatMargin(real.grossMarginBp)}
+              />
+            </>
+          )}
+        </View>
       </Stack>
     </View>
   );

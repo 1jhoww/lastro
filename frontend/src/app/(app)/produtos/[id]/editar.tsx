@@ -12,6 +12,7 @@ import { formToUpdate, productToForm } from '@/features/products/form';
 import { RequirePermission } from '@/features/session/RequirePermission';
 import { Screen } from '@/layout/Screen';
 import { useSession } from '@/session/SessionContext';
+import { ApiError } from '@/api/errors';
 import { useToast } from '@/ui';
 
 export default function EditProductRoute() {
@@ -52,6 +53,8 @@ function EditProduct() {
   );
 }
 
+const isConflict = (error: unknown) => error instanceof ApiError && error.code === 'CONFLICT';
+
 /**
  * A versão-base é a do momento em que o formulário abriu. Trocar a imagem aqui avança essa
  * base (é uma alteração desta mesma tela) sem remontar o formulário nem perder o que foi
@@ -75,6 +78,10 @@ function EditForm({
   const saveCost = useSaveReferenceCost();
   const [base, setBase] = useState(p);
   const [costBase, setCostBase] = useState(cost);
+  const [costFailure, setCostFailure] = useState<{
+    error: unknown;
+    productSaved: boolean;
+  } | null>(null);
   const [formKey, setFormKey] = useState(0);
 
   return (
@@ -86,6 +93,7 @@ function EditForm({
         editing
         showCost={costBase !== null}
         averageCostCents={costBase?.averageCostCents ?? null}
+        costFailure={costFailure}
         image={
           <ProductImageEditor
             product={p}
@@ -97,11 +105,12 @@ function EditForm({
           />
         }
         submitting={update.isPending || saveCost.isPending}
-        error={update.error ?? saveCost.error}
+        error={update.error ?? (costFailure || !isConflict(saveCost.error) ? null : saveCost.error)}
         onCancel={() => router.back()}
         onReload={async () => {
           update.reset();
           saveCost.reset();
+          setCostFailure(null);
           const fresh = (await onRefetch()).data;
           if (fresh) setBase(fresh);
           if (costBase) {
@@ -119,18 +128,28 @@ function EditForm({
           try {
             // O produto vai antes: se o custo falhar, salvar de novo reenvia só o custo.
             if (productChanged) setBase(await update.mutateAsync(body));
-            if (costChanged)
+          } catch {
+            return; // O erro fica visível no formulário.
+          }
+          const productSaved = productChanged || costFailure?.productSaved === true;
+          if (costChanged) {
+            try {
               setCostBase(
                 await saveCost.mutateAsync({
                   productId: p.id,
                   expectedVersion: costBase.version,
                   referenceCostCents: values.referenceCostCents,
+                  retry: costFailure !== null,
                 }),
               );
-          } catch {
-            return; // O erro fica visível no formulário.
+            } catch (error) {
+              // Conflito pede a versão atual, como no produto; o resto admite nova tentativa.
+              setCostFailure(isConflict(error) ? null : { error, productSaved });
+              return;
+            }
           }
-          if (productChanged || costChanged) toast.show('Produto salvo');
+          setCostFailure(null);
+          if (productSaved || costChanged) toast.show('Produto salvo');
           router.replace(`/produtos/${p.id}` as Href);
         }}
       />

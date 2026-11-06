@@ -21,7 +21,7 @@ import { canEditProductCost, costEventCopy, formatMargin } from './presentation'
 const money = (cents: number | null) => (cents === null ? 'Sem registro' : formatCents(cents));
 const marginBasis = {
   average: 'Sobre o custo médio do estoque',
-  reference: 'Sobre o custo de referência',
+  reference: 'Sobre o custo de referência, até a primeira compra recebida',
 };
 
 /** Custos e margem do produto. Só existe para quem tem permissão; preço de venda nunca muda aqui. */
@@ -53,13 +53,25 @@ export function ProductCostPanel({ productId }: { productId: string }) {
           <SummaryRow label="Preço de venda" value={formatCents(data.priceCents)} />
           <SummaryRow
             label="Custo médio do estoque"
-            hint="Real, das compras recebidas"
-            value={money(data.averageCostCents)}
+            hint={
+              data.averageCostCents === null
+                ? 'Calculado ao receber compras'
+                : 'Real, das compras recebidas'
+            }
+            value={
+              data.averageCostCents === null
+                ? 'Ainda não calculado'
+                : formatCents(data.averageCostCents)
+            }
           />
           <SummaryRow
             label="Custo de referência"
             hint="Informado manualmente"
-            value={money(data.referenceCostCents)}
+            value={
+              data.referenceCostCents === null
+                ? 'Não informado'
+                : formatCents(data.referenceCostCents)
+            }
           />
           <SummaryRow
             label="Lucro bruto por unidade"

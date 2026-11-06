@@ -119,6 +119,7 @@ describe('cadastro com custo', () => {
     await fill();
     expect(screen.getByText('Margem bruta estimada')).toBeTruthy();
     expect(screen.getAllByText('—').length).toBe(3);
+    expect(screen.getByText('Ainda não calculado')).toBeTruthy();
     await fireEvent.changeText(screen.getByLabelText('Custo de referência por un'), '600');
     expect(screen.getByText('40,00%')).toBeTruthy();
     expect(screen.getByText('R$ 4,00')).toBeTruthy();
@@ -161,19 +162,72 @@ describe('cadastro com custo', () => {
     expect(costCalls(w.server, 'PATCH')).toHaveLength(0);
   });
 
-  it('falha no custo não desfaz nem repete o cadastro', async () => {
+  const failing = async (onPatch: () => ReturnType<typeof ok> | ReturnType<typeof fail>) => {
     const w = world();
     created(w);
     w.server
-      .on('PATCH', '/api/v1/products/p1/costs', () => fail(500, 'INTERNAL'))
+      .on('PATCH', '/api/v1/products/p1/costs', onPatch)
       .on('GET', '/api/v1/products/p1/costs', () => ok(costs({ referenceCostCents: null })))
       .on('GET', '/api/v1/products/p1/cost-history', () => ok(page([])));
     await render(w, '/produtos/novo');
     await fill();
     await fireEvent.changeText(screen.getByLabelText('Custo de referência por un'), '600');
     await fireEvent.press(screen.getByRole('button', { name: 'Salvar produto' }));
-    expect(await screen.findByRole('header', { name: 'Produto p1' })).toBeTruthy();
+    expect(await screen.findByText('Custo não salvo')).toBeTruthy();
+    return w;
+  };
+
+  it('falha no custo avisa, guarda o valor e não oferece o formulário de novo', async () => {
+    const w = await failing(() => fail(500, 'INTERNAL'));
+    expect(screen.getByText('Produto "Produto p1" cadastrado')).toBeTruthy();
+    expect(screen.getByText('R$ 6,00')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: 'Salvar produto' })).toBeNull();
     expect(w.server.calls.filter((c) => c.method === 'POST')).toHaveLength(1);
+  });
+
+  it('nova tentativa reenvia só o custo e abre a ficha', async () => {
+    let attempts = 0;
+    const w = await failing(() =>
+      ++attempts === 1 ? fail(500, 'INTERNAL') : ok(costs({ version: 1 })),
+    );
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+    expect(await screen.findByRole('header', { name: 'Produto p1' })).toBeTruthy();
+    expect(attempts).toBe(2);
+    expect(w.server.calls.filter((c) => c.method === 'POST')).toHaveLength(1);
+  });
+
+  it('nova tentativa que falha continua na recuperação', async () => {
+    let attempts = 0;
+    const w = await failing(() => (++attempts, fail(503, 'UNAVAILABLE')));
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
+    await waitFor(() => expect(attempts).toBe(2));
+    expect(await screen.findByText('Custo não salvo')).toBeTruthy();
+    expect(screen.getByText('R$ 6,00')).toBeTruthy();
+    expect(w.server.calls.filter((c) => c.method === 'POST')).toHaveLength(1);
+  });
+
+  it('se a primeira gravação tiver chegado ao servidor, a nova tentativa não regrava', async () => {
+    let attempts = 0;
+    const w = world();
+    created(w);
+    w.server
+      .on('PATCH', '/api/v1/products/p1/costs', () => (++attempts, fail(500, 'INTERNAL')))
+      .on('GET', '/api/v1/products/p1/costs', () => ok(costs({ version: 1 })))
+      .on('GET', '/api/v1/products/p1/cost-history', () => ok(page([])));
+    await render(w, '/produtos/novo');
+    await fill();
+    await fireEvent.changeText(screen.getByLabelText('Custo de referência por un'), '600');
+    await fireEvent.press(screen.getByRole('button', { name: 'Salvar produto' }));
+    await fireEvent.press(await screen.findByRole('button', { name: 'Tentar novamente' }));
+    expect(await screen.findByRole('header', { name: 'Produto p1' })).toBeTruthy();
+    expect(attempts).toBe(1);
+  });
+
+  it('é possível continuar sem custo', async () => {
+    const w = await failing(() => fail(500, 'INTERNAL'));
+    await fireEvent.press(screen.getByRole('button', { name: 'Continuar sem custo' }));
+    expect(await screen.findByRole('header', { name: 'Produto p1' })).toBeTruthy();
+    expect(costCalls(w.server, 'PATCH')).toHaveLength(1);
   });
 
   it('sem custos no plano, o formulário continua como antes', async () => {
@@ -242,6 +296,16 @@ describe('edição de custo', () => {
     expect(screen.getByText('20,00%')).toBeTruthy(); // sobre o custo médio
     expect(screen.getByText('40,00%')).toBeTruthy(); // sobre a referência
     expect(screen.queryByLabelText(/Custo médio/)).toBeNull();
+    expect(screen.queryByText('Ainda não calculado')).toBeNull();
+  });
+
+  it('sem custo médio, avisa que ele ainda não foi calculado', async () => {
+    const w = editing();
+    await render(w, '/produtos/p1/editar');
+    await field();
+    expect(screen.getByText('Ainda não calculado')).toBeTruthy();
+    expect(screen.getByText(/a margem usa o custo de referência/)).toBeTruthy();
+    expect(screen.queryByText('Margem sobre o custo médio')).toBeNull();
   });
 
   it('se só o custo falhar, salvar de novo reenvia só o custo', async () => {
@@ -258,10 +322,40 @@ describe('edição de custo', () => {
     await fireEvent.changeText(await field(), '700');
     await fireEvent.changeText(screen.getByLabelText('Nome do produto'), 'Novo');
     await save();
-    expect(await screen.findByText('Não foi possível salvar')).toBeTruthy();
-    await save();
+    expect(await screen.findByText('Produto salvo, mas o custo não')).toBeTruthy();
+    expect(screen.getByLabelText('Custo de referência por un').props.value).toBe('R$ 7,00');
+    expect(screen.getByLabelText('Nome do produto').props.value).toBe('Novo');
+    await fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
     await waitFor(() => expect(attempts).toBe(2));
     expect(productPatches(w.server)).toHaveLength(1);
+  });
+
+  it('se só o custo mudou e falhou, a mensagem não fala em produto salvo', async () => {
+    const w = editing();
+    w.server.on('PATCH', '/api/v1/products/p1/costs', () => fail(500, 'INTERNAL'));
+    await render(w, '/produtos/p1/editar');
+    await fireEvent.changeText(await field(), '700');
+    await save();
+    expect(await screen.findByText('Custo não salvo')).toBeTruthy();
+    expect(screen.queryByText('Produto salvo, mas o custo não')).toBeNull();
+    expect(productPatches(w.server)).toHaveLength(0);
+  });
+
+  it('nova tentativa na edição não regrava o que já chegou ao servidor', async () => {
+    const w = editing();
+    let reads = 0;
+    let attempts = 0;
+    w.server
+      .on('GET', '/api/v1/products/p1/costs', () =>
+        ok(++reads === 1 ? costs() : costs({ referenceCostCents: 700, version: 4 })),
+      )
+      .on('PATCH', '/api/v1/products/p1/costs', () => (++attempts, fail(500, 'INTERNAL')));
+    await render(w, '/produtos/p1/editar');
+    await fireEvent.changeText(await field(), '700');
+    await save();
+    await fireEvent.press(await screen.findByRole('button', { name: 'Tentar novamente' }));
+    expect(await screen.findByRole('header', { name: 'Produto p1' })).toBeTruthy();
+    expect(attempts).toBe(1);
   });
 
   it('versão desatualizada pede recarga, sem sobrescrever', async () => {
@@ -307,8 +401,35 @@ describe('ficha do produto', () => {
 
   it('sem custo médio, a margem avisa que vem da referência', async () => {
     await detail(world());
-    expect(await screen.findByText('Sobre o custo de referência')).toBeTruthy();
+    expect(await screen.findByText(/^Sobre o custo de referência/)).toBeTruthy();
+    expect(screen.getByText('Ainda não calculado')).toBeTruthy();
+    expect(screen.getByText('Calculado ao receber compras')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Alterar custo' })).toBeTruthy();
+  });
+
+  it('sem nenhum custo, não inventa margem', async () => {
+    await detail(
+      world(),
+      costs({
+        referenceCostCents: null,
+        costBasis: null,
+        unitGrossProfitCents: null,
+        grossMarginBp: null,
+      }),
+    );
+    expect(await screen.findByText('Não informado')).toBeTruthy();
+    expect(screen.getByText('Ainda não calculado')).toBeTruthy();
+    expect(screen.getByText('Informe um custo para calcular')).toBeTruthy();
+  });
+
+  it('referência limpa com custo médio: a margem segue no custo real', async () => {
+    await detail(
+      world(),
+      costs({ referenceCostCents: null, averageCostCents: 800, costBasis: 'average' }),
+    );
+    expect(await screen.findByText('Não informado')).toBeTruthy();
+    expect(screen.getByText('R$ 8,00')).toBeTruthy();
+    expect(screen.getByText('Sobre o custo médio do estoque')).toBeTruthy();
   });
 
   it('quem só vê custos não recebe o botão de alterar', async () => {

@@ -54,7 +54,8 @@ export function Screen({
           paddingHorizontal: gutter,
         }}
         keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
+        // Na web, on-drag tira o foco a cada rolagem, inclusive a que o navegador faz ao digitar.
+        keyboardDismissMode={Platform.OS === 'web' ? 'none' : 'on-drag'}
       >
         <View style={styles.inner}>
           {masthead ?? null}

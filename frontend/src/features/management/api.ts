@@ -106,20 +106,24 @@ export function useSaveReferenceCost() {
   const { api, tenantId, header } = useTenantApi();
   const cache = useQueryClient();
   return useMutation({
-    mutationFn: ({
+    mutationFn: async ({
       productId,
+      retry,
       ...body
     }: {
       productId: string;
       expectedVersion: number;
       referenceCostCents: number | null;
-    }) =>
-      unwrap(
-        api.PATCH('/api/v1/products/{id}/costs', {
-          params: { header, path: { id: productId } },
-          body,
-        }),
-      ),
+      /** Nova tentativa: a falha anterior pode ter vindo depois de o servidor gravar. */
+      retry?: boolean;
+    }) => {
+      const params = { header, path: { id: productId } };
+      if (retry) {
+        const current = await unwrap(api.GET('/api/v1/products/{id}/costs', { params }));
+        if (current.referenceCostCents === body.referenceCostCents) return current;
+      }
+      return unwrap(api.PATCH('/api/v1/products/{id}/costs', { params, body }));
+    },
     onSuccess: () => cache.invalidateQueries({ queryKey: areaKey(tenantId) }),
   });
 }

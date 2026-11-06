@@ -1,6 +1,8 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useRouter, type Href } from 'expo-router';
+import { FormActions } from '@/features/catalog/FormParts';
 import { useCategoryLookup } from '@/features/categories/api';
+import { CommandError, Stack, SummaryRow } from '@/features/management/Parts';
 import { useSaveReferenceCost } from '@/features/management/api';
 import { canEditProductCost } from '@/features/management/presentation';
 import { RequirePermission } from '@/features/session/RequirePermission';
@@ -19,8 +21,9 @@ import {
 import { emptyProductForm, formToCreate } from '@/features/products/form';
 import type { Product } from '@/api/types';
 import { Screen } from '@/layout/Screen';
+import { formatCents } from '@/lib/money';
 import { useSession, useTenantApi } from '@/session/SessionContext';
-import { Alert, Panel, useToast } from '@/ui';
+import { Alert, Button, Panel, Text, useToast } from '@/ui';
 
 export default function NewProductRoute() {
   return (
@@ -40,8 +43,13 @@ function NewProduct() {
   const create = useCreateProduct();
   const store = useStoreProduct();
   const saveCost = useSaveReferenceCost();
-  // O produto já existe quando o custo é enviado: a falha não desfaz o cadastro nem o repete.
-  const costFailed = useRef(false);
+  // Set once the product exists and its cost failed: as with the image, the form is not offered
+  // again, so retrying can never create a duplicate product.
+  const [costRetry, setCostRetry] = useState<{
+    product: Product;
+    cents: number;
+    error: unknown;
+  } | null>(null);
   const [pendingImage, setPendingImage] = useState<PickedImage | null>(null);
   const [uploading, setUploading] = useState(false);
   // Set once the product exists and its image failed: the form is not offered again, so a
@@ -50,20 +58,18 @@ function NewProduct() {
   const [pickError, setPickError] = useState<string | null>(null);
 
   const open = (product: Product) => router.replace(`/produtos/${product.id}` as Href);
-  const finish = (message: string) =>
-    costFailed.current
-      ? toast.show('Produto cadastrado, mas o custo não foi salvo. Informe-o na ficha.', 'danger')
-      : toast.show(message);
-  const sendCost = async (product: Product, cents: number | null) => {
-    if (!showCost || cents === null) return;
+  const sendCost = async (product: Product, cents: number, retry = false) => {
     try {
       await saveCost.mutateAsync({
         productId: product.id,
         expectedVersion: 0,
         referenceCostCents: cents,
+        retry,
       });
-    } catch {
-      costFailed.current = true;
+      return true;
+    } catch (error) {
+      setCostRetry({ product, cents, error });
+      return false;
     }
   };
   const send = async (product: Product, image: PickedImage) => {
@@ -72,7 +78,7 @@ function NewProduct() {
     try {
       const next = await uploadProductImage(api, tenantId, product.id, image, product.version);
       store(next);
-      finish('Produto cadastrado com imagem');
+      toast.show('Produto cadastrado com imagem');
       open(next);
     } catch (error) {
       // O produto já existe: a falha na imagem não desfaz o cadastro e fica visível aqui.
@@ -81,6 +87,52 @@ function NewProduct() {
       setUploading(false);
     }
   };
+
+  // A imagem escolhida fica guardada e segue depois do custo, resolvido ou dispensado.
+  const afterCost = async (product: Product, message: string) => {
+    setCostRetry(null);
+    if (!pendingImage) {
+      toast.show(message);
+      return open(product);
+    }
+    await send(product, pendingImage);
+  };
+
+  if (costRetry)
+    return (
+      <Screen title="Novo produto">
+        <Alert tone="success" title={`Produto "${costRetry.product.name}" cadastrado`}>
+          {`SKU ${costRetry.product.sku}. Os dados estão salvos; falta só o custo.`}
+        </Alert>
+        <Panel title="Custo de referência">
+          <Stack>
+            <CommandError error={costRetry.error} title="Custo não salvo" />
+            <SummaryRow label="Custo informado" value={formatCents(costRetry.cents)} />
+            {pendingImage ? (
+              <Text variant="small">A imagem escolhida será enviada em seguida.</Text>
+            ) : null}
+            <FormActions>
+              <Button
+                label="Continuar sem custo"
+                variant="ghost"
+                disabled={saveCost.isPending || uploading}
+                onPress={() => void afterCost(costRetry.product, 'Produto cadastrado sem custo')}
+              />
+              <Button
+                label="Tentar novamente"
+                variant="strong"
+                loading={saveCost.isPending || uploading}
+                onPress={async () => {
+                  const { product, cents } = costRetry;
+                  if (await sendCost(product, cents, true))
+                    await afterCost(product, 'Produto cadastrado');
+                }}
+              />
+            </FormActions>
+          </Stack>
+        </Panel>
+      </Screen>
+    );
 
   if (saved && pendingImage)
     return (
@@ -105,7 +157,7 @@ function NewProduct() {
               await send(saved.product, picked);
             }}
             onSkip={() => {
-              finish('Produto cadastrado sem imagem');
+              toast.show('Produto cadastrado sem imagem');
               open(saved.product);
             }}
           />
@@ -142,12 +194,9 @@ function NewProduct() {
           if (create.isPending || saveCost.isPending || uploading) return;
           create.mutate(formToCreate(values), {
             onSuccess: async (product) => {
-              await sendCost(product, values.referenceCostCents);
-              if (!pendingImage) {
-                finish('Produto cadastrado');
-                return open(product);
-              }
-              await send(product, pendingImage);
+              const cents = showCost ? values.referenceCostCents : null;
+              if (cents !== null && !(await sendCost(product, cents))) return;
+              await afterCost(product, 'Produto cadastrado');
             },
           });
         }}
