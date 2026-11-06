@@ -23,7 +23,7 @@ Três ideias explicam quase todo o módulo:
 | Pagar um título | Sai dinheiro do caixa | O estoque |
 
 :::nota Entrada avulsa continua existindo
-Bonificação, amostra ou ajuste de abertura seguem em **Estoque › Registrar entrada**. A entrada avulsa não gera título e não muda o custo médio. Use Compras quando houver fornecedor e valor a pagar.
+Bonificação recebida de fornecedor, amostra ou ajuste de abertura seguem em **Estoque › Registrar entrada**. A entrada avulsa não gera título e não muda o custo médio. Use Compras quando houver fornecedor e valor a pagar.
 :::
 
 ## Cadastrar um fornecedor

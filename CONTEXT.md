@@ -132,6 +132,26 @@ _Avoid_: Pagamento, cancelamento.
 Registro de que o cliente recebeu um pedido expedido, separado da expedição; no máximo uma por pedido e sem efeito em estoque ou financeiro.
 _Avoid_: Expedição, romaneio assinado, entrega presumida.
 
+**Bonificação**:
+Mercadoria entregue a um cliente sem cobrança, sem faturamento nem recebível; vinculada a um pedido ou avulsa.
+_Avoid_: Desconto, venda a preço zero, bonificação de fornecedor (entrada avulsa de estoque).
+
+**Bonificação vinculada**:
+Bonificação de um pedido, que usa o id dele e acompanha sua confirmação, expedição e cancelamento.
+_Avoid_: Linha do pedido, item de valor zero.
+
+**Bonificação avulsa**:
+Bonificação sem pedido, com número próprio e motivo obrigatório, que sai do estoque ao ser confirmada.
+_Avoid_: Pedido fictício, ajuste de estoque.
+
+**Retorno de bonificação**:
+Volta total ou parcial de mercadoria bonificada que já saiu; vendável retorna ao físico, danificada não, sem efeito financeiro.
+_Avoid_: Devolução de pedido, estorno financeiro.
+
+**Bonificações concedidas**:
+Custo líquido de retornos do que foi bonificado no período; linha própria do resultado estimado, fora do faturamento e do custo das mercadorias vendidas.
+_Avoid_: Custo de mercadoria vendida, despesa operacional.
+
 **Visita comercial**:
 Atendimento manual a um cliente (presencial ou remoto), com responsável e data, que não exige pedido.
 _Avoid_: Pedido, entrega, tarefa agendada.
@@ -197,7 +217,7 @@ Regra que gera títulos a pagar por vencimento, sem duplicar por recorrência e 
 _Avoid_: Assinatura, título único.
 
 **Resultado estimado**:
-Lucro bruto menos despesas operacionais do período, para gestão.
+Lucro bruto menos despesas operacionais, mercadorias cobradas e não entregues e bonificações concedidas do período, para gestão.
 _Avoid_: Lucro líquido contábil.
 
 **Recebível**:

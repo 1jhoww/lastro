@@ -21,6 +21,8 @@ wordmark de `frontend/src/brand`).
 | `lastro-manual-contas-a-pagar.pdf` | Títulos, despesas, pagamentos, estornos, recorrências, categorias e créditos de fornecedores |
 | `lastro-manual-gestao-financeira.pdf` | Painel, saldo de caixa, fluxo projetado, resultado estimado e relatórios financeiros |
 | `lastro-manual-super-admin.pdf` | Equipe do Lastro: planos personalizados, módulos base, dependências, plano gratuito, vínculo de empresas, alteração de contrato, histórico |
+| `lastro-manual-bonificacoes.pdf` | Bonificação no pedido e avulsa, estoque, comprovante, retornos, custos e relatórios |
+| `lastro-manual-atualizacao-0-3.pdf` | Manual de atualização da versão 0.3: controle de bonificações |
 | `lastro-manual-atualizacao-0-2.pdf` | Manual de atualização da versão 0.2: só o que entrou em 5 e 6 de novembro de 2026 e como usar |
 | `lastro-apresentacao.pdf` | Apresentação do app em A4 paisagem (19 slides): visão geral, perfis, jornada da venda, um slide por módulo, Gestão, celular, planos, confiabilidade e manuais |
 

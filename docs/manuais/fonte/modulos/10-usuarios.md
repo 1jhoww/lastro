@@ -171,6 +171,7 @@ A carteira continua valendo: o vendedor só vê os próprios clientes e pedidos,
 | Pedidos | Gerar documentos | {pad} |
 | Pedidos | Gerenciar todos e cancelar | {nao} |
 | Pedidos | Aprovar descontos | {nao} |
+| Pedidos | Conceder bonificações | {lib} |
 | Clientes | Gerenciar carteira própria | {pad} |
 | Clientes | Gerenciar todos e carteiras | {nao} |
 | Visitas | Registrar e consultar | {pad} |

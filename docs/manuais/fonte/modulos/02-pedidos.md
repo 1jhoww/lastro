@@ -55,6 +55,8 @@ O pedido é montado em uma única página, com quatro partes: **Dados do pedido*
 9. Em **Finalização**, escreva as **Observações**, se houver (instruções de entrega, combinados com o cliente). Confira o resumo de cliente, itens, pagamento e o **Total do pedido**.
 10. Clique em [[Salvar rascunho]] para continuar depois, ou em [[Confirmar pedido]] para salvar e seguir direto para a confirmação.
 
+Para entregar produtos sem cobrança junto com a venda, use [[Adicionar bonificação]] em **Finalização**. Os itens ficam separados, não entram no total e não geram parcelas. O passo a passo está no manual de Bonificações.
+
 ![Tela de novo pedido: cliente e responsável no topo, busca de produtos à esquerda e carrinho à direita.](admin-pedido-novo-1280.png "sem-menu h=88")
 
 :::dica Preço e total são uma prévia

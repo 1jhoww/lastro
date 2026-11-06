@@ -60,7 +60,8 @@ Título em aberto só vira caixa quando o pagamento é registrado. Se os cliente
 | **Lucro bruto** | Faturamento menos o custo. Pedidos sem custo ficam fora, e o painel avisa. |
 | **Despesas operacionais** | Despesas avulsas e recorrentes, pela competência. |
 | **Mercadorias cobradas e não entregues** | Compras encerradas com cobrança integral. Só aparece quando existe. |
-| **Resultado estimado** | Lucro bruto, menos despesas, menos mercadorias não entregues. |
+| **Bonificações concedidas** | Custo do que foi entregue sem cobrança, já sem os retornos vendáveis. Só aparece quando existe. |
+| **Resultado estimado** | Lucro bruto, menos despesas, menos mercadorias não entregues, menos bonificações concedidas. |
 
 :::nota Por que a compra não aparece como despesa
 Comprar mercadoria troca dinheiro por estoque. O custo chega ao resultado quando a mercadoria é vendida.

@@ -31,6 +31,9 @@ Na tela, use [[Entender os saldos]] para ver essa legenda.
 | Pedido confirmado | Pedidos | Reserva: disponível diminui |
 | Pedido cancelado | Pedidos | Reserva liberada |
 | Saída registrada | Pedidos | Sai do físico e libera a reserva |
+| Bonificação vinculada | Pedidos | Reserva na confirmação, sai do físico na expedição |
+| Bonificação avulsa | Bonificações | Sai do físico ao confirmar o lançamento |
+| Retorno de bonificação | Bonificações | Vendável volta ao físico; danificado não volta |
 | Devolução recebida | Pedidos › Devoluções | Itens vendáveis voltam ao físico |
 
 ## Consultar o estoque
@@ -51,7 +54,7 @@ O **vendedor** vê apenas "Quanto há disponível para vender agora.", sem físi
 
 ## Registrar uma entrada de mercadoria
 
-Use quando chegar mercadoria do fornecedor. Quando o contrato inclui compras, mercadoria comprada entra por **Compras**, que gera as contas a pagar e atualiza o custo; a entrada avulsa fica para bonificações, amostras e saldo de abertura, e não muda o custo médio.
+Use quando chegar mercadoria do fornecedor. Quando o contrato inclui compras, mercadoria comprada entra por **Compras**, que gera as contas a pagar e atualiza o custo; a entrada avulsa fica para bonificações recebidas de fornecedores, amostras e saldo de abertura, e não muda o custo médio.
 
 1. Em [[Estoque]], clique em [[Registrar entrada]]. Na ficha de um produto, o botão já abre com o produto escolhido.
 2. Clique em [[Escolher produto]] e selecione o produto.
@@ -108,7 +111,7 @@ Se a conexão cair, clique em [[Tentar de novo]]: é seguro, não duplica. Ou cl
 
 ![Histórico de movimentações de estoque.](admin-estoque-movimentacoes-1280.png "sem-menu h=88")
 
-Cada linha mostra data, produto, tipo, quantidade, **Saldo após** e **Motivo e responsável**. Movimentações de pedidos aparecem como automáticas. Responsáveis aparecem como "Você" ou por um código.
+Cada linha mostra data, produto, tipo, quantidade, **Saldo após** e **Motivo e responsável**. Movimentações de pedidos e de bonificações aparecem como automáticas. Responsáveis aparecem como "Você" ou por um código.
 
 ## Reposição (administrador)
 
